@@ -1,0 +1,97 @@
+---
+name: review-pr
+description: Use when the user asks to review a pull request or the current branch from multiple angles, or to disposition / reply-and-resolve threads from a previous review — GitHub or Azure DevOps. Detect the platform from the origin remote and load the matching references file before starting.
+---
+
+# Review PR — Two-Pass Multi-Axis Review (review + verify, post only on request)
+
+One invocation, two passes, no posting. Pass 1 is a multi-axis review: parallel single-axis subagents against a pinned worktree, plus a mutation-testing agent in its own worktree. Pass 2 is fresh-eyes verification: by default ONE clean-context subagent re-verifies every finding and sweeps for misses; a deeper blind-re-review + isolated-skeptics mode runs only when the user explicitly asks for a deep review or the repo-nuances memory pins it. Findings go to an MD file — **not into chat**. Posting happens **only when the user asks in a later message**.
+
+## 0. Platform
+
+Detect from `git remote get-url origin` and read the matching reference **before starting** (it defines PR discovery, dedupe mechanics, anchor rules, and posting):
+
+- `github.com` → `references/github.md`
+- `dev.azure.com` / `visualstudio.com` → `references/ado.md`
+
+## 1. Scope & setup
+
+1. **Check project memory first** for a `review-repo-nuances` entry — it records this repo's gate commands, mutation-axis test command, bot reviewers to dedupe against, PR conventions, and any depth pins (e.g. deep-mode Pass 2, no small-diff shortcut). If it doesn't exist, discover those from the repo's CLAUDE.md / CI config during the review and **save such a memory** (+ MEMORY.md index line) before finishing.
+2. Never switch the user's branch. Identify the PR first via the platform reference — the user may give a branch, a PR number, or a URL — and record its head SHA and target branch. Then `git fetch origin <branch>` for the PR's head branch (works for branches never fetched). Every later step pins to the head SHA.
+3. Diff = `git diff $(git merge-base origin/<base> <head>)...<head>` where `<base>` is the PR's target branch (default branch if no PR exists). Read the PR body too: claims it makes about content ("includes X") are auditable and sometimes stale.
+4. **Dedupe against existing review surface first**: pull existing comment threads (platform reference has the mechanics) from all authors — humans and bots. Don't re-raise what's already raised; verify that "resolved" items are actually fixed in the current code — a resolved thread with the bug still present is a top finding.
+5. Create two detached worktrees at the head SHA in the session scratchpad: `review-<id>-read` for all reading agents, `review-<id>-mut` for the mutation agent (it edits files — it never shares a tree with readers). `<id>` = the PR id if one exists, otherwise the branch name with `/` replaced by `-`; the same `<id>` names the output MD later. Remove both worktrees (`git worktree remove --force`) when done.
+
+## 2. Finding format (all passes)
+
+- **Issues only** — no praise, no confirmed non-issues in the final findings or in posted comments (the MD's Pass 2 verdict log does record REFUTED entries with reasons — that's its job; chat may mention non-issues).
+- Grade **major / medium / minor**. Each finding: Title / `file:line` (at the head SHA) / `Problem:` / `Suggestion:` — one problem, one single best fix, no hedged fallbacks (a fork is allowed only when the right fix depends on author intent). When the fix is an exact replacement of a small run of contiguous lines, the Suggestion records the replacement snippet, the exact replaced line range, **and the original content of those lines** (section 6's staleness check compares against it) — at posting time it becomes a one-click appliable suggestion block if the section 6 rules allow it (they don't for relocated anchors or large replacements).
+- Tone: **polite**, mechanism-first, no editorializing ("pure waste", "rot", "tautological" banned); acknowledge documented-deliberate decisions before questioning them; conventions phrased as "the repo's convention asks"; the goal is fixes, not a verdict.
+- Walk each finding through its mechanism: what happens → why it matters → the fix. The reader must not need follow-up questions.
+- **Write comment bodies human-first, never as one chained sentence** (learned from a real PR review — a Suggestion chaining three actions with commas/em-dashes had to be re-posted): a Problem stacking 3+ facts renders them as a bulleted list; a Suggestion with more than one action becomes a numbered list ("Suggestion — two edits:"), one action per item; multi-step procedures are numbered steps, never arrow chains (A → B → C). Test: the author should be able to act on each item without re-reading the sentence it came from. Fixing an already-posted comment: edit in place (`gh api -X PATCH .../pulls/comments/<id>` / ADO thread update), no correction trail, and record the edit + timestamp in the findings MD.
+- Each finding must be **self-contained and actionable**. No deferrals to "a later PR". No offers of the user's help.
+- **Write in the user's voice** — everything posted goes out under their account and must read as theirs.
+- **Never flag AI-attribution trailers** (`Co-Authored-By: Claude ...`, "Generated with" footers) in a teammate's commits or PR body — the no-AI-attribution rule is the user's personal convention for their OWN git artifacts only.
+- Treat `TODO` comments as intentional future work — **do not challenge them**. **Omit locale files** from the review.
+- **Generated plan documents are read-only context, never a finding target** (learned from a real PR review): a `docs/plans/**` artifact — typically an HTML plan emitted by the planning tool — is produced upstream of the diff, so a defect in it is fixed in the generator, not by the PR author. Read it to learn what the implementation was *supposed* to do and audit the code against that intent; never raise a finding against the plan file itself, and never count its own inconsistencies as diff defects. The same rule applies to any other tool-generated artifact the PR merely carries along.
+
+## 3. Pass 1 — multi-axis review
+
+For small diffs (roughly < 300 changed lines) review inline yourself (the mutation axis still applies if tested logic changed). Otherwise dispatch parallel single-axis subagents, each given the section-2 format rules, the read worktree path, and the head SHA — which its report must name back (a report that doesn't name the commit is unverified: re-dispatch that axis once; if still missing, discard its findings):
+
+- **Correctness** — logic bugs, edge cases, argument/flag handling, cross-platform assumptions.
+- **Security / input handling** — injection, traversal, credential leakage, unvalidated input. Only when the diff touches servers, child processes, auth, or file IO. Calibrate: a loopback-only dev tool's flaw is minor, not major.
+- **Test quality** — fixture honesty (could anything the fixture does fail the test?), non-default config values, coverage gaps, CI wiring (do the new tests actually run from the root pipeline?).
+- **Doc-vs-code audit** — when the PR carries docs/specs/READMEs claiming what the code does: verify every claim against source; flag documented-but-absent and load-bearing-but-undocumented. Docs rot faster than code and nothing else checks them. Sweep doc-vs-**doc** and comment-vs-comment too: **a contradiction between two statements is an unresolved factual question about the system, not a tidiness defect.** Never write the finding as "these two disagree, please align them" — that offers a choice between strings and says nothing about which describes reality. Determine which is true (empirically, if the system is reachable), lead with the substantive consequence, and if the repo cannot settle it, say so and name the check that would. Weight a contradiction higher when the two sides imply different runtime behaviour — which endpoint, which identity, which order — than when they differ only in wording; the first is a live defect wearing a documentation costume.
+- **Repo conventions & gates** — the target repo's own CLAUDE.md rules, guideline-doc trees, and CI gate commands (the repo-nuances memory from section 1 records where these live); this axis may install deps and run those gates **in the read worktree only** (untracked artifacts only, never edits).
+
+Pick only the axes the diff shape justifies; if the user names an area to review explicitly, honor that. Axis diversity beats axis count: five reviewers reading the same way find the same bugs five times.
+
+### Mutation-testing axis (own worktree, runs alongside the readers)
+
+Highest-yield axis for any PR that adds or changes tested logic — it finds correct-but-unpinned code no reader can see. Protocol, exactly (past runs were invalidated by mutations that never applied and test runs that never executed):
+
+1. **Baseline:** run the standard test command in the mutation worktree; record count and duration. Red baseline → report and stop this axis.
+2. **Pick ~10–15 targeted mutations** at decision points: comparison flips (`>` ↔ `>=`), boundary constants, sort comparators, exit codes, emitted field names, filter conditions, arithmetic denominators.
+3. **One at a time:** apply via Edit with an `old_string` unique to the target line — a failed Edit means the mutation never applied; never count it. Re-run tests; compare duration and count to baseline (a millisecond run did not execute). Record KILLED (naming the failing test) or SURVIVED. Revert; verify `git status --porcelain` clean before the next.
+4. **Every survivor is a finding:** exact before→after, the real bug class it simulates, and the specific missing assertion as the suggestion.
+5. **All-killed is suspicious** — re-apply one mutation and watch it fail before believing the run.
+
+**Grade survivors as test gaps, not live defects:** caps at medium (core outputs, gates, stats primitives), else minor.
+
+## 4. Pass 2 — fresh-eyes verification, then personal checks
+
+Consolidate and dedupe axis findings into a draft (axis reviewers and the mutation agent often flag the same gap — merge, keeping the mutation's concrete evidence). Then verify:
+
+**Default:** dispatch ONE clean-context fresh-eyes subagent with the draft, the read worktree path, and the pinned head SHA (it must not redo section-1 setup): for every draft finding it re-derives the mechanism from source and returns CONFIRMED / REFUTED (with evidence) / ADJUSTED (severity, anchor, scope), then sweeps the whole diff once more for what all axes missed. Both directions matter — past passes killed false positives AND found real bugs every time.
+
+**Deep mode — only when the user explicitly asks for it ("deep review", "thorough", "paranoid") or the repo-nuances memory pins it for the repo:** replace the single verifier with two isolated jobs, dispatched concurrently:
+
+1. **Blind fresh re-review (miss check):** ONE subagent given the sections 1–2 scope/format instructions, the read worktree path, and the pinned SHA but **none of the draft** — a verifier that has read the draft is anchored by it; this one hasn't. It reviews from scratch and returns its own graded findings; those absent from the draft are additions and go through the same skeptic check before acceptance.
+2. **Isolated skeptics:** one skeptic subagent per draft finding, seeing **only that finding** plus the relevant code, prompted to refute it; verdicts as above. Findings sharing a code locus (same file AND same function / overlapping lines) may share one skeptic — max 3 per group, a separate verdict per finding, and it may recommend merging facets of one issue. Never group by theme, axis, or severity — a skeptic must never see the review's breadth.
+
+Then merge in the main conversation (both modes):
+
+- **Drop** REFUTED findings; **re-grade** where an ADJUSTED verdict is convincing; sweep/blind-review additions join the final list only after surviving verification — in deep mode the skeptic check; in default mode the personal grep-verify below is the additions' gate (re-derive the mechanism yourself, not just the anchor).
+- **Personally grep-verify** every surviving finding's mechanism and `file:line` anchor against the pinned SHA before writing the MD — subagent citations are necessary but not sufficient.
+- **Anchor validation:** run the platform reference's anchor rules (GitHub rejects inline comments outside the diff; ADO does not).
+
+## 5. Output — MD file, not chat
+
+Save `review-findings-<id>.md` in the repo root (untracked), using the `<id>` from section 1. Header line first: PR id/URL, the reviewed head SHA, and the target branch — posting-time re-verification keys off that SHA. Sections:
+
+1. **Pass 1 findings** — the draft list, graded.
+2. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
+3. **Final findings** — the merged list, organized by severity.
+
+In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"). **Do not restate the findings in chat.** Finish by telling the user that saying "post" (or similar) will publish the final findings to the PR.
+
+## 6. Posting (only when the user asks in a later message)
+
+- **Re-verify first:** re-resolve the PR and compare its current head (`headRefOid` / `lastMergeSourceCommit`) to the head SHA recorded in the MD header; if the author pushed, `git fetch origin <branch>` and re-validate anchors at the new head before posting — and for each suggestion block, re-read the spanned lines at the new head: if they differ from the finding's recorded original lines, drop the block (the prose fix stays) — applying a stale block silently overwrites the author's newer code.
+- Post per the platform reference. Shared rules regardless of platform:
+  - Every posted comment is one self-contained, actionable finding — the team processes PR comments agentically. **No overall / summary / "great job" / non-actionable comments.** Every finding gets its **own inline thread** — never merge several minors into one comment (how threads are packaged into submissions is the platform reference's concern; GitHub's no-changed-line fallback to the review body is the one sanctioned exception).
+  - **Suggestion blocks:** a finding whose fix is an exact replacement of a **small run of contiguous lines (roughly ≤10)** carries a one-click appliable suggestion block (mechanics per platform reference — anchoring rules differ and both platforms apply the block over the comment's anchor, so the anchor must span exactly the replaced lines). Before attaching, verify the spanned lines at the head SHA are byte-identical to the lines the finding recorded as replaced. Design-level fixes, multi-location fixes, larger replacements (describing the change is the review's job — writing it out is the author's), and findings whose true lines can't be anchored stay prose-only.
+  - **Never post a test/ping comment to verify connectivity.** Post the first real finding directly and diagnose errors from its response.
+  - After posting, confirm each thread is live at the right `file:line`, and update the MD to match **exactly** what was posted.
+- The MD is the later reply-and-resolve reference. On a disposition ask (often a fresh session), use `review-findings-<id>.md` as the checklist and verify each fix actually landed in the code — not just that the author replied — before resolving. **A contradiction "fixed" by deleting one side is not a fix** — it closes the thread without answering which side was true, and in a diff it looks identical to a real fix. Confirm the surviving statement is the correct one before resolving. **Every** thread gets a reply + resolve — including deferrals and false positives (the reply carries the reasoning); never leave one open as an informal tracker. Follow the target repo's own PR-workflow conventions where they exist.
