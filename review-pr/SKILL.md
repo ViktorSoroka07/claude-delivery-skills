@@ -41,11 +41,28 @@ For small diffs (roughly < 300 changed lines) review inline yourself (the mutati
 
 - **Correctness** — logic bugs, edge cases, argument/flag handling, cross-platform assumptions.
 - **Security / input handling** — injection, traversal, credential leakage, unvalidated input. Only when the diff touches servers, child processes, auth, or file IO. Calibrate: a loopback-only dev tool's flaw is minor, not major.
-- **Test quality** — fixture honesty (could anything the fixture does fail the test?), non-default config values, coverage gaps, CI wiring (do the new tests actually run from the root pipeline?).
+- **Test quality** — fixture honesty (could anything the fixture does fail the test?), non-default config values, coverage gaps, CI wiring (do the new tests actually run from the root pipeline?). **Normally folded into the mutation axis** — a reader guessing which tests are weak duplicates what mutation measures. Dispatch it separately only when tests changed but no source did, or when CI wiring is the question.
 - **Doc-vs-code audit** — when the PR carries docs/specs/READMEs claiming what the code does: verify every claim against source; flag documented-but-absent and load-bearing-but-undocumented. Docs rot faster than code and nothing else checks them. Sweep doc-vs-**doc** and comment-vs-comment too: **a contradiction between two statements is an unresolved factual question about the system, not a tidiness defect.** Never write the finding as "these two disagree, please align them" — that offers a choice between strings and says nothing about which describes reality. Determine which is true (empirically, if the system is reachable), lead with the substantive consequence, and if the repo cannot settle it, say so and name the check that would. Weight a contradiction higher when the two sides imply different runtime behaviour — which endpoint, which identity, which order — than when they differ only in wording; the first is a live defect wearing a documentation costume.
 - **Repo conventions & gates** — the target repo's own CLAUDE.md rules, guideline-doc trees, and CI gate commands (the repo-nuances memory from section 1 records where these live); this axis may install deps and run those gates **in the read worktree only** (untracked artifacts only, never edits).
 
-Pick only the axes the diff shape justifies; if the user names an area to review explicitly, honor that. Axis diversity beats axis count: five reviewers reading the same way find the same bugs five times.
+### Axis triage — choose from the diff, never run the set
+
+Running every axis on every diff is the default failure mode, and it is expensive: on a 750-line branch, eight agents cost more than the findings were worth, and most of the overlap was redundant reading. Axis diversity beats axis count — five reviewers reading the same way find the same bugs five times.
+
+Choose by trigger, and **state the chosen axes and why in one line before dispatching**, so the cost is visible and the user can add or drop one:
+
+| Axis | Dispatch when |
+| --- | --- |
+| **Mutation** | tested logic changed — always first, and the only axis that measures rather than reads |
+| **Correctness** | non-trivial logic, control flow, or arithmetic changed; skip for renames, config, copy |
+| **Doc-vs-code** | the diff carries docs, specs, or a plan rewritten as a shipped spec, making behavioural claims |
+| **Resource / security** | child processes, auth, file IO, network, or untrusted content reaching logs |
+| **Repo conventions** | diff over ~400 lines, or it touches a subsystem with its own CLAUDE.md — below that, just run the gates yourself, which is cheaper than an agent reading the guideline tree |
+| **Test quality** | tests changed but source did not (otherwise the mutation axis covers it) |
+
+If the user names an area to review explicitly, honor that on top of the triage. If the user asks for a deep or exhaustive review, run the full set.
+
+Calibration from a real run: on a real branch, mutation + correctness + doc-vs-code + resource — four agents rather than eight — would have found every finding that mattered, including the two the resource trigger fired on legitimately (child-process output reaching an on-disk log).
 
 ### Mutation-testing axis (own worktree, runs alongside the readers)
 
@@ -62,6 +79,8 @@ Highest-yield axis for any PR that adds or changes tested logic — it finds cor
 ## 4. Pass 2 — fresh-eyes verification, then personal checks
 
 Consolidate and dedupe axis findings into a draft (axis reviewers and the mutation agent often flag the same gap — merge, keeping the mutation's concrete evidence). Then verify:
+
+**Run the verifier when Pass 1 produced a major finding, or more than ~5 findings in total.** Below that threshold, grep-verify the findings yourself against the pinned SHA — the personal check in section 4 is required either way.
 
 **Default:** dispatch ONE clean-context fresh-eyes subagent with the draft, the read worktree path, and the pinned head SHA (it must not redo section-1 setup): for every draft finding it re-derives the mechanism from source and returns CONFIRMED / REFUTED (with evidence) / ADJUSTED (severity, anchor, scope), then sweeps the whole diff once more for what all axes missed. Both directions matter — past passes killed false positives AND found real bugs every time.
 
