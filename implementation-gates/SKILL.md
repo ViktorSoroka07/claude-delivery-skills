@@ -1,38 +1,31 @@
 ---
 name: implementation-gates
-description: Use when implementation work is about to be called done — at the end of an executing-plans run, before finishing-a-development-branch, before opening a PR, or before any "complete" claim. Runs the repo's own gates, then proves the new tests can actually fail and that every claim the plan made about outside behaviour is true. Also use when writing a plan, to fix its ground-truth claims before they become design decisions.
+description: Use when implementation work is about to be called done, after the repo's own gates have passed — proves the new tests could actually fail, that the plan's claims about outside systems are true, and that any written verification record states only what ran. Also use while writing a plan or spec, to settle its external claims before they become design decisions.
 ---
 
 # Implementation Gates
 
-`superpowers:verification-before-completion` enforces **honesty**: never claim a gate passed without running it. This skill enforces **sufficiency**: a suite that honestly, verifiably passes can still be too weak to catch the defect you just introduced.
+**This skill does not run the repo's gates or police completion claims.** The repo's own `verification-before-completion` owns both — use it, do not restate it here.
 
-Both failures below shipped on a branch whose gates were green and truthfully reported:
+What it adds is the step after: a suite that honestly, verifiably passes can still be too weak to catch the defect you just introduced. Both failures below shipped on a branch whose gates were green and truthfully reported.
 
 - Thirteen mutations survived. Every new test passed; several passed identically against the pre-change code.
 - A design decision rested on what a CLI's `result` frame contains. The plan argued the point coherently for three sentences and was wrong. One read-only query against the local database settled it.
 
 Green is not the bar. **Would it have gone red** is the bar.
 
-## Gate 1 — the repo's own gates
+## Gate 1 — mutation sweep over what you just wrote
 
-Read the repo's `CLAUDE.md` (root, plus any in the directories you touched) for the gate commands and the test runner. Never guess them, and never substitute a faster command.
+The repo already mandates red-green: write the test, revert the fix, watch it fail. That covers **a regression test for a bug that existed**. It says nothing about new feature code, where there is no fix to revert — and that is where survivors live.
 
-Run each, read the real exit status, and quote failures. Two traps:
+Ten to twelve mutations, targeted at the lines this change introduced. Not a whole-file sweep.
 
-- **Never grep a gate for a tally.** `Tasks: 8 successful, 11 total` contains the word "successful" and is a failure.
-- **A suspiciously instant run did not execute.** Compare duration against a known baseline; a cached turbo task is not evidence.
-
-## Gate 2 — mutation sweep on what you just wrote
-
-The only axis that measures test strength instead of guessing at it. Ten to twelve mutations, targeted at the lines this change introduced — not a whole-file sweep.
-
-**Protocol** (past runs were invalidated by mutations that never applied and test runs that never executed):
+**Protocol** — past runs were invalidated by mutations that never applied and test runs that never executed:
 
 1. Green baseline first — record test count *and* duration.
-2. One mutation at a time, applied with an `old_string` unique to the target line. **A failed edit means the mutation never applied — never count it as killed.**
+2. One at a time, applied with an `old_string` unique to the target line. **A failed edit means the mutation never applied — never count it as killed.**
 3. Re-run; compare count and duration to baseline. Record KILLED (name the failing test) or SURVIVED.
-4. Revert; confirm the tree is clean before the next one.
+4. Revert; confirm the tree is clean before the next.
 5. **All-killed is suspicious.** Re-apply one and watch it fail before believing the run.
 
 **Aim at the classes that actually survive.** Each of these shipped green in real work:
@@ -48,34 +41,35 @@ The only axis that measures test strength instead of guessing at it. Ten to twel
 
 **Every survivor is a test gap, not a live defect** — cap the severity accordingly, and fix it by adding the missing assertion.
 
-## Gate 3 — ground-truth check on outside claims
+## Gate 2 — ground-truth check on outside claims
 
-Do this **at plan time** if you can, and again before declaring done. It is the cheapest gate here and it catches the most expensive class of defect: one that is correct against the plan and wrong against the world.
+Cheapest gate here, and it catches the most expensive class: a change that is correct against the plan and wrong against the world. **Do this at plan time if you can** — after implementation, the code has already been built faithfully on the wrong premise.
 
 List every claim the design rests on about behaviour you did not write — what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it, then run it.
 
-Order of evidence, best first:
+Evidence, best first:
 
 1. **Real data** — query the local database read-only, read a captured fixture, run the tool once and look.
-2. **An existing consumer** — grep for code that already depends on the answer; it encodes the truth and its comments often state it.
-3. **Documentation** — including your own repo's.
-4. **Inference from a coherent argument** — this is not evidence. A three-sentence justification that never touches reality is exactly how the expensive defects arrive.
+2. **An existing consumer** — code that already depends on the answer encodes the truth, and its comments often state it.
+3. **Documentation**, including your own repo's.
+4. **A coherent argument** — this is not evidence. An internally consistent, unambiguous, in-scope claim can still be false, and that is precisely how the expensive defects arrive.
 
-If a claim cannot be settled, say so explicitly, name the check that would settle it, and choose the option that fails safe.
+If a claim cannot be settled, say so, name the check that would settle it, and choose the option that fails safe.
 
-## Gate 4 — the verification record says only what happened
+## Gate 3 — written records state only what ran
 
-If you write a verification section into a plan, spec, or PR body, every line must be something you executed.
+Distinct from claims made in conversation, which the repo's skill already governs. This is about verification sections written into plans, specs, and PR bodies, where they outlive the session and are read as fact.
 
-- Ran six mutations? Say six. Do not generalise to "no test survives reverting the behaviour it covers" — that is a claim about a suite, and a wider run will contradict it.
-- Could not check something? Write **what** was not verified, **why**, and **the check that would settle it**. A wrong reason is worse than no reason: it makes a reachable check look unreachable and nobody retries it.
+- Ran six mutations? Say six. Do not generalise to "no test survives reverting the behaviour it covers" — that is a claim about a whole suite, and a wider run will contradict it.
+- Could not check something? Write **what** was not verified, **why**, and **the check that would settle it**. A wrong reason is worse than no reason: it makes a reachable check look unreachable, and nobody retries it.
 
 ## Red flags
 
 | Thought | Reality |
 | --- | --- |
 | "Tests pass, so the tests are good" | They passed before the fix too, in the cases that matter |
-| "I wrote a test alongside the fix" | It was shaped by the fix. Name the old rule and the new rule and check the fixture separates them |
+| "I wrote a test alongside the fix" | It was shaped by the fix. Name the old rule and the new rule, and check the fixture separates them |
+| "Red-green covered it" | Only for a bug that existed. New code has no fix to revert |
 | "The plan says the API behaves this way" | The plan is not a source. Find one |
 | "It's obvious what this field means" | Two writers to one column disagreed about exactly that |
 | "Mutation testing is for the review" | It costs a fraction here, where the context is already loaded |
