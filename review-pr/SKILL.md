@@ -66,7 +66,11 @@ Calibration from a real run: on a real branch, mutation + correctness + doc-vs-c
 
 ### Mutation-testing axis (own worktree, runs alongside the readers)
 
-Highest-yield axis for any PR that adds or changes tested logic — it finds correct-but-unpinned code no reader can see. Protocol, exactly (past runs were invalidated by mutations that never applied and test runs that never executed):
+Highest-yield axis for any PR that adds or changes tested logic — it finds correct-but-unpinned code no reader can see.
+
+**If the branch's plan carries an executed implementation-gates record** — a mutation table naming each edit and the test that killed it — audit it instead of re-buying it: re-apply 2–3 of the recorded mutations and watch them fail, then spend fresh mutations only on changed lines the record does not cover. A record that survives the spot-check is trusted; one that does not is itself a finding (a written verification claim the tree contradicts).
+
+Protocol for the fresh mutations, exactly (past runs were invalidated by mutations that never applied and test runs that never executed):
 
 1. **Baseline:** run the standard test command in the mutation worktree; record count and duration. Red baseline → report and stop this axis.
 2. **Pick ~10–15 targeted mutations** at decision points: comparison flips (`>` ↔ `>=`), boundary constants, sort comparators, exit codes, emitted field names, filter conditions, arithmetic denominators.
@@ -114,3 +118,13 @@ In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 a
   - **Never post a test/ping comment to verify connectivity.** Post the first real finding directly and diagnose errors from its response.
   - After posting, confirm each thread is live at the right `file:line`, and update the MD to match **exactly** what was posted.
 - The MD is the later reply-and-resolve reference. On a disposition ask (often a fresh session), use `review-findings-<id>.md` as the checklist and verify each fix actually landed in the code — not just that the author replied — before resolving. **A contradiction "fixed" by deleting one side is not a fix** — it closes the thread without answering which side was true, and in a diff it looks identical to a real fix. Confirm the surviving statement is the correct one before resolving. **Every** thread gets a reply + resolve — including deferrals and false positives (the reply carries the reasoning); never leave one open as an informal tracker. Follow the target repo's own PR-workflow conventions where they exist.
+
+## 7. Applying findings (only when the user asks)
+
+Applying is a separate ask, like posting — never apply automatically after a review. When asked:
+
+- Work on the PR branch in the user's working tree; commit nothing unless told to. Author-owned records — a review-resolution spec, rationale only the author can state — are drafted **untracked** and named as drafts: they are the author's to write, not to find committed.
+- **Run every new test against the pre-fix code first; it must fail there**, with the finding's own mechanism as the expected failure. A fix-shaped test that never went red proves nothing.
+- Where the fix that lands differs from the finding's suggestion on contact with the code, record the delta and the reason in the findings MD — a posted review must not promise a fix the tree contradicts.
+- Re-run the repo's gates after the last change and record the counts.
+- Extend the findings MD with an applied section: what landed, what was **verified rather than assumed**, and a **Not closed** list for anything the fixes could not truly close. Never mark a finding closed because an edit near it landed.

@@ -20,7 +20,7 @@ Read it fully before touching anything. Then check two things:
 ### Task N: Implementation gates
 
 - [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; every survivor is a missing assertion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation changing no observable behaviour is not a gap), every real survivor is a missing assertion
 - [ ] Re-check the spec's ground-truth claims against what shipped
 - [ ] Write only what was executed into any verification section
 ```
@@ -48,6 +48,8 @@ Report survivors honestly. A survivor is a test gap to close, not a defect to ar
 ## Step 5 — Finish
 
 Hand off to the repo's `finishing-a-development-branch`.
+
+Before reporting done, update the project memory: refresh the repo-nuances entry if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what merged, what is parked, which decisions are provisional. Update existing memory files over creating duplicates.
 
 Then tell the user that review is a separate, billable decision: `/review-pr` triages its axes, and a small diff may not warrant one at all.
 

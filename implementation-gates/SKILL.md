@@ -39,7 +39,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 | Branch arms | delete a new `case` — falls through to a default that usually means "fine" |
 | Boundaries, comparators, denominators | `>` ↔ `>=`, sort order, `/ 1000` → `/ 100` |
 
-**Every survivor is a test gap, not a live defect** — cap the severity accordingly, and fix it by adding the missing assertion.
+**Screen survivors for equivalence, then treat the rest as test gaps, not live defects** — a mutation that changes no observable behaviour (a guard duplicated by a downstream consumer, a defensive clause every caller pre-filters) is an equivalent mutant, not a gap. Cap the severity accordingly, and fix each real gap by adding the missing assertion.
 
 ## Gate 2 — ground-truth check on outside claims
 
