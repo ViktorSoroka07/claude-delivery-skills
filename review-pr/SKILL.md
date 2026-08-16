@@ -71,7 +71,7 @@ Highest-yield axis for any PR that adds or changes tested logic — it finds cor
 1. **Baseline:** run the standard test command in the mutation worktree; record count and duration. Red baseline → report and stop this axis.
 2. **Pick ~10–15 targeted mutations** at decision points: comparison flips (`>` ↔ `>=`), boundary constants, sort comparators, exit codes, emitted field names, filter conditions, arithmetic denominators.
 3. **One at a time:** apply via Edit with an `old_string` unique to the target line — a failed Edit means the mutation never applied; never count it. Re-run tests; compare duration and count to baseline (a millisecond run did not execute). Record KILLED (naming the failing test) or SURVIVED. Revert; verify `git status --porcelain` clean before the next.
-4. **Every survivor is a finding:** exact before→after, the real bug class it simulates, and the specific missing assertion as the suggestion.
+4. **Screen each survivor for equivalence before filing** — a mutation a correct implementation could also produce is not a test gap (recurring shapes: a guard duplicated by a downstream consumer, an opaque id used symmetrically on both halves of a pair, statement order the framework batches anyway, a defensive clause every caller pre-filters). **Every non-equivalent survivor is a finding:** exact before→after, the real bug class it simulates, and the specific missing assertion as the suggestion.
 5. **All-killed is suspicious** — re-apply one mutation and watch it fail before believing the run.
 
 **Grade survivors as test gaps, not live defects:** caps at medium (core outputs, gates, stats primitives), else minor.
