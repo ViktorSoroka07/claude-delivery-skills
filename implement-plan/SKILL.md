@@ -49,7 +49,7 @@ Report survivors honestly. A survivor is a test gap to close, not a defect to ar
 
 Hand off to the repo's `finishing-a-development-branch`.
 
-Before reporting done, update the project memory: refresh the repo-nuances entry if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what merged, what is parked, which decisions are provisional. Update existing memory files over creating duplicates.
+Before reporting done, update the project memory: refresh the repo-nuances entry if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what merged, what is parked, which decisions are provisional. In repos that do not commit plan documents, always record where this task's executed gates record lives (plan path, branch, date), so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
 
 Then tell the user that review is a separate, billable decision: `/review-pr` triages its axes, and a small diff may not warrant one at all.
 
