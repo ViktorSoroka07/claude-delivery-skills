@@ -22,7 +22,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 
 **Protocol** — past runs were invalidated by mutations that never applied and test runs that never executed:
 
-1. Green baseline first — record test count *and* duration, using the test command the repo's CLAUDE.md or repo-nuances project memory records (some repos' obvious command is wrong — the runtime's bare test runner may choke where the package script works).
+1. Green baseline first — record test count *and* duration, using the test command the repo's CLAUDE.md or `review-repo-nuances` project memory records (some repos' obvious command is wrong — the runtime's bare test runner may choke where the package script works). If neither records one, discover it, confirm it really executed (non-zero test count), and save it into that memory.
 2. One at a time, applied with an `old_string` unique to the target line. **A failed edit means the mutation never applied — never count it as killed.**
 3. Re-run; compare count and duration to baseline. Record KILLED (name the failing test) or SURVIVED.
 4. Revert; confirm the tree is clean before the next.
@@ -39,7 +39,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 | Branch arms | delete a new `case` — falls through to a default that usually means "fine" |
 | Boundaries, comparators, denominators | `>` ↔ `>=`, sort order, `/ 1000` → `/ 100` |
 
-**Screen survivors for equivalence, then treat the rest as test gaps, not live defects** — a mutation that changes no observable behaviour (a guard duplicated by a downstream consumer, a defensive clause every caller pre-filters) is an equivalent mutant, not a gap. Cap the severity accordingly, and fix each real gap by adding the missing assertion.
+**Screen survivors for equivalence, then treat the rest as test gaps, not live defects** — a mutation a correct implementation could also produce (behaviour the spec leaves free, a guard duplicated by a downstream consumer, a defensive clause every caller pre-filters) is an equivalent mutant, not a gap. This sentence owns the definition; the other skills' screens restate it. Cap the severity accordingly, and fix each real gap by adding the missing assertion.
 
 ## Gate 2 — ground-truth check on outside claims
 

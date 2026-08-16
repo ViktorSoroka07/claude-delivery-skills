@@ -48,7 +48,7 @@ Invoke the repo's `writing-plans` skill. Then confirm the plan **ends with a gat
 ### Task N: Implementation gates
 
 - [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation changing no observable behaviour is not a gap), every real survivor is a missing assertion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion
 - [ ] Re-check the spec's ground-truth claims against what shipped
 - [ ] Write only what was executed into any verification section
 ```
