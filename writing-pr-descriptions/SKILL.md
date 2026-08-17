@@ -18,6 +18,8 @@ A description consists of, in order:
 3. **Not changed** — the deliberate scope boundary: what a reviewer might expect here that is intentionally untouched, and where it lives instead.
 4. At most **one anchor fact** a reviewer may want to verify (e.g. "citations resolve against main since #N merged").
 
+**References:** the description is read after the squash-merge, against a tree that keeps moving — anchor by what survives: file paths, symbol names, artifact ids, PR/issue numbers. Never bare line numbers (they drift silently), and never SHAs of the branch's own commits (the squash erases them as objects; GitHub renders a dead SHA as a 404). SHAs already merged on the target branch are stable and fine.
+
 An existing body's section layout may stay — the contract governs content shape, not headings. Repo-specific templates win on structure; fill them with content shaped as above.
 
 **Title:** the outcome of merging, phrased in the repo's own title convention — never process ("Address review comments", "Fixes after review"). Re-check the title on every sync; scope drifts.
@@ -41,3 +43,4 @@ An existing body's section layout may stay — the contract governs content shap
 | Flat "what we did" bullets | Problem → final behavior, with the why |
 | "DRAFT for X's review" line surviving ready-for-review | One past-tense sentence, or nothing |
 | New bullet appended after the bot's release-notes marker | Bot tail byte-identical |
+| `src/foo.ts:123` or an in-branch commit SHA cited *(observed in plan docs and review text — same drift mechanism)* | File + symbol name; the PR number or a SHA already on the target branch |
