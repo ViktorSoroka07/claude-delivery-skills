@@ -5,7 +5,7 @@ description: Use when the user asks to review a pull request or the current bran
 
 # Review PR — Two-Pass Multi-Axis Review (review + verify; post or apply only on request)
 
-One invocation, two passes, no posting. Pass 1 is a multi-axis review: parallel single-axis subagents against a pinned worktree, plus a mutation-testing agent in its own worktree. Pass 2 is fresh-eyes verification: by default ONE clean-context subagent re-verifies every finding and sweeps for misses; a deeper blind-re-review + isolated-skeptics mode runs only when the user explicitly asks for a deep review or the repo-nuances memory pins it. Findings go to an MD file — **not into chat**. Posting (section 6) and applying (section 7) happen **only when the user asks in a later message**.
+One invocation, two passes, no posting. Pass 1 is a multi-axis review: parallel single-axis subagents against a pinned worktree, plus a mutation-testing agent in its own worktree. Pass 2 is fresh-eyes verification: by default ONE clean-context subagent tries to refute every finding and sweeps for misses; a deeper blind-re-review + isolated-skeptics mode runs only when the user explicitly asks for a deep review or the repo-nuances memory pins it. Findings go to an MD file — **not into chat**. Posting (section 6) and applying (section 7) happen **only when the user asks in a later message**.
 
 ## 0. Platform
 
@@ -84,9 +84,9 @@ Protocol for the fresh mutations, exactly (past runs were invalidated by mutatio
 
 Consolidate and dedupe axis findings into a draft (axis reviewers and the mutation agent often flag the same gap — merge, keeping the mutation's concrete evidence). Then verify:
 
-**Run the verifier when Pass 1 produced a major finding, or more than ~5 findings in total.** Below that threshold, grep-verify the findings yourself against the pinned SHA — the personal check in section 4 is required either way.
+**Run the verifier by default. Skip the dispatch only when BOTH hold: the diff was small enough to review inline (section 3's ~300-line shortcut) AND Pass 1 produced no major finding** — then grep-verify the findings yourself against the pinned SHA. Finding count alone never gates the dispatch: a quiet Pass 1 on a large diff is where the sweep matters most, because a low count cannot distinguish a clean diff from a review that missed — on such a run the subagent's job is mostly the sweep, so dispatch it even with zero draft findings. The personal check below is required either way.
 
-**Default:** dispatch ONE clean-context fresh-eyes subagent with the draft, the read worktree path, and the pinned head SHA (it must not redo section-1 setup): for every draft finding it re-derives the mechanism from source and returns CONFIRMED / REFUTED (with evidence) / ADJUSTED (severity, anchor, scope), then sweeps the whole diff once more for what all axes missed. Both directions matter — past passes killed false positives AND found real bugs every time.
+**Default:** dispatch ONE clean-context fresh-eyes subagent with the draft, the read worktree path, and the pinned head SHA (it must not redo section-1 setup). Prompt it to **refute** each draft finding, the same stance deep mode gives its skeptics — a verifier asked to "check" tends to confirm, and re-derivation only protects when the agent is hunting for the hole: for every draft finding it attempts to break the claimed mechanism against source and returns CONFIRMED (the refutation failed — cite the evidence that resisted it) / REFUTED (with evidence) / ADJUSTED (severity, anchor, scope). Then it sweeps the whole diff once more for what all axes missed. Both directions matter — past passes killed false positives AND found real bugs every time.
 
 **Deep mode — only when the user explicitly asks for it ("deep review", "thorough", "paranoid") or the repo-nuances memory pins it for the repo:** replace the single verifier with two isolated jobs, dispatched concurrently:
 
