@@ -7,7 +7,7 @@ description: Use when starting new work from an idea rather than from an existin
 
 The front door for new work, and it **ends with a plan, not with code**. A plan is the cheapest artifact to correct — stopping here is the highest-leverage pause in the chain. `implement-plan` picks it up afterwards.
 
-**This skill delegates and patches. It does not restate.** Every step hands off to the repo's own skill where one exists. What it adds is two checks that most chains lack, at the two moments they are cheapest.
+**This skill delegates and patches. It does not restate.** Every step hands off to the repo's own skill where one exists. What it adds is two checks and a reference sweep that most chains lack, at the moments they are cheapest.
 
 Prefer a repo's unprefixed skill over the `superpowers:` copy — the unprefixed one is usually a fork the team has agreed on, and the two differ substantially.
 
@@ -54,6 +54,8 @@ Invoke the repo's `writing-plans` skill. Then confirm the plan **ends with a gat
 ```
 
 This is the load-bearing patch. `executing-plans` runs "verifications as specified" — specified by the plan — so a gate that is not written into the plan does not run. Writing it here means it survives even if the plan is later implemented by a different skill, or in a different session.
+
+Finally, sweep the plan's references. A plan is read at implementation time, against a tree that has moved since it was written — every reference must resolve *then*, not just now. Anchor to what survives edits and is self-validating (the implementer greps it and confirms the site): symbol names, unique string fragments, headings, file paths. Two forms are banned because they fail silently or die outright: **bare line numbers** — they drift the moment any unrelated edit lands; where a symbol alone is ambiguous, keep the symbol and add `≈line` beside it — and **SHAs of commits on the unmerged branch** — a squash-merge erases them as objects, so they render as 404s; describe the change or cite the PR number instead (SHAs already on the target branch are stable and fine).
 
 ## Step 4 — Offer a plan review
 
