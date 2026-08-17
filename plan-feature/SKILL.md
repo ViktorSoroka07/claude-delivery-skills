@@ -27,7 +27,7 @@ Invoke the repo's `brainstorming` skill and follow it exactly, including its app
 
 Before the user reviews the spec, and before any plan is written. **This is the step that a plan review cannot replace** — see the note in Step 4.
 
-List every claim the design rests on about behaviour **you did not write**: what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it and run it.
+List every claim the design rests on about behaviour **you did not write**: what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it and run it — every check read-only: query, read, observe; never a call that mutates state.
 
 Evidence, best first:
 
@@ -48,7 +48,7 @@ Invoke the repo's `writing-plans` skill. Then confirm the plan **ends with a gat
 ### Task N: Implementation gates
 
 - [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion; a plan adding no executable code under test (docs-only, config-only) runs none and records exactly that
 - [ ] Re-check the spec's ground-truth claims against what shipped
 - [ ] Write only what was executed into any verification section
 ```

@@ -18,7 +18,7 @@ Green is not the bar. **Would it have gone red** is the bar.
 
 The repo already mandates red-green: write the test, revert the fix, watch it fail. That covers **a regression test for a bug that existed**. It says nothing about new feature code, where there is no fix to revert — and that is where survivors live.
 
-Ten to twelve mutations, targeted at the lines this change introduced. Not a whole-file sweep.
+Ten to twelve mutations, targeted at the lines this change introduced. Not a whole-file sweep. A change adding no executable code under test — docs-only, config-only — runs none and records exactly that: not applicable, no executable target.
 
 **Protocol** — past runs were invalidated by mutations that never applied and test runs that never executed:
 
@@ -45,7 +45,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 
 Cheapest gate here, and it catches the most expensive class: a change that is correct against the plan and wrong against the world. **Do this at plan time if you can** — after implementation, the code has already been built faithfully on the wrong premise.
 
-List every claim the design rests on about behaviour you did not write — what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it, then run it.
+List every claim the design rests on about behaviour you did not write — what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it, then run it — every check read-only: query, read, observe; never a call that mutates state.
 
 Evidence, best first:
 

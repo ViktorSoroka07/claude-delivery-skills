@@ -20,7 +20,7 @@ Read it fully before touching anything. Then check two things:
 ### Task N: Implementation gates
 
 - [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion; a plan adding no executable code under test (docs-only, config-only) runs none and records exactly that
 - [ ] Re-check the spec's ground-truth claims against what shipped
 - [ ] Write only what was executed into any verification section
 ```
