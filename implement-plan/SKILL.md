@@ -47,7 +47,9 @@ Report survivors honestly. A survivor is a test gap to close, not a defect to ar
 
 ## Step 5 — Finish
 
-Hand off to the repo's `finishing-a-development-branch`.
+First rewrite the plan document as the spec of what shipped — invoke the personal `writing-plan-docs` skill and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
+
+Then hand off to the repo's `finishing-a-development-branch`.
 
 Before reporting done, update the project memory: refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what merged, what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
 

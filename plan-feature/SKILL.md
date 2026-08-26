@@ -42,7 +42,7 @@ Skip this step only if the repo's `brainstorming` already performs it — read i
 
 ## Step 3 — Plan
 
-Invoke the repo's `writing-plans` skill. Then confirm the plan **ends with a gates task**; if it does not, append one:
+Invoke the repo's `writing-plans` skill, and the personal `writing-plan-docs` skill alongside it — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append one:
 
 ```markdown
 ### Task N: Implementation gates
@@ -55,7 +55,7 @@ Invoke the repo's `writing-plans` skill. Then confirm the plan **ends with a gat
 
 This is the load-bearing patch. `executing-plans` runs "verifications as specified" — specified by the plan — so a gate that is not written into the plan does not run. Writing it here means it survives even if the plan is later implemented by a different skill, or in a different session.
 
-Finally, sweep the plan's references. A plan is read at implementation time, against a tree that has moved since it was written — every reference must resolve *then*, not just now. Anchor to what survives edits and is self-validating (the implementer greps it and confirms the site): symbol names, unique string fragments, headings, file paths. Two forms are banned because they fail silently or die outright: **bare line numbers** — they drift the moment any unrelated edit lands; where a symbol alone is ambiguous, keep the symbol and add `≈line` beside it — and **SHAs of commits on the unmerged branch** — a squash-merge erases them as objects, so they render as 404s; describe the change or cite the PR number instead (SHAs already on the target branch are stable and fine).
+Finally, sweep the plan's references against `writing-plan-docs`' reference rules — every reference must resolve at implementation time, against a tree that has moved, not just now.
 
 ## Step 4 — Offer a plan review
 
