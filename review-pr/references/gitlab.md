@@ -34,8 +34,8 @@ Positioned comments take a `position` object: `position_type: "text"`, the `diff
 
 ## Suggestion blocks
 
-- The fenced ```` ```suggestion ```` block is GitLab-native in note bodies; GitLab also has a **range extension** GitHub lacks: ```` ```suggestion:-N+M ```` replaces from N lines above to M lines below the anchored line (**not yet exercised**).
-- **REST does not serialize suggestion state**: the notes/discussions responses carry no `suggestions` field at all, so the API cannot confirm a block parsed as appliable — check the MR page for the Apply button on first use. Anchor the comment to the exact replaced line; a suggestion on a wrong anchor applies to the wrong lines, same as the other platforms.
+- The fenced ```` ```suggestion ```` block is GitLab-native in note bodies — **verified end-to-end on a live MR**: a block on an unchanged-line anchor rendered the Apply button and applied cleanly as a single one-line commit to the source branch, with the commit message user-editable at apply time. GitLab also has a **range extension** GitHub lacks: ```` ```suggestion:-N+M ```` replaces from N lines above to M lines below the anchored line (**not yet exercised**).
+- **REST does not serialize suggestion state**: the notes/discussions responses carry no `suggestions` field at all, so the API cannot confirm a block parsed as appliable — the Apply button on the MR page is the confirmation. Anchor the comment to the exact replaced line; a suggestion on a wrong anchor applies to the wrong lines, same as the other platforms.
 
 ## Reply & resolve (thread disposition, later)
 
@@ -45,4 +45,4 @@ Positioned comments take a `position` object: `position_type: "text"`, the `diff
 
 ## Not yet exercised — summary
 
-Deleted-line anchors; draft-note publish/bulk_publish; suggestion range syntax (```` ```suggestion:-N+M ````) and whether Apply produces its default commit message; performing resolve and reply via the API; force-push (as opposed to a normal push) behavior. Each is a first-use verification, not settled knowledge.
+Deleted-line anchors; draft-note publish/bulk_publish; the suggestion range syntax (```` ```suggestion:-N+M ````); performing resolve and reply via the API; force-push (as opposed to a normal push) behavior. Each is a first-use verification, not settled knowledge.
