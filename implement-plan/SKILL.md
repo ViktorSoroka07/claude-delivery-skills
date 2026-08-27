@@ -1,6 +1,7 @@
 ---
 name: implement-plan
 description: Builds an existing implementation plan with the delivery gates guaranteed to run. Use when a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature.
+compatibility: Delegates execution to the superpowers skill set (subagent-driven-development or executing-plans, verification-before-completion, finishing-a-development-branch) or a repo's own forks of them.
 ---
 
 # Implement Plan

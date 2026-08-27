@@ -1,6 +1,7 @@
 ---
 name: review-pr
 description: Two-pass multi-axis PR review that adversarially verifies its own findings before reporting them. Use when the user asks to review a pull request or branch — "review PR 42", "review this branch", "look over my changes" — to disposition or reply-and-resolve threads from a previous review, or to apply a previous review's findings to the branch. GitHub and Azure DevOps.
+compatibility: Requires git and an authenticated platform CLI - gh (GitHub) or az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps). Subagent dispatch recommended for the multi-axis pass.
 ---
 
 # Review PR — Two-Pass Multi-Axis Review (review + verify; post or apply only on request)
@@ -13,6 +14,8 @@ Detect from `git remote get-url origin` and read the matching reference **before
 
 - `github.com` → `references/github.md`
 - `dev.azure.com` / `visualstudio.com` → `references/ado.md`
+Then verify the platform CLI is present and authenticated (`gh auth status`; `az` or `$AZURE_DEVOPS_EXT_PAT` per the ADO reference) **before any review work starts** — a missing login should cost the user one setup instruction now, not a dead review half an hour in.
+
 - Any other host (GitLab, Bitbucket, …): no reference exists — say so plainly. Review the local branch diff against its merge-base with the default branch (sections 2–5 are platform-neutral), skip the PR-thread dedupe, and state that posting and disposition are unsupported on this platform. Never improvise API calls from general knowledge — the references exist because real mechanics diverge from the obvious.
 
 ## 1. Scope & setup

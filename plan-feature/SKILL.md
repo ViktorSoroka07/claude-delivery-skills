@@ -1,6 +1,7 @@
 ---
 name: plan-feature
 description: Turns an idea into a reviewed, evidence-grounded implementation plan, then stops so the plan can be read before anything is built. Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Implementation is a separate skill (implement-plan).
+compatibility: Delegates to the superpowers skill set (brainstorming, writing-plans) or a repo's own forks of them - install one or the chain has nothing to call.
 ---
 
 # Plan Feature
