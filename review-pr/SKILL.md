@@ -17,7 +17,7 @@ Detect from `git remote get-url origin` and read the matching reference **before
 - gitlab.com, or any host `glab auth status` recognizes (self-hosted GitLab often has no "gitlab" in its hostname) → `references/gitlab.md`
 Then verify the platform CLI is present and authenticated (`gh auth status`; `az` or `$AZURE_DEVOPS_EXT_PAT` per the ADO reference; `glab auth status`) **before any review work starts** — a missing login should cost the user one setup instruction now, not a dead review half an hour in.
 
-- Any other host (GitLab, Bitbucket, …): no reference exists — say so plainly. Review the local branch diff against its merge-base with the default branch (sections 2–5 are platform-neutral), skip the PR-thread dedupe, and state that posting and disposition are unsupported on this platform. Never improvise API calls from general knowledge — the references exist because real mechanics diverge from the obvious.
+- Any other host (Bitbucket, Gitea, …): no reference exists — say so plainly. Review the local branch diff against its merge-base with the default branch (sections 2–5 are platform-neutral), skip the PR-thread dedupe, and state that posting and disposition are unsupported on this platform. Never improvise API calls from general knowledge — the references exist because real mechanics diverge from the obvious.
 
 ## 1. Scope & setup
 
