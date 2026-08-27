@@ -1,11 +1,12 @@
 # Claude delivery skills
 
-Six [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
+Eight [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
 the path from idea to merged PR. They exist because the failure mode of agent-driven
 development is rarely the code itself — it is everything around the code: plans built
 on unverified claims about how external systems behave, tests that pass but would
-never have failed, verification records that claim more than what ran, and review
-comments that waste the author's time.
+never have failed, verification records that claim more than what ran, review
+comments that waste the author's time, subagent reports treated as facts, and
+outward-bound messages that read fine and are wrong.
 
 Each skill is a `SKILL.md` instruction package. Claude Code loads it when the task
 matches, and the instructions change how the model works — what it checks, in what
@@ -21,9 +22,11 @@ idea ──> plan-feature ──> implement-plan ──> implementation-gates
               writing-plan-docs   (the plan at start, the shipped spec at finish)
 ```
 
-`review-pr` and `writing-pr-descriptions` sit outside the build chain — each
-fires on its own request: reviewing an existing PR or branch, and creating or
-syncing a PR description.
+The other four sit outside the build chain and fire on their own triggers:
+`review-pr` on a review request, `writing-pr-descriptions` when a PR
+description is created or synced, `delegating-to-subagents` whenever work is
+handed to subagents, and `verifying-before-sending` when factual text is about
+to leave the workspace for someone else's surface.
 
 | Skill | When it fires | What it adds |
 |---|---|---|
@@ -33,6 +36,8 @@ syncing a PR description.
 | **review-pr** | "review this PR / branch" | Two-pass multi-axis review: parallel single-axis agents plus a mutation-testing agent, then a fresh-eyes verifier prompted to refute every finding. Posts nothing without being asked. GitHub, Azure DevOps, GitLab. |
 | **writing-plan-docs** | creating or syncing a plan/spec doc | Keeps the document a current-state spec, never a changelog — the doc describes the destination, not the route. |
 | **writing-pr-descriptions** | creating or syncing a PR description | Describes the diff, not the branch: net delta, deliberate scope boundary, references that survive a squash-merge. |
+| **delegating-to-subagents** | handing work to subagents, and using what they return | Treats a subagent's output as a claim, not the work: isolation checked before dispatch, files not findings partitioned, identifiers grep-verified, diffs audited before commit, silent agents triaged instead of abandoned. |
+| **verifying-before-sending** | factual text about to leave the workspace | Fact table before writing, a blind pass that inherits none of the author's reasoning, two named absence-claim traps, a two-pass cap with the warrant stated instead of the feeling. |
 
 ## What it looks like
 
