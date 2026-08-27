@@ -3,6 +3,10 @@ name: guard
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   guard:
@@ -44,9 +48,11 @@ jobs:
       # The Agent Skills reference validator (PyPI: skills-ref; the installed
       # command is `agentskills`) - frontmatter validity, name/directory
       # agreement, and the spec's length limits, for every skill.
+      # pipx rather than pip: newer runner images mark the system python
+      # externally managed, and a PEP 668 refusal would fail the job.
       - name: Validate every skill against the Agent Skills spec
         run: |
-          python3 -m pip install --quiet skills-ref
+          pipx install skills-ref
           for d in */SKILL.md; do
             agentskills validate "$(dirname "$d")"
           done
