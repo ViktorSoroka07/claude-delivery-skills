@@ -1,6 +1,6 @@
 # Claude delivery skills
 
-Nine [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
+Ten [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
 the path from idea to merged PR. They exist because the failure mode of agent-driven
 development is rarely the code itself — it is everything around the code: plans built
 on unverified claims about how external systems behave, tests that pass but would
@@ -22,12 +22,13 @@ idea ──> plan-feature ──> implement-plan ──> implementation-gates
               writing-plan-docs   (the plan at start, the shipped spec at finish)
 ```
 
-The other five sit outside the build chain and fire on their own triggers:
+The other six sit outside the build chain and fire on their own triggers:
 `review-pr` on a review request, `writing-pr-descriptions` when a PR
 description is created or synced, `delegating-to-subagents` whenever work is
 handed to subagents, `verifying-before-sending` when factual text is about to
-leave the workspace for someone else's surface, and `maintaining-project-memory`
-when project memory is written or pruned and when a continuing session ends.
+leave the workspace for someone else's surface, `maintaining-project-memory`
+when project memory is written or pruned and when a continuing session ends,
+and `writing-code-comments` whenever a code comment is about to be added.
 
 | Skill | When it fires | What it adds |
 |---|---|---|
@@ -40,6 +41,7 @@ when project memory is written or pruned and when a continuing session ends.
 | **delegating-to-subagents** | handing work to subagents, and using what they return | Treats a subagent's output as a claim, not the work: isolation checked before dispatch, files not findings partitioned, identifiers grep-verified, diffs audited before commit, silent agents triaged instead of abandoned. |
 | **verifying-before-sending** | factual text about to leave the workspace | Fact table before writing, a blind pass that inherits none of the author's reasoning, two named absence-claim traps, a two-pass cap with the warrant stated instead of the feeling. |
 | **maintaining-project-memory** | writing or pruning project memory; ending a continuing session | Memory as a promotion tier: keep only what the repo structurally cannot record, delete branch state git already answers, re-derive rules instead of copying wording, and end with the literal next-session starter prompt. |
+| **writing-code-comments** | a code comment is about to be added | Zero by default, applied at write-time; invariant-plus-cost shape when earned; and the escape hatch that makes the rule hold — a load-bearing fact becomes an expression, an assertion, or a named constant, never prose. |
 
 ## What it looks like
 
