@@ -4,3 +4,4 @@
 # local-only leak wordlist - must never be published
 .leakwords.local
 .leakguard_fail
+.claude/

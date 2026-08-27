@@ -1,0 +1,22 @@
+name: guard
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the history scan needs every commit, not a shallow tip
+
+      - name: Guard self-tests
+        run: sh scripts/test-guard.sh
+
+      # .leakwords.local never leaves the author's machine, so CI can check
+      # only the committed shape patterns. The local pre-push scan, with the
+      # full wordlist, remains the real gate.
+      - name: History scan (structural patterns only)
+        run: sh scripts/scan-history.sh

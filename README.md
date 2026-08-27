@@ -34,6 +34,33 @@ syncing a PR description.
 | **writing-plan-docs** | creating or syncing a plan/spec doc | Keeps the document a current-state spec, never a changelog — the doc describes the destination, not the route. |
 | **writing-pr-descriptions** | creating or syncing a PR description | Describes the diff, not the branch: net delta, deliberate scope boundary, references that survive a squash-merge. |
 
+## What it looks like
+
+An illustrative `review-pr` run — what the skill's contract produces, abridged:
+
+```
+> review PR 214
+
+Axes chosen from the diff: mutation + correctness + doc-vs-code — tested
+logic changed and the PR carries a spec. Say the word to add or drop one.
+
+  [parallel subagents review a pinned worktree at commit a1b2c3d;
+   the mutation agent edits files in its own worktree]
+
+Pass 2 (fresh-eyes verifier, prompted to refute each finding):
+5 confirmed, 2 refuted, 1 adjusted, 1 added by the sweep.
+
+review-findings-214.md written — 3 medium, 3 minor. Nothing was posted;
+say "post" to publish the final findings to the PR as inline threads.
+```
+
+The mutation axis measures rather than reads — its evidence looks like:
+
+| Mutation | Result |
+|---|---|
+| `>=` → `>` at the window boundary | KILLED by `test_window_edges` |
+| drop `retries` from the emitted row | SURVIVED → finding: the missing assertion, spelled out |
+
 ## The ideas underneath
 
 - **Green is not the bar; "would it have gone red" is the bar.** A test suite that
@@ -83,8 +110,26 @@ reviewers) live in a project memory entry named `review-repo-nuances` that the
 skills read and maintain. Adjust to taste — the skills state their mechanisms, so
 the seams are visible.
 
+## Beyond Claude Code
+
+The protocols here are assistant-agnostic: the mutation-sweep protocol, the
+evidence hierarchy (real data > an existing consumer > documentation > a
+coherent argument), the plan-doc lifecycle, the PR-description contract, and
+the finding format all lift cleanly into Cursor rules, Copilot instructions,
+or an `AGENTS.md` — `writing-plan-docs` and `writing-pr-descriptions` port
+almost verbatim.
+
+The orchestration does not: subagent dispatch (parallel single-axis reviewers,
+the clean-context verifier), skill-to-skill chaining, and project memory are
+Claude Code machinery, and the full skills assume them. Ported without those
+primitives, `review-pr` collapses into "one context reviews carefully" — the
+failure mode it exists to escape. So this repo stays Claude Code-native, and
+the portable parts are yours to lift.
+
 ## Provenance
 
 These skills are distilled from real delivery work on production repositories.
 Identifying details are removed; the mechanisms — each one paid for by an actual
 incident — are what remain. `CONTRIBUTING.md` explains how that line is kept.
+
+A personal project — not affiliated with or endorsed by Anthropic.
