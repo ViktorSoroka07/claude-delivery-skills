@@ -22,7 +22,15 @@ Memory holds what the repository **structurally cannot** record. Git records wha
 
 **Delete branch state outright when the work merges.** Branch tips, unpushed-commit counts, divergence flags, open reminders to push or tidy the tracker — version control answers these correctly, forever, in milliseconds. Duplicating them into memory maintains a worse copy of a perfect source, and the stale copy outlives the branch.
 
-**The test before writing a line:** is this in the code, a commit message, the PR body, the plan doc, or an issue? If yes, it is a duplicate that will drift from the authoritative copy. (A fact that *contradicts* the repo's obvious reading — the gate command that isn't what the scripts suggest — is a trap, not a duplicate.) **The issue tracker is the source everyone forgets** — one pruning pass "rescued" a decision as unrecorded when an issue was titled for that exact decision and even stated its open half. Search the tracker before concluding something lives nowhere; decisions relayed verbally are precisely what gets written into an issue rather than into code.
+**The test before writing a line:** is this in the code, a commit message, the PR body, the plan doc, an issue — or a skill? If yes, it is a duplicate that will drift from the authoritative copy. (A fact that *contradicts* the repo's obvious reading — the gate command that isn't what the scripts suggest — is a trap, not a duplicate.) **The issue tracker is the source everyone forgets** — one pruning pass "rescued" a decision as unrecorded when an issue was titled for that exact decision and even stated its open half. Search the tracker before concluding something lives nowhere; decisions relayed verbally are precisely what gets written into an issue rather than into code.
+
+**Promotion into a skill triggers the same deletion.** When a memory's content graduates into a skill, the skill becomes the procedure's durable home, and the memory is condensed — in the same session, not later — to the three things the skill cannot hold:
+
+- **a pointer naming the skill**, with the instruction to follow the skill's current text, never a paraphrase of it here — one retained paraphrase went stale while the skill moved on, and the stale copy is what the next session obeyed;
+- **the private or project-specific facts** a published skill must not carry (incident identifiers, repo-local values);
+- **a capture buffer**: a new correction lands in memory first, gets confirmed in practice, then promotes into the skill re-derived, per "A memory write is a promotion" below — and the memory line condenses again.
+
+Leaving the full text in memory after promotion creates two authoritative copies, and the one that drifts is the one sessions load first.
 
 Three mechanics for the pruning pass itself:
 
