@@ -20,7 +20,7 @@ Use the ADO PAT in `$AZURE_DEVOPS_EXT_PAT` via Basic auth: `curl -u ":$AZURE_DEV
 ## Posting
 
 - Post each final finding as its **own inline comment thread** anchored to the exact `file:line`, left **active/unresolved**. (A suggestion thread spans its replaced range instead; its `file:line` for post-verification is `rightFileStart.line`.)
-- Thread content markdown: severity header (`**Medium — title**`), minors prefixed `**Nit — ...**`, then `Problem:` / `Suggestion:`. Repo-relative `filePath` with a leading `/`.
+- Thread content Markdown: severity header (`**Medium — title**`), minors prefixed `**Nit — ...**`, then `Problem:` / `Suggestion:`. Repo-relative `filePath` with a leading `/`.
 - Post an inline thread (`POST .../pullRequests/<id>/threads?api-version=7.1`) with body:
 
   ```json

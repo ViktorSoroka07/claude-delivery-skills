@@ -14,7 +14,7 @@ description: Use when creating a pull request, writing or editing a PR title or 
 A description consists of, in order:
 
 1. **Tracking link** — the work item / story / issue the PR closes, if one exists.
-2. **What this changes** — grouped by net behavioral change (per file/area for docs and specs). Each item leads with the problem it solves, then the final behavior: "X failed / was missing / was hedged — it now does Y." Pull the why from commit-message bodies; the description curates them. Work outside the nominal scope gets its why-it-was-necessary stated up front, so the scope is legible.
+2. **What this changes** — grouped by net behavioral change (per file/area for docs and specs). Each item leads with the problem it solves, then the final behavior: "X failed / was missing / was hedged — it now does Y." Pull the "why" from commit-message bodies; the description curates them. Work outside the nominal scope gets its why-it-was-necessary stated up front, so the scope is legible.
 3. **Not changed** — the deliberate scope boundary: what a reviewer might expect here that is intentionally untouched, and where it lives instead.
 4. At most **one anchor fact** a reviewer may want to verify (e.g. "citations resolve against main since #N merged").
 
@@ -35,12 +35,12 @@ An existing body's section layout may stay — the contract governs content shap
 
 ## Common mistakes (each observed in practice)
 
-| Wrong shape | Correct shape |
-|---|---|
-| "Addendum — round 2" / "Commits after the first review round" section appended | Content folded into the scope sections it changes |
-| In-branch bug fix narrated ("off-by-one introduced earlier, fixed in a1b2c3d") | Absent — it is not a delta vs the base |
-| "(renamed from X during review)" | The final name, stated as the state of the world |
-| Flat "what we did" bullets | Problem → final behavior, with the why |
-| "DRAFT for X's review" line surviving ready-for-review | One past-tense sentence, or nothing |
-| New bullet appended after the bot's release-notes marker | Bot tail byte-identical |
+| Wrong shape                                                                                                        | Correct shape                                                           |
+|--------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| "Addendum — round 2" / "Commits after the first review round" section appended                                     | Content folded into the scope sections it changes                       |
+| In-branch bug fix narrated ("off-by-one introduced earlier, fixed in a1b2c3d")                                     | Absent — it is not a delta vs the base                                  |
+| "(renamed from X during review)"                                                                                   | The final name, stated as the state of the world                        |
+| Flat "what we did" bullets                                                                                         | Problem → final behavior, with the why                                  |
+| "DRAFT for X's review" line surviving ready-for-review                                                             | One past-tense sentence, or nothing                                     |
+| New bullet appended after the bot's release-notes marker                                                           | Bot tail byte-identical                                                 |
 | `src/foo.ts:123` or an in-branch commit SHA cited *(observed in plan docs and review text — same drift mechanism)* | File + symbol name; the PR number or a SHA already on the target branch |

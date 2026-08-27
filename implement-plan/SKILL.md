@@ -29,7 +29,7 @@ The plan is what `executing-plans` obeys. Patching the plan is what makes the ga
 
 ## Step 2 — Check the plan's premises are settled
 
-If the plan makes claims about behaviour **outside the code being written** — what an API returns, what a frame contains, what a column means — confirm they were settled against evidence, not argued.
+If the plan makes claims about behavior **outside the code being written** — what an API returns, what a frame contains, what a column means — confirm they were settled against evidence, not argued.
 
 A plan that reads well can still rest on a false premise, and implementation will faithfully amplify it. If a claim is unsettled, settle it now: real data beats an existing consumer, which beats documentation, which beats a coherent argument. This costs one query here and a rewrite later.
 

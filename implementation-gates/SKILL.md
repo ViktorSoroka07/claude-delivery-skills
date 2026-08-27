@@ -30,24 +30,24 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 
 **Aim at the classes that actually survive.** Each of these shipped green in real work:
 
-| Class | Example |
-| --- | --- |
-| Aggregate swap | `COUNT(*)` ↔ `MAX(col)` — identical on contiguous data, divergent the moment a row is skipped |
-| Awaited vs forked | `await run(x)` → `runInBackground(x)` — indistinguishable to any synchronous test stub |
-| Presence guard | `sawFlag ?` → `value > 0 ?` — collapses a measured zero into "unknown" |
-| Emitted fields | drop one column from a written row — invisible unless a test reads that column |
-| Branch arms | delete a new `case` — falls through to a default that usually means "fine" |
-| Boundaries, comparators, denominators | `>` ↔ `>=`, sort order, `/ 1000` → `/ 100` |
+| Class                                 | Example                                                                                       |
+|---------------------------------------|-----------------------------------------------------------------------------------------------|
+| Aggregate swap                        | `COUNT(*)` ↔ `MAX(col)` — identical on contiguous data, divergent the moment a row is skipped |
+| Awaited vs forked                     | `await run(x)` → `runInBackground(x)` — indistinguishable to any synchronous test stub         |
+| Presence guard                        | `sawFlag ?` → `value > 0 ?` — collapses a measured zero into "unknown"                        |
+| Emitted fields                        | drop one column from a written row — invisible unless a test reads that column                |
+| Branch arms                           | delete a new `case` — falls through to a default that usually means "fine"                    |
+| Boundaries, comparators, denominators | `>` ↔ `>=`, sort order, `/ 1000` → `/ 100`                                                    |
 
-**Screen survivors for equivalence, then treat the rest as test gaps, not live defects** — a mutation a correct implementation could also produce (behaviour the spec leaves free, a guard duplicated by a downstream consumer, a defensive clause every caller pre-filters) is an equivalent mutant, not a gap. This sentence owns the definition; the other skills' screens restate it. Cap the severity accordingly, and fix each real gap by adding the missing assertion.
+**Screen survivors for equivalence, then treat the rest as test gaps, not live defects** — a mutation a correct implementation could also produce (behavior the spec leaves free, a guard duplicated by a downstream consumer, a defensive clause every caller pre-filters) is an equivalent mutant, not a gap. This sentence owns the definition; the other skills' screens restate it. Cap the severity accordingly, and fix each real gap by adding the missing assertion.
 
 ## Gate 2 — ground-truth check on outside claims
 
 Cheapest gate here, and it catches the most expensive class: a change that is correct against the plan and wrong against the world. **Do this at plan time if you can** — after implementation, the code has already been built faithfully on the wrong premise.
 
-List every claim the design rests on about behaviour you did not write — what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it, then run it — every check read-only: query, read, observe; never a call that mutates state.
+List every claim the design rests on about behavior you did not write — what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it, then run it — every check read-only: query, read, observe; never a call that mutates state.
 
-Evidence, best first:
+Evidence, the best first:
 
 1. **Real data** — query the local database read-only, read a captured fixture, run the tool once and look.
 2. **An existing consumer** — code that already depends on the answer encodes the truth, and its comments often state it.
@@ -60,16 +60,16 @@ If a claim cannot be settled, say so, name the check that would settle it, and c
 
 Distinct from claims made in conversation, which the repo's skill already governs. This is about verification sections written into plans, specs, and PR bodies, where they outlive the session and are read as fact.
 
-- Ran six mutations? Say six. Do not generalise to "no test survives reverting the behaviour it covers" — that is a claim about a whole suite, and a wider run will contradict it.
+- Ran six mutations? Say six. Do not generalize to "no test survives reverting the behavior it covers" — that is a claim about a whole suite, and a wider run will contradict it.
 - Could not check something? Write **what** was not verified, **why**, and **the check that would settle it**. A wrong reason is worse than no reason: it makes a reachable check look unreachable, and nobody retries it.
 
 ## Red flags
 
-| Thought | Reality |
-| --- | --- |
-| "Tests pass, so the tests are good" | They passed before the fix too, in the cases that matter |
-| "I wrote a test alongside the fix" | It was shaped by the fix. Name the old rule and the new rule, and check the fixture separates them |
-| "Red-green covered it" | Only for a bug that existed. New code has no fix to revert |
-| "The plan says the API behaves this way" | The plan is not a source. Find one |
-| "It's obvious what this field means" | Two writers to one column disagreed about exactly that |
-| "Mutation testing is for the review" | It costs a fraction here, where the context is already loaded |
+| Thought                                  | Reality                                                                                            |
+|------------------------------------------|----------------------------------------------------------------------------------------------------|
+| "Tests pass, so the tests are good"      | They passed before the fix too, in the cases that matter                                           |
+| "I wrote a test alongside the fix"       | It was shaped by the fix. Name the old rule and the new rule, and check the fixture separates them |
+| "Red-green covered it"                   | Only for a bug that existed. New code has no fix to revert                                         |
+| "The plan says the API behaves this way" | The plan is not a source. Find one                                                                 |
+| "It's obvious what this field means"     | Two writers to one column disagreed about exactly that                                             |
+| "Mutation testing is for the review"     | It costs a fraction here, where the context is already loaded                                      |

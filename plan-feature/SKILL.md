@@ -5,7 +5,7 @@ description: Use when starting new work from an idea rather than from an existin
 
 # Plan Feature
 
-The front door for new work, and it **ends with a plan, not with code**. A plan is the cheapest artifact to correct — stopping here is the highest-leverage pause in the chain. `implement-plan` picks it up afterwards.
+The front door for new work, and it **ends with a plan, not with code**. A plan is the cheapest artifact to correct — stopping here is the highest-leverage pause in the chain. `implement-plan` picks it up afterward.
 
 **This skill delegates and patches. It does not restate.** Every step hands off to the repo's own skill where one exists. What it adds is two checks and a reference sweep that most chains lack, at the moments they are cheapest.
 
@@ -27,9 +27,9 @@ Invoke the repo's `brainstorming` skill and follow it exactly, including its app
 
 Before the user reviews the spec, and before any plan is written. **This is the step that a plan review cannot replace** — see the note in Step 4.
 
-List every claim the design rests on about behaviour **you did not write**: what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it and run it — every check read-only: query, read, observe; never a call that mutates state.
+List every claim the design rests on about behavior **you did not write**: what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it and run it — every check read-only: query, read, observe; never a call that mutates state.
 
-Evidence, best first:
+Evidence, the best first:
 
 1. **Real data** — query a local database read-only, read a captured fixture, run the tool once and look.
 2. **An existing consumer** — code already depending on the answer encodes the truth.
@@ -70,7 +70,7 @@ Never report a plan review as though it validated the plan's premises. If Step 2
 
 ## Step 5 — Hand off
 
-Give the user the plan path and stop. Tell them `implement-plan <path>` continues, and that they can read or edit the plan first — edits to the plan are honoured, since the plan is what implementation obeys.
+Give the user the plan path and stop. Tell them `implement-plan <path>` continues, and that they can read or edit the plan first — edits to the plan are honored, since the plan is what implementation obeys.
 
 ## Rules
 
