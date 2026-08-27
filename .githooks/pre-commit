@@ -26,6 +26,7 @@ AB#[0-9]+
 [A-Za-z0-9-]+\.company\.com
 dev\.azure\.com/[A-Za-z0-9]
 [A-Za-z0-9-]+\.visualstudio\.com
+[0-9]{4}-[0-9]{2}-[0-9]{2}
 '
 
 echo "$block_patterns" | while IFS= read -r p; do
@@ -59,7 +60,6 @@ fi
 # --- WARN: shapes that are usually, but not always, a leak ----------------
 warn_patterns='
 PR #?[0-9]{2,}
-[0-9]{4}-[0-9]{2}-[0-9]{2}
 \b[0-9a-f]{7,40}\b
 '
 echo "$warn_patterns" | while IFS= read -r p; do
