@@ -6,7 +6,17 @@ on:
 
 jobs:
   guard:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Three OSes, three greps: GNU (ubuntu), BSD (macos), and Git for
+        # Windows' MSYS2 environment - each has already caught a bug the
+        # others let through.
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with:

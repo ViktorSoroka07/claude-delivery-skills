@@ -1,0 +1,8 @@
+# The guard scripts must check out with LF everywhere: a CRLF checkout on
+# Windows (core.autocrlf=true) breaks the "#!/bin/sh" shebang line and turns
+# every pattern line into "pattern\r", which silently matches nothing.
+* text=auto
+*.sh text eol=lf
+*.yml text eol=lf
+.githooks/* text eol=lf
+.leakwords.local.example text eol=lf

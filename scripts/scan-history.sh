@@ -14,7 +14,9 @@ pats='AB#[0-9]+|dev\.azure\.com/[A-Za-z0-9]|[A-Za-z0-9-]+\.visualstudio\.com|[0-
 words=$(mktemp)
 trap 'rm -f "$words"' EXIT
 if [ -f .leakwords.local ]; then
-  grep -v '^[[:space:]]*#' .leakwords.local | grep -v '^[[:space:]]*$' > "$words"
+  # tr -d '\r': the file is user-created and may carry CRLF endings (a
+  # Windows editor); a trailing \r on a term makes it silently match nothing.
+  tr -d '\r' < .leakwords.local | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$' > "$words"
 else
   echo "NOTE: .leakwords.local missing - literal codename checks are OFF."
 fi

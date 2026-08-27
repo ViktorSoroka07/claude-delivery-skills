@@ -38,8 +38,12 @@ printf '%s\n' "$block_patterns" | while IFS= read -r p; do
 done
 
 # --- BLOCK: literal names from the untracked local wordlist ---------------
+# .leakwords.local is user-created and may carry CRLF endings (a Windows
+# editor); a trailing \r on a term makes it silently match nothing.
+CR=$(printf '\r')
 if [ -f .leakwords.local ]; then
   while IFS= read -r w; do
+    w=${w%"$CR"}
     case "$w" in ''|\#*) continue ;; esac
     hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nFi "$w")
     if [ -n "$hits" ]; then

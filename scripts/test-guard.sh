@@ -98,6 +98,20 @@ case "$out" in
   *) echo "FAIL: no WARNING in hook output"; fails=$((fails+1)) ;;
 esac
 
+# 7. A wordlist saved with CRLF line endings (a Windows editor) still catches
+#    its terms - a trailing carriage return must not blind either guard.
+mkrepo t7
+echo "mentions secretword here" > f.txt
+git add f.txt
+git commit -qm leak --no-verify
+printf 'secretword\r\n' > .leakwords.local
+./scripts/scan-history.sh >/dev/null 2>&1
+check "scanner catches a CRLF wordlist term" 1 $?
+echo "secretword again" > g.txt
+git add g.txt
+git commit -qm leak2 >/dev/null 2>&1
+check "hook blocks a CRLF wordlist term" 1 $?
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"

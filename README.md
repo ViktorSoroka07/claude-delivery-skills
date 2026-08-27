@@ -102,6 +102,10 @@ Works best alongside:
 - `gh` (GitHub) or the `az` CLI / a PAT (Azure DevOps) for `review-pr` — those
   are the two platforms it carries mechanics for.
 
+Works on macOS, Linux, and Windows: the guard scripts are POSIX sh, which Git
+for Windows already provides — hooks run under its bundled Git Bash, no extra
+setup. CI exercises all three.
+
 ## Opinionated defaults
 
 Plans live in `docs/plans/`; review findings go to an untracked MD in the repo
