@@ -1,11 +1,11 @@
 ---
 name: implementation-gates
-description: Use when implementation work is about to be called done, after the repo's own gates have passed — proves the new tests could actually fail, that the plan's claims about outside systems are true, and that any written verification record states only what ran. Also use while writing a plan or spec, to settle its external claims before they become design decisions.
+description: Verification gates that catch what a green test suite misses. Use when implementation work is about to be called done or complete, after the repo's own gates have passed — and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions.
 ---
 
 # Implementation Gates
 
-**This skill does not run the repo's gates or police completion claims.** The repo's own `verification-before-completion` owns both — use it, do not restate it here.
+**This skill does not run the repo's gates or police completion claims.** The repo's own `verification-before-completion` owns both — call the Skill tool with it rather than restating it here.
 
 What it adds is the step after: a suite that honestly, verifiably passes can still be too weak to catch the defect you just introduced. Both failures below shipped on a branch whose gates were green and truthfully reported.
 

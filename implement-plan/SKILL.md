@@ -1,6 +1,6 @@
 ---
 name: implement-plan
-description: Use when an implementation plan already exists and the work should now be built — "implement this plan", "go ahead with docs/plans/X.md", or continuing after plan-feature. Ensures the plan carries a gates task before starting, delegates execution to the repo's own skill, then runs the gates before anything is called done.
+description: Builds an existing implementation plan with the delivery gates guaranteed to run. Use when a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature.
 ---
 
 # Implement Plan
@@ -35,21 +35,21 @@ A plan that reads well can still rest on a false premise, and implementation wil
 
 ## Step 3 — Implement
 
-Hand off to the repo's `subagent-driven-development` (preferred where subagents are available) or `executing-plans`. Follow that skill's checkpoints exactly and stop where it says stop.
+Call the Skill tool with the repo's `subagent-driven-development` (preferred where subagents are available) or `executing-plans`. Follow that skill's checkpoints exactly and stop where it says stop.
 
 Announce which one you used, and whether it was the repo's copy or the `superpowers:` one — they are forks and behave differently.
 
 ## Step 4 — Gates
 
-Invoke `implementation-gates`.
+Call the Skill tool with `implementation-gates`.
 
 Report survivors honestly. A survivor is a test gap to close, not a defect to argue away, and "the tests pass" is not evidence that they would have failed.
 
 ## Step 5 — Finish
 
-First rewrite the plan document as the spec of what shipped — invoke the personal `writing-plan-docs` skill and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
+First rewrite the plan document as the spec of what shipped — call the Skill tool with `writing-plan-docs` and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
 
-Then hand off to the repo's `finishing-a-development-branch`.
+Then call the Skill tool with the repo's `finishing-a-development-branch`.
 
 Before reporting done, update the project memory: refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what merged, what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
 

@@ -42,7 +42,7 @@ Use the ADO PAT in `$AZURE_DEVOPS_EXT_PAT` via Basic auth: `curl -u ":$AZURE_DEV
 
 ## Suggestion blocks (one-click appliable fixes)
 
-When a finding's fix is an exact replacement of contiguous lines (SKILL section 6 defines when), end the comment content with the same fenced ```` ```suggestion ```` block GitHub uses — ADO renders an "Apply changes" button that stages the replacement for a commit to the source branch.
+When a finding's fix is an exact replacement of contiguous lines (posting-and-applying.md defines when), end the comment content with the same fenced ```` ```suggestion ```` block GitHub uses — ADO renders an "Apply changes" button that stages the replacement for a commit to the source branch.
 
 - **Apply replaces exactly the character span in `threadContext`.** The minimal anchor above (offsets 1 and 2) would splice the replacement into the first character of one line and leave the rest of the old code in place. A suggestion thread must span the full replaced lines:
 

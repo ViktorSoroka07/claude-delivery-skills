@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works". Takes it from idea to a reviewed plan and then stops, so the plan can be read before anything is built. Runs the design dialogue, checks the spec's claims about outside systems against evidence, and makes sure the plan ends with a gates task. Implementation is a separate skill.
+description: Turns an idea into a reviewed, evidence-grounded implementation plan, then stops so the plan can be read before anything is built. Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Implementation is a separate skill (implement-plan).
 ---
 
 # Plan Feature
@@ -21,7 +21,7 @@ If a step's skill is missing in this repo, say so and name what you will do inst
 
 ## Step 1 — Design
 
-Invoke the repo's `brainstorming` skill and follow it exactly, including its approval gates. **Do not bypass them because the change looks small** — those gates belong to the repo, not to this skill.
+Call the Skill tool with the repo's `brainstorming` and follow it exactly, including its approval gates. **Do not bypass them because the change looks small** — those gates belong to the repo, not to this skill.
 
 ## Step 2 — Ground-truth the spec
 
@@ -42,7 +42,7 @@ Skip this step only if the repo's `brainstorming` already performs it — read i
 
 ## Step 3 — Plan
 
-Invoke the repo's `writing-plans` skill, and the personal `writing-plan-docs` skill alongside it — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append one:
+Call the Skill tool twice — once for the repo's `writing-plans`, once for `writing-plan-docs` — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append one:
 
 ```markdown
 ### Task N: Implementation gates

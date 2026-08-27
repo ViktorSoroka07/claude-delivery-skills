@@ -28,11 +28,11 @@ Every inline comment must land on an added/changed diff line or GitHub **422s th
 - Anchor rules unchanged: an inline comment on a non-diff line still 422s the whole creation, pending or not.
 - **Verify by `position`, not `line`:** `GET .../reviews/{id}/comments` on a pending review returns `line`/`side` as null — that is not an error; they populate at submission. The proof the anchor took is `position`/`original_position` (line offset within the file's unified diff: the line under the first `@@` header is position 1, and each later `@@` header counts one line) plus `commit_id` equal to the staged head.
 - The staged review stays pinned to its `commit_id`. If the author pushes before the user submits, the comments keep pointing at the staged head and may render outdated — tell the user to have the anchors re-checked (or the review re-staged) before submitting in that case.
-- Section 6's "confirm each thread is live" adapts to staging: confirm `state: PENDING` plus the comment positions, then record the review id, its `html_url` (both in the creation response), and the staged head SHA in the findings MD, stating that submission is the user's action.
+- The posting reference's "confirm each thread is live" rule adapts to staging: confirm `state: PENDING` plus the comment positions, then record the review id, its `html_url` (both in the creation response), and the staged head SHA in the findings MD, stating that submission is the user's action.
 
 ## Suggestion blocks (one-click appliable fixes)
 
-When a finding's fix is an exact replacement of contiguous lines (SKILL section 6 defines when), end the comment body with a fenced ```` ```suggestion ```` block — GitHub renders a "Commit suggestion" button:
+When a finding's fix is an exact replacement of contiguous lines (posting-and-applying.md defines when), end the comment body with a fenced ```` ```suggestion ```` block — GitHub renders a "Commit suggestion" button:
 
 - The block replaces the comment's **entire anchored line range**: single-line → the `line`; multi-line → also set `start_line` and `start_side: "RIGHT"`, and the block replaces `start_line`..`line` inclusive. Anchor exactly the replaced lines — no more, no less; content = the complete replacement lines with exact indentation.
 - **Never combine a suggestion with the nearest-changed-line fallback anchor** — the applied suggestion commits over whatever lines the comment sits on, so a relocated anchor rewrites the wrong code. If the true lines aren't all in the diff, post the finding without the block (fix stays in prose).
