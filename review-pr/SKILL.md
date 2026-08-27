@@ -32,7 +32,7 @@ Detect from `git remote get-url origin` and read the matching reference **before
 - **Write comment bodies human-first, never as one chained sentence** (learned from a real PR review — a Suggestion chaining three actions with commas/em-dashes had to be re-posted). A Problem stacking 3+ facts renders them as a bulleted list. A Suggestion with more than one action becomes a numbered list ("Suggestion — two edits:"), one action per item. Multi-step procedures are numbered steps, never arrow chains (A → B → C). Test: the author should be able to act on each item without re-reading the sentence it came from. Fixing an already-posted comment: edit in place (`gh api -X PATCH .../pulls/comments/<id>` / ADO thread update), no correction trail, and record the edit + timestamp in the findings MD.
 - Each finding must be **self-contained and actionable**. No deferrals to "a later PR". No offers of the user's help.
 - **Write in the user's voice** — everything posted goes out under their account and must read as theirs.
-- **Never flag AI-attribution trailers** (`Co-Authored-By: Claude ...`, "Generated with" footers) in a teammate's commits or PR body — the no-AI-attribution rule is the user's personal convention for their OWN git artifacts only.
+- **Never flag AI-attribution trailers** (`Co-Authored-By: Claude ...`, "Generated with" footers) in a teammate's commits or PR body — a no-AI-attribution convention, where the user keeps one, governs their OWN git artifacts only.
 - Treat `TODO` comments as intentional future work — **do not challenge them**. **Omit locale files** from the review.
 - **Generated plan documents are read-only context, never a finding target** (learned from a real PR review): a `docs/plans/**` artifact — typically an HTML plan emitted by the planning tool — is produced upstream of the diff, so a defect in it is fixed in the generator, not by the PR author. Read it to learn what the implementation was *supposed* to do and audit the code against that intent; never raise a finding against the plan file itself, and never count its own inconsistencies as diff defects. The same rule applies to any other tool-generated artifact the PR merely carries along. One exception: an executed verification record inside the plan (an implementation-gates mutation table) is a claim about this branch's tests — audit it per section 3, and a record the audit contradicts is a valid finding.
 
@@ -62,8 +62,6 @@ Choose by trigger, and **state the chosen axes and why in one line before dispat
 | **Test quality**        | tests changed but source did not (otherwise the mutation axis covers it)                                                                                                    |
 
 If the user names an area to review explicitly, honor that on top of the triage. If the user asks for a deep or exhaustive review, run the full set.
-
-Calibration from a real run: on a real branch, mutation + correctness + doc-vs-code + resource — four agents rather than eight — would have found every finding that mattered, including the two the resource trigger fired on legitimately (child-process output reaching an on-disk log).
 
 ### Mutation-testing axis (own worktree, runs alongside the readers)
 

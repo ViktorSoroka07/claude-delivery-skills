@@ -22,7 +22,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 
 **Protocol** — past runs were invalidated by mutations that never applied and test runs that never executed:
 
-1. Green baseline first — record test count *and* duration, using the test command the repo's CLAUDE.md or `review-repo-nuances` project memory records (some repos' obvious command is wrong — the runtime's bare test runner may choke where the package script works). If neither records one, discover it, confirm it really executed (non-zero test count), and save it into that memory.
+1. Green baseline first — record test count *and* duration, using the test command the repo's CLAUDE.md or `review-repo-nuances` project memory records (some repos' obvious command is wrong — the runtime's built-in test runner may not be what the repo's own scripts run). If neither records one, discover it, confirm it really executed (non-zero test count), and save it into that memory.
 2. One at a time, applied with an `old_string` unique to the target line. **A failed edit means the mutation never applied — never count it as killed.**
 3. Re-run; compare count and duration to baseline. Record KILLED (name the failing test) or SURVIVED.
 4. Revert; confirm the tree is clean before the next.
@@ -33,7 +33,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 | Class                                 | Example                                                                                       |
 |---------------------------------------|-----------------------------------------------------------------------------------------------|
 | Aggregate swap                        | `COUNT(*)` ↔ `MAX(col)` — identical on contiguous data, divergent the moment a row is skipped |
-| Awaited vs forked                     | `await run(x)` → `runInBackground(x)` — indistinguishable to any synchronous test stub         |
+| Awaited vs forked                     | `await run(x)` → `runInBackground(x)` — indistinguishable to any synchronous test stub        |
 | Presence guard                        | `sawFlag ?` → `value > 0 ?` — collapses a measured zero into "unknown"                        |
 | Emitted fields                        | drop one column from a written row — invisible unless a test reads that column                |
 | Branch arms                           | delete a new `case` — falls through to a default that usually means "fine"                    |

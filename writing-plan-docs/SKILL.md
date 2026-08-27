@@ -42,5 +42,3 @@ A plan is read at implementation time — and the spec long after — against a 
 - Repo-relative links only — no `/Users/...` or machine paths (they 404 on the host). Never bare line numbers — they drift the moment any unrelated edit lands; where a symbol alone is ambiguous, keep the symbol and add `≈line` beside it. Never SHAs of the branch's own commits — a squash-merge erases them as objects, so they render as 404s; describe the change or cite the PR number instead (SHAs already on the target branch are stable and fine).
 - Don't commit generated design exports (e.g. a minified `.dc.html`); cite the artifact by name instead.
 - A deferral that is this PR's debt goes in the plan doc; a pre-existing repo condition goes to its own issue — unless the author directs otherwise.
-
-**Provenance:** promoted from project memories `a-feedback-memory` ("decisions are end-state, not deviations"; a plan shipped with checkboxes unchecked), `a-feedback-memory` ("plans do not preserve change history"), and `a-feedback-memory` (test counts stale on every sync).
