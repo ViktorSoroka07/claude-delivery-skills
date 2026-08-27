@@ -1,3 +1,6 @@
 .DS_Store
 *.zip
 .idea
+# local-only leak wordlist - must never be published
+.leakwords.local
+.leakguard_fail
