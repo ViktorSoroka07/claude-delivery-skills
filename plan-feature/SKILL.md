@@ -15,7 +15,7 @@ Prefer a repo's unprefixed skill over the `superpowers:` copy — the unprefixed
 
 Name the skills this run will use, so the user can redirect before the spending starts:
 
-> Chain: `brainstorming` (repo copy) → ground-truth check → `writing-plans` → optional plan review. Ends with a plan; nothing gets built.
+> Chain: `brainstorming` (repo copy) → ground-truth check → `writing-plans` + `writing-plan-docs` → optional plan review. Ends with a plan; nothing gets built.
 
 If a step's skill is missing in this repo, say so and name what you will do instead.
 

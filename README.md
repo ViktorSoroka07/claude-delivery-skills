@@ -15,11 +15,15 @@ order, and what it refuses to skip.
 
 ```
 idea ──> plan-feature ──> implement-plan ──> implementation-gates
-              │                  │
-              │                  └──> writing-plan-docs   (plan doc → shipped spec)
-              │
-              └──> (separate ask) review-pr ──> writing-pr-descriptions
+              │                 │
+              └────────┬────────┘
+                       v
+              writing-plan-docs   (the plan at start, the shipped spec at finish)
 ```
+
+`review-pr` and `writing-pr-descriptions` sit outside the build chain — each
+fires on its own request: reviewing an existing PR or branch, and creating or
+syncing a PR description.
 
 | Skill | When it fires | What it adds |
 |---|---|---|
@@ -51,12 +55,15 @@ idea ──> plan-feature ──> implement-plan ──> implementation-gates
 
 ## Install
 
-Clone into your personal skills directory (Claude Code discovers each
-`<skill>/SKILL.md` automatically):
+Claude Code discovers each `<skill>/SKILL.md` folder placed directly in a
+skills directory. On a machine with no personal skills yet:
 
     git clone https://github.com/ViktorSoroka07/claude-delivery-skills ~/.claude/skills
 
-Or copy individual skill folders into a project's `.claude/skills/`.
+If `~/.claude/skills` already has content, clone the repo elsewhere and copy
+the skill folders you want into it — or into a project's `.claude/skills/` —
+re-copying after each `git pull` (a nested clone puts the `SKILL.md` files one
+level too deep to be discovered).
 
 Works best alongside:
 
