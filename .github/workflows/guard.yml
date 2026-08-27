@@ -30,3 +30,23 @@ jobs:
       # full wordlist, remains the real gate.
       - name: History scan (structural patterns only)
         run: sh scripts/scan-history.sh
+
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Three real shell bugs shipped in these scripts before shellcheck
+      # was pointed at them; it stays pointed at them.
+      - name: ShellCheck the guard scripts
+        run: shellcheck .githooks/pre-commit scripts/*.sh
+
+      # The Agent Skills reference validator (PyPI: skills-ref; the installed
+      # command is `agentskills`) - frontmatter validity, name/directory
+      # agreement, and the spec's length limits, for every skill.
+      - name: Validate every skill against the Agent Skills spec
+        run: |
+          python3 -m pip install --quiet skills-ref
+          for d in */SKILL.md; do
+            agentskills validate "$(dirname "$d")"
+          done

@@ -28,7 +28,7 @@ dev\.azure\.com/[A-Za-z0-9]
 
 printf '%s\n' "$block_patterns" | while IFS= read -r p; do
   [ -z "$p" ] && continue
-  hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
+  hits=$(git diff --cached -U0 | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
   if [ -n "$hits" ]; then
     [ ! -f .leakguard_fail ] && echo "BLOCKED - internal data in staged changes:"
     report "BLOCK" "matches /$p/"
@@ -45,7 +45,7 @@ if [ -f .leakwords.local ]; then
   while IFS= read -r w; do
     w=${w%"$CR"}
     case "$w" in ''|\#*) continue ;; esac
-    hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nFi "$w")
+    hits=$(git diff --cached -U0 | grep -E '^\+' | grep -v -e '^+++' | grep -nFi "$w")
     if [ -n "$hits" ]; then
       [ ! -f .leakguard_fail ] && echo "BLOCKED - internal data in staged changes:"
       report "BLOCK" "matches a term in .leakwords.local"
@@ -65,7 +65,7 @@ warn_patterns='
 '
 printf '%s\n' "$warn_patterns" | while IFS= read -r p; do
   [ -z "$p" ] && continue
-  hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
+  hits=$(git diff --cached -U0 | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
   if [ -n "$hits" ]; then
     echo "WARNING - check these before publishing:"
     report "WARN" "matches /$p/"
