@@ -26,13 +26,13 @@ dev\.azure\.com/[A-Za-z0-9]
 [0-9]{4}-[0-9]{2}-[0-9]{2}
 '
 
-echo "$block_patterns" | while IFS= read -r p; do
+printf '%s\n' "$block_patterns" | while IFS= read -r p; do
   [ -z "$p" ] && continue
   hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
   if [ -n "$hits" ]; then
     [ ! -f .leakguard_fail ] && echo "BLOCKED - internal data in staged changes:"
     report "BLOCK" "matches /$p/"
-    echo "$hits" | sed 's/^/          /' | cut -c1-140
+    printf '%s\n' "$hits" | sed 's/^/          /' | cut -c1-140
     : > .leakguard_fail
   fi
 done
@@ -45,7 +45,7 @@ if [ -f .leakwords.local ]; then
     if [ -n "$hits" ]; then
       [ ! -f .leakguard_fail ] && echo "BLOCKED - internal data in staged changes:"
       report "BLOCK" "matches a term in .leakwords.local"
-      echo "$hits" | sed 's/^/          /' | cut -c1-140
+      printf '%s\n' "$hits" | sed 's/^/          /' | cut -c1-140
       : > .leakguard_fail
     fi
   done < .leakwords.local
@@ -59,13 +59,13 @@ warn_patterns='
 \bPR #?[0-9]{2,}
 \b[0-9a-f]{7,40}\b
 '
-echo "$warn_patterns" | while IFS= read -r p; do
+printf '%s\n' "$warn_patterns" | while IFS= read -r p; do
   [ -z "$p" ] && continue
   hits=$(git diff --cached -U0 -- $staged | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
   if [ -n "$hits" ]; then
     echo "WARNING - check these before publishing:"
     report "WARN" "matches /$p/"
-    echo "$hits" | sed 's/^/          /' | cut -c1-140
+    printf '%s\n' "$hits" | sed 's/^/          /' | cut -c1-140
   fi
 done
 

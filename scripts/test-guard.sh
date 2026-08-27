@@ -84,6 +84,20 @@ git commit -q --allow-empty -m more
 ./scripts/scan-history.sh >/dev/null 2>&1
 check "clean history scans CLEAN" 0 $?
 
+# 6. The warn tier prints but does not block. Guards against the shell's echo
+#    interpreting a backslash escape in a pattern and silently killing the tier.
+mkrepo t6
+PRREF=$(printf 'PR %s' '12345')
+echo "see $PRREF here" > f.txt
+git add f.txt
+out=$(git commit -qm warn 2>&1)
+rc=$?
+check "warn-tier commit still succeeds" 0 $rc
+case "$out" in
+  *WARNING*) echo "PASS: warn tier printed a WARNING" ;;
+  *) echo "FAIL: no WARNING in hook output"; fails=$((fails+1)) ;;
+esac
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
