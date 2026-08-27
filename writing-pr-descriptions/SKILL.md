@@ -33,6 +33,10 @@ An existing body's section layout may stay — the contract governs content shap
 5. Preserve bot-managed sections verbatim (everything from a bot marker such as a CodeRabbit release-notes comment onward — never edit or extend them).
 6. Process rationale survives as at most one past-tense sentence, only if it still helps the current reviewers (e.g. why one reviewer went first).
 
+## The author's reviewer-facing summary comment
+
+The same contract governs the **author's** "changes since the last review pass" comment (distinct from review findings, which are the reviewer's and go inline): one living record, edited in place, never a stack — multiple summary comments accumulate over a PR's life and bury the one reviewers should read. Create it at most once per PR — on the first changes-since-review sync — and note its id; every later update fetches the current body and PATCHes it back (GitHub: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<id>`; Azure DevOps: update the existing thread comment rather than posting a new thread), restructured to the current state — stale "what changed last week" content is replaced, not appended to. A fresh comment is warranted only when a new review cycle explicitly begins — then edit the superseded comment down to a one-line pointer to the new one. Replies on inline review threads are not summaries — they stay on their threads.
+
 ## Common mistakes (each observed in practice)
 
 | Wrong shape                                                                                                        | Correct shape                                                           |
