@@ -37,10 +37,12 @@ Positioned comments take a `position` object: `position_type: "text"`, the `diff
 - The fenced ```` ```suggestion ```` block is GitLab-native in note bodies; GitLab also has a **range extension** GitHub lacks: ```` ```suggestion:-N+M ```` replaces from N lines above to M lines below the anchored line (**not yet exercised**).
 - **REST does not serialize suggestion state**: the notes/discussions responses carry no `suggestions` field at all, so the API cannot confirm a block parsed as appliable — check the MR page for the Apply button on first use. Anchor the comment to the exact replaced line; a suggestion on a wrong anchor applies to the wrong lines, same as the other platforms.
 
-## Reply & resolve (thread disposition, later) — not yet exercised
+## Reply & resolve (thread disposition, later)
 
-Documented shape: reply `POST .../discussions/<discussion_id>/notes` with `{body}`; resolve `PUT .../discussions/<discussion_id>?resolved=true`. Verify both on first disposition and update this file — including whether resolving requires the discussion id alone or a note-level toggle.
+- Resolve state reads back via the discussions API: `notes[].resolved` plus `resolved_by` (verified after a real resolve — done in the UI; performing the resolve via `PUT .../discussions/<discussion_id>?resolved=true` is not yet exercised). Reply shape (`POST .../discussions/<discussion_id>/notes` with `{body}`) is also not yet exercised.
+- **A normal push does not invalidate existing threads** (verified): after the author pushed a new commit, the earlier thread kept its `position.head_sha` pinned to the head it was created against and stayed live — GitLab anchors each thread to its own diff version. The re-verify-before-posting rule still applies to NEW comments, which must carry the current `diff_refs`.
+- The disposition rule is the same as everywhere: verify the fix landed in the code at the new head (`git show <new_head>:<path>`), never just that the thread shows resolved.
 
 ## Not yet exercised — summary
 
-Deleted-line anchors; draft-note publish/bulk_publish; suggestion range syntax and Apply behavior; reply/resolve; force-push staleness behavior (what happens to positioned threads when the author pushes). Each is a first-use verification, not settled knowledge.
+Deleted-line anchors; draft-note publish/bulk_publish; suggestion range syntax (```` ```suggestion:-N+M ````) and whether Apply produces its default commit message; performing resolve and reply via the API; force-push (as opposed to a normal push) behavior. Each is a first-use verification, not settled knowledge.
