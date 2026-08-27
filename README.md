@@ -30,7 +30,7 @@ syncing a PR description.
 | **plan-feature** | "I want to build X" | Idea → reviewed plan, then stops. Ground-truths every claim the design makes about systems you did not write, before the plan is written. |
 | **implement-plan** | "implement this plan" | Plan → built. Guarantees the plan carries a gates task, checks its premises are settled, delegates execution, runs the gates. |
 | **implementation-gates** | work is about to be called done | Proves the new tests could actually fail (targeted mutation sweep), re-checks external claims, and keeps written verification records honest. |
-| **review-pr** | "review this PR / branch" | Two-pass multi-axis review: parallel single-axis agents plus a mutation-testing agent, then a fresh-eyes verifier prompted to refute every finding. Posts nothing without being asked. |
+| **review-pr** | "review this PR / branch" | Two-pass multi-axis review: parallel single-axis agents plus a mutation-testing agent, then a fresh-eyes verifier prompted to refute every finding. Posts nothing without being asked. GitHub, Azure DevOps, GitLab. |
 | **writing-plan-docs** | creating or syncing a plan/spec doc | Keeps the document a current-state spec, never a changelog — the doc describes the destination, not the route. |
 | **writing-pr-descriptions** | creating or syncing a PR description | Describes the diff, not the branch: net delta, deliberate scope boundary, references that survive a squash-merge. |
 
@@ -107,8 +107,9 @@ Works best alongside:
   to its skills (`brainstorming`, `writing-plans`, `executing-plans`,
   `subagent-driven-development`, `verification-before-completion`,
   `finishing-a-development-branch`) or to a repo's own forks of them;
-- `gh` (GitHub) or the `az` CLI / a PAT (Azure DevOps) for `review-pr` — those
-  are the two platforms it carries mechanics for.
+- an authenticated platform CLI for `review-pr` — `gh` (GitHub), `az` or a PAT
+  (Azure DevOps), or `glab` (GitLab) — the three platforms it carries earned
+  mechanics for.
 
 Works on macOS, Linux, and Windows: the guard scripts are POSIX sh, which Git
 for Windows already provides — hooks run under its bundled Git Bash, no extra
