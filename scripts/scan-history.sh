@@ -4,7 +4,7 @@
 # Exits non-zero if anything is found.
 set -u
 found=0
-pats='AB#[0-9]+|@[A-Za-z0-9.-]*company\.com|[A-Za-z0-9-]+\.company\.com|dev\.azure\.com/[A-Za-z0-9]|[A-Za-z0-9-]+\.visualstudio\.com'
+pats='AB#[0-9]+|dev\.azure\.com/[A-Za-z0-9]|[A-Za-z0-9-]+\.visualstudio\.com|[0-9]{4}-[0-9]{2}-[0-9]{2}'
 if [ -f .leakwords.local ]; then
   extra=$(grep -v '^[[:space:]]*#' .leakwords.local | grep -v '^[[:space:]]*$' | paste -sd'|' -)
   [ -n "$extra" ] && pats="$pats|$extra"

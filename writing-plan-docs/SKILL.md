@@ -23,7 +23,7 @@ The reader is someone consulting the spec later — not the reviewer of this bra
 
 ## Verification record: outcomes, not snapshots
 
-- **State that each gate passed; never volatile counts.** "server 4535 passed" goes stale the moment any test lands anywhere in the repo, and every later sync pays to refresh a number nobody consumes. Write "every package suite green". Counts are allowed only in point-in-time artifacts pinned to a commit and consumed against that state — a review findings file, a PR description — not in the living spec.
+- **State that each gate passed; never volatile counts.** "4535 tests passed" goes stale the moment any test lands anywhere in the repo, and every later sync pays to refresh a number nobody consumes. Write "every package suite green". Counts are allowed only in point-in-time artifacts pinned to a commit and consumed against that state — a review findings file, a PR description — not in the living spec.
 - **The mutation table is the exception that earns its rows.** A table of "mutation → test that kills it" is an executed gates record that later reviews audit by re-applying rows, so it must stay current: every row must name code that still exists, anchored by code identity (the expression mutated), never line numbers. When a mechanism is replaced, replace its rows with the pins that hold now — do not keep rows for deleted code and do not narrate which round added which row.
 - **Record what was NOT verified** and the concrete reason, stated so a reader can run the missing check — an honest gap beats an implied pass.
 
@@ -31,7 +31,7 @@ The reader is someone consulting the spec later — not the reviewer of this bra
 
 Re-check these whenever the branch merges its target or the upstream scope shifts:
 
-- **Out of scope / Still open:** an upstream change can narrow, answer, or reshape an item. Restate each with its current boundary condition (e.g. "the two-pass engine narrows this — it now only bites at a configured cap of 1"), or delete it if answered. An out-of-scope list that no longer matches the engine misleads exactly the person deciding what to do next.
+- **Out of scope / Still open:** an upstream change can narrow, answer, or reshape an item. Restate each with its current boundary condition (e.g. "the upstream rework narrows this — it now only bites at a configured cap of 1"), or delete it if answered. An out-of-scope list that no longer matches the engine misleads exactly the person deciding what to do next.
 - **Background/terminology:** definitions of the surrounding system drift when the system is restructured under the branch. The background must describe the engine the code merges into, without naming which PR restructured it.
 - **Claims about names and calls:** a renamed function ("the cleanup calls terminate()") or a removed field referenced in prose is a doc-vs-code defect; fix the prose to the current identifier.
 
@@ -40,5 +40,5 @@ Re-check these whenever the branch merges its target or the upstream scope shift
 A plan is read at implementation time — and the spec long after — against a tree that has moved since it was written, so every reference must resolve *then*, not just now. Anchor to what survives edits and is self-validating (the reader greps it and confirms the site): symbol names, unique string fragments, headings, file paths.
 
 - Repo-relative links only — no `/Users/...` or machine paths (they 404 on the host). Never bare line numbers — they drift the moment any unrelated edit lands; where a symbol alone is ambiguous, keep the symbol and add `≈line` beside it. Never SHAs of the branch's own commits — a squash-merge erases them as objects, so they render as 404s; describe the change or cite the PR number instead (SHAs already on the target branch are stable and fine).
-- Don't commit generated design exports (e.g. a minified `.dc.html`); cite the artifact by name instead.
+- Don't commit generated design exports (e.g. a minified single-file HTML); cite the artifact by name instead.
 - A deferral that is this PR's debt goes in the plan doc; a pre-existing repo condition goes to its own issue — unless the author directs otherwise.

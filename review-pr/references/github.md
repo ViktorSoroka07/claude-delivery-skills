@@ -8,7 +8,7 @@
 
 ## Dedupe source
 
-Pull existing threads via GraphQL `reviewThreads` (with author + path + isResolved) from all authors — humans, coderabbitai, claude.
+Pull existing threads via GraphQL `reviewThreads` (with author + path + isResolved) from all authors — humans and bots (e.g. coderabbitai, claude).
 
 ## Anchor validation (required before output)
 

@@ -1,3 +1,5 @@
 # Literal internal terms. NEVER commit this file - it is gitignored.
 # One term per line, case-insensitive substring match.
 # one term per line, e.g. an internal codename
+# include your company's domain (company.com) - the committed hook carries
+# only shape patterns, so literal hosts and names must all live here

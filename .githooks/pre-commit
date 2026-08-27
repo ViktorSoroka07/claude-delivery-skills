@@ -5,7 +5,7 @@
 #   - STRUCTURAL patterns live here, in the committed hook. They describe the
 #     *shape* of internal data (ticket ids, internal hosts, ticket URLs) and
 #     name nothing, so this file is safe to publish.
-#   - LITERAL names (codenames, client repo names) live in .leakwords.local,
+#   - LITERAL names (codenames, private repo names) live in .leakwords.local,
 #     which is gitignored and never published. Writing them here would leak
 #     the very words the hook exists to catch.
 #
@@ -22,8 +22,6 @@ report() { printf '  %-7s %s\n' "$1" "$2"; }
 # --- BLOCK: structural patterns that are never legitimate here -------------
 block_patterns='
 AB#[0-9]+
-@[A-Za-z0-9.-]*company\.com
-[A-Za-z0-9-]+\.company\.com
 dev\.azure\.com/[A-Za-z0-9]
 [A-Za-z0-9-]+\.visualstudio\.com
 [0-9]{4}-[0-9]{2}-[0-9]{2}
