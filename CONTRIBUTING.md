@@ -55,6 +55,13 @@ not be what the repo's scripts run"), not the vendor.
 The pre-commit hook cannot make this judgment - it blocks identifiers, not
 flavor. This section is the check that runs before the hook ever sees the text.
 
+The same standard gates new platform references (a gitlab.md, a bitbucket.md):
+they are earned by real use, never written from documentation. A reference
+file's value is the traps that diverge from the obvious - API behavior nobody
+writes down until it burns them - and those cannot be generated. Until someone
+has done real reviews on a platform, review-pr's honest answer there is its
+unknown-platform fallback, not a speculative reference.
+
 ## Provenance without leaking
 
 A provenance note has two jobs: proving the rule came from real experience, and

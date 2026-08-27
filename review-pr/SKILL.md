@@ -13,6 +13,7 @@ Detect from `git remote get-url origin` and read the matching reference **before
 
 - `github.com` → `references/github.md`
 - `dev.azure.com` / `visualstudio.com` → `references/ado.md`
+- Any other host (GitLab, Bitbucket, …): no reference exists — say so plainly. Review the local branch diff against its merge-base with the default branch (sections 2–5 are platform-neutral), skip the PR-thread dedupe, and state that posting and disposition are unsupported on this platform. Never improvise API calls from general knowledge — the references exist because real mechanics diverge from the obvious.
 
 ## 1. Scope & setup
 

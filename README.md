@@ -61,6 +61,14 @@ The mutation axis measures rather than reads — its evidence looks like:
 | `>=` → `>` at the window boundary | KILLED by `test_window_edges` |
 | drop `retries` from the emitted row | SURVIVED → finding: the missing assertion, spelled out |
 
+That's the default path. `review-pr` also carries, each behind its own ask:
+**deep mode** (a blind re-review plus one isolated skeptic per finding),
+**staged posting** (GitHub PENDING reviews, for holding publication until you
+submit), **apply mode** (fixes land only after every new test is proven failing
+against the pre-fix code), and **thread disposition** (reply-and-resolve with
+verification that each fix actually landed). The skill files are the full
+documentation — every mode is specified where the agent reads it.
+
 ## The ideas underneath
 
 - **Green is not the bar; "would it have gone red" is the bar.** A test suite that
