@@ -1,17 +1,17 @@
 # Claude delivery skills
 
-Thirteen [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
-the path from idea to merged PR — and the moments around it. They exist because the
-failure mode of agent-driven development is rarely the code itself: it is everything
-around the code. Plans built on unverified claims. Tests that pass but would never have
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — thirteen skills, two
+agent types, and a write-time hook — that hardens the path from idea to merged PR, and
+the moments around it. It exists because the failure mode of agent-driven development
+is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
 Comments nobody needed. Spend nobody priced.
 
 Each skill is a `SKILL.md` instruction package. Claude Code loads it when the task
 matches, and the instructions change how the model works — what it checks, in what
-order, and what it refuses to skip. Every rule in them was paid for by a real incident;
-the catalog below tells you which problem each one solves, so you can judge the set
-without reading fourteen files.
+order, and what it refuses to skip. Every rule was paid for by a real incident; the
+catalog below tells you which problem each piece solves, so you can judge the set
+without reading every file.
 
 ## The map
 
@@ -173,6 +173,24 @@ Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
 ledger, not the items that happened to finish.
 
+## The other pieces
+
+Skills are instructions the model follows; two more component types cover what
+instructions alone cannot:
+
+- **Two agent types** (`agents/`) — `axis-reviewer` and `refute-verifier` carry the
+  reviewer and skeptic contracts that `review-pr` and `verifying-before-sending`
+  otherwise restate in every dispatch prompt: the finding format, the
+  name-the-pinned-SHA rule, the refute-don't-confirm stance, read-only boundaries.
+  The skills use them when present; dispatch prompts shrink to axis, worktree, SHA,
+  and scope.
+- **One hook** (`hooks/`) — a warn-only PostToolUse backstop to `writing-code-comments`.
+  The comment rules are the most-relapsed discipline in the corpus behind this repo:
+  the skill owns the judgment, and the hook mechanically flags narrative-comment tells
+  ("Regression:", "used to", "harmless because") the moment an edit adds them — because
+  a rule the model can rationalize past needs a gate the harness executes. It never
+  blocks, and it skips prose files.
+
 ## What a run looks like
 
 An illustrative `review-pr` run — what the skill's contract produces, abridged:
@@ -236,15 +254,21 @@ documentation — every mode is specified where the agent reads it.
 
 ## Install
 
-Claude Code discovers each `<skill>/SKILL.md` folder placed directly in a
-skills directory. On a machine with no personal skills yet:
+As a plugin, from inside Claude Code:
 
-    git clone https://github.com/ViktorSoroka07/claude-delivery-skills ~/.claude/skills
+    /plugin marketplace add ViktorSoroka07/claude-delivery-skills
+    /plugin install delivery-skills@claude-delivery-skills
 
-If `~/.claude/skills` already has content, clone the repo elsewhere and copy
-the skill folders you want into it — or into a project's `.claude/skills/` —
-re-copying after each `git pull` (a nested clone puts the `SKILL.md` files one
-level too deep to be discovered).
+Skills then invoke under the plugin namespace (`/delivery-skills:review-pr`), and the
+agents are available by bare name. Alternatively, clone the repo as a subdirectory of
+your skills directory —
+
+    git clone https://github.com/ViktorSoroka07/claude-delivery-skills ~/.claude/skills/claude-delivery-skills
+
+— and Claude Code auto-loads it as a skills-directory plugin, updatable with
+`git pull` + `/reload-plugins`. Individual `skills/<name>` folders can also be copied
+into `~/.claude/skills/` or a project's `.claude/skills/` for bare-name use without
+the plugin machinery (the agents and the hook then don't come along).
 
 Works best alongside:
 

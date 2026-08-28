@@ -53,6 +53,6 @@ jobs:
       - name: Validate every skill against the Agent Skills spec
         run: |
           pipx install skills-ref
-          for d in */SKILL.md; do
+          for d in skills/*/SKILL.md; do
             agentskills validate "$(dirname "$d")"
           done

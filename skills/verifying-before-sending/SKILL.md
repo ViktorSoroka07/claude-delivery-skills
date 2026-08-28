@@ -19,7 +19,7 @@ The table catches a class prose review misses. Reading a draft checks whether ea
 
 ## Pass 1 — the blind pass
 
-Verify the claims **from a fresh context that has not seen the reasoning that produced them.** A verifier given the argument re-confirms it; a verifier given only the claims checks them.
+Verify the claims **from a fresh context that has not seen the reasoning that produced them.** A verifier given the argument re-confirms it; a verifier given only the claims checks them. (The plugin's `refute-verifier` agent type carries this stance where available.)
 
 - Hand over the claims, not the argument: numbered, each with its cited location, phrased neutrally, with an instruction to open the source rather than trust the citation.
 - **Name the weakest claims and say why they are weak** ("rests on a grep of one directory", "this negative was read from a single function"). The strongest findings come from the claims flagged as shaky.

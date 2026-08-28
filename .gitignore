@@ -5,3 +5,6 @@
 .leakwords.local
 .leakguard_fail
 .claude/
+
+# review-pr findings are point-in-time, untracked by convention
+review-findings-*.md
