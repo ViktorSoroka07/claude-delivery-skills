@@ -1,0 +1,37 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9AA0A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<rect x="0" y="0" width="1280" height="640" fill="#F7F6F3"/>
+<rect x="0" y="0" width="1280" height="10" fill="#2F7A6F"/>
+
+<text x="96" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="66" font-weight="700" fill="#2B2A27">Claude delivery skills</text>
+<text x="96" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="29" font-weight="400" fill="#6E6B65">A Claude Code plugin that hardens the path from idea to merged PR</text>
+
+<rect x="96" y="316" width="96" height="68" rx="34" fill="#ECEEF2" stroke="#6B7280" stroke-width="1"/>
+<text x="144" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">idea</text>
+
+<line x1="196" y1="350" x2="216" y2="350" stroke="#9AA0A8" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="222" y="316" width="198" height="68" rx="10" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="1"/>
+<text x="321" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">plan-feature</text>
+
+<line x1="424" y1="350" x2="444" y2="350" stroke="#9AA0A8" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="450" y="316" width="214" height="68" rx="10" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="1"/>
+<text x="557" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">implement-plan</text>
+
+<line x1="668" y1="350" x2="688" y2="350" stroke="#9AA0A8" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="694" y="316" width="250" height="68" rx="10" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="1"/>
+<text x="819" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">implementation-gates</text>
+
+<line x1="948" y1="350" x2="968" y2="350" stroke="#9AA0A8" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="974" y="316" width="210" height="68" rx="34" fill="#ECEEF2" stroke="#6B7280" stroke-width="1"/>
+<text x="1079" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">shipped spec + PR</text>
+
+<text x="96" y="478" font-family="system-ui, -apple-system, sans-serif" font-size="27" font-weight="600" fill="#8A5A1D">13 skills&#160;&#160;&#183;&#160;&#160;2 agents&#160;&#160;&#183;&#160;&#160;1 hook&#160;&#160;&#183;&#160;&#160;MIT</text>
+<text x="96" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="23" font-weight="400" fill="#9AA0A8">github.com/ViktorSoroka07/claude-delivery-skills</text>
+</svg>
