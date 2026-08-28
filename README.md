@@ -238,7 +238,11 @@ Works best alongside:
   `finishing-a-development-branch`) or to a repo's own forks of them;
 - an authenticated platform CLI for `review-pr` — `gh` (GitHub), `az` or a PAT
   (Azure DevOps), or `glab` (GitLab) — the three platforms it carries earned
-  mechanics for.
+  mechanics for;
+- the [humanizer](https://github.com/blader/humanizer) skill — the send-moment
+  pair checks whether outbound text is true and fits its reader;
+  `writing-for-audiences` hands off to humanizer as the final register pass on
+  prose published under a person's name.
 
 Works on macOS, Linux, and Windows: the guard scripts are POSIX sh, which Git
 for Windows already provides — hooks run under its bundled Git Bash, no extra

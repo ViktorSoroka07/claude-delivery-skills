@@ -45,6 +45,7 @@ Ask how the text will be consumed and shape it for exactly that:
 - **Spoken** — breath-length sentences, no parentheticals.
 - **Skimmed** — the point first; an ask never trails a long paragraph, because the trailing clause is what skimming skips.
 - **Decoded** — a figure or diagram carries its own legend; a reader with no context must be able to say what each element means.
+- **Published under a person's name** (an article, a post, a public doc) — after the content passes, run a de-AI-register pass where such a tool is installed (e.g. the MIT-licensed [humanizer](https://github.com/blader/humanizer) skill), feeding the author's own writing samples. Drafting-register tells — bold-label lists, stock vocabulary, uniform cadence — cost the text credibility with exactly the audience it was written for; the sample-priority rule keeps the author's real habits intact, including ones a pattern catalog would flag.
 
 ## Red flags
 
