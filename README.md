@@ -1,57 +1,187 @@
 # Claude delivery skills
 
 Fourteen [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
-the path from idea to merged PR. They exist because the failure mode of agent-driven
-development is rarely the code itself — it is everything around the code: plans built
-on unverified claims about how external systems behave, tests that pass but would
-never have failed, verification records that claim more than what ran, review
-comments that waste the author's time, subagent reports treated as facts, and
-outward-bound messages that read fine and are wrong.
+the path from idea to merged PR — and the moments around it. They exist because the
+failure mode of agent-driven development is rarely the code itself: it is everything
+around the code. Plans built on unverified claims. Tests that pass but would never have
+failed. Subagent reports treated as facts. Messages that read fine and are wrong.
+Comments nobody needed. Spend nobody priced.
 
 Each skill is a `SKILL.md` instruction package. Claude Code loads it when the task
 matches, and the instructions change how the model works — what it checks, in what
-order, and what it refuses to skip.
+order, and what it refuses to skip. Every rule in them was paid for by a real incident;
+the catalog below tells you which problem each one solves, so you can judge the set
+without reading fourteen files.
 
-## The chain
+## The map
+
+Four skills form the build chain; the other ten guard moments that can occur in any
+session, at any time.
+
+```mermaid
+flowchart TB
+    subgraph CHAIN["The build chain"]
+        direction LR
+        I([idea]) --> PF["plan-feature"]
+        PF --> IP["implement-plan"]
+        IP --> IG["implementation-gates"]
+        IG --> SH([shipped spec + PR])
+        WPD["writing-plan-docs"] -.plan at start,<br>spec at finish.- PF
+        WPD -.- IP
+    end
+
+    subgraph MOMENTS["Moments in any session"]
+        direction LR
+        M1{{"a PR or branch<br>needs review"}} --- RP["review-pr"]
+        M2{{"work handed<br>to subagents"}} --- DS["delegating-to-subagents"]
+        M3{{"factual text leaves<br>the workspace"}} --- SEND["verifying-before-sending<br>writing-for-audiences"]
+        M4{{"a code comment<br>about to be added"}} --- WCC["writing-code-comments"]
+        M5{{"PR description or<br>living status comment"}} --- WPR["writing-pr-descriptions"]
+        M6{{"memory written,<br>session ending"}} --- MPM["maintaining-project-memory"]
+        M7{{"spend at scale<br>about to start"}} --- BA["budgeting-agentic-work"]
+        M8{{"a request with<br>several asks"}} --- TOA["tracking-open-asks"]
+    end
+
+    CHAIN ~~~ MOMENTS
+```
+
+## What each skill solves
+
+### The build chain
+
+**`plan-feature` — a coherent plan can still be false.**
+A design that argues its premise well for three sentences can be wrong about what an
+API returns or a column means — and implementation will build on it faithfully. The
+skill ground-truths every claim about systems you did not write *before* the plan is
+written (read-only checks: real data, then an existing consumer, then docs — a coherent
+argument is not evidence), then stops so the plan can be read before anything is built.
+
+**`implement-plan` — the gate that is not written into the plan does not run.**
+Executors obey the plan, so a verification step that lives only in good intentions gets
+skipped. The skill patches the plan with a gates task before execution starts, checks
+the plan's premises were settled rather than argued, delegates the build to the repo's
+own execution skill, and finishes by rewriting the plan as the spec of what shipped.
+
+**`implementation-gates` — green is not the bar; "would it have gone red" is.**
+Thirteen mutations once survived a suite that honestly passed: the tests could not fail.
+The skill runs ten to twelve targeted mutations over the new lines (every non-equivalent
+survivor is a missing assertion), re-checks the design's claims about outside systems
+against evidence, and keeps written verification records to exactly what ran.
+
+**`writing-plan-docs` — the doc describes the destination, never the route.**
+Plan documents decay into changelogs — deviation lists, review-round narration, stale
+counts — that mislead the person reading them later. The skill keeps the doc a
+current-state spec: superseded content replaced rather than annotated, verification
+records that outlive the branch, references that resolve against a tree that has moved.
+
+### Reviewing
+
+**`review-pr` — one careful reader misses what measurement and adversarial checks catch.**
+A single reviewer finds what a single way of reading finds; and a review's own findings
+are claims that can be wrong. Two passes: parallel single-axis agents (chosen from the
+diff, never the full set) plus a mutation agent that measures instead of reads — then a
+fresh-eyes verifier prompted to *refute* every draft finding before anything is reported.
+Posts nothing without being asked.
+
+```mermaid
+flowchart LR
+    D([diff]) --> A1["axis agents<br>(chosen by triage)"]
+    D --> MU["mutation agent<br>(own worktree)"]
+    A1 --> DR([draft findings])
+    MU --> DR
+    DR --> V["fresh-eyes verifier<br>(prompted to refute)"]
+    V --> F([findings file<br>confirmed / refuted / adjusted])
+```
+
+### Working through subagents
+
+**`delegating-to-subagents` — a subagent's output is a claim about work, not the work.**
+Real incidents: a research agent invented a tool name ("confirmed from source") and the
+shipped check rejected every input; delegated diffs carried the agent's monologue into
+commits; and reports simply never arrived. The skill governs what dispatch
+guides lack — collision-safe partitioning, delivery instructions, liveness checks before
+taking over, verifying every reported identifier, auditing every delegated diff.
+
+### The send moment — three skills, one axis each
+
+Text about to leave the workspace fails three independent ways, so three skills fire
+together and split the work:
+
+```mermaid
+flowchart TB
+    T([text about to be sent]) --> Q1["verifying-before-sending<br><i>are the claims true?</i>"]
+    T --> Q2["writing-for-audiences<br><i>does the prose fit the reader?</i>"]
 
 ```
-idea ──> plan-feature ──> implement-plan ──> implementation-gates
-              │                 │
-              └────────┬────────┘
-                       v
-              writing-plan-docs   (the plan at start, the shipped spec at finish)
+
+**`verifying-before-sending` — text that reads fine and is wrong.**
+A blind pass once corrected four claims in a document that had already passed
+self-review, and found a defect that would have failed every run of a process another
+engineer was about to build on. Fact table before writing; verification by a fresh
+context that never saw the reasoning; two named traps (absence claimed from a truncated
+search, a negative claimed from one function); two passes maximum, then the warrant
+stated — never the feeling.
+
+**`writing-for-audiences` — prose the reader cannot use, or should not have.**
+"40%" invites "of what?"; two numbers measured under different conditions are not one
+comparison; and a task description condensed from an internal backlog once delivered
+interpersonal framing onto a shared board. Register matched to the reader, every number
+carrying its base, an audience gate that re-derives text instead of condensing it, and
+formatting for how the text is actually used — copied, spoken, skimmed.
+
+
+
+
+
+
+
+
+### Writing artifacts
+
+**`writing-code-comments` — subtractive comment rules keep failing; give the fact a home.**
+"Don't write comments" collapses the moment a fact feels load-bearing — which is why
+the correction kept recurring. Zero by default at write-time, an invariant-plus-cost
+shape when one is earned, and the escape hatch that makes the default hold: the
+load-bearing fact becomes an expression, an assertion that fails when broken, or a
+named constant — never prose.
+
+**`writing-pr-descriptions` — describe the diff, not the branch.**
+Descriptions accumulate review-round narration and references that die on squash-merge.
+The contract: net delta grouped by behavioral change, the deliberate scope boundary,
+references that survive history rewrites — and at most one living status comment,
+edited in place, never a stack.
+
+### The session itself
+
+**`maintaining-project-memory` — memory is a promotion tier, not a notebook.**
+A line written to memory executes with full authority in a later session that cannot
+question it: a stale "still to push" reads as a live obligation; a rule whose scope was
+dropped at the write step fires as an absolute. Keep only what the repo structurally
+cannot record; re-derive rules instead of copying wording; when content graduates into
+a skill, condense the memory to a pointer, the private residue, and a capture buffer;
+end continuing sessions with the literal next-session starter prompt.
+
+```mermaid
+flowchart LR
+    C([correction in chat]) --> M["memory<br>(capture buffer)"]
+    M -->|confirmed in practice| SK["skill<br>(the durable home)"]
+    SK -->|memory condenses to| P["pointer + residue<br>+ capture buffer"]
+    P -.new corrections land here.-> M
 ```
 
-The other ten sit outside the build chain and fire on their own triggers:
-`review-pr` on a review request, `writing-pr-descriptions` when a PR
-description is created or synced, `delegating-to-subagents` whenever work is
-handed to subagents, `maintaining-project-memory` when project memory is
-written or pruned and when a continuing session ends, `writing-code-comments`
-whenever a code comment is about to be added, `budgeting-agentic-work` when
-work will spend money or context at scale, `tracking-open-asks` when a
-request carries more than one ask — and three that share the send moment,
-one axis each: `verifying-before-sending` (are the claims true),
-`writing-for-audiences` (does the prose fit its reader), and
-``.
+**`budgeting-agentic-work` — the bill arrives after the decisions that ran it up.**
+A budget wall hit mid-run loses paid work in interrupted agents; a rework round silently
+doubled one pass's cost; idle servers spend and fake verification results. Phase the
+work so every phase ends durable, price the pass before it runs, treat rework cost as a
+process defect with a cause to fix, and stop what you started.
 
-| Skill | When it fires | What it adds |
-|---|---|---|
-| **plan-feature** | "I want to build X" | Idea → reviewed plan, then stops. Ground-truths every claim the design makes about systems you did not write, before the plan is written. |
-| **implement-plan** | "implement this plan" | Plan → built. Guarantees the plan carries a gates task, checks its premises are settled, delegates execution, runs the gates. |
-| **implementation-gates** | work is about to be called done | Proves the new tests could actually fail (targeted mutation sweep), re-checks external claims, and keeps written verification records honest. |
-| **review-pr** | "review this PR / branch" | Two-pass multi-axis review: parallel single-axis agents plus a mutation-testing agent, then a fresh-eyes verifier prompted to refute every finding. Posts nothing without being asked. GitHub, Azure DevOps, GitLab. |
-| **writing-plan-docs** | creating or syncing a plan/spec doc | Keeps the document a current-state spec, never a changelog — the doc describes the destination, not the route. |
-| **writing-pr-descriptions** | creating or syncing a PR description | Describes the diff, not the branch: net delta, deliberate scope boundary, references that survive a squash-merge. |
-| **delegating-to-subagents** | handing work to subagents, and using what they return | Treats a subagent's output as a claim, not the work: isolation checked before dispatch, files not findings partitioned, identifiers grep-verified, diffs audited before commit, silent agents triaged instead of abandoned. |
-| **verifying-before-sending** | factual text about to leave the workspace | Fact table before writing, a blind pass that inherits none of the author's reasoning, two named absence-claim traps, a two-pass cap with the warrant stated instead of the feeling. |
-| **maintaining-project-memory** | writing or pruning project memory; ending a continuing session | Memory as a promotion tier: keep only what the repo structurally cannot record, delete branch state git already answers, re-derive rules instead of copying wording, and end with the literal next-session starter prompt. |
-| **writing-code-comments** | a code comment is about to be added | Zero by default, applied at write-time; invariant-plus-cost shape when earned; and the escape hatch that makes the rule hold — a load-bearing fact becomes an expression, an assertion, or a named constant, never prose. |
-| **writing-for-audiences** | prose a specific person or audience will read, act on, or hear | Register matched to the reader, every number carrying its base and conditions, an audience gate that strips what the reader isn't entitled to, and formatting for how the text is actually used. |
+**`tracking-open-asks` — the trailing "and also…" is the ask that drops.**
+When the requester has to re-ask, they have paid twice: once waiting, once auditing.
+Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
+answered, declined, or deferred — never silently), and status reports cover the whole
+ledger, not the items that happened to finish.
 
-| **budgeting-agentic-work** | work about to spend money or context at scale | Phases that end durable so a ceiling loses one phase, the pass priced before it runs, rework cost treated as a process defect, and started compute stopped when its purpose is served. |
-| **tracking-open-asks** | a request with more than one ask; any status checkpoint | An explicit ledger from the moment asks arrive, every ask closed visibly, and reports that cover the whole ledger — a re-ask from the requester is the failure signal. |
-
-## What it looks like
+## What a run looks like
 
 An illustrative `review-pr` run — what the skill's contract produces, abridged:
 
@@ -67,7 +197,7 @@ logic changed and the PR carries a spec. Say the word to add or drop one.
 Pass 2 (fresh-eyes verifier, prompted to refute each finding):
 5 confirmed, 2 refuted, 1 adjusted, 1 added by the sweep.
 
-review-findings-214.md written — 3 medium, 3 minor. Nothing was posted;
+review-findings-214.md written — 3 medium, 4 minor. Nothing was posted;
 say "post" to publish the final findings to the PR as inline threads.
 ```
 
@@ -78,8 +208,9 @@ The mutation axis measures rather than reads — its evidence looks like:
 | `>=` → `>` at the window boundary | KILLED by `test_window_edges` |
 | drop `retries` from the emitted row | SURVIVED → finding: the missing assertion, spelled out |
 
-That's the default path. `review-pr` also carries, each behind its own ask:
-**deep mode** (a blind re-review plus one isolated skeptic per finding),
+That's the default path. `review-pr` also carries, on request:
+**deep mode** (a blind re-review plus one isolated skeptic per finding — this
+one also fires when the repo's memory pins it),
 **staged posting** (GitHub PENDING reviews, for holding publication until you
 submit), **apply mode** (fixes land only after every new test is proven failing
 against the pre-fix code), and **thread disposition** (reply-and-resolve with
@@ -96,6 +227,12 @@ documentation — every mode is specified where the agent reads it.
   write — what an API returns, what a column means, what a tool prints — gets
   settled by a read-only check against real data, an existing consumer, or
   documentation, in that order, at the moment it is cheapest: plan time.
+- **Output is a claim until verified.** A subagent's report, a reviewer's finding, a
+  green gate, a draft that reads fine — each is treated as a claim about the world,
+  checked against source before anything is built on it.
+- **One owner per rule.** When a rule applies in several skills, one skill owns its
+  statement and the others defer to it — so a refinement lands once instead of
+  drifting across copies.
 - **Delegate and patch, never restate.** These skills wrap a repo's own skills
   (or the [superpowers](https://github.com/obra/superpowers) set) rather than
   replacing them. What they add is the checks that chains tend to lack, inserted
