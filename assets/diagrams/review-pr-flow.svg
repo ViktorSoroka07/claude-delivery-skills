@@ -1,0 +1,41 @@
+<svg width="100%" viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent, their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9AA0A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<rect x="1" y="1" width="1098" height="248" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
+
+<rect x="28" y="103" width="84" height="44" rx="22" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="70" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">diff</text>
+
+<text x="140" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">pass 1</text>
+<line x1="116" y1="116" x2="172" y2="80" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="116" y1="134" x2="172" y2="170" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="180" y="44" width="200" height="58" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="280" y="64" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">axis agents, parallel</text>
+<text x="280" y="83" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">axes chosen from the diff</text>
+
+<rect x="180" y="148" width="200" height="58" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="280" y="168" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">mutation agent</text>
+<text x="280" y="187" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">measures, in its own worktree</text>
+
+<line x1="384" y1="80" x2="444" y2="114" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="384" y1="170" x2="444" y2="136" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="452" y="99" width="150" height="52" rx="26" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="527" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">draft findings</text>
+
+<text x="632" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">pass 2</text>
+<line x1="606" y1="125" x2="658" y2="125" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="666" y="95" width="196" height="60" rx="8" fill="#FBEFDC" stroke="#B47B2B" stroke-width="0.6"/>
+<text x="764" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#8A5A1D" text-anchor="middle" dominant-baseline="central">fresh-eyes verifier</text>
+<text x="764" y="135" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#A2743A" text-anchor="middle" dominant-baseline="central">prompted to refute</text>
+
+<line x1="866" y1="125" x2="898" y2="125" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="906" y="95" width="182" height="60" rx="8" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="997" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">findings file</text>
+<text x="997" y="135" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#5B6472" text-anchor="middle" dominant-baseline="central">confirmed &#183; refuted &#183; adjusted</text>
+</svg>

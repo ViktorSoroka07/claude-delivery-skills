@@ -1,5 +1,8 @@
 # Claude delivery skills
 
+[![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
+
 A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — thirteen skills, two
 agent types, and a write-time hook — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
@@ -18,32 +21,7 @@ without reading every file.
 Four skills form the build chain; the other nine guard moments that can occur in any
 session, at any time.
 
-```mermaid
-flowchart TB
-    subgraph CHAIN["The build chain"]
-        direction LR
-        I([idea]) --> PF["plan-feature"]
-        PF --> IP["implement-plan"]
-        IP --> IG["implementation-gates"]
-        IG --> SH([shipped spec + PR])
-        WPD["writing-plan-docs"] -.plan at start,<br>spec at finish.- PF
-        WPD -.- IP
-    end
-
-    subgraph MOMENTS["Moments in any session"]
-        direction LR
-        M1{{"a PR or branch<br>needs review"}} --- RP["review-pr"]
-        M2{{"work handed<br>to subagents"}} --- DS["delegating-to-subagents"]
-        M3{{"factual text leaves<br>the workspace"}} --- SEND["verifying-before-sending<br>writing-for-audiences"]
-        M4{{"a code comment<br>about to be added"}} --- WCC["writing-code-comments"]
-        M5{{"PR description or<br>living status comment"}} --- WPR["writing-pr-descriptions"]
-        M6{{"memory written,<br>session ending"}} --- MPM["maintaining-project-memory"]
-        M7{{"spend at scale<br>about to start"}} --- BA["budgeting-agentic-work"]
-        M8{{"a request with<br>several asks"}} --- TOA["tracking-open-asks"]
-    end
-
-    CHAIN ~~~ MOMENTS
-```
+![The skill map: the four-skill build chain from idea to shipped spec and PR, and eight moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## What each skill solves
 
@@ -83,15 +61,7 @@ diff, never the full set) plus a mutation agent that measures instead of reads �
 fresh-eyes verifier prompted to *refute* every draft finding before anything is reported.
 Posts nothing without being asked.
 
-```mermaid
-flowchart LR
-    D([diff]) --> A1["axis agents<br>(chosen by triage)"]
-    D --> MU["mutation agent<br>(own worktree)"]
-    A1 --> DR([draft findings])
-    MU --> DR
-    DR --> V["fresh-eyes verifier<br>(prompted to refute)"]
-    V --> F([findings file<br>confirmed / refuted / adjusted])
-```
+![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted](assets/diagrams/review-pr-flow.svg)
 
 ### Working through subagents
 
@@ -105,13 +75,8 @@ taking over, verifying every reported identifier, auditing every delegated diff.
 ### The send moment — two skills, one axis each
 
 Text about to leave the workspace fails more than one way at once, so two skills fire
-together and split the work:
-
-```mermaid
-flowchart TB
-    T([text about to be sent]) --> Q1["verifying-before-sending<br><i>are the claims true?</i>"]
-    T --> Q2["writing-for-audiences<br><i>does the prose fit the reader?</i>"]
-```
+together and split the work: one asks *are the claims true?*, the other *does the
+prose fit the reader?*
 
 **`verifying-before-sending` — text that reads fine and is wrong.**
 A blind pass once corrected four claims in a document that had already passed
@@ -153,13 +118,7 @@ cannot record; re-derive rules instead of copying wording; when content graduate
 a skill, condense the memory to a pointer, the private residue, and a capture buffer;
 end continuing sessions with the literal next-session starter prompt.
 
-```mermaid
-flowchart LR
-    C([correction in chat]) --> M["memory<br>(capture buffer)"]
-    M -->|confirmed in practice| SK["skill<br>(the durable home)"]
-    SK -->|memory condenses to| P["pointer + residue<br>+ capture buffer"]
-    P -.new corrections land here.-> M
-```
+![Memory lifecycle: a correction in chat lands in memory as a capture buffer; confirmed in practice it graduates into a skill, and the memory condenses to a pointer plus residue plus capture buffer, where new corrections land again](assets/diagrams/memory-lifecycle.svg)
 
 **`budgeting-agentic-work` — the bill arrives after the decisions that ran it up.**
 A budget wall hit mid-run loses paid work in interrupted agents; a rework round silently
