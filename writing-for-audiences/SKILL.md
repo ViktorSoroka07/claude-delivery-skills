@@ -7,7 +7,7 @@ description: Use when writing prose a specific person or audience will read, act
 
 Two failure modes, both invisible to the writer: prose the reader **cannot use** (wrong register, numbers without bases, mechanics instead of meaning) and prose the reader **should not have** (internal detail carried past its boundary). Both survive self-review, because the writer reads with their own context and their own entitlements.
 
-Three skills fire at the send moment, one axis each: `verifying-before-sending` owns whether the claims are true, and this skill owns whether the prose serves and fits its reader.
+Two skills fire at the send moment, one axis each: `verifying-before-sending` owns whether the claims are true, and this skill owns whether the prose serves and fits its reader.
 
 **When a reader signals non-understanding, the failure is the level the explanation was pitched at, not the reader's attention.** Re-explain the mechanism from its concepts in plain language; do not repeat the same sentence slower.
 

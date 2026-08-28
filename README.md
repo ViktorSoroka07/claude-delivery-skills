@@ -1,6 +1,6 @@
 # Claude delivery skills
 
-Fourteen [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
+Thirteen [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
 the path from idea to merged PR — and the moments around it. They exist because the
 failure mode of agent-driven development is rarely the code itself: it is everything
 around the code. Plans built on unverified claims. Tests that pass but would never have
@@ -15,7 +15,7 @@ without reading fourteen files.
 
 ## The map
 
-Four skills form the build chain; the other ten guard moments that can occur in any
+Four skills form the build chain; the other nine guard moments that can occur in any
 session, at any time.
 
 ```mermaid
@@ -102,16 +102,15 @@ commits; and reports simply never arrived. The skill governs what dispatch
 guides lack — collision-safe partitioning, delivery instructions, liveness checks before
 taking over, verifying every reported identifier, auditing every delegated diff.
 
-### The send moment — three skills, one axis each
+### The send moment — two skills, one axis each
 
-Text about to leave the workspace fails three independent ways, so three skills fire
+Text about to leave the workspace fails more than one way at once, so two skills fire
 together and split the work:
 
 ```mermaid
 flowchart TB
     T([text about to be sent]) --> Q1["verifying-before-sending<br><i>are the claims true?</i>"]
     T --> Q2["writing-for-audiences<br><i>does the prose fit the reader?</i>"]
-
 ```
 
 **`verifying-before-sending` — text that reads fine and is wrong.**
@@ -128,13 +127,6 @@ comparison; and a task description condensed from an internal backlog once deliv
 interpersonal framing onto a shared board. Register matched to the reader, every number
 carrying its base, an audience gate that re-derives text instead of condensing it, and
 formatting for how the text is actually used — copied, spoken, skimmed.
-
-
-
-
-
-
-
 
 ### Writing artifacts
 
