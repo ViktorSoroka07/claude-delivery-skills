@@ -57,7 +57,7 @@ For small diffs (roughly < 300 changed lines) review inline yourself (the mutati
 
 Running every axis on every diff is the default failure mode, and it is expensive: on a 750-line branch, eight agents cost more than the findings were worth, and most of the overlap was redundant reading. Axis diversity beats axis count — five reviewers reading the same way find the same bugs five times.
 
-Choose by trigger, and **state the chosen axes and why in one line before dispatching**, so the cost is visible and the user can add or drop one:
+Choose by trigger, and **state the chosen axes and why in one line before dispatching**, so the cost is visible and the user can add or drop one (`budgeting-agentic-work` owns the general price-the-pass rule):
 
 | Axis                    | Dispatch when                                                                                                                                                               |
 |-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

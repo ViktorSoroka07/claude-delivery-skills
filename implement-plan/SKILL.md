@@ -38,7 +38,7 @@ A plan that reads well can still rest on a false premise, and implementation wil
 
 Call the Skill tool with the repo's `subagent-driven-development` (preferred where subagents are available) or `executing-plans`. Follow that skill's checkpoints exactly and stop where it says stop.
 
-Where execution dispatches subagents, apply `delegating-to-subagents` on top — above all its audit of each delegated diff before the orchestrator commits it: discipline stated in a brief does not survive delegation.
+Where execution dispatches subagents, apply `delegating-to-subagents` on top — above all its audit of each delegated diff before the orchestrator commits it: discipline stated in a brief does not survive delegation. Where execution will spend at scale, `budgeting-agentic-work` governs the phase sizing and pricing of expensive passes.
 
 Announce which one you used, and whether it was the repo's copy or the `superpowers:` one — they are forks and behave differently.
 

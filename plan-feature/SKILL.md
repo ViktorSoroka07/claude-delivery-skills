@@ -14,7 +14,7 @@ Prefer a repo's unprefixed skill over the `superpowers:` copy — the unprefixed
 
 ## Before starting: announce the chain
 
-Name the skills this run will use, so the user can redirect before the spending starts:
+Name the skills this run will use, so the user can redirect before the spending starts (`budgeting-agentic-work` owns the general price-the-pass rule):
 
 > Chain: `brainstorming` (repo copy) → ground-truth check → `writing-plans` + `writing-plan-docs` → optional plan review. Ends with a plan; nothing gets built.
 
