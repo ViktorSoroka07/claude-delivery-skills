@@ -41,4 +41,5 @@ A plan is read at implementation time — and the spec long after — against a 
 
 - Repo-relative links only — no `/Users/...` or machine paths (they 404 on the host). Never bare line numbers — they drift the moment any unrelated edit lands; where a symbol alone is ambiguous, keep the symbol and add `≈line` beside it. Never SHAs of the branch's own commits — a squash-merge erases them as objects, so they render as 404s; describe the change or cite the PR number instead (SHAs already on the target branch are stable and fine).
 - Don't commit generated design exports (e.g. a minified single-file HTML); cite the artifact by name instead.
+- Artifacts that serve the operator rather than the deliverable — a personal-skill edit, a local draft, session working files — stay out of project commits and tickets unless explicitly requested: settle each new artifact's home (tracked, locally ignored, or a personal repo) before the commit that would sweep it in.
 - A deferral that is this PR's debt goes in the plan doc; a pre-existing repo condition goes to its own issue — unless the author directs otherwise.
