@@ -1,6 +1,6 @@
 # Claude delivery skills
 
-Twelve [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
+Fourteen [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
 the path from idea to merged PR. They exist because the failure mode of agent-driven
 development is rarely the code itself — it is everything around the code: plans built
 on unverified claims about how external systems behave, tests that pass but would
@@ -22,13 +22,15 @@ idea ──> plan-feature ──> implement-plan ──> implementation-gates
               writing-plan-docs   (the plan at start, the shipped spec at finish)
 ```
 
-The other eight sit outside the build chain and fire on their own triggers:
+The other ten sit outside the build chain and fire on their own triggers:
 `review-pr` on a review request, `writing-pr-descriptions` when a PR
 description is created or synced, `delegating-to-subagents` whenever work is
 handed to subagents, `maintaining-project-memory` when project memory is
 written or pruned and when a continuing session ends, `writing-code-comments`
-whenever a code comment is about to be added — and three that share the send
-moment, one axis each: `verifying-before-sending` (are the claims true),
+whenever a code comment is about to be added, `budgeting-agentic-work` when
+work will spend money or context at scale, `tracking-open-asks` when a
+request carries more than one ask — and three that share the send moment,
+one axis each: `verifying-before-sending` (are the claims true),
 `writing-for-audiences` (does the prose fit its reader), and
 ``.
 
@@ -46,6 +48,8 @@ moment, one axis each: `verifying-before-sending` (are the claims true),
 | **writing-code-comments** | a code comment is about to be added | Zero by default, applied at write-time; invariant-plus-cost shape when earned; and the escape hatch that makes the rule hold — a load-bearing fact becomes an expression, an assertion, or a named constant, never prose. |
 | **writing-for-audiences** | prose a specific person or audience will read, act on, or hear | Register matched to the reader, every number carrying its base and conditions, an audience gate that strips what the reader isn't entitled to, and formatting for how the text is actually used. |
 
+| **budgeting-agentic-work** | work about to spend money or context at scale | Phases that end durable so a ceiling loses one phase, the pass priced before it runs, rework cost treated as a process defect, and started compute stopped when its purpose is served. |
+| **tracking-open-asks** | a request with more than one ask; any status checkpoint | An explicit ledger from the moment asks arrive, every ask closed visibly, and reports that cover the whole ledger — a re-ask from the requester is the failure signal. |
 
 ## What it looks like
 
