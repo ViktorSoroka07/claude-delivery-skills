@@ -7,7 +7,7 @@ description: Use when factual text is about to leave the workspace for someone e
 
 Code has gates; outward-bound prose usually has none — and its recipient acts on it without you present. The failure class this skill exists for: **text that reads fine and is wrong.** A blind verification pass once corrected four claims in a document that had already passed self-review — one flatly wrong, one too broad, one refuted, one attributed to the wrong test — and found a defect that would have failed every run of a process another engineer was about to build on. Three of the corrections were in text headed for surfaces other people build from.
 
-Two neighbors own adjacent ground: review of *code* is review-pr's (and a repo's own review skills'), and a plan or spec's claims about outside systems are implementation-gates' Gate 2. This skill is for the prose around and beyond those: messages, comments on others' work, hand-off instructions, the spec's own sentences other teams will read.
+Two neighbors own adjacent ground: review of *code* is review-pr's (and a repo's own review skills'), and a plan or spec's claims about outside systems are implementation-gates' Gate 2. This skill is for the prose around and beyond those: messages, comments on others' work, hand-off instructions, the spec's own sentences other teams will read. At the send moment itself, two siblings carry the other axes — `writing-for-audiences` (does the prose fit the reader); this skill owns whether the claims are true.
 
 ## Build the fact table before writing
 
