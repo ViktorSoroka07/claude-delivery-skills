@@ -10,12 +10,12 @@ A project memory is not a notebook — it is a **promotion tier**. A line writte
 
 ## What memory holds — and what it must not
 
-Memory holds what the repository **structurally cannot** record. Git records what changed and when; a PR body records the net delta; a plan doc records the intended end state. None of them record the paths *not* taken, or the moment a green suite was lying — nobody commits a file explaining what they didn't build. This skill owns the memory-write discipline; `implement-plan`'s finish step applies it at end of task.
+Memory holds what the repository **structurally cannot** record. Git records what changed and when; a PR body records the net delta; a plan doc records the intended end state. None of them record the paths *not* taken — nobody commits a file explaining what they didn't build. This skill owns the memory-write discipline; `implement-plan`'s finish step applies it at end of task.
 
 **Keep, because nothing else holds it:**
 
 - **Approaches tried and rejected, with the reason** — "a size cap here would reintroduce the truncation bug the last fix removed" stops a future session from re-proposing the cap as obvious hygiene.
-- **What live verification actually showed**, especially where it contradicted a green suite.
+- **What live verification showed where no committed record holds it** — a mid-session observation that contradicted a green suite, in a repo whose plan docs carry no verification record. Where the shipped spec's record exists, memory keeps at most the pointer to it.
 - **Environment and tooling traps** — the exact steps that reproduce a hang, a dev server serving stale code after a reload, git operations unsafe when two checkouts share one repository.
 - **Decisions still genuinely open, and who owns them.**
 - **User conventions confirmed in passing.**

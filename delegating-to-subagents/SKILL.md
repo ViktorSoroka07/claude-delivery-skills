@@ -1,6 +1,6 @@
 ---
 name: delegating-to-subagents
-description: Use when handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used: an identifier wired into code, a diff committed, a finding acted on, a "done" accepted.
+description: Use when handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted.
 compatibility: Claude Code-native — assumes the Agent tool and subagent machinery. The decision to fan out belongs to the superpowers dispatch skills or a repo's own; this skill owns collision-safe partitioning and everything around and after the dispatch.
 ---
 
@@ -16,7 +16,7 @@ What it adds is what dispatch skills lack: collision-safe partitioning, and the 
 
 **Partition parallel edits by file ownership, never by finding.** Several findings usually live in one file; handing agents findings means concurrent writes and lost edits, handing them files makes collisions structurally impossible. A finding that spans a boundary gets split at the boundary. Two boundaries file ownership does not protect:
 
-- **Git.** No agent runs a git write command (commit, restore, stash, reset, add) — repo-wide operations respect no file boundary. The orchestrator does every commit, one per workstream, after verifying that workstream alone.
+- **Git.** No agent sharing a tree — the working tree, or a worktree other agents read — runs a git write command (commit, restore, stash, reset, add): repo-wide operations respect no file boundary. The sole occupant of its own dedicated worktree may restore or reset files there; commits stay the orchestrator's everywhere, one per workstream, after verifying that workstream alone.
 - **Verification.** Typecheck and tests are repo-wide, so one agent mid-edit reddens everyone else's run. Serialize the workstream that changes types everyone reads.
 
 Specify cross-boundary contracts yourself, upfront (the exact shape, the exact name), so two agents cannot disagree about a seam neither owns.

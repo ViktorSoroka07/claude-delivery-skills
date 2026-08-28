@@ -34,7 +34,7 @@ Same subject, opposite verdicts. Corollary: don't file an issue for it either �
 
 ## When the fact is load-bearing, make it executable
 
-Purely subtractive rules keep getting violated, because when a fact genuinely matters, "don't write it" offers no sanctioned home. The escape hatch neither keeps nor deletes the comment — it converts it:
+Purely subtractive rules keep getting violated, because when a fact genuinely matters, "don't write it" offers no sanctioned home. The escape hatch neither keeps nor deletes the comment — it converts it (examples invented):
 
 | The comment says | Make it |
 |---|---|

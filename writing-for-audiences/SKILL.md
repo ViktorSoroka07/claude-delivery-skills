@@ -29,8 +29,8 @@ A figure without its base is noise the reader must interrogate: "40%" invites "o
 
 Every artifact written for a surface others can see is scoped to that audience before it leaves. What crosses the boundary: facts, scope, asks. What does not: internal file paths and record identifiers, tooling and vendor names the audience has no reason to learn, personal scheduling, routing and escalation strategy, severity framing, and third parties' verbatim private words — those get paraphrased, and audited by extracting every quoted span, not by one pattern search.
 
-- **Re-derive the text for the audience; never condense the internal version.** Condensing carries internals along — one task description condensed from an internal backlog delivered a responsiveness complaint, escalation framing, and a named escalation target onto a shared board. Writing fresh from "what does this reader need" does not.
-- **A mundane internal choice, written down, can read as strategy.** An ordinary staffing arrangement documented as "X is deliberately not told" turned logistics into apparent secrecy. If an aside is incidental to the document's subject, it does not belong in the document — state the operational fact (a date, an owner) without narrating who gets told what.
+- **Re-derive the text for the audience; never condense the internal version.** Condensing carries internals along — one task description condensed from an internal backlog delivered interpersonal framing about a colleague — and its escalation plan — onto a shared board. Writing fresh from "what does this reader need" does not.
+- **A mundane internal choice, written down, can read as strategy.** An ordinary staffing arrangement, written up as a record of who was and was not being informed, turned logistics into apparent secrecy. If an aside is incidental to the document's subject, it does not belong in the document — state the operational fact (a date, an owner) without narrating who gets told what.
 - **Edits reduce the surface; they do not unsend.** Shared platforms keep history, so the gate applies at creation time, not as cleanup.
 
 ## Meaning over mechanics
