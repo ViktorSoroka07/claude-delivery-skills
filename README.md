@@ -1,6 +1,6 @@
 # Claude delivery skills
 
-Ten [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
+Twelve [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code) that harden
 the path from idea to merged PR. They exist because the failure mode of agent-driven
 development is rarely the code itself — it is everything around the code: plans built
 on unverified claims about how external systems behave, tests that pass but would
@@ -22,13 +22,15 @@ idea ──> plan-feature ──> implement-plan ──> implementation-gates
               writing-plan-docs   (the plan at start, the shipped spec at finish)
 ```
 
-The other six sit outside the build chain and fire on their own triggers:
+The other eight sit outside the build chain and fire on their own triggers:
 `review-pr` on a review request, `writing-pr-descriptions` when a PR
 description is created or synced, `delegating-to-subagents` whenever work is
-handed to subagents, `verifying-before-sending` when factual text is about to
-leave the workspace for someone else's surface, `maintaining-project-memory`
-when project memory is written or pruned and when a continuing session ends,
-and `writing-code-comments` whenever a code comment is about to be added.
+handed to subagents, `maintaining-project-memory` when project memory is
+written or pruned and when a continuing session ends, `writing-code-comments`
+whenever a code comment is about to be added — and three that share the send
+moment, one axis each: `verifying-before-sending` (are the claims true),
+`writing-for-audiences` (does the prose fit its reader), and
+``.
 
 | Skill | When it fires | What it adds |
 |---|---|---|
@@ -42,6 +44,8 @@ and `writing-code-comments` whenever a code comment is about to be added.
 | **verifying-before-sending** | factual text about to leave the workspace | Fact table before writing, a blind pass that inherits none of the author's reasoning, two named absence-claim traps, a two-pass cap with the warrant stated instead of the feeling. |
 | **maintaining-project-memory** | writing or pruning project memory; ending a continuing session | Memory as a promotion tier: keep only what the repo structurally cannot record, delete branch state git already answers, re-derive rules instead of copying wording, and end with the literal next-session starter prompt. |
 | **writing-code-comments** | a code comment is about to be added | Zero by default, applied at write-time; invariant-plus-cost shape when earned; and the escape hatch that makes the rule hold — a load-bearing fact becomes an expression, an assertion, or a named constant, never prose. |
+| **writing-for-audiences** | prose a specific person or audience will read, act on, or hear | Register matched to the reader, every number carrying its base and conditions, an audience gate that strips what the reader isn't entitled to, and formatting for how the text is actually used. |
+
 
 ## What it looks like
 
