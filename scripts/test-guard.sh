@@ -112,6 +112,20 @@ git add g.txt
 git commit -qm leak2 >/dev/null 2>&1
 check "hook blocks a CRLF wordlist term" 1 $?
 
+# 8. A staged SKILL.md whose frontmatter breaks strict YAML is blocked -
+#    the colon-space-in-unquoted-scalar class both check paths must catch -
+#    and the corrected line commits cleanly (no false positive on the fix).
+mkrepo t8
+mkdir -p skills/demo
+printf -- '---\nname: demo\ndescription: reviews a thing well: post, stage\n---\nbody\n' > skills/demo/SKILL.md
+git add skills/demo/SKILL.md
+git commit -qm skill >/dev/null 2>&1
+check "broken SKILL.md frontmatter is blocked" 1 $?
+printf -- '---\nname: demo\ndescription: reviews a thing well - post, stage\n---\nbody\n' > skills/demo/SKILL.md
+git add skills/demo/SKILL.md
+git commit -qm skill2 >/dev/null 2>&1
+check "valid SKILL.md frontmatter commits" 0 $?
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
