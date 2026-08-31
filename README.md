@@ -58,8 +58,9 @@ records that outlive the branch, references that resolve against a tree that has
 A single reviewer finds what a single way of reading finds; and a review's own findings
 are claims that can be wrong. Two passes: parallel single-axis agents (chosen from the
 diff, never the full set) plus a mutation agent that measures instead of reads — then a
-fresh-eyes verifier prompted to *refute* every draft finding before anything is reported.
-Posts nothing without being asked.
+fresh-eyes verifier prompted to *refute* every draft finding before anything is reported,
+and confirmed findings grouped into one thread per problem. Posts nothing without
+being asked.
 
 ![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted](assets/diagrams/review-pr-flow.svg)
 
@@ -178,13 +179,22 @@ The mutation axis measures rather than reads — its evidence looks like:
 | drop `retries` from the emitted row | SURVIVED → finding: the missing assertion, spelled out |
 
 That's the default path. `review-pr` also carries, on request:
-**deep mode** (a blind re-review plus one isolated skeptic per finding — this
-one also fires when the repo's memory pins it),
-**staged posting** (GitHub PENDING reviews, for holding publication until you
-submit), **apply mode** (fixes land only after every new test is proven failing
-against the pre-fix code), and **thread disposition** (reply-and-resolve with
-verification that each fix actually landed). The skill files are the full
-documentation — every mode is specified where the agent reads it.
+
+- **deep mode** — a blind re-review plus isolated skeptics per finding; also
+  fires when the repo's memory pins it
+- **scoped review** — name an area, file, or concern; honored on top of the
+  axis triage
+- **ungrouped** — disables the grouping default; every finding gets its own
+  thread
+- **staged posting** — GitHub PENDING reviews, for holding publication until
+  you submit
+- **apply mode** — fixes land only after every new test is proven failing
+  against the pre-fix code
+- **thread disposition** — reply-and-resolve with verification that each fix
+  actually landed
+
+The skill files are the full documentation — every mode is specified where the
+agent reads it.
 
 ## The ideas underneath
 

@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Two-pass multi-axis PR review that adversarially verifies its own findings before reporting them. Use when the user asks to review a pull request or branch — "review PR 42", "review this branch", "look over my changes" — to disposition or reply-and-resolve threads from a previous review, or to apply a previous review's findings to the branch. GitHub, Azure DevOps, and GitLab.
+description: Two-pass multi-axis PR review that adversarially verifies its own findings before reporting them, grouping related findings into one thread per problem by default. Use when the user asks to review a pull request or branch — "review PR 42", "review this branch", "look over my changes", "deep review" for the exhaustive pass, or naming one area to review — and for the later asks on a review already produced: post, stage, apply, or reply-and-resolve its threads. GitHub, Azure DevOps, and GitLab.
 compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Subagent dispatch recommended for the multi-axis pass.
 ---
 
@@ -42,6 +42,19 @@ Then verify the platform CLI is present and authenticated (`gh auth status`; `az
 - **Never flag AI-attribution trailers** (`Co-Authored-By: Claude ...`, "Generated with" footers) in a teammate's commits or PR body — a no-AI-attribution convention, where the user keeps one, governs their OWN git artifacts only.
 - Treat `TODO` comments as intentional future work — **do not challenge them**. **Omit locale files** from the review.
 - **Generated plan documents are read-only context, never a finding target** (learned from a real PR review): a `docs/plans/**` artifact — typically an HTML plan emitted by the planning tool — is produced upstream of the diff, so a defect in it is fixed in the generator, not by the PR author. Read it to learn what the implementation was *supposed* to do and audit the code against that intent; never raise a finding against the plan file itself, and never count its own inconsistencies as diff defects. The same rule applies to any other deliberately produced tool-generated artifact the PR merely carries along; accidental tool exhaust riding the diff (telemetry files, run logs) is instead a finding whose fix is removal — see section 1's bot-author item. One exception: an executed verification record inside the plan (an implementation-gates mutation table) is a claim about this branch's tests — audit it per section 3, and a record the audit contradicts is a valid finding.
+
+### Grouping — one thread per problem, not one per observation
+
+**Default: merge findings that share an anchor file, a fix, or a defect class into a single finding.** A reviewer who files every observation separately hands the author the triage work; grouping does it once, on the side that already has the evidence. It is also the honest shape — a live defect and the test gap that hid it are one problem, and split apart the second reads as unrelated cleanup.
+
+- A grouped finding's `Problem:` is a numbered list, one item per instance, each keeping its own `file:line`. Its `Suggestion:` is a numbered list, one edit per item — the numbered-list rule above, applied at group scale.
+- **Anchor the group to its most significant member's `file:line`.** The numbered `Problem:` list already carries every member's true location — the same convention relocated anchors use — so no group needs a PR-level home.
+- **Never group across severities.** A major or medium riding inside a bundle of minors loses the grade the author sorts by; group within a band only.
+- **Never group to shorten the list.** Findings whose fixes land in different files and would be acted on independently stay separate even when they share a theme. The test: would one author, in one sitting, make all the edits as a single change? If not, they are separate.
+- **Findings that would each carry a suggestion block stay separate** — a comment applies a block only over its own anchor, so a grouped thread keeps at most one, and a one-click apply is worth more to the author than a shorter thread list.
+- Grouping happens at §4's final merge, after Pass 2 verdicts land — the draft the verifier receives stays ungrouped. Merging two findings hides whichever one a skeptic would have refuted.
+
+Opt out when the user asks ("one thread per finding", "don't group", "ungrouped"), which is also the right shape when the review will be dispositioned item by item.
 
 ## 3. Pass 1 — multi-axis review
 
@@ -113,8 +126,24 @@ Save `review-findings-<id>.md` in the repo root (untracked), using the `<id>` fr
 2. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
 3. **Final findings** — the merged list, organized by severity.
 
-In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"). **Do not restate the findings in chat.** Finish by telling the user that saying "post" (or similar) will publish the final findings to the PR.
+In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
 
 ## 6. Posting and applying (later asks only)
 
 Posting findings to the PR and applying them to the tree are separate user requests — never automatic after a review, and often made in a fresh session. When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; it carries the re-verification and staleness checks, the pending/staged mode, the thread and suggestion-block packaging rules, the reply-and-resolve discipline, and the apply-mode protocol (every new test must fail against pre-fix code first).
+
+## 7. Modes — and telling the user they exist
+
+Every mode below is off unless the user asks. The failure this section exists to fix is not that they are undocumented: it is that they are documented **for you** and invisible **to the user**, who cannot request a mode whose trigger phrase they have never seen. A capability nobody knows about is a capability that does not ship.
+
+| Mode | The user says | What changes |
+|---|---|---|
+| **Deep review** | "deep", "thorough", "exhaustive", "paranoid" — or a repo-memory pin | Full axis set instead of triage (§3); Pass 2 becomes a blind re-review plus isolated skeptics per finding, locus-sharing per §4 |
+| **Scoped review** | names an area, file, or concern | That scope is honored *on top of* the triage, never in place of the mutation axis (§3) |
+| **Ungrouped** | "one thread per finding", "don't group" | Disables §2's grouping default |
+| **Post** | "post" | Publishes the final findings (§6) |
+| **Staged post** | "hold it", "I'll submit it myself" | Findings staged invisibly where the platform supports it; where it does not, say so plainly and post nothing |
+| **Apply** | "apply", "fix these" | Findings become edits on the branch, each new test failing against pre-fix code first (§6) |
+| **Disposition** | "resolve", "reply to the threads" | Reply-and-resolve against the findings file, verifying each fix actually landed (§6) |
+
+**Name the applicable modes in the closing message, in one line** — not a menu, and only what the user could sensibly want next. After a review that is post, apply, or a deeper pass; after posting it is apply or disposition. When a mode the user asked for is unavailable on the platform, say which and why rather than silently doing something else.
