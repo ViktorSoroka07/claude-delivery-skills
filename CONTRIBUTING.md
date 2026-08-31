@@ -76,6 +76,16 @@ This applies to `(checked YYYY-MM-DD)` on an external-API fact too. That date is
 more defensible - it says how stale the observation is - but nobody refreshes it,
 so it rots into false precision. State the finding; drop the stamp.
 
+## One full statement per lesson
+
+A lesson lands in full once, in the file that owns it - usually a platform
+reference or the posting reference, which load only at the moment they apply.
+Every other mention is a pointer clause. `SKILL.md`, the file every invocation
+pays for, changes only when the trigger, a mode, or the finding format
+changes. Writing a lesson out at full altitude in every file that mentions it
+grew one skill by a fifth in a day: the copies drift apart, and the growth is
+paid on every load.
+
 ## The README paraphrases; the skill files own
 
 The README describes skills for a human deciding what to install and what to

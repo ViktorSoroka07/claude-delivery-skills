@@ -48,7 +48,7 @@ Then verify the platform CLI is present and authenticated (`gh auth status`; `az
 **Default: merge findings that share an anchor file, a fix, or a defect class into a single finding.** A reviewer who files every observation separately hands the author the triage work; grouping does it once, on the side that already has the evidence. It is also the honest shape — a live defect and the test gap that hid it are one problem, and split apart the second reads as unrelated cleanup.
 
 - A grouped finding's `Problem:` is a numbered list, one item per instance, each keeping its own `file:line`. Its `Suggestion:` is a numbered list, one edit per item — the numbered-list rule above, applied at group scale.
-- **Anchor the group to its most significant member's `file:line`.** The numbered `Problem:` list already carries every member's true location — the same convention relocated anchors use — so no group needs a PR-level home.
+- **Anchor the group to its most significant member's `file:line`.** The numbered `Problem:` list already carries every member's true location — the same convention relocated anchors use — so a group never needs a PR-level home for spanning files (diff-membership routing is the posting reference's separate rule).
 - **Never group across severities.** A major or medium riding inside a bundle of minors loses the grade the author sorts by; group within a band only.
 - **Never group to shorten the list.** Findings whose fixes land in different files and would be acted on independently stay separate even when they share a theme. The test: would one author, in one sitting, make all the edits as a single change? If not, they are separate.
 - **Findings that would each carry a suggestion block stay separate** — a comment applies a block only over its own anchor, so a grouped thread keeps at most one, and a one-click apply is worth more to the author than a shorter thread list.
@@ -116,7 +116,7 @@ Then merge in the main conversation (both modes):
 
 - **Drop** REFUTED findings; **re-grade** where an ADJUSTED verdict is convincing. Sweep/blind-review additions join the final list only after surviving verification — in deep mode the skeptic check; in default mode the personal grep-verify below is the additions' gate (re-derive the mechanism yourself, not just the anchor).
 - **Personally grep-verify** every surviving finding's mechanism and `file:line` anchor against the pinned SHA before writing the MD — subagent citations are necessary but not sufficient.
-- **Anchor validation:** run the platform reference's anchor rules (GitHub rejects inline comments outside the diff; ADO does not).
+- **Anchor validation:** run the platform reference's anchor rules — both platforms constrain which **file** an inline comment may anchor to (GitHub refuses an out-of-diff anchor; ADO accepts it and mis-renders it), and findings on untouched files route to PR level per the posting reference.
 
 ## 5. Output — MD file, not chat
 

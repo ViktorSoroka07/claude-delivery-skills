@@ -11,7 +11,16 @@ Pull existing threads: `GET .../pullRequests/<id>/threads?api-version=7.1` (auth
 
 ## Anchor validation
 
-ADO accepts inline threads on any line of the right-side file — no changed-line restriction. Still verify the `file:line` exists at the head SHA.
+Two separate questions, answered differently. Conflating them is how a finding ends up rendered as a contradiction.
+
+- **Which line?** Genuinely unrestricted: an inline thread may sit on any line of the right-side file, changed or not. Use that — anchor to the line the finding is about, never to the nearest changed line.
+- **Which file?** Only a file in the diff renders as an inline comment. The API accepts a `threadContext` naming any path and returns a valid thread, but the UI renders a thread on an out-of-diff file behind a banner saying the file no longer exists in the latest changes and may have been moved or deleted, plus a link to view it in its original context. That banner is a false statement about the author's branch, and it renders **above** the comment — so a line in the body explaining that the file is outside the diff does not repair it, it adds a second claim contradicting the first one the reader already met.
+
+So verify the `file:line` exists at the head SHA **and** that the file is in the diff: build the diff's file set once (`git diff --name-only <mergeBase> <head>`) and assert membership for every finding's path before posting. Anything outside goes PR-level with no `threadContext`, carrying its `file:line` in the prose. Only a click of navigation is lost, and a PR-level thread always renders in Overview.
+
+**The POST succeeds and the read-back passes clean** — the defect exists only in rendering, so this fault is prevented before posting (the posting reference's file-set check), never detected after.
+
+**Repairing one already posted:** `threadContext` is immutable, so a PATCH cannot relocate it — it is delete-and-repost. Post the PR-level replacement **first**, verify it is live, active and byte-exact, and only then `DELETE .../pullRequests/<id>/threads/<threadId>/comments/<commentId>`. In that order the finding is never invisible; in the other order it is.
 
 ## Auth
 
