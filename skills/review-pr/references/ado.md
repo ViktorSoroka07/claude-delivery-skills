@@ -21,7 +21,7 @@ Use the ADO PAT in `$AZURE_DEVOPS_EXT_PAT` via Basic auth: `curl -u ":$AZURE_DEV
 
 - Post each final finding as its **own inline comment thread** anchored to the exact `file:line`, left **active/unresolved**. (A suggestion thread spans its replaced range instead; its `file:line` for post-verification is `rightFileStart.line`.)
 - Thread content Markdown: severity header (`**Medium — title**`), minors prefixed `**Nit — ...**`, then `Problem:` / `Suggestion:`. Repo-relative `filePath` with a leading `/`.
-- Post an inline thread (`POST .../pullRequests/<id>/threads?api-version=7.1`) with body:
+- Post an inline thread (`POST .../pullRequests/<id>/threads?api-version=7.1`). Build the body as a JSON file (via script — never inline shell strings with Markdown; a quoting slip in an inline `curl -d` body is the silent-mangling path the post-verification below exists to catch) and send it with `curl --data-binary @payload.json -H "Content-Type: application/json"`:
 
   ```json
   {
@@ -36,7 +36,8 @@ Use the ADO PAT in `$AZURE_DEVOPS_EXT_PAT` via Basic auth: `curl -u ":$AZURE_DEV
   ```
 
   `status: 1` = active; `commentType: 1` = text; set `rightFileStart.line` / `rightFileEnd.line` to the finding's line, keeping the template's offsets (1 and 2) — a minimal anchor on that line. **Exception:** a comment carrying a suggestion block must use the span anchor from the Suggestion-blocks section instead — the minimal anchor breaks Apply.
-- After posting, GET the threads endpoint and confirm each created thread is **live (not deleted)** at the right `file:line`.
+- After posting, GET the threads endpoint and confirm each created thread is **live (not deleted)** at the right `file:line`, and compare each returned `content` against the string you sent — the posting reference's placement-and-content rule; the GET shows what ADO stored. Compare mechanically: extract both sides with `jq -r` and `diff` the payload file against the GET response — an empty diff is the pass, and no comment bodies re-enter context.
+- **To repair a posted comment's text, PATCH the comment, not the thread** (`PATCH .../pullRequests/<id>/threads/<threadId>/comments/<commentId>` with `{"content": "..."}`). A comment-level PATCH leaves `threadContext` and the thread's `status` untouched, so a suggestion block's span survives it — unlike the two thread-level traps below.
 - **`threadContext` is immutable after creation** (learned from a real PR review): a `PATCH` carrying a corrected `threadContext` returns **200 with the span unchanged** — silently, so the response looks like success. Get the span right the first time; verify every suggestion block's end offset *before* posting. If a posted block's span turns out wrong, the fix is to PATCH the comment content and demote the fence from ```` ```suggestion ```` to an ordinary language fence (the prose fix survives) — an Apply over a wrong span corrupts the file, which is worse than no Apply.
 - **A thread `PATCH` that omits `status` clears it** — the thread comes back with `status: None` and stops rendering as active. After any thread-level PATCH, re-`PATCH` `{"status":"active"}` and re-assert it.
 
