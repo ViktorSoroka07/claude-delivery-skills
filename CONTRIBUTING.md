@@ -76,6 +76,16 @@ This applies to `(checked YYYY-MM-DD)` on an external-API fact too. That date is
 more defensible - it says how stale the observation is - but nobody refreshes it,
 so it rots into false precision. State the finding; drop the stamp.
 
+## The README paraphrases; the skill files own
+
+The README describes skills for a human deciding what to install and what to
+ask for; the skill files are what agents execute. That makes the README a
+paraphrase with a declared owner, never a second authority: it carries mode
+names and one-line purposes, not trigger phrases, qualifiers, or boundary
+conditions - operational detail in a paraphrase is the part that drifts first.
+A change to a skill's user-visible modes or defaults includes a sweep of its
+README section in the same commit.
+
 ## Before pushing
 
     ./scripts/scan-history.sh
