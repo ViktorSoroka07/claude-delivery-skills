@@ -51,6 +51,20 @@ jobs:
       - name: ShellCheck the guard scripts
         run: shellcheck .githooks/pre-commit scripts/*.sh
 
+      # The consistency gates: self-test the checkers, verify every internal
+      # reference resolves, and prove the canonical inventory statements match
+      # the tree (regenerate + diff; a failure's fix is running the generator).
+      - name: Consistency-gate self-tests
+        run: sh scripts/test-repo-checks.sh
+
+      - name: Reference integrity
+        run: sh scripts/check-refs.sh
+
+      - name: Inventory statements current
+        run: |
+          sh scripts/generate-inventory.sh
+          git diff --exit-code || { echo "Stale inventory statements - run: sh scripts/generate-inventory.sh"; exit 1; }
+
       # The Agent Skills reference validator (PyPI: skills-ref; the installed
       # command is `agentskills`) - frontmatter validity, name/directory
       # agreement, and the spec's length limits, for every skill.

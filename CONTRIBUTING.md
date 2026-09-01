@@ -103,6 +103,12 @@ README section in the same commit.
 This audits every commit's contents, messages and author identities - not just
 the working tree. A clean `git status` proves nothing about history.
 
+Adding or removing a skill, agent, or hook changes the component inventory: run
+`sh scripts/generate-inventory.sh` afterward - it rewrites the canonical
+inventory statements in the README and both plugin manifests from the tree, and
+CI fails with that same command when they are stale. `sh scripts/check-refs.sh`
+must also pass; it verifies the tree's internal references resolve.
+
 ## If something already landed
 
 Do not just delete it in a new commit; the old blob stays reachable. Rewrite the
