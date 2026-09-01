@@ -27,26 +27,26 @@ session, at any time.
 
 ### The build chain
 
-**`plan-feature` — a coherent plan can still be false.**
+**[`plan-feature`](skills/plan-feature/SKILL.md) — a coherent plan can still be false.**
 A design that argues its premise well for three sentences can be wrong about what an
 API returns or a column means — and implementation will build on it faithfully. The
 skill ground-truths every claim about systems you did not write *before* the plan is
 written (read-only checks: real data, then an existing consumer, then docs — a coherent
 argument is not evidence), then stops so the plan can be read before anything is built.
 
-**`implement-plan` — the gate that is not written into the plan does not run.**
+**[`implement-plan`](skills/implement-plan/SKILL.md) — the gate that is not written into the plan does not run.**
 Executors obey the plan, so a verification step that lives only in good intentions gets
 skipped. The skill patches the plan with a gates task before execution starts, checks
 the plan's premises were settled rather than argued, delegates the build to the repo's
 own execution skill, and finishes by rewriting the plan as the spec of what shipped.
 
-**`implementation-gates` — green is not the bar; "would it have gone red" is.**
+**[`implementation-gates`](skills/implementation-gates/SKILL.md) — green is not the bar; "would it have gone red" is.**
 Thirteen mutations once survived a suite that honestly passed: the tests could not fail.
 The skill runs ten to twelve targeted mutations over the new lines (every non-equivalent
 survivor is a missing assertion), re-checks the design's claims about outside systems
 against evidence, and keeps written verification records to exactly what ran.
 
-**`writing-plan-docs` — the doc describes the destination, never the route.**
+**[`writing-plan-docs`](skills/writing-plan-docs/SKILL.md) — the doc describes the destination, never the route.**
 Plan documents decay into changelogs — deviation lists, review-round narration, stale
 counts — that mislead the person reading them later. The skill keeps the doc a
 current-state spec: superseded content replaced rather than annotated, verification
@@ -54,7 +54,7 @@ records that outlive the branch, references that resolve against a tree that has
 
 ### Reviewing
 
-**`review-pr` — one careful reader misses what measurement and adversarial checks catch.**
+**[`review-pr`](skills/review-pr/SKILL.md) — one careful reader misses what measurement and adversarial checks catch.**
 A single reviewer finds what a single way of reading finds; and a review's own findings
 are claims that can be wrong. Two passes: parallel single-axis agents (chosen from the
 diff, never the full set) plus a mutation agent that measures instead of reads — then a
@@ -66,7 +66,7 @@ being asked.
 
 ### Working through subagents
 
-**`delegating-to-subagents` — a subagent's output is a claim about work, not the work.**
+**[`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) — a subagent's output is a claim about work, not the work.**
 Real incidents: a research agent invented a tool name ("confirmed from source") and the
 shipped check rejected every input; delegated diffs carried the agent's monologue into
 commits; and reports simply never arrived. The skill governs what dispatch
@@ -79,7 +79,7 @@ Text about to leave the workspace fails more than one way at once, so two skills
 together and split the work: one asks *are the claims true?*, the other *does the
 prose fit the reader?*
 
-**`verifying-before-sending` — text that reads fine and is wrong.**
+**[`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) — text that reads fine and is wrong.**
 A blind pass once corrected four claims in a document that had already passed
 self-review, and found a defect that would have failed every run of a process another
 engineer was about to build on. Fact table before writing; verification by a fresh
@@ -87,7 +87,7 @@ context that never saw the reasoning; two named traps (absence claimed from a tr
 search, a negative claimed from one function); two passes maximum, then the warrant
 stated — never the feeling.
 
-**`writing-for-audiences` — prose the reader cannot use, or should not have.**
+**[`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) — prose the reader cannot use, or should not have.**
 "40%" invites "of what?"; two numbers measured under different conditions are not one
 comparison; and a task description condensed from an internal backlog once delivered
 interpersonal framing onto a shared board. Register matched to the reader, every number
@@ -96,14 +96,14 @@ formatting for how the text is actually used — copied, spoken, skimmed.
 
 ### Writing artifacts
 
-**`writing-code-comments` — subtractive comment rules keep failing; give the fact a home.**
+**[`writing-code-comments`](skills/writing-code-comments/SKILL.md) — subtractive comment rules keep failing; give the fact a home.**
 "Don't write comments" collapses the moment a fact feels load-bearing — which is why
 the correction kept recurring. Zero by default at write-time, an invariant-plus-cost
 shape when one is earned, and the escape hatch that makes the default hold: the
 load-bearing fact becomes an expression, an assertion that fails when broken, or a
 named constant — never prose.
 
-**`writing-pr-descriptions` — describe the diff, not the branch.**
+**[`writing-pr-descriptions`](skills/writing-pr-descriptions/SKILL.md) — describe the diff, not the branch.**
 Descriptions accumulate review-round narration and references that die on squash-merge.
 The contract: net delta grouped by behavioral change, the deliberate scope boundary,
 references that survive history rewrites — and at most one living status comment,
@@ -111,7 +111,7 @@ edited in place, never a stack.
 
 ### The session itself
 
-**`maintaining-project-memory` — memory is a promotion tier, not a notebook.**
+**[`maintaining-project-memory`](skills/maintaining-project-memory/SKILL.md) — memory is a promotion tier, not a notebook.**
 A line written to memory executes with full authority in a later session that cannot
 question it: a stale "still to push" reads as a live obligation; a rule whose scope was
 dropped at the write step fires as an absolute. Keep only what the repo structurally
@@ -121,13 +121,13 @@ end continuing sessions with the literal next-session starter prompt.
 
 ![Memory lifecycle: a correction in chat lands in memory as a capture buffer; confirmed in practice it graduates into a skill, and the memory condenses to a pointer plus residue plus capture buffer, where new corrections land again](assets/diagrams/memory-lifecycle.svg)
 
-**`budgeting-agentic-work` — the bill arrives after the decisions that ran it up.**
+**[`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) — the bill arrives after the decisions that ran it up.**
 A budget wall hit mid-run loses paid work in interrupted agents; a rework round silently
 doubled one pass's cost; idle servers spend and fake verification results. Phase the
 work so every phase ends durable, price the pass before it runs, treat rework cost as a
 process defect with a cause to fix, and stop what you started.
 
-**`tracking-open-asks` — the trailing "and also…" is the ask that drops.**
+**[`tracking-open-asks`](skills/tracking-open-asks/SKILL.md) — the trailing "and also…" is the ask that drops.**
 When the requester has to re-ask, they have paid twice: once waiting, once auditing.
 Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
@@ -138,13 +138,13 @@ ledger, not the items that happened to finish.
 Skills are instructions the model follows; two more component types cover what
 instructions alone cannot:
 
-- **Two agent types** (`agents/`) — `axis-reviewer` and `refute-verifier` carry the
+- **Two agent types** ([`agents/`](agents/)) — [`axis-reviewer`](agents/axis-reviewer.md) and [`refute-verifier`](agents/refute-verifier.md) carry the
   reviewer and skeptic contracts that `review-pr` and `verifying-before-sending`
   otherwise restate in every dispatch prompt: the finding format, the
   name-the-pinned-SHA rule, the refute-don't-confirm stance, read-only boundaries.
   The skills use them when present; dispatch prompts shrink to axis, worktree, SHA,
   and scope.
-- **Two hooks** (`hooks/`) — warn-only backstops to `writing-code-comments`.
+- **Two hooks** ([`hooks/`](hooks/)) — warn-only backstops to `writing-code-comments`.
   The comment rules are the most-relapsed discipline in the corpus behind this repo:
   the skill owns the judgment, and the hooks mechanically flag narrative-comment tells
   ("Regression:", "used to", "harmless because") — because a rule the model can
@@ -181,7 +181,7 @@ The mutation axis measures rather than reads — its evidence looks like:
 | `>=` → `>` at the window boundary | KILLED by `test_window_edges` |
 | drop `retries` from the emitted row | SURVIVED → finding: the missing assertion, spelled out |
 
-That's the default path. `review-pr` also carries, on request:
+That's the default path. [`review-pr`](skills/review-pr/SKILL.md) also carries, on request:
 
 - **deep mode** — a blind re-review plus isolated skeptics per finding; also
   fires when the repo's memory pins it
@@ -196,7 +196,7 @@ That's the default path. `review-pr` also carries, on request:
 - **thread disposition** — reply-and-resolve with verification that each fix
   actually landed
 
-The skill files are the full documentation — every mode is specified where the
+The [skill files](skills/) are the full documentation — every mode is specified where the
 agent reads it.
 
 ## The ideas underneath
@@ -238,23 +238,23 @@ your skills directory —
     git clone https://github.com/ViktorSoroka07/claude-delivery-skills ~/.claude/skills/claude-delivery-skills
 
 — and Claude Code auto-loads it as a skills-directory plugin, updatable with
-`git pull` + `/reload-plugins`. Individual `skills/<name>` folders can also be copied
+`git pull` + `/reload-plugins`. Individual [`skills/<name>`](skills/) folders can also be copied
 into `~/.claude/skills/` or a project's `.claude/skills/` for bare-name use without
-the plugin machinery (the agents and the hook then don't come along).
+the plugin machinery (the agents and the hooks then don't come along).
 
 Works best alongside:
 
-- the [superpowers](https://github.com/obra/superpowers) plugin — `plan-feature`
-  and `implement-plan` delegate design, plan-writing, execution, and completion
+- the [superpowers](https://github.com/obra/superpowers) plugin — [`plan-feature`](skills/plan-feature/SKILL.md)
+  and [`implement-plan`](skills/implement-plan/SKILL.md) delegate design, plan-writing, execution, and completion
   to its skills (`brainstorming`, `writing-plans`, `executing-plans`,
   `subagent-driven-development`, `verification-before-completion`,
   `finishing-a-development-branch`) or to a repo's own forks of them;
-- an authenticated platform CLI for `review-pr` — `gh` (GitHub), `az` or a PAT
+- an authenticated platform CLI for [`review-pr`](skills/review-pr/SKILL.md) — `gh` (GitHub), `az` or a PAT
   (Azure DevOps), or `glab` (GitLab) — the three platforms it carries earned
   mechanics for;
 - the [humanizer](https://github.com/blader/humanizer) skill — the send-moment
   pair checks whether outbound text is true and fits its reader;
-  `writing-for-audiences` hands off to humanizer as the final register pass on
+  [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) hands off to humanizer as the final register pass on
   prose published under a person's name.
 
 Works on macOS, Linux, and Windows: the guard scripts are POSIX sh, which Git
@@ -275,13 +275,13 @@ The protocols here are assistant-agnostic: the mutation-sweep protocol, the
 evidence hierarchy (real data > an existing consumer > documentation > a
 coherent argument), the plan-doc lifecycle, the PR-description contract, and
 the finding format all lift cleanly into Cursor rules, Copilot instructions,
-or an `AGENTS.md` — `writing-plan-docs` and `writing-pr-descriptions` port
+or an `AGENTS.md` — [`writing-plan-docs`](skills/writing-plan-docs/SKILL.md) and [`writing-pr-descriptions`](skills/writing-pr-descriptions/SKILL.md) port
 almost verbatim.
 
 The orchestration does not: subagent dispatch (parallel single-axis reviewers,
 the clean-context verifier), skill-to-skill chaining, and project memory are
 Claude Code machinery, and the full skills assume them. Ported without those
-primitives, `review-pr` collapses into "one context reviews carefully" — the
+primitives, [`review-pr`](skills/review-pr/SKILL.md) collapses into "one context reviews carefully" — the
 failure mode it exists to escape. So this repo stays Claude Code-native, and
 the portable parts are yours to lift.
 
@@ -289,6 +289,6 @@ the portable parts are yours to lift.
 
 These skills are distilled from real delivery work on production repositories.
 Identifying details are removed; the mechanisms — each one paid for by an actual
-incident — are what remain. `CONTRIBUTING.md` explains how that line is kept.
+incident — are what remain. [`CONTRIBUTING.md`](CONTRIBUTING.md) explains how that line is kept.
 
 A personal project — not affiliated with or endorsed by Anthropic.
