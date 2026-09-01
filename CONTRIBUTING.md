@@ -127,6 +127,20 @@ fail; five reps per arm, single samples lie; when reps disagree on the shape
 of the output, the wording is not binding - restate it as what the output
 *is* rather than adding words.
 
+## Versioning and releases
+
+The manifest version in `.claude-plugin/plugin.json` is the release trigger:
+CI creates the tag and the GitHub release when a push to main carries a
+version that has no release yet, after the guard jobs pass, with notes
+generated from the commit messages since the previous tag. A push that leaves
+the version alone releases nothing, so the bump is the decision.
+
+Bump the minor version when a skill, agent, or hook changes behavior - a new
+rule, a changed default, a new component. Bump the patch version for wording
+that changes no behavior. Bump the major version when a component is removed
+or a mode's trigger phrase changes. Make the bump in the commit that changes
+the behavior, not in a separate "release" commit.
+
 ## Before pushing
 
     ./scripts/scan-history.sh

@@ -76,3 +76,29 @@ jobs:
           for d in skills/*/SKILL.md; do
             agentskills validate "$(dirname "$d")"
           done
+
+  release:
+    # A release is a version bump. When a push to main carries a manifest
+    # version that has no release yet, the guarded run creates the tag and
+    # the release, with notes generated from the commit messages since the
+    # previous tag. A push that leaves the version alone releases nothing.
+    needs: [guard, conformance]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Release the manifest version if it has no release yet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v=$(python3 -c 'import json; print(json.load(open(".claude-plugin/plugin.json"))["version"])')
+          if gh release view "v$v" >/dev/null 2>&1; then
+            echo "v$v is already released"
+            exit 0
+          fi
+          gh release create "v$v" --target "$GITHUB_SHA" --generate-notes
