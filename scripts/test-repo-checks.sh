@@ -25,12 +25,13 @@ check() { # $1 = description, $2 = expected exit, $3 = actual exit
 mkplugin() { # a minimal valid plugin tree the checks accept
   P="$WORK/$1"
   mkdir -p "$P/skills/demo/references" "$P/agents" "$P/hooks" "$P/.claude-plugin"
-  printf -- '---\nname: demo\ndescription: demo\n---\nSee references/how.md and `delivery-skills:demo`.\n' > "$P/skills/demo/SKILL.md"
+  printf -- '---\nname: demo\ndescription: demo\n---\nSee references/how.md, `delivery-skills:demo`, and the `delivery-skills:helper` agent.\n' > "$P/skills/demo/SKILL.md"
   printf 'how\n' > "$P/skills/demo/references/how.md"
   printf 'agent\n' > "$P/agents/helper.md"
-  printf '{"hooks":{"PostToolUse":[{"matcher":"Edit","hooks":[{"type":"command","command":"python3 \\"${CLAUDE_PLUGIN_ROOT}/hooks/h.py\\""}]}]}}\n' > "$P/hooks/hooks.json"
+  printf '{"hooks":{"PostToolUse":[{"matcher":"Edit","hooks":[{"type":"command","command":"python3 \\"${CLAUDE_PLUGIN_ROOT}/hooks/h.py\\""}]}],"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"python3 \\"${CLAUDE_PLUGIN_ROOT}/hooks/h2.py\\""}]}]}}\n' > "$P/hooks/hooks.json"
   printf 'x\n' > "$P/hooks/h.py"
-  printf '# Demo\n\nplugin - <!-- inventory -->one skills, one agent types, and one warn-only hooks<!-- /inventory --> - end. [link](skills/demo/SKILL.md)\n' > "$P/README.md"
+  printf 'y\n' > "$P/hooks/h2.py"
+  printf '# Demo\n\nplugin - <!-- inventory -->one skills, one agent types, and two warn-only hooks<!-- /inventory --> - end. [link](skills/demo/SKILL.md)\n[ext](https://example.com/x) and prose with `](` then capture to `)` here.\n' > "$P/README.md"
   printf '{\n  "name": "demo",\n  "description": "One skills, one agents, and one warn-only hooks that harden the path from idea to merged PR - tail."\n}\n' > "$P/.claude-plugin/plugin.json"
   printf '{\n  "name": "demo-mkt",\n  "description": "no counts here",\n  "plugins": [\n    {\n      "name": "demo",\n      "description": "One skills, one agents, and one warn-only hooks that harden the path from idea to merged PR."\n    }\n  ]\n}\n' > "$P/.claude-plugin/marketplace.json"
   ( cd "$P" && git init -q . && git config user.name T && git config user.email t@e.co && git add -A && git commit -qm init )
@@ -87,6 +88,8 @@ sh "$GEN" "$WORK/t6" >/dev/null 2>&1
 check "generator run succeeds on a stale tree" 0 $?
 grep -q 'Two skills, one agents' "$WORK/t6/.claude-plugin/plugin.json"
 check "plugin.json count regenerated from the tree" 0 $?
+grep -q 'two warn-only hooks' "$WORK/t6/.claude-plugin/plugin.json"
+check "hooks counted from hooks.json entries" 0 $?
 grep -q 'two skills, one agent types' "$WORK/t6/README.md"
 check "README marker region regenerated" 0 $?
 python3 -c "import json;json.load(open('$WORK/t6/.claude-plugin/plugin.json'));json.load(open('$WORK/t6/.claude-plugin/marketplace.json'))"

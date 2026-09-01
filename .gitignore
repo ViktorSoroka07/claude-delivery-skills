@@ -11,3 +11,6 @@ review-findings-*.md
 
 __pycache__/
 *.pyc
+
+# plan docs are local working artifacts here, by owner decision
+docs/plans/
