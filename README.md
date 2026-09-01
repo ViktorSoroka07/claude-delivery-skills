@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->thirteen skills, three agent types, and two warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->fourteen skills, three agent types, and two warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -17,10 +17,10 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other nine guard moments that can occur in any
+Four skills form the build chain; the other ten guard moments that can occur in any
 session, at any time.
 
-![The skill map: the four-skill build chain from idea to shipped spec and PR, and eight moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
+![The skill map: the four-skill build chain from idea to shipped spec and PR, and nine moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## What each skill solves
 
@@ -107,6 +107,13 @@ Descriptions accumulate review-round narration and references that die on squash
 The contract: net delta grouped by behavioral change, the deliberate scope boundary,
 references that survive history rewrites — and at most one living status comment,
 edited in place, never a stack.
+
+**[`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) — the message records the change, never the session.**
+Commit bodies are where release notes and PR descriptions get their "why", and where
+narration creeps in: who asked, what else got fixed on the way, a trailer some tool
+adds by default. Subject as the outcome, body as the mechanism, trailers only the
+repo's own history asks for, one commit per workstream — and history rewrites left
+to the author.
 
 ### The session itself
 

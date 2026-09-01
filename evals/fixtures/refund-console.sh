@@ -4,6 +4,7 @@
 # lookup, and whose feature branch mounts a component ahead of the task that
 # owns the mount. $1 = target directory (created; must not exist or be empty).
 # $2 = "with-plan" to also commit a follow-up plan that lacks a gates task.
+# $2 = "staged-pair" to leave two unrelated edits staged and uncommitted.
 #
 # Invented content throughout - a refund console that never existed.
 set -e
@@ -184,6 +185,13 @@ The detail page mounts the request table but fetches one page and swallows error
 EOF
   git add -A
   git commit -qm "Add the request list plan"
+fi
+
+if [ "${2:-}" = "staged-pair" ]; then
+  sed -i.bak "s/total: batch.total };/total: batch.total, currency: batch.currency ?? 'USD' };/" src/summary.js
+  sed -i.bak 's/not the batch total; the paging task/not the batch total: the paging task/' src/requestTable.js
+  rm -f src/summary.js.bak src/requestTable.js.bak
+  git add -A
 fi
 
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"

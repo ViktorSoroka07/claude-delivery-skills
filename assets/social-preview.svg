@@ -32,6 +32,6 @@
 <rect x="974" y="316" width="210" height="68" rx="34" fill="#ECEEF2" stroke="#6B7280" stroke-width="1"/>
 <text x="1079" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="21" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">shipped spec + PR</text>
 
-<text x="96" y="478" font-family="system-ui, -apple-system, sans-serif" font-size="27" font-weight="600" fill="#8A5A1D">13 skills&#160;&#160;&#183;&#160;&#160;2 agents&#160;&#160;&#183;&#160;&#160;1 hook&#160;&#160;&#183;&#160;&#160;MIT</text>
+<text x="96" y="478" font-family="system-ui, -apple-system, sans-serif" font-size="27" font-weight="600" fill="#8A5A1D">14 skills&#160;&#160;&#183;&#160;&#160;3 agents&#160;&#160;&#183;&#160;&#160;2 hooks&#160;&#160;&#183;&#160;&#160;MIT</text>
 <text x="96" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="23" font-weight="400" fill="#9AA0A8">github.com/ViktorSoroka07/claude-delivery-skills</text>
 </svg>
