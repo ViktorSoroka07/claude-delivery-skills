@@ -96,6 +96,37 @@ conditions - operational detail in a paraphrase is the part that drifts first.
 A change to a skill's user-visible modes or defaults includes a sweep of its
 README section in the same commit.
 
+## Testing a wording change
+
+A skill or agent edit that changes behavior is tested the way code is: a
+baseline that fails without the change, then the change, then the same run
+passing. Reading the new text and finding it clear is not a test - the
+wording that read fine to the author is what a weaker model negotiated with.
+
+`evals/` holds the cases, in the layout `claude plugin eval` expects: one
+directory per case with `prompt.md` (frontmatter: runs, tools, limits),
+`graders/*.md` (one grader per file), and `case.yaml` whose scaffold script
+builds the fixture repo from `evals/fixtures/`. Run with `--scaffold`, pin
+the model with `--model`, and read the ablation arm - the command runs each
+case with and without the plugin, which is the baseline for free:
+
+    claude plugin eval . --scaffold --model sonnet --runs 5
+
+The command is early-access and was not enabled when the suite was written,
+so two things are unconfirmed and marked in the case files: the scaffold's
+working directory (the cases assume the plugin root), and whether an `llm`
+grader accepts a file target. Fix them once when the command first runs and
+delete this sentence.
+
+Until it runs here, the same test is done by hand: build a fixture with
+`sh evals/fixtures/refund-console.sh <empty dir>`, dispatch five fresh
+subagents on the model of interest with the current contract and five with
+the edited one, and read every report against the grader criteria in the
+case directory. Rules that held in practice: stop if the baseline does not
+fail; five reps per arm, single samples lie; when reps disagree on the shape
+of the output, the wording is not binding - restate it as what the output
+*is* rather than adding words.
+
 ## Before pushing
 
     ./scripts/scan-history.sh
