@@ -76,6 +76,43 @@ printf 'A plan. [dead](skills/gone/SKILL.md) and prose with `](` then capture to
 sh "$CHECK" "$WORK/t5b" >/dev/null 2>&1
 check "committed plan doc with example links passes" 0 $?
 
+GEN="$ROOT/scripts/generate-inventory.sh"
+
+# 6. The generator rewrites a stale count from the tree, and the result is
+#    valid JSON.
+mkplugin t6
+mkdir -p "$WORK/t6/skills/extra"
+printf -- '---\nname: extra\ndescription: extra\n---\nbody\n' > "$WORK/t6/skills/extra/SKILL.md"
+sh "$GEN" "$WORK/t6" >/dev/null 2>&1
+check "generator run succeeds on a stale tree" 0 $?
+grep -q 'Two skills, one agents' "$WORK/t6/.claude-plugin/plugin.json"
+check "plugin.json count regenerated from the tree" 0 $?
+grep -q 'two skills, one agent types' "$WORK/t6/README.md"
+check "README marker region regenerated" 0 $?
+python3 -c "import json;json.load(open('$WORK/t6/.claude-plugin/plugin.json'));json.load(open('$WORK/t6/.claude-plugin/marketplace.json'))"
+check "surgered manifests still parse as JSON" 0 $?
+
+# 7. The generator is idempotent: a second run succeeds and changes nothing.
+#    The exit-code check keeps this group from passing vacuously when the
+#    generator is missing entirely.
+( cd "$WORK/t6" && git add -A && git commit -qm gen )
+sh "$GEN" "$WORK/t6" >/dev/null 2>&1
+check "second generator run exits 0" 0 $?
+( cd "$WORK/t6" && git diff --quiet )
+check "second generator run is a no-op" 0 $?
+
+# 8. Prose outside the canonical statements is never touched.
+grep -q 'no counts here' "$WORK/t6/.claude-plugin/marketplace.json"
+check "top-level marketplace description untouched" 0 $?
+
+# 9. The count guard: a tree whose canonical anchors are missing fails
+#    loudly instead of splicing the wrong text.
+mkplugin t9
+sed 's/<!-- inventory -->//;s/<!-- \/inventory -->//' "$WORK/t9/README.md" > "$WORK/t9/README.tmp"
+mv "$WORK/t9/README.tmp" "$WORK/t9/README.md"
+sh "$GEN" "$WORK/t9" >/dev/null 2>&1
+check "missing markers fail the generator" 1 $?
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
