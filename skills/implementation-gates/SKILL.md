@@ -28,6 +28,8 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 4. Revert; confirm the tree is clean before the next.
 5. **All-killed is suspicious.** Re-apply one and watch it fail before believing the run.
 
+This protocol has one statement, here. The plugin's `mutation-tester` agent is its executable form: `review-pr`'s mutation axis dispatches it, and so does this gate when the sweep is handed to a subagent rather than run in the current context.
+
 **Aim at the classes that actually survive.** Each of these shipped green in real work:
 
 | Class                                 | Example                                                                                       |

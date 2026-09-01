@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->thirteen skills, two agent types, and two warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->thirteen skills, three agent types, and two warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -137,12 +137,12 @@ ledger, not the items that happened to finish.
 Skills are instructions the model follows; two more component types cover what
 instructions alone cannot:
 
-- **Two agent types** ([`agents/`](agents/)) — [`axis-reviewer`](agents/axis-reviewer.md) and [`refute-verifier`](agents/refute-verifier.md) carry the
-  reviewer and skeptic contracts that `review-pr` and `verifying-before-sending`
-  otherwise restate in every dispatch prompt: the finding format, the
-  name-the-pinned-SHA rule, the refute-don't-confirm stance, read-only boundaries.
-  The skills use them when present; dispatch prompts shrink to axis, worktree, SHA,
-  and scope.
+- **Three agent types** ([`agents/`](agents/)) — [`axis-reviewer`](agents/axis-reviewer.md), [`refute-verifier`](agents/refute-verifier.md), and
+  [`mutation-tester`](agents/mutation-tester.md) carry the reviewer, skeptic, and mutation contracts that
+  `review-pr`, `implementation-gates`, and `verifying-before-sending` otherwise restate in
+  every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
+  refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
+  use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
 - **Two hooks** ([`hooks/`](hooks/)) — warn-only backstops to `writing-code-comments`.
   The comment rules are the most-relapsed discipline in the corpus behind this repo:
   the skill owns the judgment, and the hooks mechanically flag narrative-comment tells

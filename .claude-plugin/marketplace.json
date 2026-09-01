@@ -7,7 +7,7 @@
       "name": "delivery-skills",
       "source": "./",
       "displayName": "Claude Delivery Skills",
-      "description": "Thirteen skills, two agents, and two warn-only hooks that harden the path from idea to merged PR.",
+      "description": "Thirteen skills, three agents, and two warn-only hooks that harden the path from idea to merged PR.",
       "license": "MIT",
       "keywords": ["claude-code", "ai-agents", "skills", "code-review", "delivery"]
     }
