@@ -1,13 +1,13 @@
 {
   "name": "claude-delivery-skills",
-  "description": "Delivery-hardening plugin for Claude Code: skills, agents, and a hook distilled from real production work.",
+  "description": "Delivery-hardening plugin for Claude Code: skills, agents, and hooks distilled from real production work.",
   "owner": { "name": "Viktor Soroka", "url": "https://github.com/ViktorSoroka07" },
   "plugins": [
     {
       "name": "delivery-skills",
       "source": "./",
       "displayName": "Claude Delivery Skills",
-      "description": "Thirteen skills, two agents, and a write-time hook that harden the path from idea to merged PR.",
+      "description": "Thirteen skills, two agents, and two warn-only hooks that harden the path from idea to merged PR.",
       "license": "MIT",
       "keywords": ["claude-code", "ai-agents", "skills", "code-review", "delivery"]
     }

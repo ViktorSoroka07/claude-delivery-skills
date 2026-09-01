@@ -8,3 +8,6 @@
 
 # review-pr findings are point-in-time, untracked by convention
 review-findings-*.md
+
+__pycache__/
+*.pyc

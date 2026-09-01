@@ -7,23 +7,11 @@ Warn-only by design - it feeds the tell back to the model, never blocks.
 Fails open on any error: a broken backstop must not break editing.
 """
 import json
-import re
+import os
 import sys
 
-# Comment markers across the common languages the skill's corpus covered.
-COMMENT_LINE = re.compile(r"^\s*(//|#(?!!)|/\*|\*|<!--|--)\s?(.*)")
-
-# The skill's own draft-grep tells, kept conservative to avoid false positives
-# on code and strings: each must appear inside a comment line.
-TELLS = re.compile(
-    r"(Regression:|Locks in\b|used to\b|previously\b|without this\b|"
-    r"would otherwise\b|no longer\b|which is immaterial|harmless because|"
-    r"acceptable since|does not matter here)",
-    re.IGNORECASE,
-)
-
-# Files where prose is the content, not commentary.
-SKIP_SUFFIXES = (".md", ".markdown", ".txt", ".rst", ".adoc", ".json", ".lock")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from comment_tells import COMMENT_LINE, SKIP_SUFFIXES, TELLS  # noqa: E402
 
 
 def added_text(payload):

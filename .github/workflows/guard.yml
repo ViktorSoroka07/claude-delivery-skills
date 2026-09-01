@@ -29,6 +29,12 @@ jobs:
       - name: Guard self-tests
         run: sh scripts/test-guard.sh
 
+      # Both comment-discipline hooks fail open by design, so a syntax error
+      # or broken import turns them silently inert in every session - these
+      # tests are the only place such a break is visible.
+      - name: Comment-hook self-tests
+        run: sh scripts/test-hooks.sh
+
       # .leakwords.local never leaves the author's machine, so CI can check
       # only the committed shape patterns. The local pre-push scan, with the
       # full wordlist, remains the real gate.
