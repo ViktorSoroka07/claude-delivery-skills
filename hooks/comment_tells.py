@@ -15,7 +15,7 @@ COMMENT_LINE = re.compile(r"^\s*(//|#(?!!)|/\*|\*|<!--|--)\s?(.*)")
 # candidate, not a verdict.
 TELLS = re.compile(
     r"(Regression:|Locks in\b|used to\b|previously\b|without this\b|"
-    r"\bwould\b|no longer\b|which is immaterial|harmless because|"
+    r"\bwould\b|\botherwise\b|no longer\b|which is immaterial|harmless because|"
     r"acceptable since|does not matter here)",
     re.IGNORECASE,
 )

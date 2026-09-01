@@ -67,6 +67,9 @@ out=$(write_payload /x/f.py '# previously a loop\nx = 1\n' | "$PY" "$WRITE_HOOK"
 check "write hook flags a narrative tell" 2 $?
 contains "write hook stderr names the backstop" "$out" "backstop"
 
+write_payload /x/f.py '# otherwise the loop runs twice\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>/dev/null
+check "write hook flags the skill's own draft-grep tell (otherwise)" 2 $?
+
 # 3. Write hook: an earned present-tense comment passes, including one using
 #    phrasing near the tell list ("without a ...") - the false-positive guard.
 write_payload /x/f.py '# index is sorted by key\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>/dev/null
