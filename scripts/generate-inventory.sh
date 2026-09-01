@@ -34,7 +34,11 @@ with open(os.path.join(root, "hooks", "hooks.json")) as fh:
 hooks = sum(len(m.get("hooks", []))
             for ev in hooks_cfg.get("hooks", {}).values() for m in ev)
 
-s, a, h = word(len(skills)), word(len(agents)), word(hooks)
+def noun(n, singular):
+    return "%s %s%s" % (word(n), singular, "" if n == 1 else "s")
+
+
+s, a, h = len(skills), len(agents), hooks
 
 
 def surgery(path, pattern, replacement, validate_json):
@@ -56,26 +60,28 @@ def surgery(path, pattern, replacement, validate_json):
 surgery(
     "README.md",
     r"<!-- inventory -->.*?<!-- /inventory -->",
-    "<!-- inventory -->%s skills, %s agent types, and %s warn-only hooks<!-- /inventory -->" % (s, a, h),
+    "<!-- inventory -->%s, %s, and %s<!-- /inventory -->"
+    % (noun(s, "skill"), noun(a, "agent type"), noun(h, "warn-only hook")),
     False,
 )
 surgery(
     ".claude-plugin/plugin.json",
     r'"description": "[^"]*merged PR[^"]*"',
     json.dumps("description") + ": " + json.dumps(
-        "%s skills, %s agents, and %s warn-only hooks that harden the path "
+        "%s, %s, and %s that harden the path "
         "from idea to merged PR - plans ground-truthed before building, tests "
         "proven able to fail, subagent output treated as claims, outbound "
-        "text verified before it ships." % (s.capitalize(), a, h)),
+        "text verified before it ships."
+        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
     True,
 )
 surgery(
     ".claude-plugin/marketplace.json",
     r'"description": "[^"]*merged PR[^"]*"',
     json.dumps("description") + ": " + json.dumps(
-        "%s skills, %s agents, and %s warn-only hooks that harden the path "
-        "from idea to merged PR." % (s.capitalize(), a, h)),
+        "%s, %s, and %s that harden the path from idea to merged PR."
+        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
     True,
 )
-print("inventory: %d skills, %d agents, %d hooks" % (len(skills), len(agents), hooks))
+print("inventory: %d skills, %d agents, %d hooks" % (s, a, h))
 PYEOF

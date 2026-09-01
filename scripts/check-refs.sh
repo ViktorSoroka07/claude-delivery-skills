@@ -3,8 +3,9 @@
 # references resolve: references/*.md named by skills, delivery-skills:<name>
 # mentions, hooks.json command paths, and relative markdown links. Exit 0
 # clean; exit 1 with one BROKEN line per failure. Optional $1 = tree root.
-# shellcheck disable=SC2013  # word-splitting the $(grep) loops is intended:
-# every matched token is path-shaped and spaceless by the greps' charsets.
+# shellcheck disable=SC2013  # word-splitting the $(grep) and $(git ls-files)
+# loops is intended: grep tokens are spaceless by their charsets, and tracked
+# paths in this repo contain no whitespace.
 set -u
 ROOT=${1:-$(cd "$(dirname "$0")/.." && pwd)}
 fails=0

@@ -124,7 +124,7 @@ lacks "commit hook skips markdown and earned invariants" "$out" "narrative tells
 #     the named repo - the session repo's staged lines are not that commit's,
 #     and the target repo's staged lines are.
 mkrepo t10b
-TARGET="$R"
+TARGET=$(pwd -W 2>/dev/null || pwd)
 printf 'x = 1\n' > f.py
 git add f.py
 mkrepo t10a
@@ -135,6 +135,21 @@ lacks "commit hook -C: session-repo tells not pinned on a clean target" "$out" "
 ( cd "$TARGET" && printf '# previously a loop\ny = 2\n' > g.py && git add g.py )
 out=$(commit_payload "cd $TARGET && git commit -m x" | "$PY" "$COMMIT_HOOK")
 contains "commit hook cd prefix: target-repo tells are seen" "$out" "narrative tells"
+
+# 10b. Quoted directory arguments resolve too - quoting the path is the
+#      default in generated shell, so the backstop must follow it.
+out=$(printf '%s' "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"cd \\\"$TARGET\\\" && git commit -m x\"}}" | "$PY" "$COMMIT_HOOK")
+contains "commit hook follows a double-quoted cd path" "$out" "narrative tells"
+out=$(printf '%s' "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git -C \\\"$TARGET\\\" commit -m x\"}}" | "$PY" "$COMMIT_HOOK")
+contains "commit hook follows a double-quoted -C path" "$out" "narrative tells"
+
+# 10c. A cd on its own line of a multi-line command is a separator too. Run
+#      from a clean session repo, so a hit can only come from the target.
+mkrepo t10c
+printf 'clean = 1\n' > f.py
+git add f.py
+out=$(printf '%s' "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"ls\\ncd $TARGET\\ngit commit -m x\"}}" | "$PY" "$COMMIT_HOOK")
+contains "commit hook follows a newline-separated cd" "$out" "narrative tells"
 
 # 11. Commit hook: a directory the command names but the parse cannot resolve
 #     means silence, not a scan of the session repo.

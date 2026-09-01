@@ -23,24 +23,35 @@ from comment_tells import SKIP_SUFFIXES, tells_in  # noqa: E402
 GIT_COMMIT = re.compile(r"\bgit\b[^|;&]*\bcommit\b")
 STAGES_TRACKED = re.compile(r"\bcommit\b[^|;&]*(?:\s-\w*a|\s--all\b)")
 QUOTED = re.compile(r"\"[^\"]*\"|'[^']*'")
-CD_PREFIX = re.compile(r"(?:^|&&|;|\|)\s*cd\s*(\S*)")
-C_FLAG = re.compile(r"\s-C\s*(\S*)")
+CD_ANCHOR = re.compile(r"(?:^|&&|;|\||\n)\s*cd(?=\s|$)")
+C_ANCHOR = re.compile(r"\s-C(?=\s|$)")
+ARG = re.compile(r"""\s*(?:"([^"]*)"|'([^']*)'|(\S+))""")
 
 
-def target_dir(stripped, match):
+def argument_after(command, pos):
+    m = ARG.match(command, pos)
+    if not m:
+        return None
+    return m.group(1) or m.group(2) or m.group(3)
+
+
+def target_dir(command, stripped, match):
     """The directory the matched commit runs in, None for the CWD, or a lie:
     a dir the command names that cannot be resolved here means the diff below
-    must not run at all - '' signals that."""
+    must not run at all - '' signals that. Anchors are found in the stripped
+    string so quoted text cannot fake structure; the argument is then read
+    from the original at the same offset, which the length-preserving
+    blanking guarantees is the right place."""
     cwd = None
-    cds = [c for c in CD_PREFIX.finditer(stripped) if c.start() < match.start()]
+    cds = [c for c in CD_ANCHOR.finditer(stripped) if c.start() < match.start()]
     if cds:
-        d = cds[-1].group(1)
+        d = argument_after(command, cds[-1].end())
         if not d:
             return ""
         cwd = os.path.expanduser(d)
-    c = C_FLAG.search(stripped, match.start(), match.end())
+    c = C_ANCHOR.search(stripped, match.start(), match.end())
     if c:
-        d = c.group(1)
+        d = argument_after(command, c.end())
         if not d:
             return ""
         d = os.path.expanduser(d)
@@ -72,13 +83,15 @@ def main():
     if payload.get("tool_name") != "Bash":
         return 0
     command = (payload.get("tool_input", {}) or {}).get("command", "") or ""
-    # Quoted spans are message text, not command structure; blanking them
-    # length-preservingly keeps match positions valid for target_dir.
+    # Quoted spans are blanked for structure matching only, so message text
+    # cannot fake flags or cd/-C anchors; blanking is length-preserving, so
+    # target_dir can read quoted directory arguments back out of the
+    # original at the anchor's offset.
     stripped = QUOTED.sub(lambda m: " " * len(m.group(0)), command)
     match = GIT_COMMIT.search(stripped)
     if not match:
         return 0
-    cwd = target_dir(stripped, match)
+    cwd = target_dir(command, stripped, match)
     if cwd == "":
         return 0
 

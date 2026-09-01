@@ -86,12 +86,12 @@ mkdir -p "$WORK/t6/skills/extra"
 printf -- '---\nname: extra\ndescription: extra\n---\nbody\n' > "$WORK/t6/skills/extra/SKILL.md"
 sh "$GEN" "$WORK/t6" >/dev/null 2>&1
 check "generator run succeeds on a stale tree" 0 $?
-grep -q 'Two skills, one agents' "$WORK/t6/.claude-plugin/plugin.json"
-check "plugin.json count regenerated from the tree" 0 $?
+grep -q 'Two skills, one agent,' "$WORK/t6/.claude-plugin/plugin.json"
+check "plugin.json count regenerated with per-count plurals" 0 $?
 grep -q 'two warn-only hooks' "$WORK/t6/.claude-plugin/plugin.json"
 check "hooks counted from hooks.json entries" 0 $?
-grep -q 'two skills, one agent types' "$WORK/t6/README.md"
-check "README marker region regenerated" 0 $?
+grep -q 'two skills, one agent type,' "$WORK/t6/README.md"
+check "README marker region regenerated with per-count plurals" 0 $?
 python3 -c "import json;json.load(open('$WORK/t6/.claude-plugin/plugin.json'));json.load(open('$WORK/t6/.claude-plugin/marketplace.json'))"
 check "surgered manifests still parse as JSON" 0 $?
 
