@@ -1,6 +1,6 @@
 ---
 name: implementation-gates
-description: Verification gates that catch what a green test suite misses. Use when implementation work is about to be called done or complete, after the repo's own gates have passed — and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions.
+description: Use when implementation work is about to be called done or complete, after the repo's own gates have passed — and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions.
 ---
 
 # Implementation Gates
@@ -56,12 +56,27 @@ Evidence, the best first:
 
 If a claim cannot be settled, say so, name the check that would settle it, and choose the option that fails safe.
 
+This list owns the evidence order and the plan-time check; `plan-feature` and `implement-plan` call this gate rather than restating it.
+
 ## Gate 3 — written records state only what ran
 
 Distinct from claims made in conversation, which the repo's skill already governs. This is about verification sections written into plans, specs, and PR bodies, where they outlive the session and are read as fact.
 
 - Ran six mutations? Say six. Do not generalize to "no test survives reverting the behavior it covers" — that is a claim about a whole suite, and a wider run will contradict it.
 - Could not check something? Write **what** was not verified, **why**, and **the check that would settle it**. A wrong reason is worse than no reason: it makes a reachable check look unreachable, and nobody retries it.
+
+## The plan task that runs these gates
+
+A plan ends with this task, copied verbatim. `plan-feature` writes it at plan time; `implement-plan` appends it when a plan lacks one. It is what makes the gates run: the executor runs the verifications the plan specifies, so a gate that is not written into the plan does not run.
+
+```markdown
+### Task N: Implementation gates
+
+- [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion; a plan adding no executable code under test (docs-only, config-only) runs none and records exactly that
+- [ ] Re-check the spec's ground-truth claims against what shipped
+- [ ] Write only what was executed into any verification section
+```
 
 ## Red flags
 

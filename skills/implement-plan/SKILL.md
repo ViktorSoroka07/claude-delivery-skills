@@ -1,6 +1,6 @@
 ---
 name: implement-plan
-description: Builds an existing implementation plan with the delivery gates guaranteed to run. Use when a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature.
+description: Use when a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature.
 compatibility: Delegates execution to the superpowers skill set (subagent-driven-development or executing-plans, verification-before-completion, finishing-a-development-branch) or a repo's own forks of them.
 ---
 
@@ -15,24 +15,15 @@ Picks up where `plan-feature` stops, and works equally well on a plan written da
 Read it fully before touching anything. Then check two things:
 
 - **Does it still match the repo?** A plan written before a merge can name files, symbols or commands that no longer exist. Raise mismatches with the user rather than improvising around them.
-- **Does it end with a gates task?** If not, append one now — before implementation starts, so the executor runs it as part of the plan:
-
-```markdown
-### Task N: Implementation gates
-
-- [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion; a plan adding no executable code under test (docs-only, config-only) runs none and records exactly that
-- [ ] Re-check the spec's ground-truth claims against what shipped
-- [ ] Write only what was executed into any verification section
-```
+- **Does it end with a gates task?** If not, append `implementation-gates`' plan task verbatim (its section "The plan task that runs these gates") now — before implementation starts, so the executor runs it as part of the plan.
 
 The plan is what `executing-plans` obeys. Patching the plan is what makes the gate run; hoping a skill fires at the end is not.
 
 ## Step 2 — Check the plan's premises are settled
 
-If the plan makes claims about behavior **outside the code being written** — what an API returns, what a frame contains, what a column means — confirm they were settled against evidence, not argued.
+If the plan makes claims about behavior **outside the code being written** — what an API returns, what a frame contains, what a column means — confirm they were settled against evidence, not argued. Call the Skill tool with `implementation-gates` and run its Gate 2 on those claims now.
 
-A plan that reads well can still rest on a false premise, and implementation will faithfully amplify it. If a claim is unsettled, settle it now: real data beats an existing consumer, which beats documentation, which beats a coherent argument. This costs one query here and a rewrite later.
+A plan that reads well can still rest on a false premise, and implementation will faithfully amplify it. Settling a claim costs one query here and a rewrite later.
 
 ## Step 3 — Implement
 
@@ -50,13 +41,12 @@ Report survivors honestly. A survivor is a test gap to close, not a defect to ar
 
 ## Step 5 — Finish
 
-First rewrite the plan document as the spec of what shipped — call the Skill tool with `writing-plan-docs` and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
+Four steps, in this order:
 
-Then call the Skill tool with the repo's `finishing-a-development-branch`.
-
-Before reporting done, update the project memory per `maintaining-project-memory` (it owns the write discipline — what memory holds, and the starter prompt a continuing session ends with): refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
-
-Then tell the user that review is a separate, billable decision: `/review-pr` triages its axes, and a small diff may not warrant one at all.
+1. **Rewrite the plan document as the spec of what shipped** — call the Skill tool with `writing-plan-docs` and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
+2. **Call the Skill tool with the repo's `finishing-a-development-branch`.**
+3. **Update the project memory** per `maintaining-project-memory` (it owns the write discipline — what memory holds, and the starter prompt a continuing session ends with). Refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
+4. **Tell the user that review is a separate, billable decision:** `/review-pr` triages its axes, and a small diff may not warrant one at all.
 
 ## Rules
 

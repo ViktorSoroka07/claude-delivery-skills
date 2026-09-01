@@ -35,7 +35,12 @@ An existing body's section layout may stay — the contract governs content shap
 
 ## The author's reviewer-facing summary comment
 
-The same contract governs the **author's** "changes since the last review pass" comment — and any other living status comment the author maintains, on an issue as much as a PR (distinct from review findings, which are the reviewer's and go inline): one living record, edited in place, never a stack — multiple summary comments accumulate over a PR's life and bury the one reviewers should read. Keep at most one living summary comment at a time — created on the first changes-since-review sync; note its id; every later update fetches the current body and PATCHes it back (GitHub: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<id>`; Azure DevOps: update the existing thread comment rather than posting a new thread), restructured to the current state — stale "what changed last week" content is replaced, not appended to. A fresh comment is warranted only when a new review cycle explicitly begins — then edit the superseded comment down to a one-line pointer to the new one. Replies on inline review threads are not summaries — they stay on their threads.
+The same contract governs the **author's** "changes since the last review pass" comment — and any other living status comment the author maintains, on an issue as much as a PR (distinct from review findings, which are the reviewer's and go inline). It is one living record, edited in place, never a stack: multiple summary comments accumulate over a PR's life and bury the one reviewers should read.
+
+1. **At most one living summary comment at a time**, created on the first changes-since-review sync. Note its id.
+2. **Every later update edits it in place:** fetch the current body and PATCH it back (GitHub: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<id>`; Azure DevOps: update the existing thread comment rather than posting a new thread), restructured to the current state. Stale "what changed last week" content is replaced, not appended to.
+3. **A fresh comment only when a new review cycle explicitly begins** — then edit the superseded comment down to a one-line pointer to the new one.
+4. **Replies on inline review threads are not summaries** — they stay on their threads.
 
 ## Common mistakes (each observed in practice)
 

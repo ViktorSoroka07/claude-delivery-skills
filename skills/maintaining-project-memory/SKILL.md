@@ -12,7 +12,7 @@ A project memory is not a notebook — it is a **promotion tier**. A line writte
 
 Memory holds what the repository **structurally cannot** record. Git records what changed and when; a PR body records the net delta; a plan doc records the intended end state. None of them record the paths *not* taken — nobody commits a file explaining what they didn't build. This skill owns the memory-write discipline; `implement-plan`'s finish step applies it at end of task.
 
-**Keep, because nothing else holds it:**
+### Keep, because nothing else holds it
 
 - **Approaches tried and rejected, with the reason** — "a size cap here would reintroduce the truncation bug the last fix removed" stops a future session from re-proposing the cap as obvious hygiene.
 - **What live verification showed where no committed record holds it** — a mid-session observation that contradicted a green suite, in a repo whose plan docs carry no verification record. Where the shipped spec's record exists, memory keeps at most the pointer to it.
@@ -20,9 +20,13 @@ Memory holds what the repository **structurally cannot** record. Git records wha
 - **Decisions still genuinely open, and who owns them.**
 - **User conventions confirmed in passing.**
 
+### Delete what a better source already answers
+
 **Delete branch state outright when the work merges.** Branch tips, unpushed-commit counts, divergence flags, open reminders to push or tidy the tracker — version control answers these correctly, forever, in milliseconds. Duplicating them into memory maintains a worse copy of a perfect source, and the stale copy outlives the branch.
 
 **The test before writing a line:** is this in the code, a commit message, the PR body, the plan doc, an issue — or a skill? If yes, it is a duplicate that will drift from the authoritative copy. (A fact that *contradicts* the repo's obvious reading — the gate command that isn't what the scripts suggest — is a trap, not a duplicate.) **The issue tracker is the source everyone forgets** — one pruning pass "rescued" a decision as unrecorded when an issue was titled for that exact decision and even stated its open half. Search the tracker before concluding something lives nowhere; decisions relayed verbally are precisely what gets written into an issue rather than into code.
+
+### Promotion into a skill
 
 **Promotion into a skill triggers the same deletion.** When a memory's content graduates into a skill, the skill becomes the procedure's durable home, and the memory is condensed — in the same session, not later — to the three things the skill cannot hold:
 
@@ -31,6 +35,8 @@ Memory holds what the repository **structurally cannot** record. Git records wha
 - **a capture buffer**: a new correction lands in memory first, gets confirmed in practice, then promotes into the skill re-derived, per "A memory write is a promotion" below — and the memory line condenses again.
 
 Leaving the full text in memory after promotion creates two authoritative copies, and the one that drifts is the one sessions load first.
+
+### The pruning pass
 
 Three mechanics for the pruning pass itself:
 

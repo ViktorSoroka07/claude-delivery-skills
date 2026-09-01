@@ -1,6 +1,6 @@
 ---
 name: plan-feature
-description: Turns an idea into a reviewed, evidence-grounded implementation plan, then stops so the plan can be read before anything is built. Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Implementation is a separate skill (implement-plan).
+description: Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Ends at a plan; implementation is a separate skill (implement-plan).
 compatibility: Delegates to the superpowers skill set (brainstorming, writing-plans) or a repo's own forks of them - install one or the chain has nothing to call.
 ---
 
@@ -16,7 +16,7 @@ Prefer a repo's unprefixed skill over the `superpowers:` copy — the unprefixed
 
 Name the skills this run will use, so the user can redirect before the spending starts (`budgeting-agentic-work` owns the general price-the-pass rule):
 
-> Chain: `brainstorming` (repo copy) → ground-truth check → `writing-plans` + `writing-plan-docs` → optional plan review. Ends with a plan; nothing gets built.
+> Chain: `brainstorming` (repo copy) → `implementation-gates` Gate 2 (ground-truth) → `writing-plans` + `writing-plan-docs` → optional plan review. Ends with a plan; nothing gets built.
 
 If a step's skill is missing in this repo, say so and name what you will do instead.
 
@@ -28,31 +28,13 @@ Call the Skill tool with the repo's `brainstorming` and follow it exactly, inclu
 
 Before the user reviews the spec, and before any plan is written. **This is the step that a plan review cannot replace** — see the note in Step 4.
 
-List every claim the design rests on about behavior **you did not write**: what an API returns, what a stream frame contains, what a column means, what a library does under a flag, what a tool prints. For each, name the check that would settle it and run it — every check read-only: query, read, observe; never a call that mutates state.
-
-Evidence, the best first:
-
-1. **Real data** — query a local database read-only, read a captured fixture, run the tool once and look.
-2. **An existing consumer** — code already depending on the answer encodes the truth.
-3. **Documentation**, including the repo's own.
-4. **A coherent argument** — not evidence.
-
-If a claim cannot be settled, say so in the spec, name the check that would settle it, and pick the option that fails safe.
+Call the Skill tool with `implementation-gates` and run its Gate 2 on the spec: list every claim the design rests on about behavior **you did not write**, settle each with the best evidence its ladder allows, and where a claim cannot be settled, say so in the spec, name the check that would settle it, and pick the option that fails safe.
 
 Skip this step only if the repo's `brainstorming` already performs it — read its spec self-review section rather than assuming either way.
 
 ## Step 3 — Plan
 
-Call the Skill tool twice — once for the repo's `writing-plans`, once for `writing-plan-docs` — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append one:
-
-```markdown
-### Task N: Implementation gates
-
-- [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
-- [ ] Prove the new tests can fail — 10–12 targeted mutations over the lines this plan added, one at a time, reverting between; screen survivors for equivalence (a mutation a correct implementation could also produce is not a gap), every real survivor is a missing assertion; a plan adding no executable code under test (docs-only, config-only) runs none and records exactly that
-- [ ] Re-check the spec's ground-truth claims against what shipped
-- [ ] Write only what was executed into any verification section
-```
+Call the Skill tool twice — once for the repo's `writing-plans`, once for `writing-plan-docs` — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append `implementation-gates`' plan task verbatim (its section "The plan task that runs these gates").
 
 This is the load-bearing patch. `executing-plans` runs "verifications as specified" — specified by the plan — so a gate that is not written into the plan does not run. Writing it here means it survives even if the plan is later implemented by a different skill, or in a different session.
 
