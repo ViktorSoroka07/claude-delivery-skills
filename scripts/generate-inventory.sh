@@ -38,6 +38,25 @@ def noun(n, singular):
     return "%s %s%s" % (word(n), singular, "" if n == 1 else "s")
 
 
+def description(name):
+    """The skill's own trigger sentence. Read from the file rather than
+    restated, so the index below carries the owner's words and cannot drift
+    from them."""
+    path = os.path.join(root, "skills", name, "SKILL.md")
+    with open(path) as fh:
+        for line in fh:
+            if line.startswith("description:"):
+                return line[len("description:"):].strip()
+    sys.exit("skills/%s/SKILL.md: no description: line in frontmatter" % name)
+
+
+def trigger_row(name):
+    d = description(name)
+    prefix = "Use when "
+    trigger = d[len(prefix):] if d.startswith(prefix) else d
+    return "| %s | [`%s`](skills/%s/SKILL.md) |" % (trigger, name, name)
+
+
 s, a, h = len(skills), len(agents), hooks
 
 
@@ -82,6 +101,13 @@ surgery(
         "%s, %s, and %s that harden the path from idea to merged PR."
         % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
     True,
+)
+rows = "\n".join(trigger_row(n) for n in skills)
+surgery(
+    "README.md",
+    r"(?s)<!-- triggers -->.*?<!-- /triggers -->",
+    lambda m: "<!-- triggers -->\n\n| Reach for it when | Skill |\n|---|---|\n%s\n\n<!-- /triggers -->" % rows,
+    False,
 )
 print("inventory: %d skills, %d agents, %d hooks" % (s, a, h))
 PYEOF

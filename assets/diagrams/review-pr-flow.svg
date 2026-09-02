@@ -1,9 +1,9 @@
-<svg width="100%" viewBox="0 0 1100 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent, their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted">
+<svg width="100%" viewBox="0 0 1100 352" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent, their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted; posting, applying and thread disposition happen only when asked for in a later message">
 <defs>
 <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9AA0A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>
 
-<rect x="1" y="1" width="1098" height="248" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
+<rect x="1" y="1" width="1098" height="350" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
 
 <rect x="28" y="103" width="84" height="44" rx="22" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
 <text x="70" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">diff</text>
@@ -38,4 +38,16 @@
 <rect x="906" y="95" width="182" height="60" rx="8" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
 <text x="997" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">findings file</text>
 <text x="997" y="135" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#5B6472" text-anchor="middle" dominant-baseline="central">confirmed &#183; refuted &#183; adjusted</text>
+
+<line x1="997" y1="157" x2="997" y2="240" stroke="#9AA0A8" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+<text x="28" y="268" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#8B877F" letter-spacing="1.2">ONLY ON A LATER REQUEST &#183; THE REVIEW ITSELF POSTS NOTHING</text>
+<rect x="28" y="284" width="344" height="52" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="200" y="301" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">post</text>
+<text x="200" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">one thread per problem</text>
+<rect x="384" y="284" width="344" height="52" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="556" y="301" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">apply</text>
+<text x="556" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">every new test proven failing first</text>
+<rect x="740" y="284" width="344" height="52" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="912" y="301" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">reply &amp; resolve</text>
+<text x="912" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">each fix verified as landed</text>
 </svg>

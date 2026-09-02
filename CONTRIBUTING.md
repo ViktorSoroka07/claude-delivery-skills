@@ -96,6 +96,13 @@ conditions - operational detail in a paraphrase is the part that drifts first.
 A change to a skill's user-visible modes or defaults includes a sweep of its
 README section in the same commit.
 
+The exception is text the README does not write. The trigger index and the
+component inventory sit inside marker regions that `sh scripts/generate-inventory.sh`
+fills from the skill files, so they carry the owner's own sentences rather than a
+paraphrase of them, and CI fails when they are stale. Hand-editing inside a marker
+region is the drift the generator exists to prevent: change the skill's
+`description:` and regenerate.
+
 ## Testing a wording change
 
 A skill or agent edit that changes behavior is tested the way code is: a

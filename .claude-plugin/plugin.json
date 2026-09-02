@@ -2,7 +2,7 @@
   "name": "delivery-skills",
   "displayName": "Claude Delivery Skills",
   "description": "Fifteen skills, three agents, and three warn-only hooks that harden the path from idea to merged PR - plans ground-truthed before building, tests proven able to fail, subagent output treated as claims, outbound text verified before it ships.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": { "name": "Viktor Soroka" },
   "repository": "https://github.com/ViktorSoroka07/claude-delivery-skills",
   "license": "MIT",

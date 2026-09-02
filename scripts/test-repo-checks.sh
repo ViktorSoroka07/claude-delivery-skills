@@ -31,7 +31,7 @@ mkplugin() { # a minimal valid plugin tree the checks accept
   printf '{"hooks":{"PostToolUse":[{"matcher":"Edit","hooks":[{"type":"command","command":"python3 \\"${CLAUDE_PLUGIN_ROOT}/hooks/h.py\\""}]}],"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"python3 \\"${CLAUDE_PLUGIN_ROOT}/hooks/h2.py\\""}]}]}}\n' > "$P/hooks/hooks.json"
   printf 'x\n' > "$P/hooks/h.py"
   printf 'y\n' > "$P/hooks/h2.py"
-  printf '# Demo\n\nplugin - <!-- inventory -->one skills, one agent types, and two warn-only hooks<!-- /inventory --> - end. [link](skills/demo/SKILL.md)\n[ext](https://example.com/x) and prose with `](` then capture to `)` here.\n' > "$P/README.md"
+  printf '# Demo\n\nplugin - <!-- inventory -->one skills, one agent types, and two warn-only hooks<!-- /inventory --> - end. [link](skills/demo/SKILL.md)\n[ext](https://example.com/x) and prose with `](` then capture to `)` here.\n\n<!-- triggers -->\n<!-- /triggers -->\n' > "$P/README.md"
   printf '{\n  "name": "demo",\n  "description": "One skills, one agents, and one warn-only hooks that harden the path from idea to merged PR - tail."\n}\n' > "$P/.claude-plugin/plugin.json"
   printf '{\n  "name": "demo-mkt",\n  "description": "no counts here",\n  "plugins": [\n    {\n      "name": "demo",\n      "description": "One skills, one agents, and one warn-only hooks that harden the path from idea to merged PR."\n    }\n  ]\n}\n' > "$P/.claude-plugin/marketplace.json"
   ( cd "$P" && git init -q . && git config user.name T && git config user.email t@e.co && git add -A && git commit -qm init )
@@ -83,7 +83,7 @@ GEN="$ROOT/scripts/generate-inventory.sh"
 #    valid JSON.
 mkplugin t6
 mkdir -p "$WORK/t6/skills/extra"
-printf -- '---\nname: extra\ndescription: extra\n---\nbody\n' > "$WORK/t6/skills/extra/SKILL.md"
+printf -- '---\nname: extra\ndescription: Use when extra things happen\n---\nbody\n' > "$WORK/t6/skills/extra/SKILL.md"
 sh "$GEN" "$WORK/t6" >/dev/null 2>&1
 check "generator run succeeds on a stale tree" 0 $?
 grep -q 'Two skills, one agent,' "$WORK/t6/.claude-plugin/plugin.json"
@@ -95,6 +95,16 @@ check "README marker region regenerated with per-count plurals" 0 $?
 python3 -c "import json;json.load(open('$WORK/t6/.claude-plugin/plugin.json'));json.load(open('$WORK/t6/.claude-plugin/marketplace.json'))"
 check "surgered manifests still parse as JSON" 0 $?
 
+# 6b. The trigger index is built from each skill's own description: the "Use
+#     when " opener is dropped so the table header completes the sentence, and
+#     a description that does not open that way is carried through whole.
+grep -q '| extra things happen | \[`extra`\](skills/extra/SKILL.md) |' "$WORK/t6/README.md"
+check "trigger row drops the Use-when opener" 0 $?
+grep -q '| demo | \[`demo`\](skills/demo/SKILL.md) |' "$WORK/t6/README.md"
+check "trigger row without the opener is carried through whole" 0 $?
+grep -q 'Reach for it when | Skill' "$WORK/t6/README.md"
+check "trigger table carries its header" 0 $?
+
 # 7. The generator is idempotent: a second run succeeds and changes nothing.
 #    The exit-code check keeps this group from passing vacuously when the
 #    generator is missing entirely.
@@ -103,6 +113,20 @@ sh "$GEN" "$WORK/t6" >/dev/null 2>&1
 check "second generator run exits 0" 0 $?
 ( cd "$WORK/t6" && git diff --quiet )
 check "second generator run is a no-op" 0 $?
+
+# 7b. A hand-edit inside a marker region is drift, and the generator is what
+#     reverts it - the region carries the skill's words, never an editor's.
+( cd "$WORK/t6" && sed 's/| extra things happen |/| an editor made this up |/' README.md > R && mv R README.md )
+sh "$GEN" "$WORK/t6" >/dev/null 2>&1
+grep -q 'an editor made this up' "$WORK/t6/README.md"
+check "hand-edited trigger text is regenerated away" 1 $?
+
+# 7c. Missing trigger markers fail loudly, the same as the inventory markers.
+mkplugin t7c
+sed 's/<!-- triggers -->//;s/<!-- \/triggers -->//' "$WORK/t7c/README.md" > "$WORK/t7c/R"
+mv "$WORK/t7c/R" "$WORK/t7c/README.md"
+sh "$GEN" "$WORK/t7c" >/dev/null 2>&1
+check "missing trigger markers fail the generator" 1 $?
 
 # 8. Prose outside the canonical statements is never touched.
 grep -q 'no counts here' "$WORK/t6/.claude-plugin/marketplace.json"

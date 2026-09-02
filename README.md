@@ -22,6 +22,34 @@ session, at any time.
 
 ![The skill map: the four-skill build chain from idea to shipped spec and PR, and ten moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
+## Which skill do I need?
+
+Every row is the skill's own trigger sentence, generated from its file — scan the left
+column and stop at the row that matches what you are about to do. The catalog after this
+one explains *why* each exists; this table only answers *when*.
+
+<!-- triggers -->
+
+| Reach for it when | Skill |
+|---|---|
+| launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
+| handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
+| a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature. | [`implement-plan`](skills/implement-plan/SKILL.md) |
+| implementation work is about to be called done or complete, after the repo's own gates have passed — and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions. | [`implementation-gates`](skills/implementation-gates/SKILL.md) |
+| work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and when deciding which existing local branches and worktrees are safe to delete. | [`landing-merged-work`](skills/landing-merged-work/SKILL.md) |
+| writing, pruning, or restructuring project memory entries, when a merge or shipped milestone leaves memory describing finished work, when ending a session whose work continues in a later one — and whenever a statement is about to be copied from chat, a memory, or one document into another. | [`maintaining-project-memory`](skills/maintaining-project-memory/SKILL.md) |
+| starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Ends at a plan; implementation is a separate skill (implement-plan). | [`plan-feature`](skills/plan-feature/SKILL.md) |
+| the user asks to review a pull request or branch — "review PR 42", "review this branch", "look over my changes", "deep review" for the exhaustive pass, or names one area to review — and for the later asks on a review already produced — post, stage, apply, or reply-and-resolve its threads. GitHub, Azure DevOps, and GitLab. | [`review-pr`](skills/review-pr/SKILL.md) |
+| a request contains more than one ask, when new asks arrive while work is already running, and at any checkpoint or session end where status gets reported. | [`tracking-open-asks`](skills/tracking-open-asks/SKILL.md) |
+| factual text is about to leave the workspace for someone else's surface — a message a teammate will act on, a comment on another person's PR or work item, instructions another engineer will build against, skill or agent-instruction text a future session will obey, spec or wiki content other teams read — and earlier, before drafting such text at all. | [`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) |
+| writing or editing code and a comment is about to be added — new modules, bug-fix rounds, review-fix rounds, test files — and when auditing a diff's comments (your own or a delegate's) before commit. | [`writing-code-comments`](skills/writing-code-comments/SKILL.md) |
+| a commit is about to be made — "commit this", staged changes waiting, a fix-up after review, a delegated diff the orchestrator is committing — and when a commit message is being edited or squashed before a push. | [`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) |
+| writing prose a specific person or audience will read, act on, or hear — a report, a deck or speech, teaching material, an explanation, a message — and when a reader signals they did not understand ("what is this number of?", "explain it in simpler terms", "I don't get what you mean"). | [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) |
+| creating, rewriting, or syncing a plan/spec document (docs/plans or equivalent) — at feature start, when implementation ships, after a merge with the target branch, or after review fixes land. | [`writing-plan-docs`](skills/writing-plan-docs/SKILL.md) |
+| creating a pull request, writing or editing a PR title or description, when commits have landed on a branch whose PR description may no longer match — including "sync the PR description" and "update the PR body" asks — and when maintaining a living status comment on a PR or issue. GitHub and Azure DevOps. | [`writing-pr-descriptions`](skills/writing-pr-descriptions/SKILL.md) |
+
+<!-- /triggers -->
+
 ## What each skill solves
 
 ### The build chain
@@ -73,7 +101,7 @@ fresh-eyes verifier prompted to *refute* every draft finding before anything is 
 and confirmed findings grouped into one thread per problem. Posts nothing without
 being asked.
 
-![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted](assets/diagrams/review-pr-flow.svg)
+![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted — and posting, applying and thread disposition happen only when asked for in a later message](assets/diagrams/review-pr-flow.svg)
 
 ### Working through subagents
 
@@ -175,6 +203,8 @@ instructions alone cannot:
   a merge through any of the three forge CLIs, or a local merge from the default
   branch — because that moment arrives in a session that was not planning for it.
   None of the three blocks.
+
+![The three component types: fifteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; three warn-only hooks are run by the harness at the moments a skill is most often skipped — an edit adding a comment, a commit about to run, a branch landing on its target](assets/diagrams/components.svg)
 
 ## What a run looks like
 
