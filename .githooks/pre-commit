@@ -88,9 +88,27 @@ warn_patterns='
 \bPR #?[0-9]{2,}
 \b[0-9a-f]{7,40}\b
 '
+# A generated marker region carries a verbatim copy of text this hook already
+# scans in the file that owns it, so a shape inside it was judged once at its
+# source. Warning on the copy fires again on every regeneration, and a warning
+# that always fires is one nobody reads. Only the copy is exempt: a shape
+# hand-planted in the region is still caught by the history scanner, and the
+# generator reverts it.
+GENERATED=$(mktemp)
+printf '%s\n' "$staged" | grep -E '\.md$' | while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  git show ":$f" 2>/dev/null | awk '
+    /<!-- \/triggers -->/ { g=0 }
+    g                      { print }
+    /<!-- triggers -->/    { g=1 }'
+done > "$GENERATED"
+warn_added=$(git diff --cached -U0 | grep -E '^\+' | grep -v -e '^+++' | sed 's/^+//' \
+  | grep -Fxv -f "$GENERATED")
+rm -f "$GENERATED"
+
 printf '%s\n' "$warn_patterns" | while IFS= read -r p; do
   [ -z "$p" ] && continue
-  hits=$(git diff --cached -U0 | grep -E '^\+' | grep -v -e '^+++' | grep -nEi "$p")
+  hits=$(printf '%s\n' "$warn_added" | grep -nEi "$p")
   if [ -n "$hits" ]; then
     echo "WARNING - check these before publishing:"
     report "WARN" "matches /$p/"

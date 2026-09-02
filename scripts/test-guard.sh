@@ -98,6 +98,28 @@ case "$out" in
   *) echo "FAIL: no WARNING in hook output"; fails=$((fails+1)) ;;
 esac
 
+# 6b. A warn shape inside a generated marker region is a copy of text already
+#     scanned in the file that owns it, so it stays quiet - otherwise every
+#     regeneration reprints the same warning. The identical text outside the
+#     region still warns, which is what keeps the exemption honest.
+mkrepo t6b
+printf 'intro\n\n<!-- triggers -->\n| see %s here | link |\n<!-- /triggers -->\n' "$PRREF" > README.md
+git add README.md
+out=$(git commit -qm gen 2>&1)
+rc=$?
+check "generated-region commit still succeeds" 0 $rc
+case "$out" in
+  *WARNING*) echo "FAIL: warn fired on a generated-region copy"; fails=$((fails+1)) ;;
+  *) echo "PASS: warn tier skips a generated-region copy" ;;
+esac
+printf 'intro\n\nprose with %s in it\n\n<!-- triggers -->\n| see %s here | link |\n<!-- /triggers -->\n' "$PRREF" "$PRREF" > README.md
+git add README.md
+out=$(git commit -qm outside 2>&1)
+case "$out" in
+  *WARNING*) echo "PASS: the same shape outside the region still warns" ;;
+  *) echo "FAIL: warn tier missed a shape outside the region"; fails=$((fails+1)) ;;
+esac
+
 # 7. A wordlist saved with CRLF line endings (a Windows editor) still catches
 #    its terms - a trailing carriage return must not blind either guard.
 mkrepo t7
