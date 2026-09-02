@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->fourteen skills, three agent types, and two warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->fifteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -17,10 +17,10 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other ten guard moments that can occur in any
+Four skills form the build chain; the other eleven guard moments that can occur in any
 session, at any time.
 
-![The skill map: the four-skill build chain from idea to shipped spec and PR, and nine moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
+![The skill map: the four-skill build chain from idea to shipped spec and PR, and ten moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## What each skill solves
 
@@ -50,6 +50,18 @@ Plan documents decay into changelogs — deviation lists, review-round narration
 counts — that mislead the person reading them later. The skill keeps the doc a
 current-state spec: superseded content replaced rather than annotated, verification
 records that outlive the branch, references that resolve against a tree that has moved.
+
+### After the merge
+
+**[`landing-merged-work`](skills/landing-merged-work/SKILL.md) — the merge is where ownership lapses.**
+The finishing skill hands a branch off while its request is still open, and the work
+lands later — another session, a browser tab, someone else's approval — with nothing
+listening. What is left behind: a branch every ancestry command calls unmerged (the
+squash broke the link), a worktree nobody claims, memory describing finished work, and a
+tracker item closed in fact and open on the board. Containment tested against the
+request's recorded head instead of reachability, no empty result trusted from a command
+whose exit status went unchecked, the restore SHA printed with every deletion, and the
+item closed on figures asked for rather than inferred.
 
 ### Reviewing
 
@@ -150,15 +162,19 @@ instructions alone cannot:
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
   use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
-- **Two hooks** ([`hooks/`](hooks/)) — warn-only backstops to `writing-code-comments`.
+- **Three hooks** ([`hooks/`](hooks/)) — warn-only backstops to `writing-code-comments`
+  and `landing-merged-work`.
   The comment rules are the most-relapsed discipline in the corpus behind this repo:
   the skill owns the judgment, and the hooks mechanically flag narrative-comment tells
   ("Regression:", "used to", "harmless because") — because a rule the model can
   rationalize past needs a gate the harness executes. The write-time hook fires the
   moment an edit adds a tell; the commit-time hook reads the staged diff when a commit
   is about to run, so it catches the same tells however the file was authored — shell
-  heredocs and generator scripts never pass through the edit tools. Neither blocks,
-  and both skip prose files.
+  heredocs and generator scripts never pass through the edit tools. Both skip prose
+  files. The third fires the close-out reminder the moment a command lands a branch —
+  a merge through any of the three forge CLIs, or a local merge from the default
+  branch — because that moment arrives in a session that was not planning for it.
+  None of the three blocks.
 
 ## What a run looks like
 

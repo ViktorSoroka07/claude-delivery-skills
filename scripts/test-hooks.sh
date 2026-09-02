@@ -14,6 +14,7 @@ fails=0
 
 WRITE_HOOK="$ROOT/hooks/comment-discipline.py"
 COMMIT_HOOK="$ROOT/hooks/comment-discipline-commit.py"
+LAND_HOOK="$ROOT/hooks/landed-branch.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -55,12 +56,18 @@ commit_payload() { # $1 = command (no quotes/backslashes)
   printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"
 }
 
+land_payload() { # $1 = command (no quotes/backslashes)
+  printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"
+}
+
 # 1. Both hooks survive garbage stdin - the fail-open path. A broken import
 #    exits 1 here, and this is the only harness that ever sees it.
 printf '' | "$PY" "$WRITE_HOOK"
 check "write hook fails open on empty stdin" 0 $?
 printf '' | "$PY" "$COMMIT_HOOK"
 check "commit hook fails open on empty stdin" 0 $?
+printf '' | "$PY" "$LAND_HOOK"
+check "landing hook fails open on empty stdin" 0 $?
 
 # 2. Write hook: a narrative tell in an edit warns (exit 2, stderr names it).
 out=$(write_payload /x/f.py '# previously a loop\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>&1)
@@ -174,6 +181,48 @@ printf -- '--- a/f.py\n+++ b/f.py\n@@ -1 +1,2 @@\n x = 1\n+# previously a loop\n
 git add fix.patch
 out=$(commit_payload 'git commit -m x' | "$PY" "$COMMIT_HOOK")
 lacks "commit hook skips staged patch-file content" "$out" "narrative tells"
+
+# 14. Landing hook: each forge CLI's merge fires the reminder (exit 2, stderr
+#     names the backstop). Run from a plain directory, so a match here can only
+#     come from the command text - no repo state is consulted on this path.
+cd "$WORK" || exit 9
+out=$(land_payload 'gh pr merge 42 --squash --delete-branch' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook fires on a forge merge" 2 $?
+contains "landing hook stderr names the backstop" "$out" "landing-merged-work"
+land_payload 'glab mr merge 7' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook fires on the second forge CLI" 2 $?
+land_payload 'az repos pr update --id 5 --status completed' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook fires on the third forge CLI" 2 $?
+
+# 15. Landing hook: a local merge fires from the default branch and stays quiet
+#     from a feature branch - the same command there syncs the target in.
+mkrepo t15
+printf 'x = 1\n' > f.py
+git add f.py
+git commit -qm init
+land_payload 'git merge feature/x' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook fires on a local merge from the default branch" 2 $?
+git checkout -q -b feature/x
+land_payload 'git merge origin/main' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook stays quiet syncing the target into a feature branch" 0 $?
+
+# 16. Landing hook: the plumbing commands the skill itself runs are not merges.
+git checkout -q -
+land_payload 'git merge-base --is-ancestor abc123 def456' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook ignores git merge-base" 0 $?
+land_payload 'gh pr merge --help' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook ignores a help invocation" 0 $?
+land_payload 'git merge --abort' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook ignores an aborted merge" 0 $?
+
+# 17. Landing hook: a merge named inside a quoted message is message text, and
+#     a failed tool call is not a landing.
+out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"land it with gh pr merge\""}}' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook does not read a quoted message as a merge" 0 $?
+out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"gh pr merge 42"},"tool_response":{"is_error":true}}' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook stays quiet when the command failed" 0 $?
+out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}}' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook ignores non-Bash tools" 0 $?
 
 echo
 if [ $fails -eq 0 ]; then
