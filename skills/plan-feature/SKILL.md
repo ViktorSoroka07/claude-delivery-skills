@@ -16,7 +16,7 @@ Prefer a repo's unprefixed skill over the `superpowers:` copy — the unprefixed
 
 Name the skills this run will use, so the user can redirect before the spending starts (`budgeting-agentic-work` owns the general price-the-pass rule):
 
-> Chain: `brainstorming` (repo copy) → `implementation-gates` Gate 2 (ground-truth) → `writing-plans` + `writing-plan-docs` → optional plan review. Ends with a plan; nothing gets built.
+> Chain: `brainstorming` (repo copy) → `implementation-gates` Gate 2 (ground-truth) → `writing-plans` + `writing-plan-docs` → optional plan review → the plan committed on the work's branch. Ends with a plan; nothing gets built, nothing gets pushed.
 
 If a step's skill is missing in this repo, say so and name what you will do instead.
 
@@ -51,9 +51,15 @@ If the user wants it, the pass must be genuinely fresh: dispatch ONE clean-conte
 
 Never report a plan review as though it validated the plan's premises. If Step 2 left a claim unsettled, say so again here.
 
-## Step 5 — Hand off
+## Step 5 — Commit the plan on its branch, then hand off
 
-Give the user the plan path and stop. Tell them `implement-plan <path>` continues, and that they can read or edit the plan first — edits to the plan are honored, since the plan is what implementation obeys.
+The plan is the first artifact of the work, and `implement-plan` needs a fixed starting point — an untracked file in the default checkout is neither. No delegated link performs this step: a plan-writing skill runs in whatever branch it finds itself in, and a brainstorming fork can assume a branch that no earlier link created (learned from a real planning session). So this skill does it:
+
+1. **Create the work's branch**, named by the repo's own convention — read recent branch names or the contributing guide — and derived from the tracker id where one exists: some repos' commit hooks insert the issue reference only when the branch name carries it, so a branch named later lands its first commits with the wrong subject. Ask for the name only when neither a convention nor an id settles it.
+2. **Where the repo commits plan documents, commit the plan there** as the branch's first commit, per `writing-commit-messages`. Where it does not, leave the plan uncommitted and say where it lives.
+3. **Never push.** The push is the user's call, every time.
+
+Then give the user the plan path and stop. Tell them `implement-plan <path>` continues, and that they can read or edit the plan first — edits to the plan are honored, since the plan is what implementation obeys; an edit to a committed plan is one more commit on the branch, not a reason to have waited.
 
 ## Rules
 
