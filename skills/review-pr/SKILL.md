@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Use when the user asks to review a pull request or branch — "review PR 42", "review this branch", "look over my changes", "deep review" for the exhaustive pass, or names one area to review — and for the later asks on a review already produced — post, stage, apply, or reply-and-resolve its threads. GitHub, Azure DevOps, and GitLab.
+description: Use when asked to review a pull request or branch — "review PR 42", "review this branch", "look over my changes", "deep review" for the exhaustive pass, or names one area to review — and for the later asks on a review already produced — post, stage, apply, or reply-and-resolve its threads. GitHub, Azure DevOps, and GitLab.
 compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Subagent dispatch recommended for the multi-axis pass.
 ---
 
