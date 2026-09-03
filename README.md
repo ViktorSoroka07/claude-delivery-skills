@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->fifteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->sixteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -17,10 +17,10 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other eleven guard moments that can occur in any
+Four skills form the build chain; the other twelve guard moments that can occur in any
 session, at any time.
 
-![The skill map: the four-skill build chain from idea to shipped spec and PR, and ten moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
+![The skill map: the four-skill build chain from idea to shipped spec and PR, and eleven moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## Which skill do I need?
 
@@ -32,6 +32,7 @@ one explains *why* each exists; this table only answers *when*.
 
 | Reach for it when | Skill |
 |---|---|
+| review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and when a thread already marked resolved needs re-checking before merge. | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
 | launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
 | handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
 | a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature. | [`implement-plan`](skills/implement-plan/SKILL.md) |
@@ -103,6 +104,15 @@ and confirmed findings grouped into one thread per problem. Posts nothing withou
 being asked.
 
 ![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted — and posting, applying and thread disposition happen only when asked for in a later message](assets/diagrams/review-pr-flow.svg)
+
+**[`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) — the author's seat: every item, every verdict, every reply pointing at something the reviewer can see.**
+Feedback on your own change arrives from people, review bots and scanners across inline
+threads, review bodies with collapsed nitpicks, and request-level comments — and the
+recurring failures are an item nobody listed, a suggestion applied because the reviewer
+is usually right, a "fixed in" reply citing a commit that exists only locally, and a
+thread resolved over code that never changed. The skill inventories every surface before
+any verdict, verifies each claim against the layer that owns it, and keys fix replies to
+the remote rather than the commit.
 
 ### Working through subagents
 
