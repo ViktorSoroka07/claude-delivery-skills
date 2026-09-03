@@ -123,9 +123,9 @@ prose fit the reader?*
 A blind pass once corrected four claims in a document that had already passed
 self-review, and found a defect that would have failed every run of a process another
 engineer was about to build on. Fact table before writing; verification by a fresh
-context that never saw the reasoning; two named traps (absence claimed from a truncated
-search, a negative claimed from one function); two passes maximum, then the warrant
-stated — never the feeling.
+context that never saw the reasoning; three named traps (absence claimed from a truncated
+search, a negative claimed from one function, a tracker marker called stale without its
+edit history); two passes maximum, then the warrant stated — never the feeling.
 
 **[`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) — prose the reader cannot use, or should not have.**
 "40%" invites "of what?"; two numbers measured under different conditions are not one

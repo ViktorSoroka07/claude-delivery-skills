@@ -28,10 +28,11 @@ Verify the claims **from a fresh context that has not seen the reasoning that pr
 
 **What comes back is itself a set of claims** — delegating-to-subagents owns that rule; two instances specific to verifiers. Verify findings at source before adopting: in one round the verifier's central negative claim was refuted while three of its four findings held. And a verifier's *suggested fix* is a claim too: walk every prescribed behavior through both the healthy and the failure scenario before adopting it. One adopted-verbatim suggestion inverted on exactly the cases it was meant to guard — for those, zero matches was the healthy state, and the fix alerted continuously on a working system.
 
-## Two traps to check by name
+## Three traps to check by name
 
 1. **Never assert absence from a truncated result.** A grep piped through `head` returned ten unrelated matches and was read as "the string does not appear" — the lines that mattered were below the cut. If the claim is "X is not in the source", re-run without the truncation.
 2. **A negative claim needs the whole call path, not one function.** "This endpoint checks nothing about session state" came from reading a single validator; the entry point carried the check one delegation away. Same family: the wrong test, the right field on the wrong object.
+3. **A negative claim about a tracker item needs every comment and the item's edit history, not the last comment and the current body.** "Nothing was reported" and "still outstanding" are absence claims, and a marker on the item — a ticked box, a closed state — may have been set by its owner in an edit no comment announces. Who set a marker and when is a lookup on every major platform; query it before calling the marker stale, and read the whole thread, not the newest reply. (learned from a real tracker reopen)
 
 ## Pass 2 — the delta check, then stop
 
@@ -57,6 +58,7 @@ A scheduled human review with domain context substitutes for machine passes — 
 | "The draft reads fine"                      | Reading checks truth. The claim-to-source table checks completeness          |
 | "The grep found nothing, so it's absent"    | If the output was truncated, absence was never tested                        |
 | "The guard function doesn't check it"       | A negative claim needs the whole call path                                   |
+| "Ticked, but no value beside it — stale"     | Who ticked it is a lookup. Read every comment and the edit history first    |
 | "Brief the verifier so it's efficient"      | The briefing transmits your errors. Hand claims, not the argument            |
 | "The verifier suggested it, apply it"       | A fix is a claim. Walk it through the healthy *and* the failure scenario     |
 | "Three passes found things — one more"      | Two autonomous passes, then report residual risk and hand over the decision  |
