@@ -32,7 +32,7 @@ one explains *why* each exists; this table only answers *when*.
 
 | Reach for it when | Skill |
 |---|---|
-| review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and when a thread already marked resolved needs re-checking before merge. | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
+| review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked, re-checking threads already marked resolved before merge. | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
 | launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
 | handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
 | a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature. | [`implement-plan`](skills/implement-plan/SKILL.md) |
@@ -112,7 +112,8 @@ recurring failures are an item nobody listed, a suggestion applied because the r
 is usually right, a "fixed in" reply citing a commit that exists only locally, and a
 thread resolved over code that never changed. The skill inventories every surface before
 any verdict, verifies each claim against the layer that owns it, and keys fix replies to
-the remote rather than the commit.
+the remote rather than the commit. Resolved threads are counted, not read: re-checking
+them is a mode the user asks for, so a repeat round pays only for what changed.
 
 ### Working through subagents
 

@@ -1,6 +1,6 @@
 ---
 name: addressing-review-feedback
-description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and when a thread already marked resolved needs re-checking before merge.
+description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked, re-checking threads already marked resolved before merge.
 compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Platform mechanics (reading threads, replying, resolving) are review-pr's references; this skill owns the author's seat.
 ---
 
@@ -12,9 +12,9 @@ Review feedback on your own change arrives from three kinds of author on three k
 
 ## 1. Inventory: every surface, every author, before anything else
 
-Pull every surface before forming a single verdict. A forge splits feedback across places that do not link to each other, and a bot's own summary line ("N actionable comments") counts only what it chose to post inline:
+Pull every surface before forming a single verdict — every *surface*, which is not every thread. A forge splits feedback across places that do not link to each other, and a bot's own summary line ("N actionable comments") counts only what it chose to post inline:
 
-- **Inline review threads**, with their resolved state and every reply.
+- **Unresolved inline review threads**, with every reply on them. Resolved threads enter as a count; the listing reports their state without their bodies, and an option that includes them ("all", "include resolved") is the re-check mode below, not the default.
 - **Review submission bodies** — a bot folds nitpicks and out-of-diff observations into collapsed sections there, and they never appear as threads.
 - **Request-level comments** — a teammate's question, a scanner's list, a status bot.
 - **Comments on files the change does not touch** — a doc the change invalidated, raised at request level because the platform cannot anchor it.
@@ -24,9 +24,11 @@ Write the inventory as a table with these columns, one row per item, before veri
 | id | surface | author | state | the claim, in one line | verdict | action |
 |---|---|---|---|---|---|---|
 
-**Resolved threads are in scope.** A thread's state records that someone pressed a button; only the code records whether the request landed. Re-read the line each resolved thread anchors on at the current head — a request still visible in the code is an open item wearing a closed label, and one whose request did land needs no row and no reply.
+**Resolved threads are counted, not read, unless asked.** The thread listing returns each thread's resolved state for free; reading a resolved thread's body and the line it anchors on is what costs, and on a request with many settled threads it costs more than the open ones do. The default inventory is the unresolved threads plus the bodies and comments above, with one line stating how many resolved threads were not re-checked and the phrase that re-checks them. **Re-checking resolved threads is a mode the user asks for** ("check the resolved threads too", "before merge"), and it exists because a thread's state records that someone pressed a button while only the code records whether the request landed: re-read the line each resolved thread anchors on at the current head — a request still visible there is an open item wearing a closed label, and one whose request did land needs no row and no reply.
 
 Nothing gets a reply, a commit, or a resolve without a row. The table is also the closing gate: the run ends when every row's action is done, not when the visible threads look quiet.
+
+**A repeated round reads only what changed.** When feedback arrives again on the same request — a bot re-reviewed the new head, a reviewer answered — the previous round's inventory is the baseline. A thread is read again only if it is still unresolved or carries a comment newer than the last reply that round posted (the listing's timestamps say which); every other row keeps its verdict. The threads the previous round resolved are exactly the ones a fresh sweep would pay to re-read, and they are the ones with nothing new in them.
 
 ## 2. Verify: a reviewer's finding is a claim, and so is a suggestion
 
@@ -58,7 +60,7 @@ Where the repo's convention is that pushing needs the author's OK, stop there an
 
 ## 4. Reply and resolve: timing is keyed to the remote
 
-Every row gets a reply, in the author's own voice, stating the disposition and its reasoning — rejections and out-of-scope verdicts included, because the reply is where the reasoning lives for the next reader. A reply states what was done or why not; "good catch" and "thanks" are not dispositions and go under the author's name.
+Every row gets a reply, in the author's own voice, stating the disposition and its reasoning — rejections and out-of-scope verdicts included, because the reply is where the reasoning lives for the next reader. A reply states what was done or why not; "good catch" and "thanks" are not dispositions and go under the author's name. Never post a test reply to check the mechanism — post the first real reply, then read it back and confirm placement and text.
 
 **When a reply may post is decided by where the commit is, not by whether it exists:**
 
@@ -69,12 +71,22 @@ Every row gets a reply, in the author's own voice, stating the disposition and i
 
 **Closing gate: zero unresolved threads by the platform's own query, and every inventory row actioned.** Then look for what the replies provoked: a bot marks a rejection as addressed or withdrawn, or raises a new point in its reply, and a scanner needs its rescan trigger where the repo has one. A new point is a new inventory row.
 
+## Modes — and telling the user they exist
+
+| Mode | The user says | What changes |
+|---|---|---|
+| **Resolved re-check** | "check the resolved threads too", "before merge" | Resolved threads join the inventory and each anchor is re-read at the head |
+
+The default run names this mode in its closing message whenever it skipped resolved threads — the count and the phrase, in one line — because a mode the user has never seen the trigger for is a mode that never runs.
+
 ## Red flags
 
 | Thought | Reality |
 |---|---|
 | "The bot said N actionable comments, so N items" | The count is what it posted inline. The collapsed section and the review body are not in it |
-| "The thread is resolved, skip it" | The button was pressed; the code decides whether the request landed |
+| "Resolved threads are settled, don't mention them" | Count them and name the re-check phrase; the state records a button press, not a landed change |
+| "Read the resolved ones too, to be safe" | Reading them is the cost. They are a mode the user asks for |
+| "The listing has an all-threads option — use it for completeness" | Completeness is every surface, not every thread. That option is the re-check mode |
 | "The bots are usually right — apply it" | A prior sets the effort, not the verdict. Find the layer that owns the constraint |
 | "The function isn't safe on its own, harden it anyway" | That duplicates a rule the layer below owns. Two owners drift |
 | "It's stricter, so it's safer" | Construct the input the old and new rule disagree on. Stricter checks fall through to laxer branches |
