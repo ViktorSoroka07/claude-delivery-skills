@@ -1,6 +1,6 @@
 ---
 name: landing-merged-work
-description: Use when work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and when deciding which existing local branches and worktrees are safe to delete.
+description: Use when work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and, as a separate ask, when deciding which existing local branches and worktrees are safe to delete.
 compatibility: Requires git; the tracker step requires an authenticated platform CLI. The forward path of integrating a branch you just finished belongs to the superpowers skill set (finishing-a-development-branch) or a repo's own fork — this skill owns the moment after that one ends.
 ---
 
@@ -9,6 +9,8 @@ compatibility: Requires git; the tracker step requires an authenticated platform
 The merge is where ownership lapses. A finishing skill hands the branch off at "PR open, the worktree stays until the work lands" — and then it lands in a different session, a browser tab, or on someone else's approval, and nothing fires. What is left behind is a local branch that ancestry commands call unmerged, a worktree nobody claims, memory entries describing finished work, and a tracker item closed in fact and open on the board. The board is what gets re-asked.
 
 Close it out as one operation: **establish it landed → sweep → re-point what named it → close the item.** Half of it done looks exactly like none of it done, because the only part anyone sees later is the part that was skipped.
+
+**The scope is the work that landed** — its branch, its worktree, the memory entries and the tracker item that name it — not every local branch. Judging every other local branch and worktree is the second trigger above: a separate ask, priced before it runs (`budgeting-agentic-work`), because each candidate costs a fetch, a containment test and a report line, and the operator who asked about one branch did not buy the rest.
 
 ## Establish it landed — ancestry tests lie about squash-merges
 
