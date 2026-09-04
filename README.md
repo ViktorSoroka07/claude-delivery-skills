@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->sixteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->seventeen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -17,7 +17,7 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other twelve guard moments that can occur in any
+Four skills form the build chain; the other thirteen guard moments that can occur in any
 session, at any time.
 
 ![The skill map: the four-skill build chain from idea to shipped spec and PR, and eleven moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
@@ -35,6 +35,7 @@ one explains *why* each exists; this table only answers *when*.
 | review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked, re-checking threads already marked resolved before merge. | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
 | launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
 | handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
+| asked to fetch, sync, refresh or update the git repos in a folder rather than one at a time — "sync all my repos", "fetch everything under this directory", "which of these clones are behind", "bring my checkouts up to date" — and when surveying what has moved across many clones before starting work. Runs a bundled script; the judgement is in reading its output, not in doing the git work by hand. | [`git-sync`](skills/git-sync/SKILL.md) |
 | a plan document already exists and the work should now be built — "implement this plan", "execute the plan", "go ahead with docs/plans/X.md" — or when continuing after plan-feature. | [`implement-plan`](skills/implement-plan/SKILL.md) |
 | implementation work is about to be called done or complete, after the repo's own gates have passed — and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions. | [`implementation-gates`](skills/implementation-gates/SKILL.md) |
 | work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and, as a separate ask, when deciding which existing local branches and worktrees are safe to delete. | [`landing-merged-work`](skills/landing-merged-work/SKILL.md) |
@@ -190,6 +191,16 @@ When the requester has to re-ask, they have paid twice: once waiting, once audit
 Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
 ledger, not the items that happened to finish.
+
+**[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**
+Looping `pull` over a workspace breaks on exactly the repos that matter: the one parked
+on a feature branch, the one holding uncommitted work, the one whose default branch is
+checked out in another worktree. The bundled script fetches every repo and fast-forwards
+each default branch, by refspec where that branch is not checked out so no working tree
+is touched, and settles the dirty case by intersecting the incoming paths with the
+modified ones before attempting anything. Local branches move only by fast-forward, so a
+repo either advances or reports why it did not, and the end result is a disposition table
+covering every child of the folder rather than only the ones that changed.
 
 ## The other pieces
 
