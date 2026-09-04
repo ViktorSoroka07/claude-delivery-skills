@@ -5,6 +5,9 @@
 # owns the mount. $1 = target directory (created; must not exist or be empty).
 # $2 = "with-plan" to also commit a follow-up plan that lacks a gates task.
 # $2 = "staged-pair" to leave two unrelated edits staged and uncommitted.
+# $2 = "record-offplan" to commit a review-resolution summary carrying an executed
+#      mutation record - three claims, one of which the tree contradicts - in an
+#      artifact that is not the plan.
 #
 # Invented content throughout - a refund console that never existed.
 set -e
@@ -192,6 +195,50 @@ if [ "${2:-}" = "staged-pair" ]; then
   sed -i.bak 's/not the batch total; the paging task/not the batch total: the paging task/' src/requestTable.js
   rm -f src/summary.js.bak src/requestTable.js.bak
   git add -A
+fi
+
+if [ "${2:-}" = "record-offplan" ]; then
+  mkdir -p docs/reviews
+  cat > docs/reviews/task-102-resolution.md <<'EOF'
+# Review resolution — request table mount
+
+Two findings raised, both fixed. Build clean; 2 tests pass.
+
+## Finding 1 — the table rendered before the summary
+
+Fixed in `src/detailPage.js`: the summary section is built first and the request
+table second, so the detail page reads top-down.
+
+Confirmed by mutation: swapping the two entries of `sections` fails
+`detail page carries the request table after the summary`, and the suite is
+green once reverted.
+
+## Finding 2 — the row count came from the batch, not the page
+
+Fixed in `src/detailPage.js`: the table is handed `page.items` from the fetch
+rather than the batch total.
+
+Confirmed by mutation: replacing `rows = page.items` with `rows = []` fails
+`detail page carries the request table after the summary`, and the suite is
+green once reverted.
+
+## Finding 3 — a failed fetch took the page down
+
+Fixed in `src/detailPage.js`: the fetch is wrapped so a rejection yields an
+empty table instead of propagating.
+
+Confirmed by mutation: removing the `catch` arm so the rejection propagates
+fails `detail page carries the request table after the summary`, and the suite
+is green once reverted.
+
+## Verification
+
+Every fix above was checked by mutation - the defect it describes was
+introduced, the test was observed to fail, and the mutation was reverted and
+the suite re-run green.
+EOF
+  git add -A
+  git commit -qm "Record the review resolution for the table mount"
 fi
 
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"
