@@ -134,6 +134,43 @@ fail; five reps per arm, single samples lie; when reps disagree on the shape
 of the output, the wording is not binding - restate it as what the output
 *is* rather than adding words.
 
+## A skill that carries executable content
+
+Most skills here are instructions alone, and an eval case is the whole test. A
+skill that ships a script has two layers instead, and neither substitutes for
+the other:
+
+- **The script's own gates, beside the script.** They prove the code does what
+  the skill claims. `git-sync` carries `test.sh` (a fixture per outcome, with
+  the set of outcomes derived from the script rather than remembered),
+  `mutate.sh` (each check broken in turn, the suite required to fail on that
+  check's own assertion), and `matrix.sh` (the suite re-run under several global
+  configurations, because a script inherits the user's). They live in the skill
+  directory, not in `scripts/`, which holds this repository's own tooling.
+- **An eval case, for the judgement the script cannot make.** Whether the model
+  actually runs the script instead of hand-rolling the loop it replaces, and
+  whether it reports the result the way the skill asks, are properties of the
+  instructions. `git-sync-reports-every-repo` covers both.
+
+The failure this split exists to prevent is a green suite standing in for a
+skill nobody follows: every gate can pass on a script the model never invokes.
+
+Two rules the gates themselves have to obey.
+
+**A check must be able to fail.** Prove it by breaking the thing it watches and
+watching it go red. Two checks written here could not fail at all and were green
+for reasons unrelated to the code: one measured column alignment in bytes, which
+is the quantity the padding exists to make irrelevant, and one sent a signal
+that a shell sets to ignored in background jobs, so it never reached the handler
+under test. A mutation harness is how they were caught.
+
+**A fixture must not assume the environment it was written in.** The
+configuration matrix exists for the script, and it audits the fixtures for free:
+one setup here silently did nothing under a renamed default branch, because
+`checkout -b <name>` fails when a clone already carries that branch, and the
+assertion downstream then reported a healthy repo as a defect. Assert the setup
+built what it claims before asserting anything about the result.
+
 ## Versioning and releases
 
 The manifest version in `.claude-plugin/plugin.json` is the release trigger:
