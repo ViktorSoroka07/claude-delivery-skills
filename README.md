@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->seventeen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -40,6 +40,7 @@ after this one explains *why* each exists; this table only answers *when*.
 | work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and, as a separate ask, when deciding which existing local branches and worktrees are safe to delete. | [`landing-merged-work`](skills/landing-merged-work/SKILL.md) |
 | asked to review a pull request or branch — "review PR 42", "review this branch", "look over my changes", "deep review" for the exhaustive pass, or names one area to review — and for the later asks on a review already produced — post, stage, apply, or reply-and-resolve its threads. GitHub, Azure DevOps, and GitLab. | [`review-pr`](skills/review-pr/SKILL.md) |
 | review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked to, re-checking threads already marked resolved — "check the resolved threads too", "re-check the resolved ones before we merge". | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
+| filing a defect, a data point or an improvement request into a system another team owns — a shared pipeline, a platform, an internal tool, a library — that they did not ask you to review; and when reviewing such a report before it is sent. | [`reporting-defects-upstream`](skills/reporting-defects-upstream/SKILL.md) |
 | handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
 | factual text is about to leave the workspace for someone else's surface — a message a teammate will act on, a comment on another person's PR or work item, instructions another engineer will build against, skill or agent-instruction text a future session will obey, spec or wiki content other teams read — and earlier, before drafting such text at all. | [`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) |
 | writing prose a specific person or audience will read, act on, or hear — a report, a deck or speech, teaching material, an explanation, a message — and when a reader signals they did not understand ("what is this number of?", "explain it in simpler terms", "I don't get what you mean"). | [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) |
@@ -117,6 +118,15 @@ thread resolved over code that never changed. The skill inventories every surfac
 any verdict, verifies each claim against the layer that owns it, and keys fix replies to
 the remote rather than the commit. Resolved threads are counted, not read: re-checking
 them is a mode the user asks for, so a repeat round pays only for what changed.
+
+**[`reporting-defects-upstream`](skills/reporting-defects-upstream/SKILL.md) — the outsider's seat: nobody asked, so the report brings evidence and leaves the decisions.**
+A report filed into a system another team owns is read as a verdict on work they chose,
+and the sentences that sink it are the polite ones. Listing only failures implies the
+system mostly fails, so the true proportion of what works is an accuracy rule rather
+than a courtesy — and flattery breaks it in the same direction as an overstated defect.
+The rest is standing: pricing their work, ranking their priorities, asserting a change
+is safe in their codebase, and phrasing a suggestion as an instruction are all decisions
+taken from the owner, and a scan for rude vocabulary passes over every one of them.
 
 ### Working through subagents
 
