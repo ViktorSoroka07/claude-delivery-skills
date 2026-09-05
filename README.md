@@ -62,8 +62,9 @@ A design that argues its premise well for three sentences can be wrong about wha
 API returns or a column means — and implementation will build on it faithfully. The
 skill ground-truths every claim about systems you did not write *before* the plan is
 written (read-only checks: real data, then an existing consumer, then docs — a coherent
-argument is not evidence), creates the work's branch and, where the repo commits plans,
-commits the plan there first, then stops so the plan can be read before anything is built.
+argument is not evidence), puts the plan on the work's branch — created only when the
+session is on the default branch — commits it there where the repo commits plans, then
+stops so the plan can be read before anything is built.
 
 **[`implement-plan`](skills/implement-plan/SKILL.md) — the gate that is not written into the plan does not run.**
 Executors obey the plan, so a verification step that lives only in good intentions gets
