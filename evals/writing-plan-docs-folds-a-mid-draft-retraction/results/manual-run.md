@@ -20,7 +20,7 @@ score the slot rather than a passing mention.
 |---|---|---|---|---|
 | G1 folds the correction | 4/5 | 5/5 | 1/5 | 5/5 |
 | G2 every restatement | 5/5 | 5/5 | 5/5 | 5/5 |
-| G3 sibling artifacts | 0/5 | 2/5 | 0/5 | 5/5 * |
+| G3 sibling artifacts | 0/5 | 2/5 | 0/5 | 1/5 * |
 
 \* Five in five produced the line, named the commit body and declined to rewrite
 it. One in five also accounted for the request description that does not exist
@@ -30,7 +30,9 @@ rule has since been tightened to a line per artifact, so the two agree now and
 
 ## The structural form works
 
-Restating the sweep as a filled-in line moved it from 2/5 to 5/5. Every
+Restating the sweep as a filled-in line moved the commit-body disposition
+from 2/5 to 5/5; the per-artifact line scored 1/5, and the rule's current
+wording has not been run. Every
 treatment run in the second pass produced the line unprompted, named the commit
 body as still carrying the retracted claim, declined to rewrite it, and offered
 the command instead. One went further and flagged that other files in the
@@ -75,6 +77,11 @@ asked for it, which is why the rule now asks: the slot is a line per artifact,
 and an absent artifact still gets its line.
 
 ## Not tested by either run
+
+The per-artifact line. The rule now asks for a line per sibling artifact,
+absent ones included. The second run scored that form 1/5 before the rule
+asked for it, and no run has been made since; the 5/5 above is the
+commit-body disposition, not the current rule.
 
 The trigger. The skill was passed to the treatment arm by file path rather than
 by reverting the installed copy, so whether the widened `description:` causes
