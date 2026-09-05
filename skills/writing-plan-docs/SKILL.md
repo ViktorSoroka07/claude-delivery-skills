@@ -1,6 +1,6 @@
 ---
 name: writing-plan-docs
-description: Use when creating, rewriting, or syncing a plan/spec document (docs/plans or equivalent) — at feature start, when implementation ships, after a merge with the target branch, or after review fixes land.
+description: Use when creating, rewriting, or syncing a document a reader will later consult for current state, whether a plan or spec (docs/plans or equivalent), a findings or analysis report, or a research write-up. Triggers at feature start, when implementation ships, after a merge with the target branch, after review fixes land, and whenever a later finding overturns a conclusion the same document already states.
 ---
 
 # Writing plan docs
@@ -11,6 +11,8 @@ A plan document has exactly two lifecycle stages, and each stage has one job:
 2. **Once the work ships, it is rewritten as the specification of what landed** — as the last step before offering merge/PR, not after. Strip every checkbox, re-tense to what shipped, record what was verified and what was not. The pre-implementation sections (phases, file lists) need not survive.
 
 Everything below applies to the shipped-spec stage, which is where the failures happen.
+
+The two-stage lifecycle is plan-specific. **The next section is not: it governs any document a reader consults for current state**, including a findings report, an analysis write-up or a research note, none of which has an implementation to ship.
 
 ## The doc describes the destination, never the route
 
