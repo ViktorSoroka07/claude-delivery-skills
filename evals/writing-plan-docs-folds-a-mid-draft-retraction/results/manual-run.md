@@ -22,11 +22,11 @@ score the slot rather than a passing mention.
 | G2 every restatement | 5/5 | 5/5 | 5/5 | 5/5 |
 | G3 sibling artifacts | 0/5 | 2/5 | 0/5 | 5/5 * |
 
-\* Under the committed criteria, which require the request description to be
-accounted for even though it does not exist in the fixture, treatment scores
-1/5. Under what the rule actually says, which is that the line names the
-artifacts where the claim *is* stated, it scores 5/5. Both numbers are real and
-they measure different things; see "The rule is looser than its grader" below.
+\* Five in five produced the line, named the commit body and declined to rewrite
+it. One in five also accounted for the request description that does not exist
+in this fixture, which the grader required and the rule at the time did not. The
+rule has since been tightened to a line per artifact, so the two agree now and
+1/5 is the score under both.
 
 ## The structural form works
 
@@ -61,17 +61,18 @@ run's baseline was read as evidence that the fold rule was redundant. Under a
 brief that does not cap the hand-off, the baseline fails that grader four times
 in five.
 
-## The rule is looser than its grader
+## The rule was looser than its grader, and has been tightened
 
-The grader requires every sibling artifact to carry a disposition, including
+The grader required every sibling artifact to carry a disposition, including
 one that does not exist in the fixture, on the reasoning that a run which never
 mentions the request description cannot be shown to have searched for it. The
-rule only says the line is valid once all three have been searched, and an
+rule only said the line is valid once all three had been searched, and an
 absent artifact would never appear in a list of places the claim is stated.
 
 One run in five closed that gap on its own, writing that there is no PR or
-remote so the third artifact does not apply. It is achievable; the rule does
-not currently ask for it.
+remote so the third artifact does not apply. It was achievable before the rule
+asked for it, which is why the rule now asks: the slot is a line per artifact,
+and an absent artifact still gets its line.
 
 ## Not tested by either run
 

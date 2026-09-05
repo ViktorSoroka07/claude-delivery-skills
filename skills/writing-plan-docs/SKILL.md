@@ -24,13 +24,16 @@ The reader is someone consulting the spec later — not the reviewer of this bra
 - **Superseded content is replaced, not annotated.** Update the Decisions list to the decision that holds; never append the new bullet beside the stale one.
 - **A conclusion the document overturns while it is being written is folded, not appended.** Rewrite the statement where it stands and delete the correction passage: the draft that passage argues with was never published, so no reader can reconcile it against anything. The retracted claim is rarely in one place, so locate every restatement by searching the text for the claim's own terms, never from memory of where you wrote it. Appending the correction instead leaves the original claim doing work elsewhere, worst of all in a "what was not verified" or "open questions" list, which is where a reader goes to learn what not to trust. **Order sections so the settled ground truth precedes anything derived from it**, or the reader meets the derived claim first and has to hold it provisionally. (learned from a real analysis document)
 
-## Retracted claims: a required line in the hand-off
+## Retracted claims: a required block in the hand-off
 
-When the rewrite retracts a claim the document previously stated, the hand-off that offers the merge or PR carries this line, filled in:
+When the rewrite retracts a claim the document previously stated, the hand-off that offers the merge or PR carries these four lines, each one filled in:
 
-    Retracted: <the claim>. Also stated in: <artifact> (<what was done>); ...
+    Retracted: <the claim>
+    Document: <what was done>
+    Commit message body: <what was done, or that the claim is not there>
+    Request description: <what was done, or that none exists>
 
-Fill it by searching each artifact below for the claim's own terms. Recalling where the claim was stated is what leaves copies standing, and the document is the only one a working-tree sweep reaches.
+Fill them by searching each artifact for the claim's own terms. Recalling where the claim was stated is what leaves copies standing, and the document is the only one a working-tree sweep reaches.
 
 | Artifact | How it is corrected |
 |---|---|
@@ -38,7 +41,7 @@ Fill it by searching each artifact below for the claim's own terms. Recalling wh
 | The commit message body | A history rewrite, which is the author's call, never the session's |
 | The pull or merge request description | An edit to the live description |
 
-`Also stated in: nothing else` is a valid line only once all three have been searched. Where the correction needs published history rewritten, prepare it, verify the tree is unchanged against the pre-rewrite commit, and hand the author the command instead of running it. (learned from a real analysis document)
+An artifact that holds nothing, or that does not exist here, still gets its line: an omitted line and a search never run are indistinguishable to the reader. Where the correction needs published history rewritten, prepare it, verify the tree is unchanged against the pre-rewrite commit, and hand the author the command instead of running it. (learned from a real analysis document)
 
 ## Verification record: outcomes, not snapshots
 
