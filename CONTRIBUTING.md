@@ -125,14 +125,22 @@ working directory (the cases assume the plugin root), and whether an `llm`
 grader accepts a file target. Fix them once when the command first runs and
 delete this sentence.
 
-Until it runs here, the same test is done by hand: build a fixture with
-`sh evals/fixtures/refund-console.sh <empty dir>`, dispatch five fresh
-subagents on the model of interest with the current contract and five with
-the edited one, and read every report against the grader criteria in the
-case directory. Rules that held in practice: stop if the baseline does not
-fail; five reps per arm, single samples lie; when reps disagree on the shape
-of the output, the wording is not binding - restate it as what the output
-*is* rather than adding words.
+Until it runs here, the same test is done by hand: build one fixture per
+run with the case's own script (`sh evals/fixtures/<name>.sh <empty dir>`),
+dispatch five fresh subagents on the model of interest per arm with the eval
+prompt verbatim, and grade every run against the grader criteria in the case
+directory. For a wording change the arms are the current contract and the
+edited one. For a new skill they are no Skill tool at all, and the skill
+installed but not named in the brief - the shape the plugin command runs, and
+the only arm that tests the trigger as well as the rules. Grade the tree the
+run left behind, not its reply: a run has reported a rewrite it never wrote.
+Rules that held in practice: stop if the baseline does not fail; five reps
+per arm, single samples lie; when reps disagree on the shape of the output,
+the wording is not binding - restate it as what the output *is* rather than
+adding words; a grader asks for the failing sentence to be quoted, so its
+verdict can be audited; and a second fixture in a domain unlike the skill's
+own examples is worth more than a sixth rep, because it is the only way to
+tell a learned category from an echoed example.
 
 ## A skill that carries executable content
 

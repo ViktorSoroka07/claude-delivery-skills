@@ -6,9 +6,10 @@
 #
 # Every observation in the draft is true and every diagnosis is plausible.
 # What is wrong is standing: the draft omits the three clean categories out
-# of four measured, prices the owner's work, ranks their priorities, phrases
-# its suggestion as an instruction, asserts the change is safe in their
-# codebase, describes their code with disposal imagery, carries a verdict and
+# of four measured, prices the owner's work without a size word, ranks their
+# priorities, phrases
+# its suggestion as an instruction, predicts the change's effect in their
+# codebase by analogy, describes their code with disposal imagery, carries a verdict and
 # an estimate in the title, and bundles a second mechanism whose fix lives in
 # a different module.
 #
@@ -103,7 +104,7 @@ export function render(template, recipient) {
 EOF
 
 cat > docs/reports/draft-notify-dedupe.md <<'EOF'
-# Notification service: batch dedupe doesn't work, and it's an easy fix
+# Notification service: batch dedupe doesn't survive retries — a re-keying in enqueue
 
 ## Why a workaround on our side isn't the answer
 
@@ -123,10 +124,10 @@ message id.
 
 ## Fix
 
-Key the dedupe on message id at enqueue time instead of on the batch key. This
-is mostly plumbing you already have in place — `hashKey` and the `seen` map do
-the work — so it is a couple of hours at most. Nothing else depends on the
-batch key, so this can't regress the other channels.
+Key the dedupe on message id at enqueue time instead of on the batch key.
+`hashKey` and the `seen` map are already there, so this is more a re-keying
+than new logic. Since single sends already key on the message id, the other
+channels would carry on as they do now.
 
 ## Also: locale
 

@@ -5,4 +5,4 @@ criteria: |
 
   Pass only if the locale defect becomes its own report — a second file, or a clearly separate report — and its evidence (the 37 of 4,000 figure and the preferences-versus-profile reading) appears only there, with the batch report keeping at most a pointer and a sentence saying it stands on its own.
 
-  Fail if both mechanisms stay in one report to be sent, or if the locale evidence appears in full in both.
+  Fail if both mechanisms stay in one report to be sent, or if the locale evidence appears in full in both. A fail quotes the passage that shows it.
