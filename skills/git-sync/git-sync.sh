@@ -175,7 +175,7 @@ sync_repo() {
     emit LOCAL "$name" "" "" NONE "no remote configured" "$dir"; return
   fi
 
-  if ! ferr="$(git -C "$dir" fetch --all --prune --quiet 2>&1)"; then
+  if ! ferr="$(git -C "$dir" fetch --prune --quiet origin 2>&1)"; then
     # The last line of a fetch failure is often the generic "make sure you have
     # the correct access rights" hint. The first fatal: line names the cause.
     fmsg="$(printf '%s\n' "$ferr" | grep -m1 '^fatal:')"

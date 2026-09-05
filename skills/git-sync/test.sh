@@ -160,6 +160,10 @@ build_workspace() {
   printf 'local only\n' > "$WS/diverged/c.txt"
   gc "$WS/diverged" add -A; gc "$WS/diverged" commit -qm "local only commit"
 
+  # UPDATED - a second remote that cannot be reached must not fail the repo
+  new_repo secondremote; advance_origin secondremote 1
+  gc "$WS/secondremote" remote add stale "$ROOT/does-not-exist.git"
+
   # LOCAL - no remote at all
   mkdir -p "$WS/noremote"; git init -q "$WS/noremote"
   gc "$WS/noremote" config user.email t@t; gc "$WS/noremote" config user.name tester
@@ -206,6 +210,7 @@ t_main_sweep() {
   assert_status "$out" parked     UPDATED    "parked repo updates main by refspec"
   assert_status "$out" inuse      IN-USE     "main checked out elsewhere is skipped"
   assert_status "$out" diverged   DIVERGED   "diverged main is reported, not merged"
+  assert_status "$out" secondremote UPDATED  "an unreachable second remote does not fail the repo"
   assert_status "$out" noremote   LOCAL      "remoteless repo is LOCAL, not an error"
   assert_status "$out" broken     FETCH-FAIL "unreachable origin is FETCH-FAIL"
   assert_row_contains "$out" broken "fatal" "the FETCH-FAIL detail names the cause, not the generic hint"
