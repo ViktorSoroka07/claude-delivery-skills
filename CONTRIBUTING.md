@@ -141,8 +141,8 @@ skill that ships a script has two layers instead, and neither substitutes for
 the other:
 
 - **The script's own gates, beside the script.** They prove the code does what
-  the skill claims. `git-sync` carries `test.sh` (a fixture per outcome, with
-  the set of outcomes derived from the script rather than remembered),
+  the skill claims. `git-sync` carries `test.sh` (a fixture per outcome, checked
+  against the set of outcomes the script publishes),
   `mutate.sh` (each check broken in turn, the suite required to fail on that
   check's own assertion), and `matrix.sh` (the suite re-run under several global
   configurations, because a script inherits the user's). They live in the skill

@@ -1,11 +1,10 @@
 #!/bin/bash
 # Fixture harness for git-sync.sh.
 #
-# Every status the script can emit gets a fixture here. The expected vocabulary
-# below is written independently of the script; the script publishes its own via
-# --print-status-vocab and the two sets are compared. A status added to the
-# script without a fixture fails the run, so the population under test comes from
-# the artifact rather than from whatever was last edited.
+# Every status the script can emit gets a fixture here. The script publishes its
+# vocabulary via --print-status-vocab; t_vocab compares it against the expected
+# list below and against the statuses this file's own assertions cover, so a
+# status added to the script without a fixture fails the run.
 
 set -uo pipefail
 
@@ -199,7 +198,13 @@ t_vocab() {
   local got want
   got=$("$SYNC" --print-status-vocab | tr ' ' '\n' | sort | tr '\n' ' ' | sed 's/ *$//')
   want=$(printf '%s' "$EXPECTED_VOCAB" | tr ' ' '\n' | sort | tr '\n' ' ' | sed 's/ *$//')
-  assert_eq "$got" "$want" "every status the script emits has a fixture"
+  assert_eq "$got" "$want" "the script publishes the expected vocabulary"
+  local asserted missing=""
+  asserted=$(grep -E '^ *assert_status ' "$0" | awk '{print $4}' | sort -u)
+  for s in $got; do
+    printf '%s\n' "$asserted" | grep -qx "$s" || missing="$missing $s"
+  done
+  assert_eq "${missing# }" "" "every status the script emits is asserted by a fixture"
 }
 
 t_main_sweep() {

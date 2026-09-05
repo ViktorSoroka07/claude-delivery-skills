@@ -20,9 +20,10 @@ failure looks like a defect in the script.
 
 `test.sh` builds a throwaway origin and clone for every status the script can
 emit, runs the script against them, and asserts the working trees afterwards,
-not just the printed rows. It holds its own list of statuses and compares it
-against `git-sync.sh --print-status-vocab`, so **a status added without a
-fixture fails the suite** rather than passing untested.
+not just the printed rows. It compares `git-sync.sh --print-status-vocab`
+against its own expected list and against the statuses its assertions cover,
+so **a status added without a fixture fails the suite** rather than passing
+untested.
 
 Adding a status means adding its fixture in `build_workspace`.
 

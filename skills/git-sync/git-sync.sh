@@ -7,8 +7,8 @@ set -uo pipefail
 
 VERSION="1.0.0"
 
-# test.sh holds an independent copy of this list and compares it against
-# --print-status-vocab, so a status with no fixture fails the suite.
+# test.sh compares this list against the statuses its own assertions cover,
+# so a status added here without a fixture fails the suite.
 STATUS_VOCAB="UPDATED ok STASHED DECLINED BLOCKED DIVERGED CONFLICT IN-USE LOCAL NO-BRANCH FETCH-FAIL WOULD-UPDATE"
 
 SEP=$'\037'
