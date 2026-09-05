@@ -10,7 +10,7 @@ A plan document has exactly two lifecycle stages, and each stage has one job:
 1. **Before implementation**, it is a plan: context, phased steps, files to touch, verification loops. Checkboxes are scaffolding.
 2. **Once the work ships, it is rewritten as the specification of what landed** — as the last step before offering merge/PR, not after. Strip every checkbox, re-tense to what shipped, record what was verified and what was not. The pre-implementation sections (phases, file lists) need not survive.
 
-Everything below applies to the shipped-spec stage, which is where the failures happen.
+The verification-record and decaying-sections rules below apply to the shipped-spec stage, which is where those failures happen.
 
 The two-stage lifecycle is plan-specific. **The next section is not: it governs any document a reader consults for current state**, including a findings report, an analysis write-up or a research note, none of which has an implementation to ship.
 
@@ -26,7 +26,7 @@ The reader is someone consulting the spec later — not the reviewer of this bra
 
 ## Retracted claims: a required block in the hand-off
 
-When the rewrite retracts a claim the document previously stated, the hand-off that offers the merge or PR carries these four lines, each one filled in:
+When the rewrite retracts a claim the document previously stated, the closing hand-off — the message that offers the merge or PR, or reports the commit where neither exists — carries these four lines, each one filled in:
 
     Retracted: <the claim>
     Document: <what was done>
@@ -41,7 +41,7 @@ Fill them by searching each artifact for the claim's own terms. Recalling where 
 | The commit message body | A history rewrite, which is the author's call, never the session's |
 | The pull or merge request description | An edit to the live description |
 
-An artifact that holds nothing, or that does not exist here, still gets its line: an omitted line and a search never run are indistinguishable to the reader. Where the correction needs published history rewritten, prepare it, verify the tree is unchanged against the pre-rewrite commit, and hand the author the command instead of running it. (learned from a real analysis document)
+An artifact that holds nothing, or that does not exist here, still gets its line: an omitted line and a search never run are indistinguishable to the reader. Where the correction needs history rewritten, prepare it and verify the tree is unchanged against the pre-rewrite commit; run it only when the branch is unpushed and the author has asked (`writing-commit-messages` owns that boundary), otherwise hand the author the command. (learned from a real analysis document)
 
 ## Verification record: outcomes, not snapshots
 
