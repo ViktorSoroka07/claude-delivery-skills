@@ -58,7 +58,7 @@ A scheduled human review with domain context substitutes for machine passes — 
 | "The draft reads fine"                      | Reading checks truth. The claim-to-source table checks completeness          |
 | "The grep found nothing, so it's absent"    | If the output was truncated, absence was never tested                        |
 | "The guard function doesn't check it"       | A negative claim needs the whole call path                                   |
-| "Ticked, but no value beside it — stale"     | Who ticked it is a lookup. Read every comment and the edit history first    |
+| "It's ticked, but nobody said they did it — stale" | Who set it and when is a lookup. Read every comment and the edit history first |
 | "Brief the verifier so it's efficient"      | The briefing transmits your errors. Hand claims, not the argument            |
 | "The verifier suggested it, apply it"       | A fix is a claim. Walk it through the healthy *and* the failure scenario     |
 | "Three passes found things — one more"      | Two autonomous passes, then report residual risk and hand over the decision  |
