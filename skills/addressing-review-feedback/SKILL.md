@@ -12,9 +12,9 @@ Review feedback on your own change arrives from three kinds of author on three k
 
 ## 1. Inventory: every surface, every author, before anything else
 
-Pull every surface before forming a single verdict — every *surface*, which is not every thread. A forge splits feedback across places that do not link to each other, and a bot's own summary line ("N actionable comments") counts only what it chose to post inline:
+Pull every surface before forming a single verdict — every *surface*, which is not every thread. The default inventory is four reads, each made once: the request, the thread listing in its default form, the review submission bodies, and the request-level comments; the resolved-thread count comes from what the default thread listing reports, never from a second call. A forge splits feedback across places that do not link to each other, and a bot's own summary line ("N actionable comments") counts only what it chose to post inline:
 
-- **Unresolved inline review threads**, with every reply on them. Resolved threads enter as a count; the listing reports their state without their bodies, and an option that includes them ("all", "include resolved") is the re-check mode below, not the default.
+- **Unresolved inline review threads**, with every reply on them. Resolved threads enter as the count the default listing reports; the option that lists them too ("all", "include resolved") is the re-check mode below, and the default inventory never runs it.
 - **Review submission bodies** — a bot folds nitpicks and out-of-diff observations into collapsed sections there, and they never appear as threads.
 - **Request-level comments** — a teammate's question, a scanner's list, a status bot.
 - **Comments on files the change does not touch** — a doc the change invalidated, raised at request level because the platform cannot anchor it.
@@ -60,7 +60,7 @@ Where the repo's convention is that pushing needs the author's OK, stop there an
 
 ## 4. Reply and resolve: timing is keyed to the remote
 
-Every row gets a reply, in the author's own voice, stating the disposition and its reasoning — rejections and out-of-scope verdicts included, because the reply is where the reasoning lives for the next reader. A reply states what was done or why not; "good catch" and "thanks" are not dispositions and go under the author's name. Never post a test reply to check the mechanism — post the first real reply, then read it back and confirm placement and text.
+Every row gets a reply, in the author's own voice, stating the disposition and its reasoning — rejections and out-of-scope verdicts included, because the reply is where the reasoning lives for the next reader. A reply states what was done or why not; "good catch" and "thanks" are not dispositions and go under the author's name. Never post a test reply to check the mechanism — post the first real reply, read it back in the default listing and confirm placement and text, and resolve the thread only after that read.
 
 **When a reply may post is decided by where the commit is, not by whether it exists:**
 
