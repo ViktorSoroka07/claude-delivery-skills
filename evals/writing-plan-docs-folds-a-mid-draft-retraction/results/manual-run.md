@@ -10,29 +10,36 @@ Arms differ only in the contract. Baseline received the task and no contract,
 which models the trigger not firing and matches the runner's own no-plugin
 ablation. Treatment was told to read and follow SKILL.md.
 
-Two runs were needed. The first tested the rule as prose; the second tested it
+Three runs were made. The first tested the rule as prose; the second tested it
 after the sweep was restated as a required slot, against a grader rewritten to
-score the slot rather than a passing mention.
+score the slot rather than a passing mention; the third tested the rule as it
+now stands — a line per sibling artifact, absent ones included — with the
+contract pasted into the brief in full, treatment arm only, five fixtures
+verified identical by hash.
 
 ## Results
 
-| Grader | run 1 base | run 1 treat | run 2 base | run 2 treat |
-|---|---|---|---|---|
-| G1 folds the correction | 4/5 | 5/5 | 1/5 | 5/5 |
-| G2 every restatement | 5/5 | 5/5 | 5/5 | 5/5 |
-| G3 sibling artifacts | 0/5 | 2/5 | 0/5 | 1/5 * |
+| Grader | run 1 base | run 1 treat | run 2 base | run 2 treat | run 3 treat |
+|---|---|---|---|---|---|
+| G1 folds the correction | 4/5 | 5/5 | 1/5 | 5/5 | 5/5 |
+| G2 every restatement | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| G3 sibling artifacts | 0/5 | 2/5 | 0/5 | 1/5 * | 5/5 |
 
 \* Five in five produced the line, named the commit body and declined to rewrite
 it. One in five also accounted for the request description that does not exist
 in this fixture, which the grader required and the rule at the time did not. The
-rule has since been tightened to a line per artifact, so the two agree now and
-1/5 is the score under both.
+rule was then tightened to a line per artifact, so the two agree, and run 3
+scores that form.
 
 ## The structural form works
 
 Restating the sweep as a filled-in line moved the commit-body disposition
-from 2/5 to 5/5; the per-artifact line scored 1/5, and the rule's current
-wording has not been run. Every
+from 2/5 to 5/5; the per-artifact line scored 1/5 before the rule asked for
+it and 5/5 once it did. In run 3 every report carried the four lines under
+the rule's own labels, named the pre-existing commit as still carrying the
+claim, offered the reword command without running it, and stated that no
+request description exists; the reflog of every fixture shows no amend or
+rebase. Every
 treatment run in the second pass produced the line unprompted, named the commit
 body as still carrying the retracted claim, declined to rewrite it, and offered
 the command instead. One went further and flagged that other files in the
@@ -76,12 +83,11 @@ remote so the third artifact does not apply. It was achievable before the rule
 asked for it, which is why the rule now asks: the slot is a line per artifact,
 and an absent artifact still gets its line.
 
-## Not tested by either run
+## Not tested
 
-The per-artifact line. The rule now asks for a line per sibling artifact,
-absent ones included. The second run scored that form 1/5 before the rule
-asked for it, and no run has been made since; the 5/5 above is the
-commit-body disposition, not the current rule.
+Run 3's baseline. The third run had no no-contract arm; its baseline for G3
+is run 2's treatment score of 1/5 against the same grader, on the rule before
+the per-artifact form.
 
 The trigger. The skill was passed to the treatment arm by file path rather than
 by reverting the installed copy, so whether the widened `description:` causes
