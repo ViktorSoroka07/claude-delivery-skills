@@ -160,6 +160,11 @@ build_workspace() {
   printf 'local only\n' > "$WS/diverged/c.txt"
   gc "$WS/diverged" add -A; gc "$WS/diverged" commit -qm "local only commit"
 
+  # DIVERGED, but only ahead: a local commit and nothing new on origin
+  new_repo ahead
+  printf 'local only\n' > "$WS/ahead/c.txt"
+  gc "$WS/ahead" add -A; gc "$WS/ahead" commit -qm "local only commit"
+
   # UPDATED - a second remote that cannot be reached must not fail the repo
   new_repo secondremote; advance_origin secondremote 1
   gc "$WS/secondremote" remote add stale "$ROOT/does-not-exist.git"
@@ -210,6 +215,9 @@ t_main_sweep() {
   assert_status "$out" parked     UPDATED    "parked repo updates main by refspec"
   assert_status "$out" inuse      IN-USE     "main checked out elsewhere is skipped"
   assert_status "$out" diverged   DIVERGED   "diverged main is reported, not merged"
+  assert_row_lacks "$out" diverged "nothing to pull" "a truly diverged repo is told to merge"
+  assert_status "$out" ahead      DIVERGED   "ahead-only main is reported, not merged"
+  assert_row_contains "$out" ahead "nothing to pull" "an ahead-only repo is told there is nothing to pull"
   assert_status "$out" secondremote UPDATED  "an unreachable second remote does not fail the repo"
   assert_status "$out" noremote   LOCAL      "remoteless repo is LOCAL, not an error"
   assert_status "$out" broken     FETCH-FAIL "unreachable origin is FETCH-FAIL"

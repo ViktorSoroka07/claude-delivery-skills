@@ -212,7 +212,12 @@ sync_repo() {
   fi
   if ! git -C "$dir" merge-base --is-ancestor "$before" "$after" 2>/dev/null; then
     ahead="$(git -C "$dir" rev-list --count "$after".."$before" 2>/dev/null)"
-    emit DIVERGED "$name" "$db" "" NONE "local $db is ${ahead:-?} ahead, merge by hand${parked:+, $parked}" "$dir"; return
+    if git -C "$dir" merge-base --is-ancestor "$after" "$before" 2>/dev/null; then
+      emit DIVERGED "$name" "$db" "" NONE "local $db is ${ahead:-?} ahead, nothing to pull, push when ready${parked:+, $parked}" "$dir"
+    else
+      emit DIVERGED "$name" "$db" "" NONE "local $db is ${ahead:-?} ahead, merge by hand${parked:+, $parked}" "$dir"
+    fi
+    return
   fi
 
   delta="+$(git -C "$dir" rev-list --count "$before".."$after")"
