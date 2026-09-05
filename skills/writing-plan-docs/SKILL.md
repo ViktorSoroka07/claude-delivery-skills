@@ -22,19 +22,22 @@ The reader is someone consulting the spec later — not the reviewer of this bra
 - **No review-round narration.** "A review produced N findings", "round 2 fixed…", "was X until PR #N changed it" — all deleted. What a review taught folds into the spec as a plain requirement; a superseded mechanism is described only in its current form. If the finding's outcome is worth reading later, it belongs in the PR description or the review's own findings file.
 - **No revision sections and no sibling plan files.** One plan per PR, edited inline; no `## Revision — <date>` blocks, no "Update:" callouts, no before/after comparisons. If a choice needs justification, the justification lives in that section's prose as the reason for the current design.
 - **Superseded content is replaced, not annotated.** Update the Decisions list to the decision that holds; never append the new bullet beside the stale one.
-- **A conclusion the document overturns while it is being written is folded, not appended.** Rewrite the statement where it stands and delete the correction passage: the draft that passage argues with was never published, so no reader can reconcile it against anything. The retracted claim is rarely in one place, so locate every restatement by searching the text for the claim's own terms, never from memory of where you wrote it. Appending the correction instead leaves the original claim doing work elsewhere, worst of all in a "what was not verified" or "open questions" list, which is where a reader goes to learn what not to trust. **Order sections so the settled ground truth precedes anything derived from it**, or the reader meets the derived claim first and has to hold it provisionally. (learned from a real analysis document)
 
-## A retraction is not finished until the sibling artifacts are swept
+## Retracted claims: a required line in the hand-off
 
-The same claim travels into artifacts with different lifetimes, and each takes a different mechanism to correct:
+When the rewrite retracts a claim the document previously stated, the hand-off that offers the merge or PR carries this line, filled in:
 
-| Artifact | Corrected by |
+    Retracted: <the claim>. Also stated in: <artifact> (<what was done>); ...
+
+Fill it by searching each artifact below for the claim's own terms. Recalling where the claim was stated is what leaves copies standing, and the document is the only one a working-tree sweep reaches.
+
+| Artifact | How it is corrected |
 |---|---|
 | The document | An ordinary edit |
 | The commit message body | A history rewrite, which is the author's call, never the session's |
 | The pull or merge request description | An edit to the live description |
 
-Correcting the document alone leaves the false claim standing in the two artifacts that outlive the branch, and the commit body is the copy that survives into blame and release notes. Search each artifact for the claim's own terms rather than recalling where it was stated. Where the fix needs published history rewritten, prepare it, verify the tree is unchanged against the pre-rewrite commit, and hand the author the command. (learned from a real analysis document)
+`Also stated in: nothing else` is a valid line only once all three have been searched. Where the correction needs published history rewritten, prepare it, verify the tree is unchanged against the pre-rewrite commit, and hand the author the command instead of running it. (learned from a real analysis document)
 
 ## Verification record: outcomes, not snapshots
 
