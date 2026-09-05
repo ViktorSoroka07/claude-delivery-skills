@@ -77,6 +77,15 @@ jobs:
             agentskills validate "$(dirname "$d")"
           done
 
+      # The spec validator above reads SKILL.md alone; this is what Claude
+      # Code itself accepts - both manifests against its schema and every
+      # component's frontmatter. It needs no account: validation is local.
+      - name: Validate the plugin against Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .claude-plugin/plugin.json
+          claude plugin validate .
+
   release:
     # A release is a version bump. When a push to main carries a manifest
     # version that has no release yet, the guarded run creates the tag and
