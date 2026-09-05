@@ -307,6 +307,24 @@ t_ask_flag() {
   assert_eq "$(gc "$WS/dirtyclear" rev-parse main)" "$before" "declined under --ask, main did not move"
 }
 
+t_need_you() {
+  say ""; say "== the summary counts only repos that need the user =="
+  local W="$ROOT/needyou"
+  rm -rf "$W"; mkdir -p "$W/.origins" "$W/.scratch"
+  WS="$W"
+  new_repo current
+  new_repo declining; advance_origin declining 1
+  lines_file "$W/declining/b.txt" 1 "MY-EDIT"
+  mkdir -p "$W/noremote"; git init -q "$W/noremote"
+  gc "$W/noremote" config user.email t@t; gc "$W/noremote" config user.name tester
+  printf 'x\n' > "$W/noremote/x.txt"; gc "$W/noremote" add -A; gc "$W/noremote" commit -qm init
+
+  local out; out=$(printf 'n\n' | "$SYNC" "$W" --quiet 2>&1)
+  assert_status "$out" declining DECLINED "the declined fixture reports DECLINED"
+  assert_status "$out" noremote LOCAL "the remoteless fixture reports LOCAL"
+  assert_eq "$(printf '%s\n' "$out" | grep -c "need you")" "0" "DECLINED and LOCAL rows are not counted as needing the user"
+}
+
 t_single_repo() {
   say ""; say "== a repo as the target syncs only itself =="
   build_workspace
@@ -443,6 +461,7 @@ t_stash_accept
 t_stash_decline
 t_conflict
 t_ask_flag
+t_need_you
 t_single_repo
 t_no_recursion
 t_exotic_names

@@ -432,7 +432,7 @@ awk -F"$SEP" -v grn="$C_GRN" -v yel="$C_YEL" -v red="$C_RED" -v blu="$C_BLU" \
 count() { awk -F"$SEP" -v s="$1" '$2==s' "$TMP/sorted" | grep -c . ; }
 n_moved=$(( $(count UPDATED) + $(count STASHED) + $(count WOULD-UPDATE) ))
 n_ok=$(count ok)
-n_att=$(awk -F"$SEP" '$1>=3' "$TMP/sorted" | grep -c .)
+n_att=$(( $(count BLOCKED) + $(count CONFLICT) + $(count DIVERGED) + $(count IN-USE) + $(count NO-BRANCH) + $(count FETCH-FAIL) ))
 
 summary="  ${TOTAL} repo(s)"
 [ "$n_moved" -gt 0 ] && summary="$summary, ${n_moved} updated"
