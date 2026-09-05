@@ -15,7 +15,7 @@ Most defects in factual text trace to writing against incomplete facts — each 
 
 Then, for a send whose recipient will act on it, keep a claim-to-source table in the local draft file: one row per factual claim, naming the file and line that backs it. Mark any row with no backing; keep an unbacked claim only deliberately, and say in the local file where it came from instead. The table never ships with the text.
 
-The table catches a class prose review misses. Reading a draft checks whether each sentence is *true*; asking where each claim is verifiable checks whether the text is *complete* — whether the recipient can act on it without you present. Under-specification and dropped qualifiers survive the first check and fail the second. One audited draft that "read fine" named one location where the source names two, overstated a finding's scope, and omitted the two places a find-and-replace must *not* touch.
+The table catches a class prose review misses. Reading a draft checks whether each sentence is *true*; asking where each claim is verifiable checks whether the text is *complete* — whether the recipient can act on it without you present. For a procedure, complete means executable: walk each step through every state the text itself names and every outcome its commands can produce, and a state with no instruction, or a completion condition some state can never reach, is a defect even when every fact is correct. Under-specification and dropped qualifiers survive the first check and fail the second. One audited draft that "read fine" named one location where the source names two, overstated a finding's scope, and omitted the two places a find-and-replace must *not* touch.
 
 ## Pass 1 — the blind pass
 
