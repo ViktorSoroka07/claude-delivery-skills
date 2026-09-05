@@ -195,7 +195,10 @@ the working tree. A clean `git status` proves nothing about history.
 Adding or removing a skill, agent, or hook changes the component inventory: run
 `sh scripts/generate-inventory.sh` afterward - it rewrites the canonical
 inventory statements in the README and both plugin manifests from the tree, and
-CI fails with that same command when they are stale. `sh scripts/check-refs.sh`
+CI fails with that same command when they are stale. The trigger index follows
+the order of the README's catalog ("What each skill solves"), so a new skill
+needs its catalog entry before the generator will run: a skill the catalog
+does not name fails the generator rather than landing at the end of the table. `sh scripts/check-refs.sh`
 must also pass; it verifies the tree's internal references resolve.
 
 ## If something already landed

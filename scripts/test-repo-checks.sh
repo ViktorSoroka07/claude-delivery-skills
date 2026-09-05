@@ -140,6 +140,24 @@ mv "$WORK/t9/README.tmp" "$WORK/t9/README.md"
 sh "$GEN" "$WORK/t9" >/dev/null 2>&1
 check "missing markers fail the generator" 1 $?
 
+# 10. The trigger index follows the catalog's order when the README carries
+#     one, so the table groups the way the prose does.
+mkplugin t10
+mkdir -p "$WORK/t10/skills/extra"
+printf -- '---\nname: extra\ndescription: Use when extra things happen\n---\nbody\n' > "$WORK/t10/skills/extra/SKILL.md"
+printf '\n## What each skill solves\n\n### Kind A\n\n**[`extra`](skills/extra/SKILL.md) - extra.**\n\n### Kind B\n\n**[`demo`](skills/demo/SKILL.md) - demo.**\n\n## After\n' >> "$WORK/t10/README.md"
+sh "$GEN" "$WORK/t10" >/dev/null 2>&1
+check "generator succeeds with a catalog present" 0 $?
+[ "$(grep -o '\[`[a-z]*`\](skills' "$WORK/t10/README.md" | head -2 | tr -d '\n')" = '[`extra`](skills[`demo`](skills' ]
+check "trigger rows follow the catalog order, not the alphabet" 0 $?
+
+# 10b. A skill the catalog does not name fails the generator instead of
+#      landing at the end of the table unnoticed.
+mkdir -p "$WORK/t10/skills/orphan"
+printf -- '---\nname: orphan\ndescription: Use when orphaned\n---\nbody\n' > "$WORK/t10/skills/orphan/SKILL.md"
+sh "$GEN" "$WORK/t10" >/dev/null 2>&1
+check "a skill missing from the catalog fails the generator" 1 $?
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"

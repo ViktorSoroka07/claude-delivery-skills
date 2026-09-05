@@ -102,7 +102,28 @@ surgery(
         % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
     True,
 )
-rows = "\n".join(trigger_row(n) for n in skills)
+def catalog_order(names):
+    """The README's catalog groups the skills by kind; the trigger index
+    follows that order so adjacent rows are related, and a skill the catalog
+    does not mention fails here rather than landing at the end unnoticed. A
+    README with no catalog section keeps the alphabetical order."""
+    with open(os.path.join(root, "README.md")) as fh:
+        text = fh.read()
+    m = re.search(r"(?ms)^## What each skill solves\n(.*?)(?=^## )", text)
+    if not m:
+        return names
+    listed = []
+    for n in re.findall(r"\*\*\[`([a-z0-9-]+)`\]", m.group(1)):
+        if n not in listed:
+            listed.append(n)
+    missing = [n for n in names if n not in listed]
+    if missing:
+        sys.exit("README.md: the catalog under '## What each skill solves' "
+                 "does not name: %s" % ", ".join(missing))
+    return [n for n in listed if n in names]
+
+
+rows = "\n".join(trigger_row(n) for n in catalog_order(skills))
 surgery(
     "README.md",
     r"(?s)<!-- triggers -->.*?<!-- /triggers -->",
