@@ -101,6 +101,7 @@ trap '[ -n "${TMP:-}" ] && rm -rf "$TMP"' EXIT
 # so an interrupt restores the work or says where it is, instead of exiting
 # silently on a tree that looks clean.
 STASH_REPO=""
+# shellcheck disable=SC2329  # reached through trap
 on_interrupt() {
   trap - INT TERM
   if [ -n "$STASH_REPO" ]; then
@@ -282,7 +283,8 @@ progress() {
   [ "$QUIET" -eq 1 ] && return 0
   [ -t 2 ] || return 0
   local done_ inflight
-  done_=$(ls "$TMP"/res.* 2>/dev/null | grep -c .)
+  done_=0
+  for f in "$TMP"/res.*; do [ -e "$f" ] && done_=$((done_+1)); done
   inflight=$(cat "$TMP"/run.* 2>/dev/null | tr '\n' ' ' | cut -c1-46)
   printf '\r\033[K%s[%d/%d]%s fetching %s' "$C_DIM" "$done_" "$TOTAL" "$C_RST" "${inflight:-...}" >&2
 }

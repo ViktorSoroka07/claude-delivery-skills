@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2016  # mutation targets are literal script text
 # Mutation harness for git-sync.sh.
 #
 # For each mutation: apply it, assert the file actually changed, run test.sh,
