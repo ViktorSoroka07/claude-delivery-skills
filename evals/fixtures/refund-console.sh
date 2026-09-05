@@ -8,6 +8,10 @@
 # $2 = "record-offplan" to commit a review-resolution summary carrying an executed
 #      mutation record - three claims, one of which the tree contradicts - in an
 #      artifact that is not the plan.
+# $2 = "plan-drafted" to leave the session on a branch the user already created
+#      for the next task, with that task's approved plan drafted but uncommitted.
+# $2 = "plan-on-branch" to commit the next task's plan on the branch created for
+#      it and leave the session there, ready for implementation.
 #
 # Invented content throughout - a refund console that never existed.
 set -e
@@ -242,3 +246,37 @@ EOF
 fi
 
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"
+
+if [ "${2:-}" = "plan-drafted" ] || [ "${2:-}" = "plan-on-branch" ]; then
+  git checkout -qb feature/request-list
+  cat > docs/plans/task-102.md <<'EOF'
+# Task 102 — Batch detail request list: status filter, paging and states
+
+## Context
+
+The detail page mounts the request table but fetches one page and swallows errors. This task makes it a working results region.
+
+## Tasks
+
+### Task 1: Query state container
+
+- [ ] Add `src/requestList.js` exporting `loadRequestList(batchId, { status, page })` that calls `fetchRequests` and returns `{ rows, totalCount, error }`
+- [ ] Unit test: filter and page are forwarded; a rejected fetch yields `error` and empty rows
+
+### Task 2: Page states
+
+- [ ] `renderDetailPage` renders a loading, error, or empty section from the container's result
+- [ ] Unit test per state
+
+### Task 3: Implementation gates
+
+- [ ] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion
+- [ ] Prove the new tests can fail — 10–12 targeted mutations
+EOF
+  if [ "${2:-}" = "plan-on-branch" ]; then
+    git add -A
+    git commit -qm "Add the request list plan"
+  fi
+  [ "$(git branch --show-current)" = "feature/request-list" ] ||
+    { echo "fixture: expected to be on feature/request-list" >&2; exit 1; }
+fi
