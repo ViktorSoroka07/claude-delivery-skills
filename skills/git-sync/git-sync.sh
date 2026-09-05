@@ -222,6 +222,10 @@ sync_repo() {
 
   delta="+$(git -C "$dir" rev-list --count "$before".."$after")"
 
+  if [ "$cur" != "$db" ] && git -C "$dir" worktree list --porcelain 2>/dev/null | grep -qx "branch refs/heads/$db"; then
+    emit IN-USE "$name" "$db" "$delta" NONE "$db is checked out in another worktree" "$dir"; return
+  fi
+
   if [ "$NO_WRITE" -eq 1 ]; then
     if [ "$DRY_RUN" -eq 1 ]; then emit WOULD-UPDATE "$name" "$db" "$delta" NONE "$parked" "$dir"
     else emit ok "$name" "$db" "$delta" NONE "fetched, $db left alone${parked:+, $parked}" "$dir"; fi
@@ -229,9 +233,6 @@ sync_repo() {
   fi
 
   if [ "$cur" != "$db" ]; then
-    if git -C "$dir" worktree list --porcelain 2>/dev/null | grep -qx "branch refs/heads/$db"; then
-      emit IN-USE "$name" "$db" "$delta" NONE "$db is checked out in another worktree" "$dir"; return
-    fi
     # A refspec fetch moves the ref with no checkout, and git rejects it unless
     # it is a fast-forward.
     if git -C "$dir" fetch --quiet origin "$db:$db" 2>/dev/null; then

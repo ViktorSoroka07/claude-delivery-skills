@@ -252,6 +252,7 @@ t_dry_run() {
   out=$("$SYNC" "$WS" --jobs 4 --quiet --dry-run </dev/null 2>&1)
   after=$(gc "$WS/behind" rev-parse main)
   assert_status "$out" behind WOULD-UPDATE "dry run reports WOULD-UPDATE"
+  assert_status "$out" inuse IN-USE "dry run reports IN-USE where the live run would"
   assert_eq "$before" "$after" "dry run left local main where it was"
 }
 
