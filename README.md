@@ -17,10 +17,10 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other thirteen guard moments that can occur in any
+Four skills form the build chain; the other fourteen guard moments that can occur in any
 session, at any time.
 
-![The skill map: the four-skill build chain from idea to shipped spec and PR, and twelve moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
+![The skill map: the four-skill build chain from idea to shipped spec and PR, and thirteen moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## Which skill do I need?
 
@@ -239,7 +239,7 @@ instructions alone cannot:
   branch — because that moment arrives in a session that was not planning for it.
   None of the three blocks.
 
-![The three component types: fifteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; three warn-only hooks are run by the harness at the moments a skill is most often skipped — an edit adding a comment, a commit about to run, a branch landing on its target](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; three warn-only hooks are run by the harness at the moments a skill is most often skipped — an edit adding a comment, a commit about to run, a branch landing on its target](assets/diagrams/components.svg)
 
 ## What a run looks like
 
