@@ -1,6 +1,6 @@
 ---
 name: addressing-review-feedback
-description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked, re-checking threads already marked resolved before merge.
+description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked to, re-checking threads already marked resolved — "check the resolved threads too", "re-check the resolved ones before we merge".
 compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Platform mechanics (reading threads, replying, resolving) are review-pr's references; this skill owns the author's seat.
 ---
 
@@ -24,7 +24,7 @@ Write the inventory as a table with these columns, one row per item, before veri
 | id | surface | author | state | the claim, in one line | verdict | action |
 |---|---|---|---|---|---|---|
 
-**Resolved threads are counted, not read, unless asked.** The thread listing returns each thread's resolved state for free; reading a resolved thread's body and the line it anchors on is what costs, and on a request with many settled threads it costs more than the open ones do. The default inventory is the unresolved threads plus the bodies and comments above, with one line stating how many resolved threads were not re-checked and the phrase that re-checks them. **Re-checking resolved threads is a mode the user asks for** ("check the resolved threads too", "before merge"), and it exists because a thread's state records that someone pressed a button while only the code records whether the request landed: re-read the line each resolved thread anchors on at the current head — a request still visible there is an open item wearing a closed label, and one whose request did land needs no row and no reply.
+**Resolved threads are counted, not read, unless asked.** The thread listing returns each thread's resolved state for free; reading a resolved thread's body and the line it anchors on is what costs, and on a request with many settled threads it costs more than the open ones do. The default inventory is the unresolved threads plus the bodies and comments above, with one line stating how many resolved threads were not re-checked and the phrase that re-checks them. **Re-checking resolved threads is a mode the user asks for** ("check the resolved threads too", "re-check the resolved ones before we merge") — the ask names the resolved threads, and a deadline or an approaching merge on its own is not one — and it exists because a thread's state records that someone pressed a button while only the code records whether the request landed: re-read the line each resolved thread anchors on at the current head — a request still visible there is an open item wearing a closed label, and one whose request did land needs no row and no reply.
 
 Nothing gets a reply, a commit, or a resolve without a row. The table is also the closing gate: the run ends when every row's action is done, not when the visible threads look quiet.
 
@@ -75,7 +75,7 @@ Every row gets a reply, in the author's own voice, stating the disposition and i
 
 | Mode | The user says | What changes |
 |---|---|---|
-| **Resolved re-check** | "check the resolved threads too", "before merge" | Resolved threads join the inventory and each anchor is re-read at the head |
+| **Resolved re-check** | "check the resolved threads too", "re-check the resolved ones before we merge" | Resolved threads join the inventory and each anchor is re-read at the head |
 
 The default run names this mode in its closing message whenever it skipped resolved threads — the count and the phrase, in one line — because a mode the user has never seen the trigger for is a mode that never runs.
 
