@@ -219,6 +219,10 @@ check "landing hook ignores an aborted merge" 0 $?
 #     a failed tool call is not a landing.
 out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"git commit -m \"land it with gh pr merge\""}}' | "$PY" "$LAND_HOOK" 2>&1)
 check "landing hook does not read a quoted message as a merge" 0 $?
+out=$(land_payload 'git commit -q -F - <<EOF\nRecount the cards\n\nThe fifth skill closes the work out after the merge lands.\nEOF' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook does not read a heredoc commit body as a merge" 0 $?
+out=$(land_payload 'gh pr comment 42 --body-file - <<EOF\nReady once gh pr merge runs\nEOF' | "$PY" "$LAND_HOOK" 2>&1)
+check "landing hook does not read a heredoc body naming a forge merge as one" 0 $?
 out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"gh pr merge 42"},"tool_response":{"is_error":true}}' | "$PY" "$LAND_HOOK" 2>&1)
 check "landing hook stays quiet when the command failed" 0 $?
 out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}}' | "$PY" "$LAND_HOOK" 2>&1)
