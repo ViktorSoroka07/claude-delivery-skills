@@ -52,6 +52,8 @@ Every asset-bundle miss was a lookup whose key input contained the absolute
 path of the runner's checkout directory (`/home/runner/work/<run-id>/app/...`).
 Runners get a fresh directory per run, so no two runs produce the same key.
 The other three types key on content hashes and repository-relative paths.
+A miss on an asset bundle costs the build about four minutes: the bundle is
+rebuilt from source.
 
 Separately, the cache's stats endpoint reported `evicted: 0` for all fourteen
 days, while 312 entries we had written disappeared between lookups (present
