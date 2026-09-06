@@ -38,11 +38,12 @@ Leaving the full text in memory after promotion creates two authoritative copies
 
 ### The pruning pass
 
-Three mechanics for the pruning pass itself:
+Mechanics for the pruning pass itself:
 
 - **Not every finished-work memory is branch state.** A decision record — architecture chosen, alternatives rejected, deployment constraints — keeps its reasoning even after the merge; only chronology dies. Read what a file actually contains before trimming it.
 - **Commit hashes survive a merge commit and die on a squash.** Verify a cited SHA still resolves before treating it as dead — and prefer symbol anchors regardless (`writing-plan-docs`' reference rules own the anchoring discipline).
 - **Rewrite in place to current state; never append a correction.** The same end-state discipline `writing-plan-docs` applies to plan documents. Update existing entries over creating near-duplicates, and keep the index line in step.
+- **The pass covers the store, not one directory.** Per-checkout state is keyed by the checkout's path, so a renamed, re-spelled, or ephemeral checkout (a task worktree, a scratch clone) leaves a directory its path no longer reaches, and a session that opens one reads it as authoritative — one such twin produced a false "no memory exists" finding. List the store's directories against the checkouts that exist on disk and delete those whose path is gone, checking recency first so an oddly spelled live directory is not mistaken for a dead one. At any session's end, glance for a twin of the current checkout; the full sweep runs when a pass is asked for.
 
 ## A memory write is a promotion — re-derive, never copy the wording
 

@@ -30,7 +30,6 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A generated artifact unchanged after a source edit is not evidence regeneration failed; confirm what the generator embeds from that source before reporting a missed sync. → review-pr, doc-vs-code axis
 - When a message and the document it cites ship together, every figure and status the two share is checked to match; pushback is answered from the document. → verifying-before-sending
 - A headless sub-agent can write into the operator's real persistent memory and the write survives the session being killed; snapshot and restore that store around harness runs. → delegating-to-subagents
-- Memory directories are keyed by the working-directory path, so a renamed or re-spelled checkout leaves a dead twin a session can read as authoritative; prune twins and check recency before trusting one. → maintaining-project-memory
 - When the remote uses an SSH host alias, platform and slug cannot be parsed from the URL and must be passed to the platform CLI explicitly. → review-pr, platform step
 - A tool that sets a repo-local git identity for its own commits leaves it in place for everyone; check the repo-local identity before a session's first commit. → implement-plan
 - In teaching or lesson code the comments are the deliverable, beside the line each explains; this inverts the zero-comment default. → writing-code-comments, as a boundary
@@ -49,3 +48,4 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - Tracker edit-history mechanics for a negative claim. The trap is already in verifying-before-sending; the API call is a lookup a session can make.
 - Posting-script encoding traps. The content read-back already catches the outcome.
 - History sanitizing as a skill. CONTRIBUTING's domain.
+- Filing a new index line under its heading rather than at the file's end. Tested on a fixture: the weaker model filed it under the matching heading unaided in every rep, so a sentence adds nothing.
