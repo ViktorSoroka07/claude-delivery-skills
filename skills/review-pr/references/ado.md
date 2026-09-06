@@ -75,6 +75,10 @@ When a finding's fix is an exact replacement of contiguous lines (posting-and-ap
 - Block content = the complete replacement for the spanned lines, exact indentation. Replacement text containing a triple-backtick fence → widen the suggestion fence to four backticks (````` ````suggestion `````).
 - GitHub's empty-block-deletes-lines rule is GitHub-only: the ADO span excludes the last line's trailing newline, so an empty block would leave a blank line behind — keep pure-deletion fixes prose-only.
 
+## Builds
+
+A pull request's builds run on its merge ref, not on the source branch: `GET .../build/builds?branchName=refs/pull/<prId>/merge&api-version=7.1`. Querying by the source branch name returns nothing. `GET .../build/builds/<buildId>/timeline` gives per-stage results.
+
 ## No pending / draft comment mode
 
 ADO has no equivalent of GitHub's PENDING review: a thread is visible to everyone the moment the POST returns, comments cannot be staged or batched for a later one-shot submission, and the review model is immediate threads plus a vote (Approve / Approve with suggestions / Wait for author / Reject). ADO's "draft" is a PR-level state (the PR isn't ready for review), not a comment state. When the user asks to hold publication (submit later themselves, keep review activity invisible for now): post nothing, say explicitly that ADO cannot stage comments, and leave the findings in `review-findings-<id>.md` — the posting session, on the user's word, is the moment they become visible.
