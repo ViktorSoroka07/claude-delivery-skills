@@ -39,6 +39,8 @@ Evaluate each row with the receiving-code-review stance where the superpowers sk
 
 **A suggestion is a behavior change, and the way to check one is to construct the input where the old rule and the new rule disagree.** State what each returns for it. A stricter check that falls through to a laxer branch on rejection is the common trap: tightening a parser so a previously accepted value now reaches a lenient fallback turns a harmless tolerance into a wrong answer. If no input separates the two rules, the suggestion changes nothing and is declined as a no-op; if one does, that input decides the verdict.
 
+**A suggestion that changes how a stored value is written is a change to every writer and every reader of it.** Enumerate both sets before applying: a consumer that dedupes or maps on the value turns a partial reformat into wrong data, not a cosmetic difference — two of eight writers were changed once, and a uniform dataset displayed as mixed. When the finding is about how the value *reads*, the fix belongs at the reader.
+
 "The bots are usually right" is a prior, not a verdict. It sets how much effort verification deserves, never whether it happens.
 
 Four verdicts, and every row gets exactly one:
