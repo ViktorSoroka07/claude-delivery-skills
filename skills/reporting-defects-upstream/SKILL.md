@@ -38,6 +38,15 @@ demonstrated that its numbers are worth trusting.
 The test: **could the owner learn the size of the problem from your first paragraph,
 and would that estimate survive reading the rest?**
 
+The sample matters as much as the count. Reviewed work is a biased sample — its
+defects are the only ones anyone has looked for — so a report built from the
+best-documented cases indicts whoever was most diligent, or whoever happened to
+be reviewed. State the failure class generically rather than through the cases
+that surfaced it; put every defect count beside the coverage that produced it
+(five defects across the four changes reviewed, of forty), or the count reads as
+a quality signal when it is an attention signal; and never assert how the work in
+a shared repository was produced — by a person or by a tool — from its shape.
+
 ## Decisions that belong to the owner
 
 These are the ones that survive editing, because none of them contain a rude word.
