@@ -22,6 +22,8 @@ Close it out as one operation: **establish it landed → sweep → re-point what
 
 Contained means everything local went into the merge — including the case where the forge pushed commits the local copy never saw. Not contained means local commits the merge did not carry: that is a finding, and it stops the deletion.
 
+Before reporting a not-contained tip as lost work, test whether it is an earlier round the merge superseded — the usual shape after review fixes were pushed from another checkout. Per-commit patch ids cannot answer that across a squash. Two diffs can: `git diff <local-tip> <recorded-head>` reading as the merged side correcting the local one, and `git diff <base> <recorded-head> -- <paths the branch touched>` coming back empty. Any residue is attributed with `git log <recorded-head>..<base> -- <path>`.
+
 **A failed command returns the same empty output as a passing one.** Once the remote branch is pruned the recorded head is no longer a local object, so the comparison errors — and with stderr suppressed, the empty result reads exactly like a clean pass. Fetch the request's published head ref first, then prove the object is local before believing any answer about it:
 
     git cat-file -e <recorded-head>^{commit}   # non-zero here means the verdict below is invalid, not clean
