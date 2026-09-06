@@ -1,8 +1,10 @@
-# Keeping this repository publishable
+# Contributing
 
 These skills are refined from real delivery work. That is what makes them good,
 and it is also the risk: the work happens in private repositories, and the
-details leak in through provenance notes rather than through code.
+details leak in through provenance notes rather than through code. The first
+half of this document is about keeping the repository publishable; the rest is
+how a change is tested, described, and released.
 
 ## Setup (once per clone)
 
@@ -125,31 +127,33 @@ working directory (the cases assume the plugin root), and whether an `llm`
 grader accepts a file target. Fix them once when the command first runs and
 delete this sentence.
 
-Until it runs here, the same test is done by hand: build one fixture per
-run with the case's own script (`sh evals/fixtures/<name>.sh <empty dir>`),
-dispatch five fresh subagents on the model of interest per arm with the eval
-prompt verbatim, and grade every run against the grader criteria in the case
-directory. For a wording change the arms are the current contract and the
-edited one. For a new skill they are no Skill tool at all, and the skill
-installed but not named in the brief - the shape the plugin command runs, and
-the only arm that tests the trigger as well as the rules. Grade the tree the
-run left behind, not its reply: a run has reported a rewrite it never wrote.
-Rules that held in practice: stop if the baseline does not fail; five reps
-per arm, single samples lie; when reps disagree on the shape of the output,
-the wording is not binding - restate it as what the output *is* rather than
-adding words; a grader asks for the failing sentence to be quoted, so its
-verdict can be audited; and a second fixture in a domain unlike the skill's
-own examples is worth more than a sixth rep, because it is the only way to
-tell a learned category from an echoed example.
+Until it runs here, the same test is done by hand:
 
-Each choice in that recipe answers a failure seen here:
+1. Build one fixture per run with the case's own script
+   (`sh evals/fixtures/<name>.sh <empty dir>`).
+2. Dispatch five fresh subagents on the model of interest per arm, with the
+   eval prompt verbatim.
+3. Grade every run against the grader criteria in the case directory, reading
+   the tree the run left behind rather than its reply: a run has reported a
+   rewrite it never wrote.
 
+The arms depend on what changed:
+
+- **A wording change:** the current contract and the edited one.
+- **A new skill:** no Skill tool at all, and the skill installed but not named
+  in the brief - the shape the plugin command runs, and the only arm that
+  tests the trigger as well as the rules.
+
+Rules that held in practice, each answering a failure seen here:
+
+- **Stop if the baseline does not fail.** A rule the weaker model keeps
+  unaided tests nothing; check which graders the baseline fails before running
+  the treatment arm, because a blunt violation is one it strips on its own.
 - **Five reps per arm.** A single sample lies in both directions: a wording
   that fails one run in two still passes a lone trial half the time, while
   five clean runs leave such a rule about a three-in-a-hundred chance of
   hiding, and a one-in-three failure about one in eight. Five is where the
-  batch is still one dispatch and a survivor is a signal rather than luck;
-  past it, a second domain buys more than a sixth rep.
+  batch is still one dispatch and a survivor is a signal rather than luck.
 - **Sonnet as the model of interest.** The skills have to hold on the weakest
   model a user will run them with, and the weaker model is the more sensitive
   instrument: a rule the strongest model keeps from intent alone is the one a
@@ -158,8 +162,13 @@ Each choice in that recipe answers a failure seen here:
 - **Fresh subagents, unnamed in the brief.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
-- **The tree rather than the reply.** A run has reported a rewrite it never
-  wrote.
+- **When reps disagree on the shape of the output, the wording is not
+  binding.** Restate it as what the output *is* rather than adding words.
+- **A grader asks for the failing sentence to be quoted**, so its verdict can
+  be audited.
+- **A second fixture in a domain unlike the skill's own examples is worth more
+  than a sixth rep.** It is the only way to tell a learned category from an
+  echoed example.
 
 ## A skill that carries executable content
 
@@ -182,21 +191,21 @@ the other:
 The failure this split exists to prevent is a green suite standing in for a
 skill nobody follows: every gate can pass on a script the model never invokes.
 
-Two rules the gates themselves have to obey.
+Two rules the gates themselves have to obey:
 
-**A check must be able to fail.** Prove it by breaking the thing it watches and
-watching it go red. Two checks written here could not fail at all and were green
-for reasons unrelated to the code: one measured column alignment in bytes, which
-is the quantity the padding exists to make irrelevant, and one sent a signal
-that a shell sets to ignored in background jobs, so it never reached the handler
-under test. A mutation harness is how they were caught.
-
-**A fixture must not assume the environment it was written in.** The
-configuration matrix exists for the script, and it audits the fixtures for free:
-one setup here silently did nothing under a renamed default branch, because
-`checkout -b <name>` fails when a clone already carries that branch, and the
-assertion downstream then reported a healthy repo as a defect. Assert the setup
-built what it claims before asserting anything about the result.
+- **A check must be able to fail.** Prove it by breaking the thing it watches
+  and watching it go red. Two checks written here could not fail at all and
+  were green for reasons unrelated to the code: one measured column alignment
+  in bytes, which is the quantity the padding exists to make irrelevant, and
+  one sent a signal that a shell sets to ignored in background jobs, so it
+  never reached the handler under test. A mutation harness is how they were
+  caught.
+- **A fixture must not assume the environment it was written in.** The
+  configuration matrix exists for the script, and it audits the fixtures for
+  free: one setup here silently did nothing under a renamed default branch,
+  because `checkout -b <name>` fails when a clone already carries that branch,
+  and the assertion downstream then reported a healthy repo as a defect. Assert
+  the setup built what it claims before asserting anything about the result.
 
 ## Versioning and releases
 
@@ -206,27 +215,33 @@ version that has no release yet, after the guard jobs pass, with notes
 generated from the commit messages since the previous tag. A push that leaves
 the version alone releases nothing, so the bump is the decision.
 
-Bump the minor version when a skill, agent, or hook changes behavior - a new
-rule, a changed default, a new component. Bump the patch version for wording
-that changes no behavior. Bump the major version when a component is removed
-or a mode's trigger phrase changes. Make the bump in the commit that changes
-the behavior, not in a separate "release" commit.
+| Bump | When |
+|---|---|
+| Major | a component is removed, or a mode's trigger phrase changes |
+| Minor | a skill, agent, or hook changes behavior - a new rule, a changed default, a new component |
+| Patch | wording that changes no behavior |
+
+Make the bump in the commit that changes the behavior, not in a separate
+"release" commit.
 
 ## Before pushing
 
-    ./scripts/scan-history.sh
+Three checks, in this order. CI runs all three and fails on any of them, but
+the first is the one to run before the push rather than after: a leak that
+reaches the remote is fixed only by rewriting history.
 
-This audits every commit's contents, messages and author identities - not just
-the working tree. A clean `git status` proves nothing about history.
-
-Adding or removing a skill, agent, or hook changes the component inventory: run
-`sh scripts/generate-inventory.sh` afterward - it rewrites the canonical
-inventory statements in the README and both plugin manifests from the tree, and
-CI fails with that same command when they are stale. The trigger index follows
-the order of the README's catalog ("What each skill solves"), so a new skill
-needs its catalog entry before the generator will run: a skill the catalog
-does not name fails the generator rather than landing at the end of the table. `sh scripts/check-refs.sh`
-must also pass; it verifies the tree's internal references resolve.
+1. `sh scripts/scan-history.sh` - audits every commit's contents, messages and
+   author identities, not just the working tree. A clean `git status` proves
+   nothing about history.
+2. `sh scripts/generate-inventory.sh` - after adding or removing a skill,
+   agent, or hook. It rewrites the canonical inventory statements in the README
+   and both plugin manifests from the tree, and CI fails when they are stale.
+   The trigger index follows the order of the README's catalog ("What each
+   skill solves"), so a new skill needs its catalog entry first: a skill the
+   catalog does not name fails the generator rather than landing at the end of
+   the table.
+3. `sh scripts/check-refs.sh` - verifies the tree's internal references
+   resolve.
 
 ## If something already landed
 
