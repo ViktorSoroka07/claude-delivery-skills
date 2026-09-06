@@ -28,7 +28,7 @@ Specify cross-boundary contracts yourself, upfront (the exact shape, the exact n
 
 ## While it runs
 
-**Idle is not done, and silence is not death.** Agents routinely go idle without delivering — pull the report explicitly, restating the exact output format wanted. But before concluding a quiet agent is stuck, sample its workspace two or three times, a minute apart: a build or mutation agent's tree oscillates between dirty and clean, so one clean sample proves nothing. An orchestrator once "took over" for an agent that was mid-run, overwriting its driver script under it. If you do take over, use a different worktree — never the agent's own.
+**Idle is not done, and silence is not death.** Agents routinely go idle without delivering — pull the report explicitly, restating the exact output format wanted and asking for an honest partial — what blocked it and how far it got — so a stuck agent and one that finished but wrote its result as prose both answer with something usable. But before concluding a quiet agent is stuck, sample its workspace two or three times, a minute apart: a build or mutation agent's tree oscillates between dirty and clean, so one clean sample proves nothing. An orchestrator once "took over" for an agent that was mid-run, overwriting its driver script under it. If you do take over, use a different worktree — never the agent's own.
 
 **Address agents unambiguously.** Names can collide across sessions, and a message by name can reach a stale agent that worked on something else entirely — use the id, or the name with the disambiguating ref the harness lists when two rows share it.
 
