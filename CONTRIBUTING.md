@@ -64,6 +64,15 @@ writes down until it burns them - and those cannot be generated. Until someone
 has done real reviews on a platform, review-pr's honest answer there is its
 unknown-platform fallback, not a speculative reference.
 
+## Where a lesson waits
+
+A lesson that has passed the one-sentence test but not yet been re-derived
+into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is aimed
+at. The file is tracked, so an entry meets the same bar as a skill and the
+pre-commit hook scans it like one. Promoting or declining an entry removes it
+from the queue in the same commit - a declined entry keeps one line with its
+reason, so the same lesson is not queued twice.
+
 ## Provenance without leaking
 
 A provenance note has two jobs: proving the rule came from real experience, and
