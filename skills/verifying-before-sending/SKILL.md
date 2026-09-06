@@ -17,6 +17,8 @@ Then, for a send whose recipient will act on it, keep a claim-to-source table in
 
 The table catches a class prose review misses. Reading a draft checks whether each sentence is *true*; asking where each claim is verifiable checks whether the text is *complete* — whether the recipient can act on it without you present. For a procedure, complete means executable: walk each step through every state the text itself names and every outcome its commands can produce, and a state with no instruction, or a completion condition some state can never reach, is a defect even when every fact is correct. Under-specification and dropped qualifiers survive the first check and fail the second. One audited draft that "read fine" named one location where the source names two, overstated a finding's scope, and omitted the two places a find-and-replace must *not* touch.
 
+A package of several files is complete only when its reference graph closes. Grep the outgoing set for the names of anything held back — other filenames, internal finding ids, an index the recipient will not receive — and cite only identifiers the recipient already holds. A flat set of files also needs a one-page entry point that maps each item of the request to the document answering it.
+
 ## Pass 1 — the blind pass
 
 Verify the claims **from a fresh context that has not seen the reasoning that produced them.** A verifier given the argument re-confirms it; a verifier given only the claims checks them. (The plugin's `refute-verifier` agent type carries this stance where available.)
