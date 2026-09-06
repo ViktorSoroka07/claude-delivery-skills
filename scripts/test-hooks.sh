@@ -1,5 +1,5 @@
 #!/bin/sh
-# Self-tests for the comment-discipline hooks (hooks/*.py). Each test feeds a
+# Self-tests for the hooks (hooks/*.py). Each test feeds a
 # hook the JSON payload the harness sends it and asserts on the verdict; the
 # commit-time tests build a throwaway repo with real staged content. Run from
 # anywhere inside the repo; exits non-zero on any FAIL. Both hooks fail open,
@@ -229,6 +229,25 @@ out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}
 check "landing hook ignores non-Bash tools" 0 $?
 
 echo
+BRIEF_HOOK="$ROOT/hooks/session-brief.py"
+
+# 18. Session brief: emits the SessionStart context as JSON naming every
+#     owning skill, ignores its stdin, and fails open when its text is missing.
+out=$(printf '{"hook_event_name":"SessionStart","source":"startup"}' | "$PY" "$BRIEF_HOOK" 2>/dev/null)
+check "session brief exits 0" 0 $?
+ctx=$(printf '%s' "$out" | "$PY" -c 'import json,sys; d=json.load(sys.stdin)["hookSpecificOutput"]; assert d["hookEventName"]=="SessionStart"; print(d["additionalContext"])' 2>/dev/null)
+check "session brief output is the SessionStart JSON shape" 0 $?
+for s in writing-for-audiences review-pr maintaining-project-memory writing-code-comments; do
+  contains "session brief names $s" "$ctx" "delivery-skills:$s"
+done
+printf '' | "$PY" "$BRIEF_HOOK" >/dev/null 2>&1
+check "session brief survives empty stdin" 0 $?
+cp "$BRIEF_HOOK" "$WORK/orphan-brief.py"
+out=$(printf '' | "$PY" "$WORK/orphan-brief.py" 2>/dev/null)
+check "session brief fails open without its text file" 0 $?
+[ -z "$out" ]
+check "session brief emits nothing without its text file" 0 $?
+
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
   exit 0

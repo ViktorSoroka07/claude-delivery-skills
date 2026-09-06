@@ -80,7 +80,7 @@ surgery(
     "README.md",
     r"<!-- inventory -->.*?<!-- /inventory -->",
     "<!-- inventory -->%s, %s, and %s<!-- /inventory -->"
-    % (noun(s, "skill"), noun(a, "agent type"), noun(h, "warn-only hook")),
+    % (noun(s, "skill"), noun(a, "agent type"), noun(h, "hook")),
     False,
 )
 surgery(
@@ -91,7 +91,7 @@ surgery(
         "from idea to merged PR - plans ground-truthed before building, tests "
         "proven able to fail, subagent output treated as claims, outbound "
         "text verified before it ships."
-        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
+        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "hook"))),
     True,
 )
 surgery(
@@ -99,7 +99,7 @@ surgery(
     r'"description": "[^"]*merged PR[^"]*"',
     json.dumps("description") + ": " + json.dumps(
         "%s, %s, and %s that harden the path from idea to merged PR."
-        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "warn-only hook"))),
+        % (noun(s, "skill").capitalize(), noun(a, "agent"), noun(h, "hook"))),
     True,
 )
 def catalog_order(names):

@@ -33,6 +33,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session-brief.py\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

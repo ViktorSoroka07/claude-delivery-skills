@@ -88,7 +88,7 @@ sh "$GEN" "$WORK/t6" >/dev/null 2>&1
 check "generator run succeeds on a stale tree" 0 $?
 grep -q 'Two skills, one agent,' "$WORK/t6/.claude-plugin/plugin.json"
 check "plugin.json count regenerated with per-count plurals" 0 $?
-grep -q 'two warn-only hooks' "$WORK/t6/.claude-plugin/plugin.json"
+grep -q 'two hooks' "$WORK/t6/.claude-plugin/plugin.json"
 check "hooks counted from hooks.json entries" 0 $?
 grep -q 'two skills, one agent type,' "$WORK/t6/README.md"
 check "README marker region regenerated with per-count plurals" 0 $?

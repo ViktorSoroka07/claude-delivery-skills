@@ -88,6 +88,11 @@ changes. Writing a lesson out at full altitude in every file that mentions it
 grew one skill by a fifth in a day: the copies drift apart, and the growth is
 paid on every load.
 
+`hooks/session-brief.md` is the strictest case: it loads into every session,
+so each rule there is a pointer to the skill that owns it plus a one-sentence
+core, never the full statement. A change to a rule lands in its skill; the
+brief changes only when the pointer or the core does.
+
 ## The README paraphrases; the skill files own
 
 The README describes skills for a human deciding what to install and what to

@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and three warn-only hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and four hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -235,11 +235,12 @@ instructions alone cannot:
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
   use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
-- **Three hooks** ([`hooks/`](hooks/)) — warn-only backstops, run by the harness at
-  the moments a skill is most often skipped. A rule the model can rationalize past
-  needs a gate the harness executes; the skill still owns the judgment, and none of
-  the three blocks. The comment rules are the most-relapsed discipline in the corpus
-  behind this repo, which is why two of the three watch them.
+- **Four hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Three
+  are warn-only backstops at the moments a skill is most often skipped: a rule the
+  model can rationalize past needs a gate the harness executes; the skill still owns
+  the judgment, and none of them blocks. The comment rules are the most-relapsed
+  discipline in the corpus behind this repo, which is why two of the three watch them.
+  The fourth runs at session start.
   - **Write-time** — fires the moment an edit adds a narrative-comment tell
     ("Regression:", "used to", "harmless because"); backs `writing-code-comments`.
   - **Commit-time** — reads the staged diff when a commit is about to run, so the
@@ -250,8 +251,14 @@ instructions alone cannot:
     branch, a merge through any of the three forge CLIs or a local merge from the
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
+  - **Session brief** — at session start, and again after a clear or a compaction,
+    injects the standing rules that hold across every task: writing for people, one
+    best fix per finding, re-derive what you promote, memory stays minimal, zero
+    comments by default. Each is a pointer to the skill that owns it plus a
+    one-sentence core, so a user's `CLAUDE.md` no longer needs a copy — they travel
+    with the plugin. The text is [`hooks/session-brief.md`](hooks/session-brief.md).
 
-![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; three warn-only hooks are run by the harness at the moments a skill is most often skipped — an edit adding a comment, a commit about to run, a branch landing on its target](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; four hooks are run by the harness — three warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target) and one injects the standing rules at session start](assets/diagrams/components.svg)
 
 ## What a run looks like
 
