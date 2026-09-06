@@ -37,6 +37,8 @@ Every artifact written for a surface others can see is scoped to that audience b
 
 For a non-implementer audience, every highlight is an action and what it bought the reader — never process detail ("merged", "suite green", "standard upgrade pattern"), which reads as noise to anyone who cannot act on it. And when your text sits alongside companion surfaces — another presenter's section, a linked document — **reference and attribute rather than re-announce**: duplicated content forces the audience to sit through it twice and drifts against the original.
 
+**Ground abstract findings in one worked example that follows the reader's own journey.** Define a single concrete scenario once — an id, a handful of items, what happens to each at every stage — and hang each point on it or on the person who meets it, in the order *what we see → why it matters → the example → the proposal*. A status model that three abstract explanations failed to land was grasped from one such story.
+
 ## Format for actual use
 
 Ask how the text will be consumed and shape it for exactly that:
