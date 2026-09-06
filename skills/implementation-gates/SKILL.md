@@ -56,6 +56,8 @@ Evidence, the best first:
 3. **Documentation**, including your own repo's.
 4. **A coherent argument** — this is not evidence. An internally consistent, unambiguous, in-scope claim can still be false, and that is precisely how the expensive defects arrive.
 
+When the tool is a compiled or bundled binary, read it as source rather than as a dump of strings: list the strings once to locate the feature, then find the function that resolves the value — a message string near the logic is not the logic, and proximity has inverted a root cause. Enum members and defaults sit in schema-shaped records; a field's presence in a structure says nothing about whether it is displayed, so find the render site; minified names differ per chunk, so a name found in one chunk proves nothing about another. Record the version you read in whatever artifact keeps the claim.
+
 If a claim cannot be settled, say so, name the check that would settle it, and choose the option that fails safe.
 
 This list owns the evidence order and the plan-time check; `plan-feature` and `implement-plan` call this gate rather than restating it.
