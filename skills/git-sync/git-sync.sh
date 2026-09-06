@@ -101,7 +101,7 @@ trap '[ -n "${TMP:-}" ] && rm -rf "$TMP"' EXIT
 # so an interrupt restores the work or says where it is, instead of exiting
 # silently on a tree that looks clean.
 STASH_REPO=""
-# shellcheck disable=SC2329  # reached through trap
+# shellcheck disable=SC2329,SC2317  # reached through trap
 on_interrupt() {
   trap - INT TERM
   if [ -n "$STASH_REPO" ]; then
