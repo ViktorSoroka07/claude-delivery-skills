@@ -25,7 +25,7 @@ Ten to twelve mutations, targeted at the lines this change introduced. Not a who
 1. Green baseline first — record test count *and* duration, using the test command the repo's CLAUDE.md or `review-repo-nuances` project memory records (some repos' obvious command is wrong — the runtime's built-in test runner may not be what the repo's own scripts run). If neither records one, discover it, confirm it really executed (non-zero test count), and save it into that memory.
 2. One at a time, applied with an `old_string` unique to the target line. **A failed edit means the mutation never applied — never count it as killed.**
 3. Re-run; compare count and duration to baseline. Record KILLED (name the failing test) or SURVIVED.
-4. Revert; confirm the tree is clean before the next.
+4. Revert; confirm the tree is clean before the next. The change under test is committed before the sweep starts: a revert by `git checkout -- <file>` restores the last commit, so on an uncommitted change it silently wipes the work the sweep was measuring. A detached worktree at the pinned commit is immune; the working tree is not.
 5. **All-killed is suspicious.** Re-apply one and watch it fail before believing the run.
 
 This protocol has one statement, here. The plugin's `mutation-tester` agent is its executable form: `review-pr`'s mutation axis dispatches it, and so does this gate when the sweep is handed to a subagent rather than run in the current context.
