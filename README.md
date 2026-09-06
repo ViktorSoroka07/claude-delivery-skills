@@ -92,10 +92,10 @@ The finishing skill hands a branch off while its request is still open, and the 
 lands later — another session, a browser tab, someone else's approval — with nothing
 listening. What is left behind: a branch every ancestry command calls unmerged (the
 squash broke the link), a worktree nobody claims, memory describing finished work, and a
-tracker item closed in fact and open on the board. Containment tested against the
-request's recorded head instead of reachability, no empty result trusted from a command
-whose exit status went unchecked, the restore SHA printed with every deletion, and the
-item closed on figures asked for rather than inferred.
+tracker item closed in fact and open on the board. The skill pairs each leftover with
+the check that closes it, and keeps the one rule that matters most if the list is ever
+trimmed: never trust an empty result from a command whose exit status went unchecked,
+because a failed check prints the same nothing as a clean one.
 
 ![What the merge leaves behind and the check that closes each: a branch ancestry commands call unmerged, closed by testing containment against the request's recorded head; an unclaimed worktree, removed with the restore SHA printed; memory entries describing finished work, pruned in the same pass; a tracker item open on the board, closed on figures asked for. No empty result is trusted from a command whose exit status went unchecked](assets/diagrams/merge-leftovers.svg)
 
@@ -168,6 +168,8 @@ formatting for how the text is actually used — copied, spoken, skimmed.
 
 ### Writing artifacts
 
+Three artifacts, one rule: each records the change, never the session that produced it.
+
 **[`writing-code-comments`](skills/writing-code-comments/SKILL.md) — subtractive comment rules keep failing; give the fact a home.**
 "Don't write comments" collapses the moment a fact feels load-bearing — which is why
 the correction kept recurring. Zero by default at write-time, an invariant-plus-cost
@@ -233,19 +235,21 @@ instructions alone cannot:
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
   use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
-- **Three hooks** ([`hooks/`](hooks/)) — warn-only backstops to `writing-code-comments`
-  and `landing-merged-work`.
-  The comment rules are the most-relapsed discipline in the corpus behind this repo:
-  the skill owns the judgment, and the hooks mechanically flag narrative-comment tells
-  ("Regression:", "used to", "harmless because") — because a rule the model can
-  rationalize past needs a gate the harness executes. The write-time hook fires the
-  moment an edit adds a tell; the commit-time hook reads the staged diff when a commit
-  is about to run, so it catches the same tells however the file was authored — shell
-  heredocs and generator scripts never pass through the edit tools. Both skip prose
-  files. The third fires the close-out reminder the moment a command lands a branch —
-  a merge through any of the three forge CLIs, or a local merge from the default
-  branch — because that moment arrives in a session that was not planning for it.
-  None of the three blocks.
+- **Three hooks** ([`hooks/`](hooks/)) — warn-only backstops, run by the harness at
+  the moments a skill is most often skipped. A rule the model can rationalize past
+  needs a gate the harness executes; the skill still owns the judgment, and none of
+  the three blocks. The comment rules are the most-relapsed discipline in the corpus
+  behind this repo, which is why two of the three watch them.
+  - **Write-time** — fires the moment an edit adds a narrative-comment tell
+    ("Regression:", "used to", "harmless because"); backs `writing-code-comments`.
+  - **Commit-time** — reads the staged diff when a commit is about to run, so the
+    same tells are caught however the file was authored — shell heredocs and
+    generator scripts never pass through the edit tools. Both comment hooks skip
+    prose files.
+  - **Landed-branch** — fires the close-out reminder the moment a command lands a
+    branch, a merge through any of the three forge CLIs or a local merge from the
+    default branch, because that moment arrives in a session that was not planning
+    for it; backs `landing-merged-work`.
 
 ![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; three warn-only hooks are run by the harness at the moments a skill is most often skipped — an edit adding a comment, a commit about to run, a branch landing on its target](assets/diagrams/components.svg)
 
