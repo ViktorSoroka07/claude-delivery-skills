@@ -142,21 +142,24 @@ verdict can be audited; and a second fixture in a domain unlike the skill's
 own examples is worth more than a sixth rep, because it is the only way to
 tell a learned category from an echoed example.
 
-Each choice in that recipe answers a failure seen here. Five reps, because a
-single sample lies in both directions: a wording that fails one run in two
-still passes a lone trial half the time, while five clean runs leave such a
-rule about a three-in-a-hundred chance of hiding, and a one-in-three failure
-about one in eight. Five is where the batch is still one dispatch and a
-survivor is a signal rather than luck; past it, a second domain buys more
-than a sixth rep. Sonnet as the model of interest, because the skills have
-to hold on the weakest model a user will run them with, and the weaker model
-is the more sensitive instrument: a rule the strongest model keeps from intent
-alone is the one a weaker model negotiates, and that negotiation is the
-defect the test hunts - the author's own reading is already the strong-model
-run. Fresh subagents, because each rep must be an independent trial with no
-context carried from the last; unnamed in the brief, because a skill that
-fires only when named has a trigger defect a named arm would hide. The tree
-rather than the reply, because a run has reported a rewrite it never wrote.
+Each choice in that recipe answers a failure seen here:
+
+- **Five reps per arm.** A single sample lies in both directions: a wording
+  that fails one run in two still passes a lone trial half the time, while
+  five clean runs leave such a rule about a three-in-a-hundred chance of
+  hiding, and a one-in-three failure about one in eight. Five is where the
+  batch is still one dispatch and a survivor is a signal rather than luck;
+  past it, a second domain buys more than a sixth rep.
+- **Sonnet as the model of interest.** The skills have to hold on the weakest
+  model a user will run them with, and the weaker model is the more sensitive
+  instrument: a rule the strongest model keeps from intent alone is the one a
+  weaker model negotiates, and that negotiation is the defect the test hunts.
+  The author's own reading is already the strong-model run.
+- **Fresh subagents, unnamed in the brief.** Each rep must be an independent
+  trial with no context carried from the last, and a skill that fires only
+  when named has a trigger defect a named arm would hide.
+- **The tree rather than the reply.** A run has reported a rewrite it never
+  wrote.
 
 ## A skill that carries executable content
 
