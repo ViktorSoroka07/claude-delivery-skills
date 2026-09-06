@@ -97,6 +97,12 @@ changes. Writing a lesson out at full altitude in every file that mentions it
 grew one skill by a fifth in a day: the copies drift apart, and the growth is
 paid on every load.
 
+The one deliberate duplicate is `implementation-gates`' plan task. It is copied
+verbatim into plans in repositories that do not carry the plugin, so it holds
+its own definitions (the equivalence test included) inline and references no
+plugin file. Do not tidy that duplication into a cross-reference: a plan that
+points at a file its executor cannot read runs no gate.
+
 `hooks/session-brief.md` is the strictest case: it loads into every session,
 so each rule there is a pointer to the skill that owns it plus a one-sentence
 core, never the full statement. A change to a rule lands in its skill; the
