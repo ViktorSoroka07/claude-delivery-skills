@@ -52,6 +52,10 @@ Never bake into a comment a value that moves independently of it — a model nam
 
 The strongest tell that a comment should not exist: it argues that something slightly-off is acceptable — "which is immaterial here", "harmless because", "acceptable since". That comment is a confession, not documentation. Fix the code so the argument is unnecessary: one fix summed two overlapping counts and carried three lines explaining why the double-count didn't matter to a threshold check; changing the parameter from a count to a boolean removed both the over-count and the comment — the code became correct instead of defensibly incorrect.
 
+## Two doc-comment blocks on one declaration: only the last binds
+
+A doc-comment block immediately followed by another (`*/` then `/**`, only whitespace between) attaches to nothing. The language binds the last block to the declaration, and every gate — compiler, doc generator, linter — drops the first without a word. The orphan is usually a comment whose declaration was deleted or moved from under it. When auditing a diff, grep for the pattern over the whole range since the merge-base, not since the commit a previous review pinned — a narrower sweep once reported zero while a known instance sat in an excluded file. The fix moves the orphan back to its true subject, or deletes it; never merge it into the block below.
+
 ## Tests
 
 A well-named test case is the spec; the assertions are the mechanism. Preambles ("Locks in…", "Mirrors the contract of…") and inline narration of a single assertion add prose to something already stated executably. The bug a regression test prevents is recorded in the test name and the commit — not in a paragraph above the test.
