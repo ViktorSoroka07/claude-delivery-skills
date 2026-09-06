@@ -1,0 +1,42 @@
+<svg width="100%" viewBox="0 0 1000 322" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three seats around a change: the reviewer's seat, where review-pr reads a change, yours or someone else's, because a review was asked for; the author's seat, where addressing-review-feedback works through feedback on your own change; and the outsider's seat, where reporting-defects-upstream files into another team's system that nobody asked you to review. Each card names what the seat brings and what it refuses to do">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9AA0A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<rect x="1" y="1" width="998" height="320" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
+
+<text x="26" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#8B877F" letter-spacing="1.2">THREE SEATS &#183; WHOSE WORK IT IS, AND WHO ASKED</text>
+
+<text x="174" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">the reviewer's seat</text>
+<rect x="26" y="86" width="296" height="40" rx="20" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="174" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">yours or theirs &#183; a review was asked for</text>
+<line x1="174" y1="128" x2="174" y2="148" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="26" y="154" width="296" height="58" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="174" y="174" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">review-pr</text>
+<text x="174" y="193" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">parallel axes, then a refuter</text>
+<rect x="26" y="228" width="296" height="72" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="174" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#1C5A51">brings</tspan> findings a skeptic tried to refute first</text>
+<text x="174" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#8A5A1D">refuses</tspan> to post, apply or resolve unasked</text>
+
+<text x="500" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">the author's seat</text>
+<rect x="352" y="86" width="296" height="40" rx="20" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="500" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">your own change &#183; feedback arrived</text>
+<line x1="500" y1="128" x2="500" y2="148" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="352" y="154" width="296" height="58" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="500" y="174" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">addressing-review-feedback</text>
+<text x="500" y="193" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">inventory, verify, apply, reply and resolve</text>
+<rect x="352" y="228" width="296" height="72" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="500" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#1C5A51">brings</tspan> a verdict on every item, on every surface</text>
+<text x="500" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#8A5A1D">refuses</tspan> to resolve threads over unchanged code</text>
+
+<text x="826" y="72" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">the outsider's seat</text>
+<rect x="678" y="86" width="296" height="40" rx="20" fill="#ECEEF2" stroke="#6B7280" stroke-width="0.6"/>
+<text x="826" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="#3A414D" text-anchor="middle" dominant-baseline="central">another team's system &#183; nobody asked</text>
+<line x1="826" y1="128" x2="826" y2="148" stroke="#9AA0A8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="678" y="154" width="296" height="58" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="826" y="174" font-family="system-ui, -apple-system, sans-serif" font-size="13.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">reporting-defects-upstream</text>
+<text x="826" y="193" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">evidence supplied, decisions left</text>
+<rect x="678" y="228" width="296" height="72" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="826" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#1C5A51">brings</tspan> evidence, the true proportion of what works</text>
+<text x="826" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#5B6472" text-anchor="middle"><tspan font-weight="600" fill="#8A5A1D">refuses</tspan> to price their work, rank it, or instruct</text>
+</svg>

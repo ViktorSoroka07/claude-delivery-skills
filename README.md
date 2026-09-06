@@ -97,7 +97,13 @@ request's recorded head instead of reachability, no empty result trusted from a 
 whose exit status went unchecked, the restore SHA printed with every deletion, and the
 item closed on figures asked for rather than inferred.
 
+![What the merge leaves behind and the check that closes each: a branch ancestry commands call unmerged, closed by testing containment against the request's recorded head; an unclaimed worktree, removed with the restore SHA printed; memory entries describing finished work, pruned in the same pass; a tracker item open on the board, closed on figures asked for. No empty result is trusted from a command whose exit status went unchecked](assets/diagrams/merge-leftovers.svg)
+
 ### Reviewing
+
+Three skills, three seats: what was asked for, and whose work it is, decide which one fires.
+
+![Three seats around a change: the reviewer's seat, where review-pr reads a change, yours or someone else's, because a review was asked for; the author's seat, where addressing-review-feedback works through feedback on your own change; the outsider's seat, where reporting-defects-upstream files into another team's system nobody asked you to review. Each card names what the seat brings and what it refuses to do](assets/diagrams/review-seats.svg)
 
 **[`review-pr`](skills/review-pr/SKILL.md) — one careful reader misses what measurement and adversarial checks catch.**
 A single reviewer finds what a single way of reading finds; and a review's own findings
@@ -142,6 +148,8 @@ taking over, verifying every reported identifier, auditing every delegated diff.
 Text about to leave the workspace fails more than one way at once, so two skills fire
 together and split the work: one asks *are the claims true?*, the other *does the
 prose fit the reader?*
+
+![The send moment as two axes: verifying-before-sending owns whether the claims are true, writing-for-audiences owns whether the prose fits the reader; only text in the corner that is both true and fits leaves the workspace, and the other three corners name the failure each skill catches](assets/diagrams/send-moment.svg)
 
 **[`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) — text that reads fine and is wrong.**
 A blind pass once corrected four claims in a document that had already passed
