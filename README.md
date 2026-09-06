@@ -17,10 +17,10 @@ without reading every file.
 
 ## The map
 
-Four skills form the build chain; the other fourteen guard moments that can occur in any
-session, at any time.
+Four skills form the build chain and a fifth closes the work out after the merge; the other
+thirteen guard moments that can occur in any session, at any time.
 
-![The skill map: the four-skill build chain from idea to shipped spec and PR, and thirteen moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
+![The skill map: the four-skill build chain from idea to shipped spec and PR with landing-merged-work hanging off its end, and twelve moment cards pairing a session trigger with the skill that fires on it](assets/diagrams/skill-map.svg)
 
 ## Which skill do I need?
 

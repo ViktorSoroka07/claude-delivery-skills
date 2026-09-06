@@ -1,9 +1,9 @@
-<svg width="100%" viewBox="0 0 900 684" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The skill map: four skills form the build chain from idea to shipped spec and PR; thirteen moment cards pair a session trigger with the skill that fires on it">
+<svg width="100%" viewBox="0 0 900 584" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The skill map: four skills form the build chain from idea to shipped spec and PR, and a fifth closes the work out after the merge lands; twelve moment cards pair a session trigger with the skill that fires on it">
 <defs>
 <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9AA0A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
 </defs>
 
-<rect x="1" y="1" width="898" height="682" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
+<rect x="1" y="1" width="898" height="582" rx="14" fill="#F7F6F3" stroke="#E2E0DB" stroke-width="1"/>
 
 <text x="26" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#8B877F" letter-spacing="1.2">THE BUILD CHAIN</text>
 
@@ -38,6 +38,11 @@
 <rect x="216" y="152" width="196" height="52" rx="8" fill="#FBEFDC" stroke="#B47B2B" stroke-width="0.6"/>
 <text x="314" y="170" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#8A5A1D" text-anchor="middle" dominant-baseline="central">writing-plan-docs</text>
 <text x="314" y="188" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#A2743A" text-anchor="middle" dominant-baseline="central">plan at start &#183; spec at finish</text>
+
+<line x1="787" y1="152" x2="803" y2="104" stroke="#9AA0A8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="690" y="152" width="184" height="52" rx="8" fill="#E2F0ED" stroke="#2F7A6F" stroke-width="0.6"/>
+<text x="782" y="170" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">landing-merged-work</text>
+<text x="782" y="188" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" fill="#2F7A6F" text-anchor="middle" dominant-baseline="central">after the merge lands, later</text>
 
 <text x="26" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#8B877F" letter-spacing="1.2">MOMENTS IN ANY SESSION</text>
 
@@ -85,9 +90,9 @@
 <text x="125" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">to be made</text>
 <text x="125" y="526" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">writing-commit-messages</text>
 <rect x="244" y="468" width="198" height="84" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
-<text x="343" y="486" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">work just landed</text>
-<text x="343" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">on its target</text>
-<text x="343" y="526" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">landing-merged-work</text>
+<text x="343" y="486" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a defect filed into</text>
+<text x="343" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">another team's system</text>
+<text x="343" y="526" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">reporting-defects-upstream</text>
 <rect x="462" y="468" width="198" height="84" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
 <text x="561" y="486" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">review feedback arrived</text>
 <text x="561" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">on your own change</text>
@@ -96,8 +101,4 @@
 <text x="777" y="486" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a folder of clones</text>
 <text x="777" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">gone stale</text>
 <text x="777" y="526" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">git-sync</text>
-<rect x="26" y="568" width="198" height="84" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
-<text x="125" y="586" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a defect filed into</text>
-<text x="125" y="600" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">another team's system</text>
-<text x="125" y="626" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">reporting-defects-upstream</text>
 </svg>
