@@ -32,6 +32,8 @@ Example of the shape (invented):
 
 Staged changes that would be reverted separately are separate commits. The test: if one of them turns out wrong, can it be reverted without the other? "Also fixed X while there" in a draft body is the tell that two workstreams are staged as one — split them (`git add -p`) before writing either message.
 
+The split follows what compiles, not the kind of file: an existing test that now specifies the changed behavior belongs in the commit that changes the behavior. Split into a separate tests commit, the source commit fails its own suite and breaks bisect across the range. Check each commit of a split at its own SHA in a detached worktree — the working tree that resembles the last commit says nothing about the first.
+
 A fix to a mistake made on this same branch, before anyone reviewed it, is not a commit with a story: mark it for the commit it fixes (`git commit --fixup <sha>`). The squash that rewrites history is the author's decision — perform it only when the branch is unpushed and the user has asked for it; otherwise leave the fixup commit in place and say it is there. After review, the fix is its own commit whose message describes the delta, not the review.
 
 ## Delegated diffs
