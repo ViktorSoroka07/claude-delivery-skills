@@ -27,11 +27,12 @@ An existing body's section layout may stay — the contract governs content shap
 ## Syncing when commits land
 
 1. Re-derive the net delta `<base>...tip`.
-2. **Re-fold** the affected sections to the new final state — rewrite in place.
-3. Delete framing that stopped being true: draft/lifecycle lines, future tense ("will add"), pre-rebase mechanics, approval anchors.
-4. Fixes to mistakes made on this same branch are not deltas — they appear nowhere.
-5. Preserve bot-managed sections verbatim (everything from a bot marker such as a CodeRabbit release-notes comment onward — never edit or extend them).
-6. Process rationale survives as at most one past-tense sentence, only if it still helps the current reviewers (e.g. why one reviewer went first).
+2. **Compose against the body as it is now, not a copy fetched earlier.** The description is a shared document: the author edits it, reviewers paste into it, bots append to it. An edit built on a stale copy silently discards whatever landed in between, and the write reports success either way — the loss shows up later, as content that was there and is gone. Fetch the live body immediately before writing, and carry an assertion across the edit over something the other party contributed — the count of embedded images, the presence of a marker block — so a clobber fails the write instead of shipping. This is also what makes a rewrite safe to attempt at all: without the assertion, "I preserved their content" is a hope, not a check.
+3. **Re-fold** the affected sections to the new final state — rewrite in place.
+4. Delete framing that stopped being true: draft/lifecycle lines, future tense ("will add"), pre-rebase mechanics, approval anchors.
+5. Fixes to mistakes made on this same branch are not deltas — they appear nowhere.
+6. Preserve bot-managed sections verbatim (everything from a bot marker such as a CodeRabbit release-notes comment onward — never edit or extend them).
+7. Process rationale survives as at most one past-tense sentence, only if it still helps the current reviewers (e.g. why one reviewer went first).
 
 ## The author's reviewer-facing summary comment
 
@@ -52,4 +53,5 @@ The same contract governs the **author's** "changes since the last review pass" 
 | Flat "what we did" bullets                                                                                         | Problem → final behavior, with the why                                  |
 | "DRAFT for X's review" line surviving ready-for-review                                                             | One past-tense sentence, or nothing                                     |
 | New bullet appended after the bot's release-notes marker                                                           | Bot tail byte-identical                                                 |
+| "I already have the body — PATCH my version back"                                                                 | Fetch it again; assert their additions survived the edit                |
 | `src/foo.ts:123` or an in-branch commit SHA cited *(observed in plan docs and review text — same drift mechanism)* | File + symbol name; the PR number or a SHA already on the target branch |
