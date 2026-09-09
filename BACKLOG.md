@@ -21,6 +21,7 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A pre-commit hook that stashes and restores the tree can delete untracked files, so the review's findings file in the repo root can vanish on the author's next commit; decide where the file lives. → review-pr, output location (a design decision, not a sentence)
 - A convention recorded from observed absence ("only these statuses exist", "no PR route") expires silently when the repo adds the thing; record the check that established it and re-run the check, not the conclusion. → maintaining-project-memory
 - A ticket asking another team for a decision states the capability requirements the dependent work relies on, not only the risks, or the decider optimises the only dimension shown. → reporting-defects-upstream
+- An assertion that an event did not occur passes silently when its observation window closes before the action runs or when its matcher has quietly stopped matching, so the window covers the whole action and any guard proving the matcher still fires observes an event the system under test produced, never a literal restated in the test. → implementation-gates
 
 ## Medium — real, narrower, or partly covered
 
