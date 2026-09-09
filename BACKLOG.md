@@ -40,6 +40,7 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A file path cited in an already-sent message cannot be repaired, so a rename needs a citation sweep that includes sent messages, not only the repo. → writing-plan-docs
 - Write identifiers, never point-in-time states, into prose that outlives the moment; an id stays true while "still open" sealed beside it rots. → writing-plan-docs
 - A permission deny rule matches anywhere in a compound shell command, so chaining a denied command after an allowed one kills both; run the allowed step in its own call. → no home yet; a harness trap
+- A containment query that matches nothing still exits successfully, so a check chained on its exit status reports a commit as pushed when no remote holds it; read the output, not the status. → addressing-review-feedback, reply timing
 
 ## Declined, with the reason
 
