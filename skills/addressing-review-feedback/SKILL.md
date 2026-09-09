@@ -73,6 +73,8 @@ Every row gets a reply, in the author's own voice, stating the disposition and i
 
 **Closing gate: zero unresolved threads by the platform's own query, and every inventory row actioned.** Then look for what the replies provoked: a bot marks a rejection as addressed or withdrawn, or raises a new point in its reply, and a scanner needs its rescan trigger where the repo has one. A new point is a new inventory row.
 
+**A round that changed code moved the tip, so the request's description may have stopped describing it** — a count it states, a behavior the fixes widened, a limitation they closed. Re-check the description against the tip before calling the round done; it is the part of a review round nobody is prompted to look at, because the threads going quiet feels like the end. `writing-pr-descriptions` owns how, and two of its rules bite hardest here: re-fold the affected sections in place rather than appending a round section, and compose against the live body, since a bot may have added a generated block to it while the round was running.
+
 ## Modes — and telling the user they exist
 
 | Mode | The user says | What changes |
