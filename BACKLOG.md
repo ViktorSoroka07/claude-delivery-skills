@@ -27,6 +27,8 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 
 - Outward-facing output is published only once every dispatched agent has reported: confirm none is still running rather than watching the one whose result you happen to be waiting for, because work you dispatched yourself is part of the job and a closing report that lands after the conclusion means the conclusion was premature. → verifying-before-sending, review-pr posting
 
+- A finding that states an open question inside itself is a signal to hold, never a disclaimer that licenses publishing, because the pending answer can invert its grade and consequence after the author has already read it; the honesty of the caveat is what makes it look publishable. → review-pr, posting reference
+
 ## Medium — real, narrower, or partly covered
 
 - Compound mutations are split, since a kill proves some operand is pinned, never all; a mutation that fails to compile is evidence in neither direction and is restated until it builds. → implementation-gates
