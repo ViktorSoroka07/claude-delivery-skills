@@ -43,12 +43,13 @@ Report survivors honestly. A survivor is a test gap to close, not a defect to ar
 
 ## Step 5 — Finish
 
-Four steps, in this order:
+Five steps, in this order:
 
 1. **Rewrite the plan document as the spec of what shipped** — call the Skill tool with `writing-plan-docs` and follow its shipped-spec stage (strip checkboxes, re-tense to what landed, record what was and was not verified, no review history, no volatile counts). This happens **before** offering merge/PR options, not after.
-2. **Call the Skill tool with the repo's `finishing-a-development-branch`.**
-3. **Update the project memory** per `maintaining-project-memory` (it owns the write discipline — what memory holds, and the starter prompt a continuing session ends with). Refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
-4. **Tell the user that review is a separate, billable decision:** `/review-pr` triages its axes, and a small diff may not warrant one at all.
+2. **State readiness from evidence.** "Ready to push" has one evidence: the repo's gates run from the repo root on the final committed tree with a clean status, including whatever the push itself will run, with the last line quoted. A run before the last edit or from a subdirectory, a hook that ran on an earlier commit, or a push the harness refused is not it, and the operator pushing into a failure is the symptom.
+3. **Call the Skill tool with the repo's `finishing-a-development-branch`.**
+4. **Update the project memory** per `maintaining-project-memory` (it owns the write discipline — what memory holds, and the starter prompt a continuing session ends with). Refresh the `review-repo-nuances` entry (that exact name — it is the one `review-pr` and `implementation-gates` read) if this work changed gates, commands, or conventions, and record what a next session needs that the repo itself cannot tell it — what is parked, which decisions are provisional. In repos that do not commit plan documents, record in that same entry where this task's executed gates record lives — plan path, branch, the SHA the gates ran at — so a later review can audit the mutation table instead of re-running the sweep. Update existing memory files over creating duplicates.
+5. **Tell the user that review is a separate, billable decision:** `/review-pr` triages its axes, and a small diff may not warrant one at all.
 
 ## Rules
 

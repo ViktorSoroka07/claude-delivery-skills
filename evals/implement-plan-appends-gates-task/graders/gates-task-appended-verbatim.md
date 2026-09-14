@@ -3,7 +3,7 @@ type: regex
 target:
   source: file
   path: "docs/plans/task-102.md"
-pattern: "### Task \\d+: Implementation gates\\n\\n- \\[ \\] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion\\n- \\[ \\] Prove the new tests can fail — 10–12 targeted mutations"
+pattern: "### Task \\d+: Implementation gates\\n\\n- \\[ \\] Run the repo's gates — REQUIRED SUB-SKILL: verification-before-completion\\n(?:- \\[ \\] [^\\n]*\\n)*- \\[ \\] Prove the new tests can fail — 10–12 targeted mutations"
 match: contains
 ---
 
