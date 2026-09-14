@@ -235,11 +235,20 @@ Confirmed by mutation: removing the `catch` arm so the rejection propagates
 fails `detail page carries the request table after the summary`, and the suite
 is green once reverted.
 
+## Finding 4 — the page title lost the batch id
+
+Fixed in `src/detailPage.js`: the title is built from `batch.id` rather than a
+constant.
+
+Mutation: replacing the title with the constant `'Batch'` — SURVIVED. No test
+reads `title`; the assertion belongs with task 102's page-state tests and is
+left there.
+
 ## Verification
 
 Every fix above was checked by mutation - the defect it describes was
-introduced, the test was observed to fail, and the mutation was reverted and
-the suite re-run green.
+introduced and the suite re-run. Three failed the named test and were reverted
+green; the fourth survived and is recorded as such.
 EOF
   git add -A
   git commit -qm "Record the review resolution for the table mount"
