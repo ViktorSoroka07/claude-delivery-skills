@@ -53,6 +53,8 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A permission deny rule matches anywhere in a compound shell command, so chaining a denied command after an allowed one kills both; run the allowed step in its own call. → no home yet; a harness trap
 - A containment query that matches nothing still exits successfully, so a check chained on its exit status reports a commit as pushed when no remote holds it; read the output, not the status. → addressing-review-feedback, reply timing
 
+- A mutation that fails more tests than there are assertions targeting the mutated behaviour may be failing them through an unrelated crash rather than through any assertion, so a kill is attributed by reading the failing test names and the error, never by the count alone. → implementation-gates
+
 ## Declined, with the reason
 
 - Widening a field to optional wakes a dormant optional-chain equality (`a?.x === y` holds when both are undefined). Tested on a fixture: the weaker model caught it unaided in every rep, so a sentence adds nothing.
