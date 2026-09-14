@@ -83,23 +83,6 @@ A pull request's builds run on its merge ref, not on the source branch: `GET ...
 
 ADO has no equivalent of GitHub's PENDING review: a thread is visible to everyone the moment the POST returns, comments cannot be staged or batched for a later one-shot submission, and the review model is immediate threads plus a vote (Approve / Approve with suggestions / Wait for author / Reject). ADO's "draft" is a PR-level state (the PR isn't ready for review), not a comment state. When the user asks to hold publication (submit later themselves, keep review activity invisible for now): post nothing, say explicitly that ADO cannot stage comments, and leave the findings in `review-findings-<id>.md` — the posting session, on the user's word, is the moment they become visible.
 
-## Work item fields (rich text)
-
-A different API surface from the PR-thread comments above, and its multiline fields (Description, a comment) do not default to Markdown the way a thread comment does. `GET`/`PATCH` a work item and check `multilineFieldsFormat` in the response — a map of field name to `"html"` or `"markdown"`. Every newly created work item defaults every multiline field to `"html"`; sending Markdown syntax into an HTML-formatted field is stored and read back byte-for-byte unchanged (no error), and renders in the UI as literal text — asterisks and brackets visible, not a list.
-
-Switch a field to Markdown with one PATCH that sets the format and a value together — a format-only op errors ("the type changed without a value"):
-
-```json
-[
-  {"op": "add", "path": "/multilineFieldsFormat/System.Description", "value": "Markdown"},
-  {"op": "add", "path": "/fields/System.Description", "value": "<markdown text>"}
-]
-```
-
-After that PATCH, plain CommonMark in later updates renders correctly without repeating the format op. Confirm which format actually landed by reading `multilineFieldsFormat` back — a mismatch between what was sent and what the field claims to be otherwise stays silent.
-
-**In both formats, a raw `<` in the field is read as an unclosed HTML tag and silently truncates everything after it** — no error on write; the field just reads back shorter than what was sent. Escape it (`&lt;`) or keep it inside a code span. (learned from a real work-item update)
-
 ## Reply & resolve (thread disposition, later)
 
 - Reply: `POST .../pullRequests/<id>/threads/<threadId>/comments?api-version=7.1` with `{ "parentCommentId": <first comment id>, "content": "<markdown>", "commentType": 1 }`.

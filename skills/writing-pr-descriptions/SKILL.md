@@ -36,7 +36,7 @@ An existing body's section layout may stay — the contract governs content shap
 
 ## The author's reviewer-facing summary comment
 
-The same contract governs the **author's** "changes since the last review pass" comment — and any other living status comment the author maintains, on an issue as much as a PR (distinct from review findings, which are the reviewer's and go inline). It is one living record, edited in place, never a stack: multiple summary comments accumulate over a PR's life and bury the one reviewers should read.
+The same contract governs the **author's** "changes since the last review pass" comment — and any other living status comment the author maintains, on an issue as much as a PR (distinct from review findings, which are the reviewer's and go inline). It is one living record, edited in place, never a stack: multiple summary comments accumulate over a PR's life and bury the one reviewers should read. On a tracker item the comment is a rich-text field, and `landing-merged-work` owns the format trap: read the field's format back before writing, since Markdown into an HTML field renders literally and the read-back does not catch it.
 
 1. **At most one living summary comment at a time**, created on the first changes-since-review sync. Note its id.
 2. **Every later update edits it in place:** fetch the current body and PATCH it back (GitHub: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<id>`; Azure DevOps: update the existing thread comment rather than posting a new thread), restructured to the current state. Stale "what changed last week" content is replaced, not appended to.
