@@ -134,20 +134,25 @@ wording that read fine to the author is what a weaker model negotiated with.
 
 `evals/` holds the cases, in the layout `claude plugin eval` expects: one
 directory per case with `prompt.md` (frontmatter: runs, tools, limits),
-`graders/*.md` (one grader per file), and `case.yaml` whose scaffold script
-builds the fixture repo from `evals/fixtures/`. Run with `--scaffold`, pin
-the model with `--model`, and read the ablation arm - the command runs each
-case with and without the plugin, which is the baseline for free:
+`graders/*.md` (one grader per file; an `llm` grader's rubric is the file
+body, and `focus: {source: file, path: ...}` points it at a file the run
+left behind), `case.yaml` naming a `fixture.sh` beside it as the scaffold,
+and that script building the fixture repo from `evals/fixtures/`. The
+scaffold runs inside the empty run workspace, with no arguments and no
+environment, and `$0` is the script's own absolute path in the case
+directory — which is how `fixture.sh` reaches the shared fixtures. Run with
+`--scaffold`, grant the tools the cases use (the case's own `allowed_tools`
+cannot widen the read-only set), pin the model with `--model`, and read the
+ablation arm - the command runs each case with and without the plugin,
+which is the baseline for free:
 
-    claude plugin eval . --scaffold --model sonnet --runs 5
+    claude plugin eval . --scaffold --allow-tools Bash Write Edit Agent --model sonnet --runs 5
 
-The command is early-access and was not enabled when the suite was written,
-so two things are unconfirmed and marked in the case files: the scaffold's
-working directory (the cases assume the plugin root), and whether an `llm`
-grader accepts a file target. Fix them once when the command first runs and
-delete this sentence.
-
-Until it runs here, the same test is done by hand:
+A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
+start when the Docker configuration directory in the home folder contains
+a symbolic link (Docker Desktop's CLI plugins are links); the run then
+reports an error on every case and costs nothing. Until the machine allows
+it, the same test is done by hand:
 
 1. Build one fixture per run with the case's own script
    (`sh evals/fixtures/<name>.sh <empty dir>`).

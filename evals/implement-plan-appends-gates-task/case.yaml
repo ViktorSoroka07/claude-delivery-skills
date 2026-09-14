@@ -1,12 +1,4 @@
 schema_version: "1.1"
 name: implement-plan-appends-gates-task
 context:
-  # The scaffold's working directory is not documented for this early-access
-  # command. This assumes it is the plugin root and the run workspace is a
-  # separate empty directory named by $PWD at agent time; if the command
-  # reports the fixture script as missing, fix the path here once and note
-  # the answer in CONTRIBUTING's "Testing a wording change".
-  scaffold_script: |
-    f=evals/fixtures/refund-console.sh
-    [ -f "$f" ] || { echo "scaffold: $f not found from $(pwd); see CONTRIBUTING" >&2; exit 1; }
-    sh "$f" . with-plan >/dev/null
+  scaffold_script: fixture.sh
