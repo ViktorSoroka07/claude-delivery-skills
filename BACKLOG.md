@@ -25,6 +25,8 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A branch created from a remote ref inherits that ref as its upstream, so a later plain push from it lands on the remote's default branch; create it with `--no-track` (or unset the upstream afterwards) and, when the user pushes themselves, hand over an explicit `push -u origin <name>` and confirm the branch shows no upstream before handing over. → finishing-a-development-branch, landing-merged-work
 - "Ready to push" is a done-claim whose only evidence is the pre-push chain run on the final committed tree with a clean status, from the repo root, with its last line quoted; a gate that ran before the last edit or from a subdirectory, a hook that ran on an earlier commit, or a push the harness denied is not that evidence, and the user pushing into a failure is the symptom. → implementation-gates
 
+- Outward-facing output is published only once every dispatched agent has reported: confirm none is still running rather than watching the one whose result you happen to be waiting for, because work you dispatched yourself is part of the job and a closing report that lands after the conclusion means the conclusion was premature. → verifying-before-sending, review-pr posting
+
 ## Medium — real, narrower, or partly covered
 
 - Compound mutations are split, since a kill proves some operand is pinned, never all; a mutation that fails to compile is evidence in neither direction and is restated until it builds. → implementation-gates
