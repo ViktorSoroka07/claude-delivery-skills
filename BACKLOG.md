@@ -29,6 +29,8 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 
 - A finding that states an open question inside itself is a signal to hold, never a disclaimer that licenses publishing, because the pending answer can invert its grade and consequence after the author has already read it; the honesty of the caveat is what makes it look publishable. → review-pr, posting reference
 
+- A surviving mutation means either the assertions are weak or the code has no observable effect, and only deleting the feature outright separates the two — so where a change's effect is asserted indirectly, one mutation removes the whole registration or call site, and a suite still green proves the assertions pass with the feature absent. → implementation-gates
+
 ## Medium — real, narrower, or partly covered
 
 - Compound mutations are split, since a kill proves some operand is pinned, never all; a mutation that fails to compile is evidence in neither direction and is restated until it builds. → implementation-gates
