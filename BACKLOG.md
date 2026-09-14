@@ -23,6 +23,7 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - A ticket asking another team for a decision states the capability requirements the dependent work relies on, not only the risks, or the decider optimises the only dimension shown. → reporting-defects-upstream
 - An assertion that an event did not occur passes silently when its observation window closes before the action runs or when its matcher has quietly stopped matching, so the window covers the whole action and any guard proving the matcher still fires observes an event the system under test produced, never a literal restated in the test. → implementation-gates
 - A branch created from a remote ref inherits that ref as its upstream, so a later plain push from it lands on the remote's default branch; create it with `--no-track` (or unset the upstream afterwards) and, when the user pushes themselves, hand over an explicit `push -u origin <name>` and confirm the branch shows no upstream before handing over. → finishing-a-development-branch, landing-merged-work
+- "Ready to push" is a done-claim whose only evidence is the pre-push chain run on the final committed tree with a clean status, from the repo root, with its last line quoted; a gate that ran before the last edit or from a subdirectory, a hook that ran on an earlier commit, or a push the harness denied is not that evidence, and the user pushing into a failure is the symptom. → implementation-gates
 
 ## Medium — real, narrower, or partly covered
 
