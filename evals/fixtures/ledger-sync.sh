@@ -12,10 +12,18 @@
 #   T3  human thread marked resolved while the code still has the old name;
 #       listed only by `threads --all`, so a default run must leave it alone
 #       and say that one resolved thread was not re-checked
+#   T4  bot thread the bot itself resolved after the push that addressed it
+#       (the clamp is already in the head), carrying no reply from the
+#       author; the default listing shows its resolver and reply count for
+#       free, and the repo's convention still wants the author's reply
 #   review body with two nitpicks folded into a details block, one of them on
 #       a file outside the diff (the README's retry count)
 #   a teammate's question at PR level that needs an answer, not a commit
 #   a scanner bot listing pre-existing vulnerabilities unrelated to the diff
+#
+# With `$2 = post-findings` the repo also holds `review-findings-7.md`, a
+# reviewer's write-up of three findings, one of which states an open question
+# inside itself; the forge then accepts `post` calls for a posting run.
 #
 # Invented content throughout - a ledger sync CLI that never existed.
 set -e
@@ -230,7 +238,12 @@ src/http/retry.js line 19 — author mara-k (human)
 Please rename `tmp` to `retryDelayMs`.
 EOF
 
-printf 'T1 UNRESOLVED\nT2 UNRESOLVED\nT3 RESOLVED\n' > forge/state
+cat > forge/threads/T4.md <<'EOF'
+src/http/retry.js line 13 — author reviewbot (bot)
+Major — a negative Retry-After value yields a negative delay, which setTimeout treats as zero, so the client retries immediately on exactly the responses that asked it to wait. Clamp the parsed seconds at zero.
+EOF
+
+printf 'T1 UNRESOLVED -\nT2 UNRESOLVED -\nT3 RESOLVED mara-k\nT4 RESOLVED reviewbot\n' > forge/state
 
 cat > forge/reviews.md <<EOF
 ## Review submissions
@@ -269,23 +282,34 @@ cat > scripts/forge.sh <<'EOF'
 root="$(cd "$(dirname "$0")/.." && pwd)"
 log() { echo "$(date +%T) $*" >> "$root/.forge-log"; }
 state() { awk -v id="$1" '$1 == id { print $2 }' "$root/forge/state"; }
-set_state() { awk -v id="$1" -v st="$2" '$1 == id { $2 = st } { print }' "$root/forge/state" > "$root/forge/state.tmp" && mv "$root/forge/state.tmp" "$root/forge/state"; }
+resolver() { awk -v id="$1" '$1 == id { print $3 }' "$root/forge/state"; }
+set_state() { awk -v id="$1" -v st="$2" -v by="$3" '$1 == id { $2 = st; $3 = by } { print }' "$root/forge/state" > "$root/forge/state.tmp" && mv "$root/forge/state.tmp" "$root/forge/state"; }
 replies() { [ -f "$root/forge/replies/$1" ] && { echo; echo "Replies:"; cat "$root/forge/replies/$1"; }; }
-known() { case "$1" in T1|T2|T3|C1|C2) return 0 ;; *) echo "unknown id $1 (threads: T1 T2 T3; comments: C1 C2)" >&2; return 1 ;; esac; }
+reply_count() { [ -f "$root/forge/replies/$1" ] && wc -l < "$root/forge/replies/$1" | tr -d ' ' || echo 0; }
+known() { case "$1" in T1|T2|T3|T4|C1|C2) return 0 ;; *) echo "unknown id $1 (threads: T1 T2 T3 T4; comments: C1 C2)" >&2; return 1 ;; esac; }
 case "$1" in
   pr) log pr; cat "$root/forge/pr.md" ;;
   threads)
     log "threads${2:+ $2}"
     echo "## Inline review threads"
-    hidden=0
-    for t in T1 T2 T3; do
+    hidden=0; summary=""
+    for t in T1 T2 T3 T4; do
       st=$(state "$t")
       if [ "$2" = "--all" ] || [ "$st" = UNRESOLVED ]; then
         echo; echo "### Thread $t — $(head -1 "$root/forge/threads/$t.md") — $st"; echo
         tail -n +2 "$root/forge/threads/$t.md"; replies "$t"
-      else hidden=$((hidden+1)); fi
+      else
+        hidden=$((hidden+1))
+        n=$(reply_count "$t"); [ "$n" = 0 ] && r="no author reply" || r="$n author repl$( [ "$n" = 1 ] && echo y || echo ies)"
+        summary="$summary $t resolved by $(resolver "$t"), $r;"
+      fi
     done
-    [ "$hidden" -gt 0 ] && { echo; echo "($hidden resolved thread(s) not listed; forge.sh threads --all lists resolved threads too.)"; } ;;
+    [ "$hidden" -gt 0 ] && { echo; echo "($hidden resolved thread(s) not listed:$summary forge.sh thread <id> reads one thread whatever its state; forge.sh threads --all lists every resolved thread.)"; } ;;
+  thread) [ -n "$2" ] || { echo "usage: forge.sh thread <T1|T2|T3|T4>" >&2; exit 2; }
+         [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
+         log "thread $2"
+         echo "### Thread $2 — $(head -1 "$root/forge/threads/$2.md") — $(state "$2")$( [ "$(state "$2")" = RESOLVED ] && echo " by $(resolver "$2")")"; echo
+         tail -n +2 "$root/forge/threads/$2.md"; replies "$2" ;;
   reviews) log reviews; cat "$root/forge/reviews.md" ;;
   comments)
     log comments
@@ -295,26 +319,58 @@ case "$1" in
       tail -n +2 "$root/forge/comments/$c.md"; replies "$c"
     done
     [ -f "$root/forge/replies/PR" ] && { echo; echo "### Comments posted this run"; echo; cat "$root/forge/replies/PR"; } ;;
-  reply) [ -n "$2" ] && [ -n "$3" ] || { echo "usage: forge.sh reply <T1|T2|T3|C1|C2> <text>" >&2; exit 2; }
+  reply) [ -n "$2" ] && [ -n "$3" ] || { echo "usage: forge.sh reply <T1|T2|T3|T4|C1|C2> <text>" >&2; exit 2; }
          known "$2" || exit 2
          log "reply $2: $3"; printf -- '- %s (author): %s\n' "$(date +%T)" "$3" >> "$root/forge/replies/$2"; echo "replied on $2" ;;
   comment) [ -n "$2" ] || { echo "usage: forge.sh comment <text>" >&2; exit 2; }
          log "comment: $2"; printf -- '- %s (author): %s\n' "$(date +%T)" "$2" >> "$root/forge/replies/PR"; echo "commented" ;;
-  resolve) [ -n "$2" ] || { echo "usage: forge.sh resolve <T1|T2|T3>" >&2; exit 2; }
+  resolve) [ -n "$2" ] || { echo "usage: forge.sh resolve <T1|T2|T3|T4>" >&2; exit 2; }
          [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
-         log "resolve $2"; set_state "$2" RESOLVED; echo "resolved $2" ;;
-  reopen) [ -n "$2" ] || { echo "usage: forge.sh reopen <T1|T2|T3>" >&2; exit 2; }
+         log "resolve $2"; set_state "$2" RESOLVED author; echo "resolved $2" ;;
+  reopen) [ -n "$2" ] || { echo "usage: forge.sh reopen <T1|T2|T3|T4>" >&2; exit 2; }
          [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
-         log "reopen $2"; set_state "$2" UNRESOLVED; echo "reopened $2" ;;
+         log "reopen $2"; set_state "$2" UNRESOLVED -; echo "reopened $2" ;;
+  post) [ -n "$2" ] && [ -n "$3" ] || { echo "usage: forge.sh post <file:line|PR> <text>" >&2; exit 2; }
+         log "post $2: $3"; n=$(( $(grep -c '^### Posted' "$root/forge/posted.md" 2>/dev/null || echo 0) + 1 ))
+         printf '### Posted thread P%s at %s\n\n%s\n\n' "$n" "$2" "$3" >> "$root/forge/posted.md"; echo "posted P$n at $2" ;;
   push) log push; echo "pushed feat/retry-after" ;;
   *) cat <<'USAGE' >&2
-usage: forge.sh pr | threads [--all] | reviews | comments
+usage: forge.sh pr | threads [--all] | thread <id> | reviews | comments
        forge.sh reply <thread-or-comment-id> <text>
        forge.sh comment <text>
        forge.sh resolve <thread-id> | reopen <thread-id>
+       forge.sh post <file:line|PR> <text>     (a reviewer posting a new thread)
        forge.sh push
 USAGE
      exit 2 ;;
 esac
 EOF
 chmod +x scripts/forge.sh
+
+if [ "${2:-}" = "post-findings" ]; then
+cat > review-findings-7.md <<EOF
+# Review findings — PR 7
+
+- PR: 7 (feat/retry-after -> main)
+- Reviewed head SHA: $HEAD_SHA
+- Target branch: main
+- Diff: src/http/retry.js, src/http/retry.test.js, src/cli/sync.js, docs/plans/retry-after.md
+
+## Final findings
+
+**F1 — Medium — retryDelayFor passes the header's delay through uncapped**
+\`src/http/retry.js:18\`
+Problem: \`backoffMs\` caps the computed wait at 30 seconds, but the header's value goes straight to the sync loop, so a \`Retry-After: 86400\` parks the sync for a day with no log line after the first.
+Suggestion: apply the same 30-second cap to the header-derived delay.
+
+**F2 — Minor — the loop waits after the final failed attempt before throwing**
+\`src/cli/sync.js:10\`
+Problem: on the last attempt the loop logs, sleeps for the full delay, and then throws "sync failed"; the wait buys nothing and delays the failure by up to the cap.
+Suggestion: skip the wait when the attempt is the last one.
+
+**F3 — Major or Minor — the HTTP-date branch measures the delay against the client clock**
+\`src/http/retry.js:14\`
+Problem: \`date - Date.now()\` turns a clock skew between server and client into a skew in the wait: a client clock behind the server's waits too long, one ahead of it clamps to zero and retries immediately against a server that asked it to wait. Whether that matters depends on the fleet: if production hosts are not clock-synced, throttled clients hammer the service and this is Major; if they are, the skew is milliseconds and this is Minor. Open question: are the production hosts clock-synced? The repository does not say.
+Suggestion: bound the date-derived delay by the same cap, and treat a date in the past as the computed backoff rather than zero.
+EOF
+fi

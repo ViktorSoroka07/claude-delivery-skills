@@ -110,3 +110,16 @@ that did so also read the resolved thread's body from disk, which no grader
 reading the log can see. A real forge is not a directory; the next fixture
 revision should put the data where a repository search does not find it
 (recorded in the review findings as B3).
+
+## The bot-resolved thread (rule queued, not landed)
+
+The fixture gained T4, a thread its own bot resolved after the push that
+addressed it, with no author reply, and the forge gained `thread <id>` so a
+single resolved thread can be read without listing them all. Five baseline
+reps on the current text left T4 without a reply in every rep. Three
+wordings of a rule making such a thread a row of the default inventory each
+produced a reply on T4 in five of five reps — and each also sent the model
+to read T3, the human-resolved thread beside it, in four of five reps, with
+one to three reps then applying T3's rename; the current text produces
+neither. The rule is back in the backlog with that finding; the fixture and
+the `thread` command stay for the next attempt.

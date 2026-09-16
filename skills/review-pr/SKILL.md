@@ -129,13 +129,13 @@ Then merge in the main conversation (both modes):
 
 ## 5. Output — MD file, not chat
 
-Save `review-findings-<id>.md` in the repo root (untracked), using the `<id>` from section 1. Header line first: PR id/URL, the reviewed head SHA, and the target branch — posting-time re-verification keys off that SHA. Sections:
+Save `review-findings-<id>.md` in the repo root (untracked), using the `<id>` from section 1, and only once every dispatched axis agent has reported (`verifying-before-sending` owns that gate: a closing report that lands after the conclusion means the conclusion was premature). Header line first: PR id/URL, the reviewed head SHA, and the target branch — posting-time re-verification keys off that SHA. Sections:
 
 1. **Pass 1 findings** — the draft list, graded.
 2. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
 3. **Final findings** — the merged list, organized by severity.
 
-In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
+In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. An untracked file in the repo root is exposed to the repo's own automation: a pre-commit hook that stashes and restores the tree can delete it on the author's next commit, and a formatting gate that runs over every file can block their next push on it. Check the repo's hooks and gates for either (the repo-conventions axis has read them), and where one exists say so beside the path in the hand-off, so the author moves or excludes the file before it costs them a commit. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
 
 ## 6. Posting and applying (later asks only)
 
