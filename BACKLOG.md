@@ -63,3 +63,4 @@ Nothing here is pre-approved; the tiers are the maintainer's current read.
 - Posting-script encoding traps. The content read-back already catches the outcome.
 - History sanitizing as a skill. CONTRIBUTING's domain.
 - Filing a new index line under its heading rather than at the file's end. Tested on a fixture: the weaker model filed it under the matching heading unaided in every rep, so a sentence adds nothing.
+- Reading a survived row in a mutation record as the author's disclosed gap rather than a contradicted claim. Tested on the record fixture with a disclosed survivor: the weaker model kept it unflagged unaided in every rep (five hand runs and one runner run), so a sentence adds nothing.
