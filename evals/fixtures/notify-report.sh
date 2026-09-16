@@ -10,8 +10,9 @@
 # priorities, phrases
 # its suggestion as an instruction, predicts the change's effect in their
 # codebase by analogy, describes their code with disposal imagery, carries a verdict and
-# an estimate in the title, and bundles a second mechanism whose fix lives in
-# a different module.
+# an estimate in the title, bundles a second mechanism whose fix lives in
+# a different module, and asks the owner to choose between options by their
+# risks alone, without the two things the caller's own flow relies on.
 #
 # Invented content throughout - a notification service that never existed.
 set -e
@@ -57,6 +58,11 @@ Separately, across all four categories, 37 of the 4,000 rendered messages
 came out in the default language although the recipient carried another
 locale. All 37 recipients had the locale set on their profile record and not
 on their notification-preference record.
+
+The invoice-reminder flow relies on two things from the service. Retry on
+timeout stays enabled on our side: a dropped reminder is a missed payment.
+And no recipient receives the same reminder twice: each carries a one-time
+payment link, and the second link invalidates the first.
 EOF
 
 cat > vendor-notes/notify/client.js <<'EOF'
@@ -128,6 +134,14 @@ Key the dedupe on message id at enqueue time instead of on the batch key.
 `hashKey` and the `seen` map are already there, so this is more a re-keying
 than new logic. Since single sends already key on the message id, the other
 channels would carry on as they do now.
+
+## Options for the service team
+
+Option A: key the dedupe on message id at enqueue. Risk: a caller that relies
+on batch-level idempotency would see per-message behaviour instead.
+
+Option B: callers disable retry on batch calls. Risk: a batch that times out
+is not re-sent.
 
 ## Also: locale
 

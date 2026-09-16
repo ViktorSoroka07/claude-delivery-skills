@@ -10,3 +10,15 @@ Hand-run per CONTRIBUTING's "Testing a wording change", the plugin eval command 
 Baseline reads: every rep named the two dead directories, called them decoys or other checkouts, and left them in place. Treatment reads: every rep listed the store against the disk, checked mtimes, deleted both, and declined to carry the twin's contradicting note into the live memory.
 
 Declined from the same run: a sentence telling the writer to file a new index line under its heading rather than at the file's end. The baseline filed it under the matching heading in every rep, so the sentence adds nothing; it stands in BACKLOG's declined section.
+
+## The absence-check rule
+
+The fixture gained a "no CI" entry recorded from observed absence that the
+checkout has since falsified (it carries a workflow file), graded by
+`re-runs-the-absence-check`. Five fresh Sonnet reps on the current skill
+text, the pruning-pass prompt verbatim: every rep read the checkout, found
+the workflow file, and deleted the entry with its index line as answered by
+the repo. The baseline does not fail, so the sentence proposed for the
+pruning pass (re-check an entry recorded from absence rather than re-read
+it) was declined; `BACKLOG.md` carries the line. The grader stays as a
+regression guard on the behaviour the current text already produces.

@@ -58,3 +58,16 @@ the frame makes it an option, and those runs are graded that way.
 
 The "never price their work" rule against a hedged estimate that names no
 shape at all ("probably small on your side"); the fixture's is shaped.
+
+## The dependent-requirement rule
+
+The fixture's draft gained an options section listing one risk per option,
+and the notes gained the two things the caller's invoice-reminder flow
+relies on (retry stays enabled; no recipient gets a reminder twice), graded
+by `states-the-dependent-requirement`. Five fresh Sonnet reps on the current
+skill text, the prompt verbatim: every rep pulled both requirements from the
+notes and set them beside the options, in a section of their own or under
+the consequence, and left the choice with the owner. The baseline does not
+fail, so the bullet proposed for "Decisions that belong to the owner" was
+declined; `BACKLOG.md` carries the line. The grader stays as a regression
+guard.
