@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: review-pr-axis-reads-without-fixing
+context:
+  scaffold_script: fixture.sh
