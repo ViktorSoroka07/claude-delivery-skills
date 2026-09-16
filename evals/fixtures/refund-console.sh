@@ -106,7 +106,7 @@ cat > src/detailPage.js <<'EOF'
 import { renderSummary } from './summary.js';
 
 export async function renderDetailPage(batch) {
-  return { title: `Batch ${batch.id}`, sections: [renderSummary(batch)] };
+  return { title: 'Batch', sections: [renderSummary(batch)] };
 }
 EOF
 
@@ -206,7 +206,8 @@ if [ "${2:-}" = "record-offplan" ]; then
   cat > docs/reviews/task-102-resolution.md <<'EOF'
 # Review resolution — request table mount
 
-Two findings raised, both fixed. Build clean; 2 tests pass.
+Four findings raised, all fixed; three confirmed by mutation, one survivor
+recorded. Build clean; 3 tests pass.
 
 ## Finding 1 — the table rendered before the summary
 
