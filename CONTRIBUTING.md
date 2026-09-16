@@ -191,6 +191,11 @@ Rules that held in practice, each answering a failure seen here:
   binding.** Restate it as what the output *is* rather than adding words.
 - **A grader asks for the failing sentence to be quoted**, so its verdict can
   be audited.
+- **The fixture carries one defect: the one under test.** A judge grades
+  whatever contradiction it finds, so a header that miscounts its own body or
+  a fix the base already had fails the rule's grader on a defect the rule had
+  nothing to do with, and the verdict reads as the rule's. Read the fixture
+  as the judge will before its first run.
 - **A second fixture in a domain unlike the skill's own examples is worth more
   than a sixth rep.** It is the only way to tell a learned category from an
   echoed example.
