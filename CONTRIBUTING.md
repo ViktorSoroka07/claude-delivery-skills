@@ -196,6 +196,12 @@ Rules that held in practice, each answering a failure seen here:
   a fix the base already had fails the rule's grader on a defect the rule had
   nothing to do with, and the verdict reads as the rule's. Read the fixture
   as the judge will before its first run.
+- **Both arms are graded on every grader of the case, never on the new one
+  alone.** A rule can reach its own grader in every rep while sending the
+  model into a behaviour a neighbouring grader forbids; the baseline arm
+  shows which graders the current text already passes, and a rule that
+  loses one of them has not earned its place however well it scores on its
+  own.
 - **A second fixture in a domain unlike the skill's own examples is worth more
   than a sixth rep.** It is the only way to tell a learned category from an
   echoed example.
