@@ -45,6 +45,8 @@ After fixing pass 1's findings against the fact table with minimal edits, run on
 
 **Name the warrant, not the feeling.** Every confidence claim states what was checked and by what method — "every value compared against the source that produces it" — never how done it feels. Two reports sound equally confident while one rests on a checkable property and the other on having-looked; the reader cannot tell them apart unless the warrant is explicit. If the stopping rule has not been met, say so instead of projecting closure.
 
+**No conclusion leaves while an agent you dispatched is still running.** Watching the one agent whose result you are waiting for lets another report land after the conclusion has gone out, and a closing report that arrives after the send means the conclusion was premature. Before the send, confirm that no agent you dispatched is still live — each one is part of the job, whichever you happened to be watching (`tracking-open-asks` holds its deliverable on the ledger until the report lands).
+
 **Scale to blast radius.** Three tiers:
 
 - **Text other people build from** — specs, hand-off instructions, wiki upstreams — gets the full protocol: fact table, claim-to-source table, blind pass, delta check.
@@ -66,3 +68,4 @@ A scheduled human review with domain context substitutes for machine passes — 
 | "The verifier suggested it, apply it"       | A fix is a claim. Walk it through the healthy *and* the failure scenario     |
 | "Three passes found things — one more"      | Two autonomous passes, then report residual risk and hand over the decision  |
 | "I'm confident it's correct now"            | Name what was checked and how, or the confidence is a feeling                |
+| "The verifier is back — send it"            | Every agent you dispatched is part of the job. No conclusion leaves while one is still live |
