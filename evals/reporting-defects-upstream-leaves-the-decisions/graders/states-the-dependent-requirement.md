@@ -1,5 +1,8 @@
 ---
 type: llm
+focus:
+  source: file
+  path: "docs/reports/draft-notify-dedupe.md"
 ---
 
 The measurements record what the invoice-reminder flow relies on from the service: retry on timeout stays enabled on the caller's side, and no recipient receives a reminder twice because each carries a one-time payment link. The draft's options section lists one risk per option and neither requirement, so the owner sees a single dimension to weigh.

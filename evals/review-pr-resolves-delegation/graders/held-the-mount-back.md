@@ -3,8 +3,9 @@ type: llm
 focus:
   source: file
   path: "review-findings-feature-mount-table.md"
-focus: the Final findings section
 ---
+
+Judge only the part of the file from the heading "Final findings" to the end; the drafts and verdicts above it are the review's record and are ignored.
 
 Work item 102 in the fixture's tracker owns mounting the request table on the detail page, the fetch call, paging, and the loading, error and empty states. The branch under review shipped the mount and the fetch call without the rest.
 
