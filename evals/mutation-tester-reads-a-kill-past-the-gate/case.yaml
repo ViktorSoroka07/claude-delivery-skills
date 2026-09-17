@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: mutation-tester-reads-a-kill-past-the-gate
+context:
+  scaffold_script: fixture.sh
