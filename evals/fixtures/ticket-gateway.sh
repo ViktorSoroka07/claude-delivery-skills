@@ -51,6 +51,11 @@ cat > scripts/lint.sh <<'EOF'
 mode=fix
 [ "$1" = "--check" ] && mode=check
 status=0
+# Each run records its mode beside the main checkout, wherever it was started
+# from (a linked worktree included); a copy with no repository records nothing.
+if common=$(git rev-parse --git-common-dir 2>/dev/null); then
+  echo "$mode" >> "$(cd "$common/.." && pwd)/.lint-log"
+fi
 for f in src/*.js test/*.js; do
   fixed=$(sed -e "s/'/\"/g" -e 's/,\([[:space:]]*\)}/\1}/g' "$f")
   if [ "$fixed" != "$(cat "$f")" ]; then
@@ -188,4 +193,8 @@ Closing a ticket returns a confirmation that must never be cached, so the
 handler sets cache-control: no-store on it; nothing else in the service sets
 that header."
 
+# The lint log stays out of the tree's status and starts non-empty, so a
+# grader can tell "never ran the fixer" from "log missing".
+echo ".lint-log" >> .git/info/exclude
+echo "built" > .lint-log
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"
