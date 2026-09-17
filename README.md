@@ -212,7 +212,9 @@ process defect with a cause to fix, and stop what you started.
 When the requester has to re-ask, they have paid twice: once waiting, once auditing.
 Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
-ledger, not the items that happened to finish.
+ledger, not the items that happened to finish. The ledger runs both ways: what waits on
+the requester is restated at the end of every message until it is answered, so an open
+question never has to be found by re-reading the conversation.
 
 **[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**
 Looping `pull` over a workspace breaks on exactly the repos that matter: the one parked
@@ -254,7 +256,7 @@ instructions alone cannot:
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero
-    comments by default. Each is a pointer to the skill that owns it plus a
+    comments by default, every message ends with what waits on the requester. Each is a pointer to the skill that owns it plus a
     one-sentence core, so a user's `CLAUDE.md` no longer needs a copy — they travel
     with the plugin. The text is [`hooks/session-brief.md`](hooks/session-brief.md).
 

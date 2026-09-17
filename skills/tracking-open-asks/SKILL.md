@@ -21,6 +21,14 @@ An ask leaves the ledger in exactly one of four states, each stated to the reque
 
 At any checkpoint, and always at session end, status covers the **whole ledger**, not the items that happened to finish: done items with their evidence, open items with their state, and nothing omitted because it is embarrassing or stale. The closing message answers every still-open item before the next-session starter prompt; an item whose closure was already stated to the requester needs no restating, so a fully-closed ledger's closing is the starter prompt alone (`maintaining-project-memory` owns the closing's form).
 
+## What waits on the requester is on the ledger too
+
+The ledger runs in both directions. A question put to the requester, a decision handed to them, an action only they can take (a push, an approval, a login) is an open item from the moment it is asked. It is lost faster than their own asks are: the message that asked it is followed by messages of work, and a requester who comes back finds it only by re-reading the conversation.
+
+- **Every message that ends while such items are open closes with all of them**, not only the ones that message raised, and including the ones the requester has said they know about and will get to: an acknowledgement is not an answer, and "your two questions are still open" is a reference to the list, not the list. Each item is restated as the question itself. One item is a sentence; two or more are a numbered table: what is needed, what it blocks, and what happens if no answer comes — the default that will be taken, or that the work waits. The numbers stay the same from message to message, so the requester can answer "2: yes" without quoting anything.
+- **An item leaves the table in one of two ways, each stated:** the requester answered it, or the work went ahead on the default the table named. An item that simply stops being listed is the silent closure the section above forbids, pointed the other way.
+- **Work that does not depend on an open item carries on.** The table is the closing of a message, never a reason to stop.
+
 ## Red flags
 
 | Thought                                        | Reality                                                                    |
@@ -30,3 +38,5 @@ At any checkpoint, and always at session end, status covers the **whole ledger**
 | "I reported what I finished"                   | The requester needs the whole ledger — open items are the report's point   |
 | "The agent will deliver it eventually"         | A promised deliverable is an open ask until the report lands               |
 | "That item became moot"                        | Moot is a closure to state, not a silence                                  |
+| "I asked that two messages ago, they saw it" | They saw it before three screens of work. Repeat it in the closing table until it is answered |
+| "Only the new question belongs in this message" | The table is the whole set. A partial one teaches the requester to go back and search |

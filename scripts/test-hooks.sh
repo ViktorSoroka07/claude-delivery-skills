@@ -237,7 +237,7 @@ out=$(printf '{"hook_event_name":"SessionStart","source":"startup"}' | "$PY" "$B
 check "session brief exits 0" 0 $?
 ctx=$(printf '%s' "$out" | "$PY" -c 'import json,sys; d=json.load(sys.stdin)["hookSpecificOutput"]; assert d["hookEventName"]=="SessionStart"; print(d["additionalContext"])' 2>/dev/null)
 check "session brief output is the SessionStart JSON shape" 0 $?
-for s in writing-for-audiences review-pr maintaining-project-memory writing-code-comments; do
+for s in writing-for-audiences review-pr maintaining-project-memory writing-code-comments tracking-open-asks; do
   contains "session brief names $s" "$ctx" "delivery-skills:$s"
 done
 printf '' | "$PY" "$BRIEF_HOOK" >/dev/null 2>&1
