@@ -53,6 +53,30 @@ own settings, output style included, which the subagents did not; the three
 deciding graders read the file and the reply's counts, which a style does
 not reach.
 
+## The same case through the runner
+
+One run of `claude plugin eval` on this case alone, five runs per arm, the
+runner's own arms (the plugin, and no plugin at all), its default judge. All
+ten runs completed and wrote the findings file.
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| packing-table-written (with-only) | | 5/5 |
+| packing-obeys-its-limits (with-only) | | 4/5 |
+| report-counts-both-ways (with-only) | | 4/5 |
+| refuted-draft-dropped | 5/5 | 5/5 |
+| default-list-kept-whole | 3/5 | 3/5 |
+| report-keeps-the-bodies-out | 0/5 | 1/5 |
+
+Where the rubric names something a reader can point at, the judge agrees
+with the hand grades. On the two rubrics that ask it to weigh a whole
+findings file or the tone of a reply it is far stricter than the hand
+grades, the same in both arms, and its three votes split on some runs; the
+runner itself warns that a judge is unreliable on a file this long. Those
+two rubrics want narrowing before their runner scores mean anything: the
+first to the final section alone, the second to a statement of what a
+one-line index may carry (a title, a grade, an anchor) and what it may not.
+
 ## Not tested
 
 The trigger: "my review … finish the review" names the activity. The
