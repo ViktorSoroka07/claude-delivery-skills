@@ -30,6 +30,33 @@ non-fixing form or a scratch copy. One first-wording rep ran git write
 commands in the read tree to compare against main and restored it. Trees
 were clean at the end of every rep.
 
+## Conventions axis, second round
+
+The contract said of the file's own drift both "reported once at the file"
+and, in the never-raise list, never raise; the first round's reps split three
+to two on it. The never-raise entry is gone, the rule now says to file it
+once as a minor addressed to the repo, and a file the change creates is
+graded against the convention as written. Run as fresh headless sessions
+started as the agent (`claude -p --agent`), five per wording, since a
+dispatched subagent gets the contract its parent session loaded at start.
+
+| | Drift filed once at the file | Git write commands in the read tree |
+|---|---|---|
+| First round's text (its record above) | 3/5 | 1/5 seen |
+| Contradiction removed | 4/5 | 4/5 |
+| The same, plus a clause that notes are not findings | 4/5 | 5/5 |
+| Clause dropped; boundary names the scratch export | 5/5 | 0/5 |
+
+The clause moved nothing and was dropped. The second column was not what the
+round set out to measure: nine sessions in ten stashed the tree and checked
+the base branch out over it, then restored it, to learn whether the red lint
+gate was already red on the base. The boundary forbade the write and offered
+no other way to answer a question the axis has to ask. It now names one,
+exporting the base into a scratch directory and running the gate there; with
+it no session wrote to the tree and four of five used the export. Trees were
+clean at the end of every run in every row, which is why a grader that reads
+only the final tree never saw this.
+
 ## Correctness axis
 
 | Grader | Baseline |
