@@ -10,6 +10,9 @@
 #      artifact that is not the plan.
 # $2 = "plan-drafted" to leave the session on a branch the user already created
 #      for the next task, with that task's approved plan drafted but uncommitted.
+# $2 = "plan-drafted-published" is "plan-drafted" on a branch that is already
+#      published: a bare remote sits in the workspace and the branch tracks the
+#      remote branch of its own name, the state `push -u` leaves.
 # $2 = "plan-on-branch" to commit the next task's plan on the branch created for
 #      it and leave the session there, ready for implementation.
 #
@@ -257,8 +260,18 @@ fi
 
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"
 
-if [ "${2:-}" = "plan-drafted" ] || [ "${2:-}" = "plan-on-branch" ]; then
+if [ "${2:-}" = "plan-drafted" ] || [ "${2:-}" = "plan-on-branch" ] || [ "${2:-}" = "plan-drafted-published" ]; then
   git checkout -qb feature/request-list
+  if [ "${2:-}" = "plan-drafted-published" ]; then
+    echo ".origin.git/" >> .git/info/exclude
+    git clone -q --bare . .origin.git
+    git -C .origin.git symbolic-ref HEAD refs/heads/main
+    git remote add origin .origin.git
+    git fetch -q origin
+    git remote set-head origin main
+    git branch -q --set-upstream-to=origin/feature/request-list feature/request-list
+    git branch -q --set-upstream-to=origin/main main
+  fi
   cat > docs/plans/task-102.md <<'EOF'
 # Task 102 — Batch detail request list: status filter, paging and states
 
