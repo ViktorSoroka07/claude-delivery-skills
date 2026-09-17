@@ -25,6 +25,12 @@
 # reviewer's write-up of three findings, one of which states an open question
 # inside itself; the forge then accepts `post` calls for a posting run.
 #
+# With `$2 = merge-findings` the branch also carries three user docs that
+# misdescribe the code, and `review-findings-7.md` holds a review finished
+# through Pass 2 with no final section: four minors of one defect class over
+# three files, a medium of that class, a medium and a minor of other classes,
+# and one refuted draft.
+#
 # Invented content throughout - a ledger sync CLI that never existed.
 set -e
 T=${1:?target directory}
@@ -201,6 +207,36 @@ The remote service sends `Retry-After` on 429 and 503. The client backs off on i
 - Jitter on the computed backoff.
 EOF
 
+FILES_CHANGED="src/http/retry.js, src/http/retry.test.js, src/cli/sync.js, docs/plans/retry-after.md"
+if [ "${2:-}" = "merge-findings" ]; then
+FILES_CHANGED="$FILES_CHANGED, docs/retry.md, docs/cli.md, docs/faq.md"
+cat > docs/retry.md <<'EOF'
+# Retries
+
+The computed backoff doubles on every attempt and is capped at 60 seconds.
+
+A `Retry-After` header is read as a number of milliseconds.
+
+A `Retry-After` header given as an HTTP-date is ignored, and the computed backoff is used instead.
+EOF
+
+cat > docs/cli.md <<'EOF'
+# Command line
+
+`ledger-sync` pushes the local ledger and retries on failure.
+
+Each retry writes one line to stdout, so redirect stdout to keep a record.
+EOF
+
+cat > docs/faq.md <<'EOF'
+# FAQ
+
+## How many times is a failed sync retried?
+
+Up to 3 times, after which the command exits with "sync failed".
+EOF
+fi
+
 git add -A
 git commit -q -m "Honour Retry-After on failed syncs
 
@@ -215,7 +251,7 @@ cat > forge/pr.md <<EOF
 PR 7 — Honour Retry-After on failed syncs
 branch: feat/retry-after -> main
 head: $HEAD_SHA (pushed; matches local HEAD)
-files changed: src/http/retry.js, src/http/retry.test.js, src/cli/sync.js, docs/plans/retry-after.md
+files changed: $FILES_CHANGED
 EOF
 
 mkdir -p forge/threads forge/comments forge/replies
@@ -372,5 +408,71 @@ Suggestion: skip the wait when the attempt is the last one.
 \`src/http/retry.js:14\`
 Problem: \`date - Date.now()\` turns a clock skew between server and client into a skew in the wait: a client clock behind the server's waits too long, one ahead of it clamps to zero and retries immediately against a server that asked it to wait. Whether that matters depends on the fleet: if production hosts are not clock-synced, throttled clients hammer the service and this is Major; if they are, the skew is milliseconds and this is Minor. Open question: are the production hosts clock-synced? The repository does not say.
 Suggestion: bound the date-derived delay by the same cap, and treat a date in the past as the computed backoff rather than zero.
+EOF
+fi
+
+if [ "${2:-}" = "merge-findings" ]; then
+cat > review-findings-7.md <<EOF
+# Review findings — PR 7
+
+- PR: 7 (feat/retry-after -> main)
+- Reviewed head SHA: $HEAD_SHA
+- Target branch: main
+- Diff: $FILES_CHANGED
+
+## Pass 1 — draft findings
+
+**D1 — Minor — the retry guide states a 60-second cap and the code caps at 30**
+\`docs/retry.md:3\`
+Problem: the guide says the computed backoff "is capped at 60 seconds"; \`backoffMs\` in \`src/http/retry.js:6\` caps it at \`30_000\` ms, so an operator sizing a timeout from the guide allows twice the wait the client ever takes.
+Suggestion: replace "capped at 60 seconds" with "capped at 30 seconds". Original line 3: "The computed backoff doubles on every attempt and is capped at 60 seconds."
+
+**D2 — Minor — the retry guide says the header is read as milliseconds and the code reads seconds**
+\`docs/retry.md:5\`
+Problem: \`parseRetryAfter\` multiplies the numeric header by 1000 (\`src/http/retry.js:12\`), which is the seconds the HTTP specification defines; the guide's "milliseconds" tells a service owner to send a value a thousand times too large.
+Suggestion: replace "a number of milliseconds" with "a number of seconds". Original line 5: "A \`Retry-After\` header is read as a number of milliseconds."
+
+**D3 — Minor — the command-line guide sends the reader to stdout for retry lines written to stderr**
+\`docs/cli.md:5\`
+Problem: \`logRetry\` writes with \`process.stderr.write\` (\`src/http/retry.js:23\`), so the redirect the guide recommends captures nothing.
+Suggestion: replace line 5 with "Each retry writes one line to stderr, so redirect stderr to keep a record." Original line 5: "Each retry writes one line to stdout, so redirect stdout to keep a record."
+
+**D4 — Minor — the FAQ says a failed sync is retried up to 3 times and the limit is 5**
+\`docs/faq.md:5\`
+Problem: \`MAX_RETRIES\` is 5 (\`src/http/retry.js:3\`) and the sync loop runs to it (\`src/cli/sync.js:5\`).
+Suggestion: replace "Up to 3 times" with "Up to 5 times". Original line 5: "Up to 3 times, after which the command exits with \"sync failed\"."
+
+**D5 — Medium — the retry guide says an HTTP-date header is ignored and the code honours it**
+\`docs/retry.md:7\`
+Problem: \`parseRetryAfter\` falls through to \`Date.parse\` and returns the distance to that date (\`src/http/retry.js:13-14\`), and the sync loop prefers it over the computed backoff. The guide describes the opposite runtime behaviour, so a service owner who reads it sends dates expecting no effect and parks every client until that date.
+Suggestion: replace line 7 with "A \`Retry-After\` header given as an HTTP-date is honoured: the client waits until that date." Original line 7: "A \`Retry-After\` header given as an HTTP-date is ignored, and the computed backoff is used instead."
+
+**D6 — Medium — retryDelayFor passes the header's delay through uncapped**
+\`src/http/retry.js:18\`
+Problem: \`backoffMs\` caps the computed wait at 30 seconds, but the header's value goes straight to the sync loop, so a \`Retry-After: 86400\` parks the sync for a day with no log line after the first.
+Suggestion: apply the same 30-second cap to the header-derived delay.
+
+**D7 — Minor — the loop waits after the final failed attempt before throwing**
+\`src/cli/sync.js:10\`
+Problem: on the last attempt the loop logs, sleeps for the full delay, and then throws "sync failed"; the wait buys nothing and delays the failure by up to the cap.
+Suggestion: skip the wait when the attempt is the last one.
+
+**D8 — Minor — parseRetryAfter returns 0 for an empty header**
+\`src/http/retry.js:11\`
+Problem: \`Number("")\` is 0, so an empty \`Retry-After\` would retry immediately.
+Suggestion: return null for an empty string.
+
+## Pass 2 — verification (one clean-context verifier, then a personal grep-verify of every survivor at $HEAD_SHA)
+
+- D1 CONFIRMED — \`grep -n 30_000 src/http/retry.js\` → line 6; the guide's line 3 reads 60.
+- D2 CONFIRMED — \`* 1000\` at \`src/http/retry.js:12\`.
+- D3 CONFIRMED — \`process.stderr.write\` at \`src/http/retry.js:23\`; no stdout write anywhere in \`src/\`.
+- D4 CONFIRMED — \`MAX_RETRIES = 5\` at \`src/http/retry.js:3\`.
+- D5 CONFIRMED — the date branch at \`src/http/retry.js:13-14\` returns a delay, and \`src/cli/sync.js:8\` prefers it.
+- D6 CONFIRMED — no cap between \`parseRetryAfter\` and the \`setTimeout\` in \`src/cli/sync.js:10\`.
+- D7 CONFIRMED — the \`await\` at \`src/cli/sync.js:10\` runs on every iteration, the last included.
+- D8 REFUTED — \`readHeader\` (\`src/http/headers.js:4-5\`) trims the value and returns undefined for an empty one, so an empty string never reaches \`parseRetryAfter\`.
+- Sweep additions: none.
+- Existing threads on the PR were read before Pass 1: D8 is the bot's open thread T1 re-derived, and no other draft duplicates one.
 EOF
 fi
