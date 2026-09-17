@@ -295,6 +295,8 @@ That's the default path. [`review-pr`](skills/review-pr/SKILL.md) also carries, 
   axis triage
 - **ungrouped** — disables the grouping default; every finding gets its own
   thread
+- **compact** — fewer threads: one defect class becomes one thread, across
+  files
 - **staged posting** — GitHub PENDING reviews, for holding publication until
   you submit
 - **apply mode** — fixes land only after every new test is proven failing
