@@ -26,6 +26,7 @@ cd "$T"
 git init -q -b main
 git config user.email fixture@example.invalid
 git config user.name Fixture
+git config commit.gpgsign false
 
 cat > bin/export.sh <<'EOF'
 #!/bin/sh

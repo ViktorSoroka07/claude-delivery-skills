@@ -6,7 +6,8 @@
 # $2 = "with-plan" to also commit a follow-up plan that lacks a gates task.
 # $2 = "staged-pair" to leave two unrelated edits staged and uncommitted.
 # $2 = "record-offplan" to commit a review-resolution summary carrying an executed
-#      mutation record - three claims, one of which the tree contradicts - in an
+#      mutation record - four findings: three claimed confirmed by mutation,
+#      one of which the tree contradicts, and one disclosed survivor - in an
 #      artifact that is not the plan.
 # $2 = "plan-drafted" to leave the session on a branch the user already created
 #      for the next task, with that task's approved plan drafted but uncommitted.
@@ -28,6 +29,7 @@ cd "$T"
 git init -q -b main
 git config user.email fixture@example.invalid
 git config user.name Fixture
+git config commit.gpgsign false
 
 cat > CLAUDE.md <<'EOF'
 # Refund console

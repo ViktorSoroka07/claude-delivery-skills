@@ -26,6 +26,7 @@ seed() { # $1 = repo name
   cd "$ROOT/workspace/$n"
   git config user.email fixture@example.invalid
   git config user.name Fixture
+  git config commit.gpgsign false
   printf 'name: %s\n' "$n" > service.yml
   printf 'ok\n' > README.md
   git add -A
@@ -44,6 +45,7 @@ advance() { # $1 = repo name; pushes a commit the clone does not have
   cd "$ROOT/.push"
   git config user.email fixture@example.invalid
   git config user.name Fixture
+  git config commit.gpgsign false
   git checkout -q -B main origin/main
   printf 'ok\nretries: 3\n' > README.md
   git add -A

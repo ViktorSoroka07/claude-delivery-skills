@@ -43,6 +43,7 @@ cd "$T"
 git init -q -b main
 git config user.email fixture@example.invalid
 git config user.name Fixture
+git config commit.gpgsign false
 
 cat > CLAUDE.md <<'EOF'
 # ledger-sync
@@ -321,7 +322,7 @@ state() { awk -v id="$1" '$1 == id { print $2 }' "$root/forge/state"; }
 resolver() { awk -v id="$1" '$1 == id { print $3 }' "$root/forge/state"; }
 set_state() { awk -v id="$1" -v st="$2" -v by="$3" '$1 == id { $2 = st; $3 = by } { print }' "$root/forge/state" > "$root/forge/state.tmp" && mv "$root/forge/state.tmp" "$root/forge/state"; }
 replies() { [ -f "$root/forge/replies/$1" ] && { echo; echo "Replies:"; cat "$root/forge/replies/$1"; }; }
-reply_count() { [ -f "$root/forge/replies/$1" ] && wc -l < "$root/forge/replies/$1" | tr -d ' ' || echo 0; }
+reply_count() { if [ -f "$root/forge/replies/$1" ]; then grep -c '^- [0-9:]* (author): ' "$root/forge/replies/$1" || true; else echo 0; fi; }
 known() { case "$1" in T1|T2|T3|T4|C1|C2) return 0 ;; *) echo "unknown id $1 (threads: T1 T2 T3 T4; comments: C1 C2)" >&2; return 1 ;; esac; }
 case "$1" in
   pr) log pr; cat "$root/forge/pr.md" ;;
