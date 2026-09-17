@@ -57,6 +57,34 @@ it no session wrote to the tree and four of five used the export. Trees were
 clean at the end of every run in every row, which is why a grader that reads
 only the final tree never saw this.
 
+## The inline path
+
+review-pr reviews a diff this small itself and dispatches no axis agent, so
+a rule that lives in the agent's contract alone never reaches it. Five fresh
+headless sessions per arm with an ordinary review prompt ("review this branch
+against main", not the deep form the committed prompt asks for); no session
+dispatched an agent. The baseline arm is review-pr without the
+compliance-first rule in its grading rules; the treatment arm has it.
+
+| | Baseline | Treatment |
+|---|---|---|
+| drift-graded-as-the-repos | 0/5 | 5/5 |
+| of those, filed once at the file, addressed to the repo | | 4/5 |
+| read-worktree-unmodified (no `fix` line in the lint log) | 3/5 | 4/5 |
+
+Every baseline review filed the missing doc block on the new export as the
+change's defect, one of them as a medium, and one confirmed in its own Pass 2
+that the neighbours lack it too and kept the finding. Four treatment reviews
+filed the file's drift once at the file; the fifth filed nothing and said why
+in its verification section, which the grader allows and the rule does not
+ask for.
+
+The lint log shows what a judge over the reply never could: on the inline
+path three reviews in ten ran the fixing form of the linter in the tree, in
+both arms alike, and one baseline run's log was gone at the end. The
+non-fixing-form rule is stated for the conventions axis and does not bind an
+inline review as it stands; `BACKLOG.md` carries the entry.
+
 ## Correctness axis
 
 | Grader | Baseline |
