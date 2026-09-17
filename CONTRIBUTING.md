@@ -151,13 +151,29 @@ which is the baseline for free:
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then
-reports an error on every case and costs nothing. Until the machine allows
-it, the same test is done by hand:
+reports an error on every case and costs nothing. With that cleared, a case
+whose run uses git can still die inside the sandbox where the system's git is
+a shim that writes a cache file outside it; such a run leaves no tree to
+grade and is unusable, never a fail, and a real git first on the path ends
+it. The runner's two arms are the plugin and no plugin at all, which answers
+whether the plugin changes behaviour; whether one edited sentence does is a
+run of the old text against the new, by hand or as two runner runs with
+`--ablation none` on two worktrees. Until the machine allows the runner, and
+for that comparison, the same test is done by hand:
 
-1. Build one fixture per run with the case's own script
-   (`sh evals/fixtures/<name>.sh <empty dir>`).
-2. Dispatch five fresh subagents on the model of interest per arm, with the
-   eval prompt verbatim.
+1. Build one fixture per run with the case's own script, from inside an empty
+   directory (`cd <empty dir> && sh <plugin root>/evals/<case>/fixture.sh`): it
+   finds the shared builder from its own path and passes the case's variant,
+   which a direct call to the builder leaves out.
+2. Start five fresh sessions on the model of interest per arm, with the eval
+   prompt verbatim, each a process of its own (`claude -p`, run from the
+   fixture directory, while the files on disk hold that arm's text). A
+   subagent dispatched from a working session is not fresh: it gets the skill
+   and agent text its parent loaded at start, so an arm produced by swapping
+   a file under a live session runs the other arm's text. Confirm the arm
+   from each transcript, by a phrase only one text has. An agent contract is
+   run as the agent (`--agent`), and a rule about what a later message must
+   hold is run as two turns (`--resume`), which the runner cannot do.
 3. Grade every run against the grader criteria in the case directory, reading
    the tree the run left behind rather than its reply: a run has reported a
    rewrite it never wrote.
