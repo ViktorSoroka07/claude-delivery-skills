@@ -49,7 +49,7 @@ after this one explains *why* each exists; this table only answers *when*.
 | a commit is about to be made — "commit this", staged changes waiting, a fix-up after review, a delegated diff the orchestrator is committing — and when a commit message is being edited or squashed before a push. | [`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) |
 | writing, pruning, or restructuring project memory entries, when a merge or shipped milestone leaves memory describing finished work, when ending a session whose work continues in a later one — and whenever a statement is about to be copied from chat, a memory, or one document into another. | [`maintaining-project-memory`](skills/maintaining-project-memory/SKILL.md) |
 | launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
-| a request contains more than one ask, when new asks arrive while work is already running, and at any checkpoint or session end where status gets reported. | [`tracking-open-asks`](skills/tracking-open-asks/SKILL.md) |
+| a request contains more than one ask, when new asks arrive while work is already running, at any checkpoint or session end where status gets reported, and whenever a question, decision or action is handed to the requester. | [`tracking-open-asks`](skills/tracking-open-asks/SKILL.md) |
 | asked to fetch, sync, refresh or update the git repos in a folder rather than one at a time — "sync all my repos", "fetch everything under this directory", "which of these clones are behind", "bring my checkouts up to date" — and when surveying what has moved across many clones before starting work. Runs a bundled script; the judgement is in reading its output, not in doing the git work by hand. | [`git-sync`](skills/git-sync/SKILL.md) |
 
 <!-- /triggers -->
@@ -213,7 +213,7 @@ When the requester has to re-ask, they have paid twice: once waiting, once audit
 Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
 ledger, not the items that happened to finish. The ledger runs both ways: what waits on
-the requester is restated at the end of every message until it is answered, so an open
+the requester is restated at the end of every message, so an open
 question never has to be found by re-reading the conversation.
 
 **[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**

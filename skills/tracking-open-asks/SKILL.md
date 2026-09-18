@@ -1,6 +1,6 @@
 ---
 name: tracking-open-asks
-description: Use when a request contains more than one ask, when new asks arrive while work is already running, and at any checkpoint or session end where status gets reported.
+description: Use when a request contains more than one ask, when new asks arrive while work is already running, at any checkpoint or session end where status gets reported, and whenever a question, decision or action is handed to the requester.
 ---
 
 # Tracking Open Asks
@@ -25,8 +25,8 @@ At any checkpoint, and always at session end, status covers the **whole ledger**
 
 The ledger runs in both directions. A question put to the requester, a decision handed to them, an action only they can take (a push, an approval, a login) is an open item from the moment it is asked. It is lost faster than their own asks are: the message that asked it is followed by messages of work, and a requester who comes back finds it only by re-reading the conversation.
 
-- **Every message that ends while such items are open closes with all of them**, not only the ones that message raised, and including the ones the requester has said they know about and will get to: an acknowledgement is not an answer, and "your two questions are still open" is a reference to the list, not the list. Each item is restated as the question itself. One item is a sentence; two or more are a numbered table: what is needed, what it blocks, and what happens if no answer comes — the default that will be taken, or that the work waits. The numbers stay the same from message to message, so the requester can answer "2: yes" without quoting anything.
-- **An item leaves the table in one of two ways, each stated:** the requester answered it, or the work went ahead on the default the table named. An item that simply stops being listed is the silent closure the section above forbids, pointed the other way.
+- **Every message that ends while such items are open closes with all of them**, not only the ones that message raised, and including ones asked in an earlier session and the ones the requester has said they know about and will get to: an acknowledgement is not an answer, and "your two questions are still open" is a reference to the list, not the list. Each item is restated as the question itself. In a closing message that carries a next-session starter prompt the table sits directly above the starter, which stays last (`maintaining-project-memory` owns that form). One item is a sentence; two or more are a numbered table: what is needed, what it blocks, and what happens if no answer comes — the default that will be taken, or that the work waits. The numbers stay the same from message to message, so the requester can answer "2: yes" without quoting anything.
+- **An item leaves the table in one of three ways, each stated:** the requester answered it, the work went ahead on the default the table named, or the work no longer needs it, with a sentence saying why. An item that simply stops being listed is the silent closure *Every ask closes visibly* forbids, pointed the other way.
 - **Work that does not depend on an open item carries on.** The table is the closing of a message, never a reason to stop.
 
 ## Red flags
@@ -38,5 +38,5 @@ The ledger runs in both directions. A question put to the requester, a decision 
 | "I reported what I finished"                   | The requester needs the whole ledger — open items are the report's point   |
 | "The agent will deliver it eventually"         | A promised deliverable is an open ask until the report lands               |
 | "That item became moot"                        | Moot is a closure to state, not a silence                                  |
-| "I asked that two messages ago, they saw it" | They saw it before three screens of work. Repeat it in the closing table until it is answered |
+| "I asked that two messages ago, they saw it" | They saw it before three screens of work. Repeat it in the closing table until it leaves the table |
 | "Only the new question belongs in this message" | The table is the whole set. A partial one teaches the requester to go back and search |
