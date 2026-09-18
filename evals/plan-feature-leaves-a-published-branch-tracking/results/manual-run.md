@@ -25,6 +25,25 @@ it named no remedy for a branch found tracking the default, and
 `--unset-upstream` is one. Both were checked in a scratch clone. The case
 stays as the guard for the published state, which no other case builds.
 
+## The graders and the wording since
+
+The table's one baseline miss is a hand grade on the tree. The two regex
+graders then read any line of the paste, and passed that run: the old
+branch's line still showed its upstream, and the plan commit sat on a new
+branch cut from the same tip. Both now anchor on the current-branch marker
+of `git branch -vv`, and the second reads the plan as that branch standing
+one commit ahead of its own remote. On captures of four runs (plan
+committed; a second branch cut; the upstream unset; the plan left
+uncommitted) the first reads pass, fail, fail, pass and the second pass,
+fail, fail, fail.
+
+The check's wording has since widened from "does not track the default
+branch" to "tracks nothing but its own name": a push that follows the
+upstream lands on whatever branch is tracked, a release branch as much as
+the default. That is a second correction of the text, checked in a scratch
+clone (`git checkout -b <name> origin/release` tracks `origin/release`), and
+no run covers it.
+
 ## A first run the fixture spoiled
 
 The variant's first version made its bare remote by cloning while the work

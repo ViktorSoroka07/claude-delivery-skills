@@ -1,8 +1,8 @@
 ---
 type: regex
-pattern: "^[0-9a-f]{7,} .*\\n[0-9a-f]{7,} Mount the request table"
+pattern: "^\\* feature/request-list\\s+[0-9a-f]+\\s+\\[origin/feature/request-list: ahead 1\\]"
 flags: m
 match: contains
 ---
 
-The pasted `git log --oneline -3` shows one new commit, the plan, on top of the branch's existing tip.
+The pasted `git branch -vv` shows the current branch one commit ahead of its own remote branch: the plan, committed on the branch the session was on. A `git log` line cannot tell that branch from a second one cut at the same tip.
