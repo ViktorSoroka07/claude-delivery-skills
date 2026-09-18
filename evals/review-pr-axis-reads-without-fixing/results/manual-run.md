@@ -97,6 +97,28 @@ The
 non-fixing-form rule is stated for the conventions axis and does not bind an
 inline review as it stands; `BACKLOG.md` carries the entry.
 
+## The committed prompt through the runner
+
+One run of `claude plugin eval` on this case, three runs per arm, the
+runner's own arms and its default judge, on the deep-review prompt as
+committed:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| findings-file-written | 0/3 | 3/3 |
+| drift-graded-as-the-repos | 0/3 | 3/3 |
+| platform-header-seen | 0/3 | 2/3 |
+| read-worktree-unmodified | 3/3 | 3/3 |
+
+Every plugin review graded the doc block as the file's drift and left the
+lint log without a `fix` line; two of three found the vendored header. The
+no-plugin arm wrote no findings file under the name the two file graders
+read, so their 0/3 there is six thrown graders, not a reading of what an
+unaided review does with the doc block or the header. The inline form of
+the same prompt has its own case and record
+(`review-pr-grades-the-files-drift-inline`), where two plugin runs of
+three ended with the lint log gone.
+
 ## Correctness axis
 
 | Grader | Baseline |
