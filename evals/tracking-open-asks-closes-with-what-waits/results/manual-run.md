@@ -125,14 +125,14 @@ script added whose header says the metrics dashboard must stay closed while
 it runs: turn one starts the soak and asks what to know about it; turn two
 asks for the rename. Five fresh headless sessions per arm on two models,
 graded on turn two's reply by hand. The baseline is the brief and skill as
-they stand; two wordings were tried, each a bullet in the skill's section on
-what waits and a clause in the brief's core.
+they stand; three wordings were tried, each a bullet in the skill's section
+on what waits and a sentence in the brief's core.
 
-| Turn two | Sonnet, baseline | Sonnet, wording 1 | Sonnet, wording 2 | Strong, baseline | Strong, wording 1 | Strong, wording 2 |
-|---|---|---|---|---|---|---|
-| condition kept out of the waiting list | 5/5, 5/5 | 5/5 | 5/5 | 1/5, 1/5 | 5/5 | 5/5 |
-| condition not repeated at all | 4/5, 4/5 | 5/5 | 1/5 | 0/5, 0/5 | 4/5 | 2/5 |
-| both open questions restated | 4/5, 3/5 | 2/5 | 4/5 | 5/5, 5/5 | 3/5 | 3/5 |
+| Turn two | Sonnet, baseline | Sonnet, w1 | Sonnet, w2 | Sonnet, w3 | Strong, baseline | Strong, w1 | Strong, w2 | Strong, w3 |
+|---|---|---|---|---|---|---|---|---|
+| condition kept out of the waiting list | 5/5, 5/5 | 5/5 | 5/5 | 5/5 | 1/5, 1/5 | 5/5 | 5/5 | 5/5 |
+| condition not repeated at all | 4/5, 4/5 | 5/5 | 1/5 | 0/5 | 0/5, 0/5 | 4/5 | 2/5 | 3/5 |
+| both open questions restated | 4/5, 3/5 | 2/5 | 4/5 | 4/5 | 5/5, 5/5 | 3/5 | 3/5 | 5/5 |
 
 Two baselines per model because the first fixture's soak slept four minutes
 under a header that said an hour, and seven of ten sessions read the code
@@ -146,7 +146,15 @@ list on Sonnet but had four of five say the condition again in the body, and
 two strong sessions closed with "nothing waits on you except reviewing the
 diff" over two open owner questions. Restating fell from five of five to
 three of five on the strong model under both wordings; a rule that loses a
-neighbouring grader is not landed. The mechanism is queued in `BACKLOG.md`.
+neighbouring grader is not landed. Wording 3 left the list sentence alone
+and described the condition's own output ("one sentence in the body of the
+message that starts it, with when it ends, mentioned again only when its
+state changes; the table is unchanged by it"): the strong model kept its
+restating at five of five and stopped listing the condition, but every
+Sonnet session now repeated it in the body as a reminder, where four of five
+baseline sessions had said nothing, so the rule induced the behaviour it
+exists to stop, in a milder form. Three wordings, three different costs; the
+entry is in `BACKLOG.md` under Declined with this reason.
 
 ## Not tested
 
