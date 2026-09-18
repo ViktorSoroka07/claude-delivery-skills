@@ -39,6 +39,15 @@ lacks() { # $1 = description, $2 = haystack, $3 = needle
   esac
 }
 
+empty() { # $1 = description, $2 = haystack
+  if [ -z "$2" ]; then
+    echo "PASS: $1"
+  else
+    echo "FAIL: $1 (expected no output, got '$2')"
+    fails=$((fails+1))
+  fi
+}
+
 mkrepo() {
   R="$WORK/$1"
   mkdir -p "$R"
@@ -245,8 +254,7 @@ check "session brief survives empty stdin" 0 $?
 cp "$BRIEF_HOOK" "$WORK/orphan-brief.py"
 out=$(printf '' | "$PY" "$WORK/orphan-brief.py" 2>/dev/null)
 check "session brief fails open without its text file" 0 $?
-[ -z "$out" ]
-check "session brief emits nothing without its text file" 0 $?
+empty "session brief emits nothing without its text file" "$out"
 
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
