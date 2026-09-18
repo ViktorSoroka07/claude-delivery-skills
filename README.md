@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and four hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and five hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -237,12 +237,13 @@ instructions alone cannot:
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
   use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
-- **Four hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Three
+- **Five hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Three
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
   the judgment, and none of them blocks. The comment rules are the most-relapsed
   discipline in the corpus behind this repo, which is why two of the three watch them.
-  The fourth runs at session start.
+  The other two carry what a session cannot see for itself: the standing rules at
+  session start, and how far into its context window it has run.
   - **Write-time** — fires the moment an edit adds a narrative-comment tell
     ("Regression:", "used to", "harmless because"); backs `writing-code-comments`.
   - **Commit-time** — reads the staged diff when a commit is about to run, so the
@@ -259,6 +260,12 @@ instructions alone cannot:
     comments by default, every message ends with what waits on the requester. Each is a pointer to the skill that owns it plus a
     one-sentence core, so a user's `CLAUDE.md` no longer needs a copy — they travel
     with the plugin. The text is [`hooks/session-brief.md`](hooks/session-brief.md).
+  - **Context meter** — on each prompt past 70% of the context window, injects one
+    line naming how far into the window the session has run, so it reaches a seam and
+    hands over rather than starting another task. A session has no view of its own
+    meter, which is why the rule that asked it to name a seam had to become a
+    measurement. The size comes from the transcript's own usage numbers, against a
+    200k window unless `DELIVERY_SKILLS_CONTEXT_WINDOW` sets another.
 
 ![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; four hooks are run by the harness — three warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target) and one injects the standing rules at session start](assets/diagrams/components.svg)
 
