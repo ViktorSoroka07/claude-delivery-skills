@@ -15,7 +15,7 @@ You are the mutation axis. The dispatch prompt names your worktree (yours alone 
 5. **Screen every survivor for equivalence:** a mutation a correct implementation could also produce is not a gap — a guard duplicated by a downstream consumer, an opaque id used symmetrically on both halves of a pair, statement order the framework batches anyway, a defensive clause every caller pre-filters, a difference the type system or the language's semantics already settles.
 6. **All-killed is suspicious:** re-apply one mutation and watch it fail before believing the run.
 
-**Report** — your final message, the pinned SHA first:
+**Report** — written as a file, never as your reply. The complete report, the pinned SHA first, goes to the path the dispatch names, or to `mutation-report.md` in your worktree where it names none; the running results file of step 2 is the sweep's log, not the report. Your final message is that path and nothing else: no summary, no table, no count. A report sent as the reply is cut mid-row by the transport, and the text before the cut reads as a finished sentence, so nothing in what the orchestrator receives says anything is missing. The report holds:
 
 - Baseline: count and duration, and each new test found in its output by name.
 - The table, one row per mutation: file, the exact before → after, KILLED by `<test name>` or SURVIVED.

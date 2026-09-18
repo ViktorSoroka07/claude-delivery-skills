@@ -136,3 +136,44 @@ tree to re-run the tests without the header and restored it.
 
 The full review path (review-pr dispatching the agent) and the trigger: the
 agent was dispatched by hand with its axis named.
+
+## Report delivery: the file the dispatch names
+
+The dispatch named the report file — what `delegating-to-subagents`' delivery
+instruction now asks an orchestrator to do — and said nothing about the reply's
+form, which is what the contract owns; that split is the test. Five fresh
+headless sessions per arm started as the agent (`claude -p --agent`, Sonnet),
+one fixture per session, the conventions axis named in the brief. The baseline
+arm ran while the contract still ended "Deliver the complete report as your
+final message"; the treatment arm carries the delivery paragraph that names the
+file and defines the reply.
+
+| Grader | Baseline | Treatment |
+|---|---|---|
+| the reply is the path and nothing else | 0/5 | 5/5 |
+| the file holds the complete report | 5/5 | 5/5 |
+| drift-graded-as-the-repos | 5/5 | 5/5 |
+| read-worktree-unmodified (no `fix` line in the lint log) | 2/5 | 5/5 |
+
+Every baseline rep wrote the file the brief named and then pasted a summary or
+the findings themselves into the reply as well — 1,156 to 1,599 characters of
+it, which is the report a transport cuts. Every treatment reply was the path
+and nothing else, 173 characters. Both arms filed the doc-block gap as the
+file's own drift, so the grader this case is named for did not move.
+
+The lint-log row is not a result of the rule. Two baseline reps ran the fixing
+form of the gate in the read tree and reverted it, and a third deleted the log
+that records the mode of every run, straight after running the fixer, leaving
+that grader no file — which is scored a fail. The transcript's own Bash calls
+are what show this; the tree and the log at the end cannot.
+
+Not tested: a dispatch that names no file (the contract's fallback path), the
+same sentence in `refute-verifier` and `mutation-tester`, and the full review
+path where the skill dispatches the agent rather than a hand-written brief.
+
+Two mechanics for the next hand run here. A headless rep inherits the machine's
+configured output style, and an explanatory one wraps every reply in a block
+that makes "the reply is the path alone" ungradable, so each rep passes
+`--settings '{"outputStyle":"default"}'`. And the agent has no Write tool: all
+ten reps wrote the report with a shell heredoc, so the file handoff needs no
+tool grant.
