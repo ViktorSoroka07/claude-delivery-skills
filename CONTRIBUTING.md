@@ -248,6 +248,14 @@ Rules that held in practice, each answering a failure seen here:
 - **A second fixture in a domain unlike the skill's own examples is worth more
   than a sixth rep.** It is the only way to tell a learned category from an
   echoed example.
+- **The operator's own instruction files come off for the batch.** A hand run
+  inherits the user-level instruction file and settings of the machine it runs
+  on, and any rule there that bears on the behaviour under test - a command the
+  settings deny, an action an instruction reserves for the operator - binds
+  every rep in both arms and reads back as the plugin's result. Move those files
+  aside for the batch and restore them from a trap that verifies checksums; a
+  case whose correct behaviour the machine forbids is otherwise unmeasurable in
+  either arm.
 
 ## A skill that carries executable content
 
