@@ -40,3 +40,28 @@ so the parenthetical was left alone.
 
 A formatting gate that blocks the push on the untracked file; a hook whose
 pop conflicts. The trigger: the prompt names the review.
+
+## Through the runner
+
+One run of `claude plugin eval` on this case, three runs per arm, the
+runner's own arms (no plugin, the plugin) and its default judge, on the
+fixture with the stash hook seeded and the lint red. It was run from a
+worktree checked out at the released tag the rest of the baseline was taken
+at, not at the branch head, which by then carried two hooks that did not
+exist when the other cases ran.
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| findings-file-written | 0/3 | 3/3 |
+| exposure-named-beside-the-path | 0/3 | 3/3 |
+
+Every plugin run wrote the findings file and named the exposure beside its
+path; the judge was unanimous in all six verdicts. No no-plugin run wrote a
+file at all, so its arm fails the exposure grader for want of the artifact as
+much as for want of the warning: the prompt asks for the findings in a file
+and for the path in the reply, and an unaided review answers in chat.
+
+This is the two-arm form of the hand table above, where both arms wrote the
+file because both were told to follow the skill and only the exposure
+sentence differed. The hand table is what says the sentence earns its place;
+this one says the behaviour is absent without the plugin.

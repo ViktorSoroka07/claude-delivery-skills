@@ -1,10 +1,10 @@
 # Manual runs
 
-`claude plugin eval` is enabled as a command but gated at run time: it prints
-"`plugin eval` is currently in early access" and exits 0 without running. The
-case was therefore run by the hand procedure in CONTRIBUTING's "Testing a
-wording change": ten isolated fixtures per run, verified byte-identical by
-hash, five subagents per arm on sonnet.
+`claude plugin eval` was gated at run time when this case was written: it
+printed "`plugin eval` is currently in early access" and exited 0 without
+running. The case was therefore run by the hand procedure in CONTRIBUTING's
+"Testing a wording change": ten isolated fixtures per run, verified
+byte-identical by hash, five subagents per arm on sonnet.
 
 Arms differ only in the contract. Baseline received the task and no contract,
 which models the trigger not firing and matches the runner's own no-plugin
@@ -104,3 +104,36 @@ this data read the field and reported X". Every flagged match, and every clean
 result, has to be read. The criteria file is the grader; a script over it is a
 convenience that drifts from it in whichever direction its author was not
 worried about.
+
+## Through the runner
+
+One run of `claude plugin eval` on this case, three runs per arm, the
+runner's own arms (no plugin, the plugin) and its default judge. The prompt
+names no skill, so the plugin arm tests the trigger as well as the rules.
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| finds-every-restatement | 0/3 | 2/3 |
+| folds-the-correction-into-the-text | 0/3 | 1/3 |
+| sweeps-the-commit-body | 0/3 | 1/3 |
+
+Every plugin-arm verdict was re-read by hand against the document the run
+left behind, and the judge agrees with the hand grade on all nine. One run
+folded the correction, swept all four restatements and enumerated the three
+sibling artifacts. One corrected all four figures and the headroom
+conclusion but kept the correction section with its narration standing
+("my earlier reading of the run log was wrong"), which is the fail the first
+grader is for. One left the document untouched, reported the contradiction
+in chat and asked which figure to trust — a run that diagnosed correctly and
+delivered nothing.
+
+**The number is a floor, not the rule's pass rate.** The hand runs above
+score 5/5 on a treatment arm that was told to read the contract; here the
+skill has to fire on its own, and the runner keeps no transcript, so whether
+the two failing runs ever loaded it cannot be read from what it kept. A
+`tool_used: Skill` grader marked `arm: with-only` would separate a rule that
+was not followed from a rule that was never loaded, and this case has none.
+
+The no-plugin arm fails every grader in every run, which is what makes the
+case worth its cost: the behaviour is absent without the plugin, not merely
+inconsistent with it.
