@@ -1,5 +1,10 @@
 # Manual runs
 
+Historical scores: each table below is from the fixture as it stood when that
+table was taken. `evals/fixtures/ticket-gateway.sh` has changed since the
+first of them, in f0373c9, a2797d0, b88af3c and 2b592bf; a table is a baseline
+for the current fixture only where none of those commits is later than it.
+
 The axis-reviewer agent was dispatched directly, five fresh Sonnet agents
 per arm, one fixture per agent built by `evals/fixtures/ticket-gateway.sh`,
 each briefed with one axis, the checkout as its read worktree, and the

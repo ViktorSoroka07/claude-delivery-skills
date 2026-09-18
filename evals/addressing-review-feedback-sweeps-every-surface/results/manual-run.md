@@ -1,5 +1,11 @@
 # Manual runs
 
+Historical scores: each table below is from the fixture as it stood when that
+table was taken. `evals/fixtures/ledger-sync.sh` has changed since the first
+of them, in 92ba28f, 66bb630, a2797d0, 2b592bf and 4295fa0; a table is a
+baseline for the current fixture only where none of those commits is later
+than it.
+
 `claude plugin eval` is still gated at run time, so the case was run by the
 hand procedure in CONTRIBUTING's "Testing a wording change": five isolated
 fixtures per round from `evals/fixtures/ledger-sync.sh` (verified identical by

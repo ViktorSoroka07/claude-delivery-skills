@@ -1,5 +1,7 @@
 # Manual run
 
+Historical scores: each table below is from the fixture as it stood when that table was taken. `evals/fixtures/memory-store.sh` has changed since the first of them, in 8efd0ea; a table is a baseline for the current fixture only where none of those commits is later than it.
+
 Hand-run per CONTRIBUTING's "Testing a wording change", the plugin eval command being early-access-gated on the machine. Five fresh subagents per arm on the model of interest, each on its own fixture built by `evals/fixtures/memory-store.sh`, the skill named in the brief (so the trigger is untested), the tree graded rather than the reply.
 
 | arm | records the trap | files it under its heading | deletes the twin | deletes the ephemeral dir | live memory intact |

@@ -1,5 +1,11 @@
 # Manual runs
 
+Historical scores: each table below is from the fixture as it stood when that
+table was taken. `evals/fixtures/refund-console.sh` has changed since the
+first of them, in 5ea7fb1, 2500ef5, 83cfc92, a2797d0 and 2b592bf; a table is a
+baseline for the current fixture only where none of those commits is later
+than it.
+
 Fixtures from `evals/fixtures/refund-console.sh record-offplan`, verified
 identical by tree hash; fresh Sonnet subagents loading the installed skill
 through the Skill tool; the eval prompt verbatim; graded on the findings file

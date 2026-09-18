@@ -1,5 +1,10 @@
 # Manual runs
 
+Historical scores: each table below is from the fixture as it stood when that
+table was taken. `evals/fixtures/notify-report.sh` has changed since the first
+of them, in 58d8ceb, 8efd0ea, a2797d0 and 2b592bf; a table is a baseline for
+the current fixture only where none of those commits is later than it.
+
 `claude plugin eval` is still gated at run time, so the case was run by the
 hand procedure in CONTRIBUTING's "Testing a wording change": ten fixtures
 from `evals/fixtures/notify-report.sh`, verified identical by hash, fresh
