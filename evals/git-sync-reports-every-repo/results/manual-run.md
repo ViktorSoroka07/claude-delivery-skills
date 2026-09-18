@@ -29,3 +29,19 @@ Every run also went past the script to diagnose the two repos needing the
 user — `git remote -v`, `git fetch`, `git log origin/main..main` in those
 directories — before reporting. That is reading the output as the skill asks,
 not the loop it forbids: no run pulled or fetched across the folder by hand.
+
+## The turn limit is what this case is measuring
+
+Across the release baseline (three runs per arm) and a two-run plugin-arm
+pass afterwards, the plugin arm's turn counts are 17, 20, 31, 31 and 28
+against a `max_turns` of 30: two of five runs were cut off at the limit, and
+the runs that finished came within two turns of it. Every no-plugin run of
+three hit the limit. The bundled script is run in every plugin run and in no
+unaided one, so the unaided arm's exhaustion is the per-repo loop the skill
+exists to replace — that contrast is the case's point and should not be
+bought off by a higher limit for both arms.
+
+The plugin arm, though, is being scored on whether it fits the budget rather
+than on what it reports: its one clean run at 28 turns passes every grader.
+Raising `max_turns` for this case is the call to make, with the baseline rows
+retaken at the new limit so the numbers stay comparable.
