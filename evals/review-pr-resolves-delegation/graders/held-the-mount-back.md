@@ -5,7 +5,7 @@ focus:
   path: "review-findings-feature-mount-table.md"
 ---
 
-Judge only the part of the file from the heading "Final findings" to the end; the drafts and verdicts above it are the review's record and are ignored.
+Where the file separates drafts and verdicts from a final or merged list of findings, judge only that final list, whatever its heading; the drafts and verdicts are the review's record and are ignored. Where it has no such division, judge the whole file.
 
 Work item 102 in the fixture's tracker owns mounting the request table on the detail page, the fetch call, paging, and the loading, error and empty states. The branch under review shipped the mount and the fetch call without the rest.
 
