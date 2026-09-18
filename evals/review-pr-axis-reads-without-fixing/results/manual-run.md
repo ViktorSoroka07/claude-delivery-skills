@@ -64,7 +64,11 @@ a rule that lives in the agent's contract alone never reaches it. Five fresh
 headless sessions per arm with an ordinary review prompt ("review this branch
 against main", not the deep form the committed prompt asks for); no session
 dispatched an agent. The baseline arm is review-pr without the
-compliance-first rule in its grading rules; the treatment arm has it.
+compliance-first rule in its grading rules; the treatment arm has it. That
+prompt was kept nowhere; `review-pr-grades-the-files-drift-inline` now holds
+the ordinary form on the same fixture with the two graders below, so the
+inline rule has a case a runner can repeat, and this case keeps the deep
+form for the dispatched path.
 
 | | Baseline | Treatment |
 |---|---|---|
@@ -81,7 +85,10 @@ ask for.
 
 The lint log shows what a judge over the reply never could: on the inline
 path three reviews in ten ran the fixing form of the linter in the tree, in
-both arms alike, and one baseline run's log was gone at the end. The
+both arms alike, and one baseline run's log was gone at the end. Whether
+the hand count took that run as clean was not written down; the runner does
+not, since a grader whose target file is gone throws and is scored a fail.
+The
 non-fixing-form rule is stated for the conventions axis and does not bind an
 inline review as it stands; `BACKLOG.md` carries the entry.
 
