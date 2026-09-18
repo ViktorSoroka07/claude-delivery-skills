@@ -198,9 +198,11 @@ to the author.
 A line written to memory executes with full authority in a later session that cannot
 question it: a stale "still to push" reads as a live obligation; a rule whose scope was
 dropped at the write step fires as an absolute. Keep only what the repo structurally
-cannot record; re-derive rules instead of copying wording; when content graduates into
-a skill, condense the memory to a pointer, the private residue, and a capture buffer;
-end continuing sessions with the literal next-session starter prompt.
+cannot record; re-derive rules instead of copying wording; never prune an entry the
+store marks as the user's or the team's because a skill now states the same rule; when
+content graduates into a skill, condense the memory to a pointer, the private residue,
+and a capture buffer; end continuing sessions with the literal next-session starter
+prompt.
 
 ![Memory lifecycle: a correction in chat lands in memory as a capture buffer; confirmed in practice it graduates into a skill, and the memory condenses to a pointer plus residue plus capture buffer, where new corrections land again](assets/diagrams/memory-lifecycle.svg)
 

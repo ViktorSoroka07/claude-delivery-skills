@@ -64,3 +64,45 @@ grader edit.
 The dead-twin row is the rule working: three plugin runs of five deleted both
 dead directories after checking them against the checkouts on disk, and no
 unaided run deleted either, in ten runs across the two rounds.
+
+## The boundary for an entry recording a ruling
+
+The pruning pass's minimality rule reached the live memory's `feedback_review_style.md`,
+whose body restates verbatim a rule the plugin's own brief states. Ten fresh headless
+Sonnet reps per arm, one fixture each, the tree graded rather than the reply; arm
+membership confirmed in every transcript by a phrase only the arm's own text carries.
+
+| Grader | Baseline | Shape 1 | Shape 2 |
+|---|---|---|---|
+| keeps-the-live-memory-intact | 7/10 | 8/10 | 10/10 |
+| deletes-the-dead-twins | 10/10 | 9/10 | 10/10 |
+| re-runs-the-absence-check | 10/10 | 10/10 | 10/10 |
+| records-the-trap-once, by hand | 10/10 | 10/10 | 10/10 |
+
+**Shape 1 did not bind, and how it failed is the result worth keeping.** It made the
+rule's trigger an entry "holding a decision taken for this project", and pre-empted the
+justification the failing baseline reps gave. Both surviving failures refused the
+trigger instead: "not a project-specific decision, so it was noise", and "no
+project-specific reasoning attached to it". A precondition the run has to judge is one
+it can judge its way out of, and the sentence answering the old justification never
+fires.
+
+**Shape 2 states the trigger as something readable in the store** — the entry's type, or
+the heading it is filed under — and swept every grader. One rep names the distinction
+back: it kept the entry as "a user ruling, not just a restated skill rule". No neighbour
+moved; the dead-twin row recovered the single rep shape 1 had lost, which was an
+ordinary miss of the underscore twin rather than the rule crowding it out.
+
+The baseline's first five reps were clean and its second five failed three times. Five
+reps would have reported no baseline failure at all and stopped the task; the rate here
+is about three in ten, and CONTRIBUTING's five-rep floor hides such a rate about one
+time in six.
+
+## The operator's own global instruction files have to come off for a hand run
+
+The machine's user-level instruction file tells every session that recursive deletion is
+the operator's act, and the user-level settings deny `rm -rf` outright. This case's
+correct behaviour is deleting two dead directories, so a probe rep refused to delete and
+said so. Both files are moved aside for each batch and restored by a trap that verifies
+checksums; without that the case is unmeasurable in both arms, and the failure reads as
+the plugin's. CONTRIBUTING's "Testing a wording change" carries the general form.

@@ -26,6 +26,8 @@ Memory holds what the repository **structurally cannot** record. Git records wha
 
 **The test before writing a line:** is this in the code, a commit message, the PR body, the plan doc, an issue — or a skill? If yes, it is a duplicate that will drift from the authoritative copy. (A fact that *contradicts* the repo's obvious reading — the gate command that isn't what the scripts suggest — is a trap, not a duplicate.) **The issue tracker is the source everyone forgets** — one pruning pass "rescued" a decision as unrecorded when an issue was titled for that exact decision and even stated its open half. Search the tracker before concluding something lives nowhere; decisions relayed verbally are precisely what gets written into an issue rather than into code.
 
+**A rule stated elsewhere has not answered the entry that records deciding it here.** Where the store marks an entry as the user's or the team's — its type, or the heading it is filed under — that marking is the decision record, and a skill, instruction file or style guide that states the same rule is not a better source for it: agreeing is not the same fact as having been decided here, and the entry outlives any reinstall, reword or removal of the thing that agrees. Such an entry is never pruned for holding nothing beyond the rule it settles — none of them do. Prune it only where the code, the tracker or the history records the decision itself.
+
 ### Promotion into a skill
 
 **Promotion into a skill triggers the same deletion.** When a memory's content graduates into a skill, the skill becomes the procedure's durable home, and the memory is condensed — in the same session, not later — to the three things the skill cannot hold:
