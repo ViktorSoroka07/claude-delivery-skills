@@ -167,7 +167,9 @@ for that comparison, the same test is done by hand:
    which a direct call to the builder leaves out.
 2. Start five fresh sessions on the model of interest per arm, with the eval
    prompt verbatim, each a process of its own (`claude -p`, run from the
-   fixture directory, while the files on disk hold that arm's text). A
+   fixture directory, with `--plugin-dir <that arm's worktree>` where the
+   plugin is not installed from the clone, while the files on disk hold that
+   arm's text). A
    subagent dispatched from a working session is not fresh: it gets the skill
    and agent text its parent loaded at start, so an arm produced by swapping
    a file under a live session runs the other arm's text. Confirm the arm
@@ -194,13 +196,13 @@ Rules that held in practice, each answering a failure seen here:
   that fails one run in two still passes a lone trial half the time, while
   five clean runs leave such a rule about a three-in-a-hundred chance of
   hiding, and a one-in-three failure about one in eight. Five is where the
-  batch is still one dispatch and a survivor is a signal rather than luck.
+  batch is still cheap to run and a survivor is a signal rather than luck.
 - **Sonnet as the model of interest.** The skills have to hold on the weakest
   model a user will run them with, and the weaker model is the more sensitive
   instrument: a rule the strongest model keeps from intent alone is the one a
   weaker model negotiates, and that negotiation is the defect the test hunts.
   The author's own reading is already the strong-model run.
-- **Fresh subagents, unnamed in the brief.** Each rep must be an independent
+- **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
 - **When reps disagree on the shape of the output, the wording is not
