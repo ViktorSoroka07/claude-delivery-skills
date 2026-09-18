@@ -9,11 +9,24 @@ how a change is tested, described, and released.
 ## Setup (once per clone)
 
     git config core.hooksPath .githooks
+    git config user.email <the address you publish under>
     cp .leakwords.local.example .leakwords.local   # then fill it in
 
 The hook does nothing until `core.hooksPath` is set - git does not run hooks
 from a tracked directory on its own, and it never ships `.git/hooks` in a clone.
 **A clone with no setup step has no protection.**
+
+The identity line is the same kind of protection, and the one whose failure
+cannot be undone in place: where the machine's global `user.email` belongs to an
+employer, that address lands in this repository's public history, and removing
+it means rewriting history rather than making a follow-up commit.
+`scripts/scan-history.sh` audits author and committer identities against the
+local wordlist, so the slip is caught before a push - but that wordlist is
+local, so CI never runs this check. Making the identity a function of the
+directory instead - git's conditional includes, with no `user.email` at the top
+level and `user.useConfigOnly = true` so an uncovered repository refuses to
+commit rather than guessing - settles it for every clone at once, including the
+ones not made yet.
 
 ## What must never appear
 
