@@ -203,7 +203,12 @@ for that comparison, the same test is done by hand:
    hold is run as two turns (`--resume`), which the runner cannot do.
 3. Grade every run against the grader criteria in the case directory, reading
    the tree the run left behind rather than its reply: a run has reported a
-   rewrite it never wrote.
+   rewrite it never wrote. Where the graded behaviour is an act rather than an
+   output - a check run, a mutation applied, a file read - the run's own tool
+   calls are the evidence, because the artifact shows only what the run chose
+   to report: one rep here re-applied three of a record's four mutations and
+   wrote about none of them, and its findings file reads exactly like a rep
+   that never looked.
 
 The arms depend on what changed:
 
