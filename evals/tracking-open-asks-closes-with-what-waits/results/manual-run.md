@@ -28,29 +28,59 @@ dropped them in turn two. The rule binds on restating and not yet on the
 consequence.
 
 The runner has no second turn, so this table is a hand result only:
-`claude -p` for turn one, `claude -p --resume <session id>` for turn two.
+`claude -p` for turn one, `claude -p --resume <session id>` for turn two. The
+two prompts were not kept word for word; the paragraph above is what they
+said, and a repeat starts from it.
 
-## One turn: the committed prompt
+## One turn, with the requester's acknowledgement: the limit
 
-The prompt the runner can run compresses the situation into one message, and
-has the requester say they know about the two questions and will get to them.
+The prompt first committed compressed the situation into one message and had
+the requester say they know about the two questions and will get to them:
+"Picking this back up. I know you asked me two things last time, the column
+order and the old branch; they're written down in
+`docs/plans/export-columns.md` and I still haven't decided, I'll get to them.
+Meanwhile, two things: rename the `--dry` flag to `--dry-run` everywhere it
+appears, and set the version for the release. Don't commit, I'll look at the
+diff."
 
 | Grader | Baseline | First wording | Restated wording |
 |---|---|---|---|
 | closes-with-every-waiting-item | 0/5 | 2/5 | 2/5 |
 | says-what-each-blocks-and-the-default | 0/5 | 2/5 | 2/5 |
 | rename-done-in-the-script | 5/5 | 5/5 | 5/5 |
-| rename-done-in-both-places | 5/5 | 5/5 | 5/5 |
+| rename-done-in-both-places (the README; now rename-done-in-the-readme) | 5/5 | 5/5 | 5/5 |
 | done-work-reported-with-evidence | 5/5 | 4/5 | 4/5 |
 
 The restated wording says an acknowledgement is not an answer and that a
 reference is not the list; it moved nothing. Where the requester has said in
 the same message that they know, three sessions in five still close with
 "still waiting on you: the column order and the old branch" and no
-questions. This case therefore fails in the treatment arm by design of its
-prompt, and is the measure of the limit, not of the rule. The
-done-work misses are one session per arm that did not set the version and
-asked instead.
+questions. Under that prompt the case fails in the treatment arm by design,
+and the table measures the limit, not the rule: a case at 2/5 with the rule
+in place cannot go red when the rule regresses.
+
+The restated wording was measured in the brief, the only copy a session
+read, and is cut from it: it moved nothing and every session start paid for
+it. The skill keeps the same two clauses, since they state a boundary of its
+own rule and no run loaded the skill to test them either way.
+
+The done-work misses are in the two treatment columns alone, one session
+each, which asked which version to set instead of setting it; the baseline
+has none. A rule about asking can induce exactly that, and one run in five
+is also within what five reps cannot tell from noise. No transcript line
+was recorded that settles which; the grader is scored in every later run of
+the case.
+
+## One turn: the committed prompt since
+
+The committed prompt no longer has the requester acknowledge the two
+questions: it names the plan file, which records both as asked with no
+answer yet, and asks for the rename and the version. The rubrics changed
+with it: the second fails a reply that gives what an item blocks without
+what happens if no answer comes, which the two-turn table shows is the
+common shape, and the script's rename is read as the new flag present and
+the old flag absent anywhere in the file, whatever the quoting. No hand run
+has been made on this prompt.
 
 The fixture's first draft planted the release version as a third waiting
 item. The changelog already names the next version, every baseline session

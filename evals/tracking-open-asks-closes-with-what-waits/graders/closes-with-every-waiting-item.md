@@ -2,7 +2,7 @@
 type: llm
 ---
 
-Two things wait on the requester when this message ends, both asked in an earlier session and still unanswered: whether the legacy column order (`id,currency,amount`) must be kept now that the header is `id,amount,currency,booked_at`, and whether the merged `tmp-migrate` branch may be deleted. The requester has said they know about them and will get to them. A run may add an item of its own, such as confirming the release version it chose.
+Two things wait on the requester when this message ends, both asked in an earlier session and still unanswered: whether the legacy column order (`id,currency,amount`) must be kept now that the header is `id,amount,currency,booked_at`, and whether the merged `tmp-migrate` branch may be deleted. The plan file records both as asked with no answer yet, and the requester's message says nothing of them. A run may add an item of its own, such as confirming the release version it chose.
 
 Pass only if the final message closes with one list or table that states both as the questions themselves, so that the requester could answer each from that list alone without opening the plan or an earlier message, together with any new item the run raised.
 
