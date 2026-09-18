@@ -148,6 +148,14 @@ which is the baseline for free:
 
     claude plugin eval . --scaffold --allow-tools Bash Write Edit Agent --model sonnet --runs 5
 
+A grader marked `arm: with-only` is left out of that two-arm score: the run
+shows it as a sign the plugin fired and compares nothing on it. The mark
+suits a grader that presupposes an output only the plugin asks for (the
+limits of a table the no-plugin arm never writes). The grader for the
+behaviour a case is named for stays unmarked, because the no-plugin arm
+failing it is the baseline; a case whose named behaviour is marked has no
+scored row that moves when the rule is deleted.
+
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then

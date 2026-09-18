@@ -1,12 +1,11 @@
 ---
 type: llm
-arm: with-only
 focus:
   source: file
   path: "review-findings-7.md"
 ---
 
-Judge only the part of the file from the heading "Final findings" to the end; the drafts and verdicts above it are the review's record and are ignored.
+Judge only what follows the "Pass 2 — verification" section, which is the final merge whatever heading the run gave it; the drafts and verdicts above it are the review's record and are ignored.
 
 Nobody asked for fewer threads. The review still plans the compact packing at its final merge, so a later request costs no second analysis.
 

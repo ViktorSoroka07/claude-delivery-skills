@@ -20,9 +20,14 @@ table beside the default list: the four docs minors in one row across three
 files, the docs medium alone, the other medium and the other minor alone.
 No row mixed grades. Every treatment reply gave both thread counts and
 named "post compact" as an ask. The baseline cannot produce the table, so
-the three graders that need it are marked `arm: with-only` and decide
-nothing; the decision rests on the other three, where the treatment arm
-scores no lower than the baseline on any.
+the three graders that need it were marked `arm: with-only` and decided
+nothing; the decision rested on the other three, where the treatment arm
+scores no lower than the baseline on any. That left the runner's two-arm
+score blind to the rule: with all three marked, deleting the compact
+paragraph moved no scored number. `packing-table-written` is unmarked since,
+so the behaviour the case is named for is scored in both arms and the
+no-plugin arm failing it is the baseline; the two graders that presuppose
+the table stay marked.
 
 The misses on report-keeps-the-bodies-out are the same in both arms and
 older than this rule: a reply that gives each finding a sentence of its
@@ -50,9 +55,13 @@ the five above on every grader but one reply that restated bodies). The
 baseline that counts ran as five fresh headless sessions started while the
 two files held the earlier text; each transcript shows the skill loaded and
 the compact paragraph absent. The headless sessions ran under the author's
-own settings, output style included, which the subagents did not; the three
-deciding graders read the file and the reply's counts, which a style does
-not reach.
+own settings, output style included, which the subagents did not. The two
+deciding graders that read the file are out of a style's reach.
+`report-keeps-the-bodies-out` is not: it fails a reply for retelling a
+finding's Problem in prose, which is what an explanatory style adds, and the
+style ran in the baseline arm only. Its 3/5 against 4/5 is therefore
+confounded in the treatment's favour and carries no weight; "no lower than
+the baseline" rests on the two file graders.
 
 ## The same case through the runner
 

@@ -5,7 +5,7 @@ focus:
   path: "review-findings-7.md"
 ---
 
-Judge only the part of the file from the heading "Final findings" to the end. Everything above it is the review's drafts and verdicts, where the refuted draft and ungrouped findings rightly appear; ignore it.
+Judge only what follows the "Pass 2 — verification" section, which is the final merge whatever heading the run gave it. Everything above that point is the review's drafts and verdicts, where the refuted draft and ungrouped findings rightly appear; ignore it.
 
 The final findings are written once, in default form, organised by severity. A packing plan sits beside that list and never replaces it.
 

@@ -5,7 +5,7 @@ focus:
   path: "review-findings-7.md"
 ---
 
-Judge only the part of the file from the heading "Final findings" to the end; the drafts and verdicts above it are the review's record and are ignored.
+Judge only what follows the "Pass 2 — verification" section, which is the final merge whatever heading the run gave it; the drafts and verdicts above it are the review's record and are ignored.
 
 Pass 2 refuted D8 (the empty `Retry-After` header): `readHeader` returns undefined for an empty value, so the case never reaches the parser. A refuted draft is dropped at the final merge; it stays only in the Pass 1 and Pass 2 sections, where it is the record.
 
