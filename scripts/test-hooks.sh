@@ -311,6 +311,63 @@ empty "context meter stays silent on a transcript with no usage" "$out"
 out=$(meter_payload "$WORK/quiet.jsonl" | DELIVERY_SKILLS_CONTEXT_WINDOW=50000 "$PY" "$METER_HOOK" 2>/dev/null)
 contains "context meter follows the window override" "$out" "82%"
 
+echo
+STOP_HOOK="$ROOT/hooks/uncommitted-changes.py"
+
+stop_payload() { # $1 = cwd, $2 = session id
+  printf '{"hook_event_name":"Stop","session_id":"%s","cwd":"%s","stop_hook_active":false}' "$2" "$1"
+}
+
+# 20. Uncommitted-changes hook: names tracked files a turn leaves uncommitted.
+#     Stop fires at the end of every turn, so the same line would repeat
+#     through a session that is mid-edit; the dedupe marker is what keeps it
+#     to once per set, and TMPDIR points it at the throwaway tree here.
+printf '' | TMPDIR="$WORK" "$PY" "$STOP_HOOK" >/dev/null 2>&1
+check "uncommitted hook fails open on empty stdin" 0 $?
+
+mkrepo t20
+printf 'x = 1\n' > f.py
+printf 'entry\n' > BACKLOG.md
+git add f.py BACKLOG.md
+git commit -qm init
+out=$(stop_payload "$R" s20a | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+empty "uncommitted hook stays silent on a clean tree" "$out"
+
+printf 'another entry\n' >> BACKLOG.md
+out=$(stop_payload "$R" s20a | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+msg=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["systemMessage"])' 2>/dev/null)
+check "uncommitted hook output is the systemMessage shape" 0 $?
+contains "uncommitted hook names the file left uncommitted" "$msg" "uncommitted: BACKLOG.md"
+contains "uncommitted hook names the rule to follow" "$msg" "one workstream per commit"
+
+# Same set again in the same session is the repeat the dedupe exists for; a
+# file joining the set is news, and a commit clearing it resets the state.
+out=$(stop_payload "$R" s20a | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+empty "uncommitted hook stays silent on the same set twice" "$out"
+printf 'y = 2\n' >> f.py
+out=$(stop_payload "$R" s20a | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+contains "uncommitted hook speaks again when the set grows" "$out" "f.py"
+git add -A
+git commit -qm second
+out=$(stop_payload "$R" s20a | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+empty "uncommitted hook stays silent once the set is committed" "$out"
+
+# Untracked files are not what this watches: a scratch file is not a stray
+# change, and warning on one would fire in every session.
+printf 'scratch\n' > notes.txt
+out=$(stop_payload "$R" s20b | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+empty "uncommitted hook ignores untracked files" "$out"
+
+# A staged rename reports "old -> new"; the new name is the one to commit.
+git mv f.py g.py
+out=$(stop_payload "$R" s20c | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+contains "uncommitted hook names the new side of a rename" "$out" "g.py"
+lacks "uncommitted hook does not name the old side of a rename" "$out" "f.py"
+
+# Outside a repository there is nothing to commit and nothing to say.
+out=$(stop_payload "$WORK" s20d | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
+empty "uncommitted hook stays silent outside a repository" "$out"
+
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
   exit 0
