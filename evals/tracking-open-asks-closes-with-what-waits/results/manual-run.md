@@ -115,6 +115,39 @@ item. The changelog already names the next version, every baseline session
 set it without asking, and the graders were rewritten around the two items
 that do wait.
 
+## A condition the requester only has to keep holding
+
+Seen in use: a session that had started an hour-long run whose safe end
+depended on the requester keeping an app closed put "keep it closed" into
+the waiting table of every later message, and the requester could not tell
+whether the list wanted an answer. Two turns on the same fixture with a soak
+script added whose header says the metrics dashboard must stay closed while
+it runs: turn one starts the soak and asks what to know about it; turn two
+asks for the rename. Five fresh headless sessions per arm on two models,
+graded on turn two's reply by hand. The baseline is the brief and skill as
+they stand; two wordings were tried, each a bullet in the skill's section on
+what waits and a clause in the brief's core.
+
+| Turn two | Sonnet, baseline | Sonnet, wording 1 | Sonnet, wording 2 | Strong, baseline | Strong, wording 1 | Strong, wording 2 |
+|---|---|---|---|---|---|---|
+| condition kept out of the waiting list | 5/5, 5/5 | 5/5 | 5/5 | 1/5, 1/5 | 5/5 | 5/5 |
+| condition not repeated at all | 4/5, 4/5 | 5/5 | 1/5 | 0/5, 0/5 | 4/5 | 2/5 |
+| both open questions restated | 4/5, 3/5 | 2/5 | 4/5 | 5/5, 5/5 | 3/5 | 3/5 |
+
+Two baselines per model because the first fixture's soak slept four minutes
+under a header that said an hour, and seven of ten sessions read the code
+and said so; the second fixture sleeps the hour. The baseline fails on the
+strong model alone: eight of ten of its sessions put the condition into the
+numbered table as an item to answer, where no Sonnet session did. Wording 1
+("said once and never listed") emptied the list on two strong sessions and
+two Sonnet ones. Wording 2 ("the list holds what needs a reply or an act; a
+condition ... is said once in the body ... and is not an item") kept the
+list on Sonnet but had four of five say the condition again in the body, and
+two strong sessions closed with "nothing waits on you except reviewing the
+diff" over two open owner questions. Restating fell from five of five to
+three of five on the strong model under both wordings; a rule that loses a
+neighbouring grader is not landed. The mechanism is queued in `BACKLOG.md`.
+
 ## Not tested
 
 The items' exit: that an answered item leaves the list, and that one
