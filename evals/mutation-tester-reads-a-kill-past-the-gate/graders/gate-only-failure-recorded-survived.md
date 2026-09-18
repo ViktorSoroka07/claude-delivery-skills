@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: "if \\(false\\)[^\\n]*SURVIVED"
+pattern: "amount < 0[^\\n|]*(?:→|->|=>)[^\\n|]*false[^\\n]*SURVIVED"
 match: contains
 ---
 
