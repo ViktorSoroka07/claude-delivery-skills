@@ -24,6 +24,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "refund-console.sh: $T is not empty; refusing to build a fixture over existing files" >&2
   exit 1
 fi
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 mkdir -p "$T/src" "$T/test" "$T/scripts" "$T/tracker" "$T/docs/plans"
 cd "$T"
 git init -q -b main
@@ -265,10 +266,12 @@ echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --s
 if [ "${2:-}" = "plan-drafted" ] || [ "${2:-}" = "plan-on-branch" ] || [ "${2:-}" = "plan-drafted-published" ]; then
   git checkout -qb feature/request-list
   if [ "${2:-}" = "plan-drafted-published" ]; then
+    mkdir -p .git/info
     echo ".origin.git/" >> .git/info/exclude
     git clone -q --bare . .origin.git
+    git -C .origin.git remote remove origin
     git -C .origin.git symbolic-ref HEAD refs/heads/main
-    git remote add origin .origin.git
+    git remote add origin "$(pwd)/.origin.git"
     git fetch -q origin
     git remote set-head origin main
     git branch -q --set-upstream-to=origin/feature/request-list feature/request-list

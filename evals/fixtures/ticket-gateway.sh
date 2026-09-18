@@ -28,6 +28,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "ticket-gateway.sh: $T is not empty; refusing to build over existing files" >&2
   exit 1
 fi
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 mkdir -p "$T/src/platform" "$T/test" "$T/scripts"
 cd "$T"
 git init -q -b main
@@ -218,6 +219,7 @@ that header."
 # The lint log stays out of the tree's status and starts non-empty, so a
 # grader can tell "never ran the fixer" from "log missing".
 if [ "${2:-}" = "stash-hook" ]; then git config core.hooksPath .githooks; fi
+mkdir -p .git/info
 echo ".lint-log" >> .git/info/exclude
 echo "built" > .lint-log
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"

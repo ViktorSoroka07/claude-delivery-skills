@@ -13,6 +13,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "import-throughput.sh: $T is not empty; refusing to build a fixture over existing files" >&2
   exit 1
 fi
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 mkdir -p "$T/docs"
 cd "$T"
 git init -q -b main

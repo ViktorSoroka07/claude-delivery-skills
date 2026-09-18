@@ -19,6 +19,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "refund-runbook.sh: $T is not empty; refusing to build over existing files" >&2
   exit 1
 fi
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 mkdir -p "$T/src" "$T/scripts" "$T/docs/oncall"
 cd "$T"
 git init -q -b main

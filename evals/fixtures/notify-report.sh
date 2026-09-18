@@ -21,6 +21,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "notify-report.sh: $T is not empty; refusing to build over existing files" >&2
   exit 1
 fi
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 mkdir -p "$T/docs/reports" "$T/notes" "$T/vendor-notes/notify"
 cd "$T"
 git init -q -b main
