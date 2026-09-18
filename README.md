@@ -65,7 +65,9 @@ skill ground-truths every claim about systems you did not write *before* the pla
 written (read-only checks: real data, then an existing consumer, then docs — a coherent
 argument is not evidence), puts the plan on the work's branch — created only when the
 session is on the default branch — commits it there where the repo commits plans, then
-stops so the plan can be read before anything is built.
+stops so the plan can be read before anything is built. Before handing the branch back it
+checks that the branch tracks nothing but its own name: an upstream naming the default
+branch turns a later push into a silent commit to the default branch.
 
 **[`implement-plan`](skills/implement-plan/SKILL.md) — the gate that is not written into the plan does not run.**
 Executors obey the plan, so a verification step that lives only in good intentions gets
@@ -212,8 +214,8 @@ process defect with a cause to fix, and stop what you started.
 When the requester has to re-ask, they have paid twice: once waiting, once auditing.
 Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
-ledger, not the items that happened to finish. The ledger runs both ways: what waits on
-the requester is restated at the end of every message, so an open
+ledger, not the items that happened to finish. The ledger runs both ways: while anything is
+outstanding, every message ends with what waits on the requester, so an open
 question never has to be found by re-reading the conversation.
 
 **[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**
@@ -272,7 +274,7 @@ instructions alone cannot:
     around. It speaks once per set of paths, because the end of every turn is the
     same moment as the end of the session.
 
-![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; four hooks are run by the harness — three warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target) and one injects the standing rules at session start](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; six hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted) and two inject what a session cannot see for itself (the standing rules at session start, and how far into its context window it has run)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
@@ -310,7 +312,8 @@ That's the default path. [`review-pr`](skills/review-pr/SKILL.md) also carries, 
 - **ungrouped** — disables the grouping default; every finding gets its own
   thread
 - **compact** — fewer threads: one defect class becomes one thread, across
-  files
+  files. The packing is worked out in every review, while the findings are in
+  context; asking for it posts from that plan rather than starting a new pass
 - **staged posting** — GitHub PENDING reviews, for holding publication until
   you submit
 - **apply mode** — fixes land only after every new test is proven failing
