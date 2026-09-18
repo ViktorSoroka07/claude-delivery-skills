@@ -29,7 +29,8 @@
 # misdescribe the code, and `review-findings-7.md` holds a review finished
 # through Pass 2 with no final section: four minors of one defect class over
 # three files, a medium of that class, a medium and a minor of other classes,
-# and one refuted draft.
+# and one refuted draft. The rename T3 asks for is made in this variant, so
+# the resolved thread is no eighth defect for a merge to pick up.
 #
 # Invented content throughout - a ledger sync CLI that never existed.
 set -e
@@ -237,6 +238,8 @@ cat > docs/faq.md <<'EOF'
 
 Up to 3 times, after which the command exits with "sync failed".
 EOF
+sed -e 's/const tmp = /const retryDelayMs = /' -e 's/return tmp;/return retryDelayMs;/' src/http/retry.js > src/http/retry.js.renamed
+mv src/http/retry.js.renamed src/http/retry.js
 fi
 
 git add -A

@@ -29,11 +29,12 @@ gap through `amount = 0` to `amount = 1`, which leaves coverage alone. The
 two arms were the same, five of five. The named mutation is what a record
 audit hands the agent, and it is the input on which the arms differ.
 
-The fixture's second trap, a waiver condition whose `tier` operand only
-removal exposes, did not separate the arms either: one treatment session of
-five removed the operand, the rest flipped it, and a flip is killed. One
-operand at a time is what the protocol asks for and what both arms did;
-removing an operand is a different mutation, which nothing yet asks for.
+The fixture then carried a second trap, a waiver condition whose `tier`
+operand only removal exposed. It did not separate the arms either: one
+treatment session of five removed the operand, the rest flipped it, and a
+flip is killed. No grader read it, so the fixture now pins the operand with a
+test of its own and carries the coverage trap alone: the runs above had six
+tests, and a build from the current script has seven.
 
 ## Not tested
 

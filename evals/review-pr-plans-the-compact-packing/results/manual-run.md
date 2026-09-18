@@ -36,7 +36,8 @@ One treatment run re-checked the fixture's resolved thread, found its rename
 unmade, added it as a ninth finding and packed it in a row of its own. That
 is the skill's dedupe step working on a defect the shared fixture carries
 for another case, and the graders judge by what each finding says, so it
-passes; a fixture built for this case alone would not carry it.
+passes. The `merge-findings` variant has since made that rename, so the
+resolved thread no longer hands a run a ninth finding.
 
 ## How the arms were produced
 

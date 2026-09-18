@@ -3,17 +3,12 @@
 # whose feature branch adds a fee function with its tests. $1 = target
 # directory (created; must not exist or be empty).
 #
-# Two traps a mutation sweep must not fall into:
-#   - `npm test` carries a line-coverage threshold of 100. The negative-amount
-#     clamp is executed by a test that asserts only the result's type, so a
-#     mutation that stops the clamp running fails no assertion, lowers
-#     coverage, and makes the command exit non-zero: a kill by exit code that
-#     no test made. Run without the threshold it survives, and the missing
-#     assertion is fee(-5) === 0.
-#   - the waiver condition is `waived && tier === "gold"`. The tests pin
-#     `waived` and never a waived non-gold account, so replacing the whole
-#     condition is killed while the `tier` operand alone survives. The missing
-#     assertion is a waived silver account still paying.
+# The one trap a mutation sweep must not fall into: `npm test` carries a
+# line-coverage threshold of 100. The negative-amount clamp is executed by a
+# test that asserts only the result's type, so a mutation that stops the clamp
+# running fails no assertion, lowers coverage, and makes the command exit
+# non-zero: a kill by exit code that no test made. Run without the threshold
+# it survives, and the missing assertion is fee(-5) === 0.
 # Everything else in the function is pinned.
 #
 # Invented content throughout - a fee schedule that never existed.
@@ -100,6 +95,10 @@ test("the fee is capped", () => {
 
 test("a waived gold account pays nothing", () => {
   assert.equal(fee(1000, "gold", true), 0);
+});
+
+test("a waiver on a silver account changes nothing", () => {
+  assert.equal(fee(1000, "silver", true), 20);
 });
 
 test("a negative amount is accepted", () => {
