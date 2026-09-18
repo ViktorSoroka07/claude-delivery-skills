@@ -15,5 +15,8 @@ __pycache__/
 # plan docs are local working artifacts here, by owner decision
 docs/plans/
 
+# machine-specific session hints; CLAUDE.md carries the repo's own
+CLAUDE.local.md
+
 # plugin eval run output
 evals/results/
