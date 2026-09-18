@@ -80,7 +80,35 @@ with it: the second fails a reply that gives what an item blocks without
 what happens if no answer comes, which the two-turn table shows is the
 common shape, and the script's rename is read as the new flag present and
 the old flag absent anywhere in the file, whatever the quoting. No hand run
-has been made on this prompt.
+has been made on this prompt. One run through the runner, three runs per
+arm, the runner's own arms (no plugin, the plugin) and its default judge:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| closes-with-every-waiting-item | 0/3 | 2/3 |
+| says-what-each-blocks-and-the-default | 0/3 | 0/3 |
+| done-work-reported-with-evidence | 3/3 | 2/3 |
+| rename-done-in-the-script | 3/3 | 3/3 |
+| no-old-flag-left-in-the-script | 3/3 | 3/3 |
+| rename-done-in-the-readme | 3/3 | 3/3 |
+
+Without the acknowledgement the case separates the arms on restating: no
+reply without the plugin carries the two questions, and two of three with it
+close on both, worded to be answered from that message alone. The
+consequence rubric fails every run in both arms. One plugin reply says what
+each item blocks and none says what happens if no answer comes, which is
+what the two-turn table found: the rule binds on restating and not on the
+default.
+
+The third plugin run is the done-work miss with its transcript line this
+time. It did the rename, then wrote "I don't want to guess the target" and
+made the version its first waiting item ("What version should `VERSION` be
+set to? ... I won't guess a semver bump"), where the changelog names the
+next version and every no-plugin run set it; it also dropped the
+`tmp-migrate` question. Counted with the hand runs above that is three
+plugin-side sessions in thirteen asking instead of doing, against none in
+eight without the rule. That reads as a cost of the rule, a session told to
+keep a list of questions finding one more to ask, more than as noise.
 
 The fixture's first draft planted the release version as a third waiting
 item. The changelog already names the next version, every baseline session
