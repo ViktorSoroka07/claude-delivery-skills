@@ -82,10 +82,44 @@ Where the rubric names something a reader can point at, the judge agrees
 with the hand grades. On the two rubrics that ask it to weigh a whole
 findings file or the tone of a reply it is far stricter than the hand
 grades, the same in both arms, and its three votes split on some runs; the
-runner itself warns that a judge is unreliable on a file this long. Those
-two rubrics want narrowing before their runner scores mean anything: the
-first to the final section alone, the second to a statement of what a
+runner itself warns that a judge is unreliable on a file this long.
+
+## Through the runner again, on the narrowed rubrics
+
+The two rubrics were narrowed straight after that run: the file rubrics to
+the part after the fixture's Pass 2 section, the reply rubric to what a
 one-line index may carry (a title, a grade, an anchor) and what it may not.
+`packing-table-written` lost its `with-only` mark, and the fixture's
+resolved thread has its rename made. Three runs per arm on that state:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| packing-table-written | 0/3 | 3/3 |
+| default-list-kept-whole | 3/3 | 3/3 |
+| refuted-draft-dropped | 3/3 | 3/3 |
+| report-keeps-the-bodies-out | 0/3 | 3/3 |
+| report-counts-both-ways (with-only) | | 3/3 |
+| packing-obeys-its-limits (with-only) | | 0/3 by the judge, 3/3 by hand |
+
+The narrowing did what it was for: the two rubrics the judge had scored at
+3/5 and at 0/5 and 1/5 now read 3/3 where a hand grade agrees, and the case
+has a scored row that goes to 0/3 when the plugin is absent. No run raised a
+ninth finding.
+
+`packing-obeys-its-limits` is the exception. The runner keeps each run's
+findings file as the grader's evidence, and all three plugin files pack
+correctly: one Minor row anchored at `docs/retry.md:3` holding the four docs
+minors, and the docs medium, the uncapped delay and the final-attempt wait
+in a row each. The merge renumbered the findings in every run, and two runs
+folded the two minors on `docs/retry.md` into one grouped finding, so the
+row's members read "F3 (items 1–2), F4, F5" or "3, 4, 5, 6" where the rubric
+names D1 to D4. The judge failed all three, three votes to none, on files of
+about nine thousand characters, with the runner's long-file warning on each.
+The rubric already says findings may be renumbered; that sentence does not
+carry a small judge through it. The grader is marked `with-only`, so no
+score moves on it, but its runner verdict means nothing as it stands: the
+rows' grades and anchors are regular enough for regex graders, which is what
+the runner's warning recommends.
 
 ## Not tested
 
