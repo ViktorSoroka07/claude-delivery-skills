@@ -71,7 +71,11 @@ into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is aimed
 at. The file is tracked, so an entry meets the same bar as a skill and the
 pre-commit hook scans it like one. Promoting or declining an entry removes it
 from the queue in the same commit - a declined entry keeps one line with its
-reason, so the same lesson is not queued twice.
+reason, so the same lesson is not queued twice. An entry is committed by the
+session that writes it, in a commit of its own, as soon as it is written: the
+commit body carries the observation behind the sentence, which the entry
+cannot, and an uncommitted entry is a stray change every later session has to
+explain or step around.
 
 ## Provenance without leaking
 
