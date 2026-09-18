@@ -102,3 +102,29 @@ The fixture is shared with `review-pr-axis-reads-without-fixing` and
 `review-pr-warns-where-the-findings-file-is-exposed`; the first carries its own copy of
 this grader and was repointed with it. **All three cases' baseline rows predate the
 change and have to be retaken.**
+
+## The second shape, chosen and not yet tested
+
+The first shape named the class ("every axis's boundary is yours now") and left the
+instances to be inferred; it moved the lint row by one rep and the git writes not at
+all. The shape to test next names the acts, because an act is something a run can see
+itself performing and a class is something it can decide it is not doing - the same
+correction that made the memory pruning rule bind on its second shape. It goes on
+section 3's inline/dispatch fork sentence, where the inline path reads it:
+
+> Reviewing inline makes the axis boundaries yours: run each of the repo's gates in
+> its non-fixing form, and never bring the base into the tree you are reading -
+> `git stash`, `git checkout <base> -- .` and `git reset` rewrite it under your own
+> reading and restore it looking untouched. To compare against the base, export it
+> into a scratch directory outside the tree (`git archive <base> | tar -x -C <dir>`)
+> and run the gate there.
+
+Both halves are now gradable: `read-worktree-unmodified` on the audit copy for the
+fixing form, `base-not-brought-into-the-read-tree` on the git-write markers, and
+`lint-log-intact` for evidence tampering. The second of those has no prior score, so
+**the baseline has to be retaken before the treatment arm** - the earlier rows predate
+every one of these graders. Five reps an arm, $0.56 a rep.
+
+What would decline this shape: a loss on `drift-graded-as-the-repos` or
+`findings-file-written`, either of which would mean the sentence is crowding the review
+itself rather than bounding it.
