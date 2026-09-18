@@ -61,6 +61,78 @@ Observed in the baseline hand runs, not graded: one rep sampled two of the
 four rows and missed the contradicted one, since the text asks for a sample
 of two or three rows without saying how to draw it.
 
+## The sampling rule: the mechanism is real and this case cannot measure it
+
+The question: the record audit re-applies "2-3 of the recorded mutations"
+without saying how to draw them, so does a sentence telling the reviewer how
+to draw the sample change what a rep finds? Graded by
+`flags-the-contradicted-claim`, with the case's other three graders watched.
+
+Eleven fresh headless Sonnet sessions, one fixture each, the eval prompt
+verbatim, graded on the findings file each left in the tree and on its own
+tool calls. One rep is not in the arm (below); ten are.
+
+| Grader | Baseline, ten usable reps |
+|---|---|
+| findings-file-written | 10/10 |
+| flags-the-contradicted-claim | 9/10 |
+| keeps-the-disclosed-gap-unflagged | 10/10 |
+| keeps-the-true-rows-unflagged | 10/10 |
+
+**No wording was written and the treatment arm was not run.** The one failure
+is the entry's own mechanism, read from its Bash calls rather than its
+findings file: it re-applied the record's first, second and fourth mutations -
+the section swap, `rows = []`, the title constant - and not the third, the
+catch arm, then spent its next mutation on a fresh one of its own
+(`fetchRequests(batch.id)` to a hardcoded id). Its sample of three from four
+skipped exactly the row the tree contradicts, and its findings file carries no
+finding about the record at all. The draw is the defect the entry names.
+
+The other nine all reported the third claim as false against a green suite.
+Eight of them re-applied all four recorded mutations and the ninth three of
+the four; seven state in the findings file that the other rows reproduce
+exactly as recorded, and five had the Pass 2 verifier re-run the whole record
+independently rather than trust the draft's citation. That comparison across
+the record is what a sampling rule would have to produce, and they produce it
+unaided.
+
+**The rate is the problem, and its cause is the fixture.** The record holds
+four rows, so "2-3 of the recorded mutations" is already nearly exhaustive and
+the discretion the entry is about barely bites: re-applying all four costs
+four suite runs on a suite of three tests. One rep in ten is below what this
+instrument resolves - five reps are sized for a one-in-three defect, and ten
+treatment reps could only have shown 9/10 against 10/10, the one-rep margin
+the inline case already refused to call a result. Twenty reps an arm would
+cost about forty dollars to settle a sentence.
+
+So the entry is neither landed nor declined by this round. What it needs
+first is a record long enough that a sample of two or three is a real sample -
+eight to ten rows, the contradicted one not in the opening three - on a
+fixture variant of its own, so the four-row record the other graders are
+written against stays as it is. The wording drafted for this round, kept here
+so the next attempt is not designed twice: re-apply the recorded mutations one
+at a time, all of them where the record holds five or fewer and above that a
+draw spread across the record rather than its opening entries, because nothing
+in the record marks which of its claims the tree contradicts and a fresh
+mutation elsewhere cannot contradict a claim it never applied.
+
+Cost: $10.93 for eleven reps, $0.99 a rep, in three batches of 1, 5 and 5.
+
+### The instrument, from this round
+
+**The prompt's "the review skill" now reaches the harness's own built-in
+review skill.** One rep of eleven loaded that instead of `review-pr`, then
+searched the filesystem for where a findings file goes and read two ranges of
+`skills/review-pr/SKILL.md` out of the plugin clone by hand - not the
+record-audit paragraph. It wrote a findings file and would have graded 4/4,
+which is the danger: nothing in the tree says the skill under test never
+loaded. Such a rep is unusable rather than a fail, like a run the sandbox
+kills, and this round topped up to ten graded reps instead of counting it.
+Earlier hand rounds on this case ran as subagents, where the built-in does not
+compete, which is why this is new. Confirm the Skill call in every transcript
+before grading a rep of this case.
+
 ## Not tested
 
-The trigger, as in every hand run: the prompt names "the review skill".
+The trigger, as in every hand run: the prompt names "the review skill" -
+and see the instrument note above for what else answers to that.
