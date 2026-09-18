@@ -153,7 +153,7 @@ Every mode below is off unless the user asks. The failure this section exists to
 | **Deep review** | "deep", "thorough", "exhaustive", "paranoid" — or a repo-memory pin | Full axis set instead of triage (§3); Pass 2 becomes a blind re-review plus isolated skeptics per finding, locus-sharing per §4 |
 | **Scoped review** | names an area, file, or concern | That scope is honored *on top of* the triage, never in place of the mutation axis (§3) |
 | **Ungrouped** | "one thread per finding", "don't group" | Disables §2's grouping default |
-| **Compact** | "post compact", "compact", "fewer threads" | Posts from the MD's compact packing table: one defect class is one thread, across files; multi-member threads lose their one-click suggestions (§2) |
+| **Compact** | "post compact", "compact", "fewer threads" | Posts from the MD's compact packing table: one defect class is one thread, across files; multi-member threads lose their one-click suggestions (posting reference) |
 | **Post** | "post" | Publishes the final findings (§6) |
 | **Staged post** | "hold it", "I'll submit it myself" | Findings staged invisibly where the platform supports it; where it does not, say so plainly and post nothing |
 | **Apply** | "apply", "fix these" | Findings become edits on the branch, each new test failing against pre-fix code first (§6) |
