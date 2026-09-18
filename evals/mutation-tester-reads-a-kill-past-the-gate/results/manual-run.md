@@ -81,11 +81,29 @@ now anchor on the clamp's own condition, and the second counts KILLED only
 where it opens a cell, so a row that reads SURVIVED and names the earlier
 record's claim passes.
 
+## The committed prompt through the runner
+
+The hand runs above started the agent directly; the committed prompt has a
+session dispatch it and relay its report, and all four graders read that
+relay. One run of `claude plugin eval` over the suite, three runs per arm,
+the runner's own arms and its default judge, on the fixture with the single
+trap and the graders anchored on the clamp's row:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| gate-only-failure-recorded-survived | 0/3 | 3/3 |
+| gate-only-failure-not-recorded-killed | 3/3 | 3/3 |
+| threshold-taken-out-of-the-command | 0/3 | 3/3 |
+| clamp-gap-filed-as-a-test-gap | 0/3 | 3/3 |
+
+The clamp's row reached the reply in every plugin run, which is what the two
+regex graders need from the relay. The second row passes without the plugin
+because no reply there put KILLED in a cell of the clamp's row; its sibling
+requires the row to read SURVIVED and fails those runs.
+
 ## Not tested
 
 The other rules carried into the contract: a mutation that does not compile,
 a staleness gate on a generated artifact, a candidate the type system
 settles before a run, a survivor on a subset confirmed against the full
-suite. The case's
-committed prompt, which has a session dispatch the agent; the hand runs
-started the agent directly.
+suite.
