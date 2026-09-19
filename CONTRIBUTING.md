@@ -239,6 +239,30 @@ evidence, and the four rules are not interchangeable:
   outcome can do. Under `--ablation none` the mark does nothing and the
   grader is scored like any other.
 
+**A new grader is mechanical unless its condition is irreducibly semantic.**
+`regex`, `file_exists` and `tool_used` cost nothing per rep, return the same
+verdict every time, and can be tried against an artifact that already exists
+before a case is ever run; an `llm` grader is a judgement bought per rep and
+read through whatever that judge does with the rubric's shape. The
+compact-packing case is the precedent: five regex graders over the findings
+file replaced one rubric that had failed three files which pack correctly by
+hand.
+
+The boundary is what the pattern is anchored to. **A pattern matching a string
+the fixture seeded scores whether the run edited the draft, not whether it did
+what the rule asks** - the unaided arm fails by keeping the seeded word, the
+treated arm passes by deleting it, and the row looks like the rule working
+until the fixture's wording is softened, after which the grader passes in both
+arms with nothing to say it has stopped measuring. Anchor a pattern in what the
+run must produce - a figure it has to carry across from the notes, a path, a
+marker the rule requires - and it is a grader; anchor it in what the fixture
+planted and it is a diff detector. Where the rule is about what the run writes
+instead, and where - a requirement beside the options, a proportion before the
+failure, a frame around an imperative, a pointer whose path the run chooses -
+no pattern reaches it, and a judged rubric is the instrument even where it
+grades harshly. Both were tried on one family and the trial is written up under
+the judge paragraph below.
+
 **The default judge is the weakest part of the instrument, and the next baseline
 is run with `--judge-model sonnet`.** Scored against hand labels on two kept
 findings files — one that should pass the rubric it is put through and one that
