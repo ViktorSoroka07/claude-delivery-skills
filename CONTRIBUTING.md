@@ -360,6 +360,87 @@ Rules that held in practice, each answering a failure seen here:
   case whose correct behaviour the machine forbids is otherwise unmeasurable in
   either arm.
 
+## When a rule outlives the model that needed it
+
+A rule lands here because a model needed it, and it is paid for on every load
+after that. Nothing holds a model still, so some rules stop being needed — and
+the instrument already collects the signal for nothing, because the default run
+scores both arms. **A row whose no-plugin arm scores as well as its plugin arm
+is the flag.**
+
+It is a flag and not a result: three things produce that shape, and only one of
+them is a rule to retire.
+
+1. **The row is not measuring.** A grader that passes without the behaviour
+   converges the arms for free — `exists: false` on a path the run never touched
+   passes either way, and a rubric with no `focus` votes on a final message that
+   holds no evidence in either arm. Show that the row can fail before reading
+   its convergence — twenty of this suite's seventy-one `llm` graders carry no
+   `focus`, so this is the common shape and not an exotic one.
+2. **Nothing landed behind the row.** A case scores every grader it was given,
+   not only the behaviour it is named for, so a row can guard something the
+   model does unaided with no rule behind it at all. There is nothing to retire;
+   what the row is now is a regression guard on a behaviour that is free today.
+3. **The model has internalised the rule.** This one is the retirement, and it
+   is confirmed by measurement rather than by the flag.
+
+The same arithmetic hides the flag as readily as it fakes one, so a row that
+does *not* converge is a reading only where its graders resolved. One case here
+had two file-reading rows sitting at 0/3 in the unaided arm on thrown graders
+alone, which reads as the plugin winning both; once the prompt named the file
+those graders read, one row still separated (0/3 against 3/3) and the other
+scored 3/3 in both arms. The row that converged is the second reading above:
+its candidate sentence had been declined, the weaker model having found the
+thing it asked for in five of five reps.
+
+**The retirement test is the landing test run backwards.** The rule's text is
+whatever its landing commit added — to the skill that owns it, and to any copy
+in the brief's core line, an agent contract or the README paraphrase — and the
+arm without the rule is the current tree with exactly that removed, in a
+worktree the hand run's `--plugin-dir` then points at. Where the landing commit
+carried two rules, which happens here, only the hunks of the one under test
+come out.
+
+    git show <landing-commit> -- skills agents hooks/session-brief.md README.md \
+      | git apply -R --check
+
+**Expect that to refuse, and read the refusal as information.** Reversing a
+landing patch works only while nothing has rewritten the lines around it, and
+the files rules land in are the files that keep growing: of this repository's
+landings to date, 40 of 77 no longer reverse-apply. The diff still says which
+sentences the rule is, so where the reversal refuses, take those sentences out
+of the current text by hand. The parent's file
+(`git show <landing-commit>^:<file>`) is not that arm unless
+`git log <landing-commit>..HEAD -- <file>` is empty: where the file has moved on
+since, its parent is the current text minus every rule that landed after this
+one, which is a different arm than the one under test — and it is wrong silently
+where `git apply -R` is wrong loudly.
+
+Run the two texts against each other as an edited sentence is run above, on the
+model that kind of rule is measured on. That section carries over, the
+both-arms-every-grader rule included, except in two places. **Its first rule
+inverts:** here the arm without the rule passing is the result being looked for,
+not the signal to stop — the entry check and the exit check are one question
+read in opposite directions. And **the comparison point is the landing's own
+rows**, which hold only while the case and its fixture have not moved since they
+were taken: where a record dates its tables it says which fixture commits
+re-stale them, and where it does not, the case's own history answers it. Where
+they have moved, or where the rule landed before anyone measured it, the run
+supplies both arms itself and the comparison is between those two.
+
+The rule is deleted from every file that carries it — the files the pathspec
+above names, not the case, the fixture or the backlog — when the arm without it
+matches the rate the arm with it scored at landing.
+
+Record the retirement the way the landing was recorded — the rows in the case's
+`results/manual-run.md`, the measurement in the commit body — and keep the case.
+A retired rule's case is the only thing that would show the behaviour coming
+back, and what was being paid for on every load was the rule, not the case.
+
+Run the sweep when the model in use changes, and while the rows it reads
+against are still current: once the comparison has gone stale, every rule in
+the sweep costs a fresh two-arm run instead of a reading.
+
 ## A skill that carries executable content
 
 Most skills here are instructions alone, and an eval case is the whole test. A
