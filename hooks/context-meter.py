@@ -8,6 +8,14 @@ usage the last main-thread API call recorded in the transcript, not from an
 estimate of the file's length.
 
 Fails open: any error emits nothing and the prompt goes through unannotated.
+
+The window itself cannot be read from the transcript - the same model id runs
+with different windows - so it is assumed, and the assumption is checked: a
+session that has passed the configured window is running in a larger one,
+because the call that carried it would have been refused otherwise. Past that
+point the percentage is meaningless, and saying so is the only honest thing
+the hook can do; telling such a session to wind down is a false alarm on every
+prompt it sends.
 """
 import json
 import os
@@ -16,6 +24,14 @@ import sys
 DEFAULT_WINDOW = 200000
 THRESHOLD = 0.70
 TAIL_BYTES = 1 << 20
+
+MISCALIBRATED = (
+    "delivery-skills context meter: this session has passed %s tokens while the meter "
+    "is set to a %s-token window, so the window is bigger than the meter assumes and "
+    "its percentage says nothing about how much room is left. Read nothing into it "
+    "here; setting DELIVERY_SKILLS_CONTEXT_WINDOW to this session's real window makes "
+    "the meter work again."
+)
 
 LINE = (
     "delivery-skills context meter: this session is at %d%% of its context window "
@@ -80,11 +96,15 @@ def main():
     tokens = context_tokens(path)
     if tokens < limit * THRESHOLD:
         return
+    if tokens > limit:
+        context = MISCALIBRATED % (thousands(tokens), thousands(limit))
+    else:
+        context = LINE % (
+            round(100.0 * tokens / limit), thousands(tokens), thousands(limit))
     sys.stdout.write(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "UserPromptSubmit",
-            "additionalContext": LINE % (
-                round(100.0 * tokens / limit), thousands(tokens), thousands(limit)),
+            "additionalContext": context,
         }
     }))
 

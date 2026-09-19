@@ -263,6 +263,11 @@ meter_payload() { # $1 = transcript path
   printf '{"hook_event_name":"UserPromptSubmit","transcript_path":"%s","prompt":"go"}' "$1"
 }
 
+# Every percentage below is a percentage of a window, and the hook takes that
+# window from the environment: run with the operator's own value set, these
+# cases assert one number and measure another. Each run pins its own.
+meter() { env DELIVERY_SKILLS_CONTEXT_WINDOW="${1:-200000}" "$PY" "$METER_HOOK"; }
+
 usage_line() { # $1 = input tokens, $2 = cache-read tokens
   printf '{"type":"assistant","message":{"usage":{"input_tokens":%s,"cache_read_input_tokens":%s}}}\n' "$1" "$2"
 }
@@ -271,15 +276,15 @@ usage_line() { # $1 = input tokens, $2 = cache-read tokens
 #     past the threshold only. It fails open like the others, and a session
 #     that never sees the line is the failure it exists to prevent, so the
 #     silent paths are asserted as tightly as the loud one.
-printf '' | "$PY" "$METER_HOOK" >/dev/null 2>&1
+printf '' | meter >/dev/null 2>&1
 check "context meter fails open on empty stdin" 0 $?
 
 usage_line 1000 40000 > "$WORK/quiet.jsonl"
-out=$(meter_payload "$WORK/quiet.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/quiet.jsonl" | meter 2>/dev/null)
 empty "context meter stays silent below the threshold" "$out"
 
 usage_line 2000 150000 > "$WORK/loud.jsonl"
-out=$(meter_payload "$WORK/loud.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/loud.jsonl" | meter 2>/dev/null)
 ctx=$(printf '%s' "$out" | "$PY" -c 'import json,sys; d=json.load(sys.stdin)["hookSpecificOutput"]; assert d["hookEventName"]=="UserPromptSubmit"; print(d["additionalContext"])' 2>/dev/null)
 check "context meter output is the UserPromptSubmit JSON shape" 0 $?
 contains "context meter names how far into the window the session is" "$ctx" "76% of its context window"
@@ -289,8 +294,22 @@ contains "context meter names the skill that owns the hand-over" "$ctx" "maintai
 # agent's few thousand tokens as the session's own.
 cp "$WORK/loud.jsonl" "$WORK/side.jsonl"
 printf '{"type":"assistant","isSidechain":true,"message":{"usage":{"input_tokens":3000}}}\n' >> "$WORK/side.jsonl"
-out=$(meter_payload "$WORK/side.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/side.jsonl" | meter 2>/dev/null)
 contains "context meter reads past a subagent's own window" "$out" "76%"
+
+# A window the session has already passed is not the window: the call carrying
+# those tokens would have been refused. The percentage is then meaningless, and
+# the hook says so instead of telling a session with room left to wind down.
+usage_line 9000 250000 > "$WORK/over.jsonl"
+out=$(meter_payload "$WORK/over.jsonl" | meter 2>/dev/null)
+ctx=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])' 2>/dev/null)
+contains "context meter reports a window it has passed as miscalibrated" "$ctx" "bigger than the meter assumes"
+contains "context meter names the override that fixes it" "$ctx" "DELIVERY_SKILLS_CONTEXT_WINDOW"
+lacks "context meter does not tell an over-window session to wind down" "$ctx" "Reach the next seam"
+
+# The same transcript against a window that really is that big stays silent.
+out=$(meter_payload "$WORK/over.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter stays silent where the window is actually larger" "$out"
 
 # The tail read, on a transcript past the 1 MB the hook seeks back over: the
 # seek lands mid-line, and a dropped line must not be the usage line.
@@ -298,14 +317,14 @@ contains "context meter reads past a subagent's own window" "$out" "76%"
 with open(sys.argv[1], "w") as fh:
     fh.write("{\"type\":\"user\",\"pad\":\"" + "x" * 1200000 + "\"}\n")
     fh.write("{\"type\":\"assistant\",\"message\":{\"usage\":{\"input_tokens\":2000,\"cache_read_input_tokens\":150000}}}\n")' "$WORK/big.jsonl"
-out=$(meter_payload "$WORK/big.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/big.jsonl" | meter 2>/dev/null)
 contains "context meter reads the tail of a large transcript" "$out" "76%"
 
-out=$(meter_payload "$WORK/no-such.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/no-such.jsonl" | meter 2>/dev/null)
 empty "context meter stays silent without a transcript" "$out"
 
 printf '{"type":"user"}\n' > "$WORK/nousage.jsonl"
-out=$(meter_payload "$WORK/nousage.jsonl" | "$PY" "$METER_HOOK" 2>/dev/null)
+out=$(meter_payload "$WORK/nousage.jsonl" | meter 2>/dev/null)
 empty "context meter stays silent on a transcript with no usage" "$out"
 
 out=$(meter_payload "$WORK/quiet.jsonl" | DELIVERY_SKILLS_CONTEXT_WINDOW=50000 "$PY" "$METER_HOOK" 2>/dev/null)
