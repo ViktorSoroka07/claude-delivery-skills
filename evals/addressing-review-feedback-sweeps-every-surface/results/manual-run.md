@@ -107,15 +107,77 @@ published main, so it passes. Four runs added a trim to the log-line fix;
 the rejected-the-unreachable-major grader reads the parser, which no run
 touched.
 
-## Fixture note
+## Fixture note (closed)
 
-The forge's data lives in `forge/` inside the fixture tree, gitignored but
-readable, and one run read it directly instead of through the script. The
-read-every-surface grader then fails a run that did read every surface. The run
-that did so also read the resolved thread's body from disk, which no grader
-reading the log can see. A real forge is not a directory; the next fixture
-revision should put the data where a repository search does not find it
-(recorded in the review findings as B3).
+The forge's data used to live in `forge/` inside the fixture tree, gitignored
+but readable, and one round-1 run read it directly instead of through the
+script. The read-every-surface grader then failed a run that had read every
+surface, and that run also read the resolved thread's body from disk, where no
+grader reading the log can see it. The data now lives in the fixture's own
+`.git/forge/`, which `forge.sh` resolves; the call log stays at the repo root
+where the graders read it. Every table above round 3 was taken against the
+readable layout.
+
+## Round 3 — the closing re-check phrase, tested as a slot (baseline only)
+
+Change proposed: restate the Modes section's closing-message rule ("the count
+and the phrase, in one line") as a slot the run fills — `N resolved thread(s)
+not re-checked — say "check the resolved threads too" to include them.` Rounds
+1 and 2 each lost one run in five on inventory-complete to the same clause: the
+report stated the count and then offered something other than the ask.
+
+**The baseline does not fail, so no wording was written and no treatment arm
+was run.** Ten fresh headless Sonnet reps on the current text, on the fixture
+with the data moved into `.git/forge/`:
+
+| Grader | round 1 | round 2 | round 3 baseline |
+|---|---|---|---|
+| inventory-complete | 4/5 | 4/5 | 10/10 |
+| read-every-surface | 4/5 | 5/5 | 10/10 |
+| no-fix-reply-before-push | 5/5 | 5/5 | 10/10 |
+| no-gratitude | 5/5 | 5/5 | 10/10 |
+| rejected-the-unreachable-major | 5/5 | 5/5 | 10/10 |
+| rejections-and-question-answered | 5/5 | 5/5 | 10/10 |
+| resolved-thread-code-untouched | 5/5 | 5/5 | 10/10 |
+| resolved-threads-need-an-ask | 1/5 | 5/5 | 10/10 |
+| scanner-finding-not-in-plan | 5/5 | 5/5 | 10/10 |
+
+All ten reps named both resolved threads as not re-checked and quoted the
+trigger phrase verbatim, in four shapes ("Say ... if you want them
+re-checked", "To have me re-read them ..., say ...", "Saying ... re-checks
+them against the current head", and one that asked it back as a question).
+Every transcript carries the Skill call for this skill. The skipped-clause
+failure rounds 1 and 2 found did not recur once.
+
+**What changed is the instrument, not the sentence.** Rounds 1 and 2 ran as
+subagents with the contract pasted into the brief; round 3 ran as fresh
+headless sessions loading the installed plugin, which is what CONTRIBUTING's
+procedure now requires, because a subagent gets the skill text its parent
+cached at session start. A rule that reached the model through a pasted brief
+is not the same stimulus as one reached through the skill's own trigger, and
+the pasted-brief rounds are the weaker instrument. Five reps were run first and
+came back clean; five more were added before concluding, because the earlier
+rounds put the rate near one in five, where a clean five is a third of the
+time.
+
+A rule whose baseline passes adds nothing for any model, so the slot is
+declined rather than landed. Anything that revives it needs a fresh failure
+seen on this instrument, not the pasted-brief rounds above.
+
+Ten reps, $2.12, about five minutes at three concurrent.
+
+## Runner pass at the moved fixture
+
+One pass of this case through `claude plugin eval` after the data moved into
+`.git/forge/` (one rep an arm, $1.35, six minutes): the scaffold built, all
+nine graders resolved their focus files, and no grader threw. The plugin-arm
+run reached the resolved threads through `threads --all` — logged, and caught
+by resolved-threads-need-an-ask, which is the read that used to be possible
+off disk and invisible. One judge miss to note for later hand-grading:
+read-every-surface was failed three votes to none on a log that shows
+`threads`, `reviews` and `comments` four minutes before the first reply; the
+`threads --all` call at the end of that log appears to be what the judge
+scored.
 
 ## The bot-resolved thread (rule queued, not landed)
 
