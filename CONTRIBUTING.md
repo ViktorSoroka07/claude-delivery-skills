@@ -501,6 +501,18 @@ the version alone releases nothing, so the bump is the decision.
 Make the bump in the commit that changes the behavior, not in a separate
 "release" commit.
 
+**The generated notes are the starting point, not the release.** A commit
+subject states the outcome of a change for this tree, which is not what the
+release gave someone who installed the plugin - so a release is not finished
+until its notes say in prose what changed for a user: a short paragraph for
+each change a subject alone does not explain, what it now does and why that
+shape, with the generated list left beneath them. Write each paragraph from the
+commit's body, where the mechanism is, rather than from its subject.
+`gh release edit <tag> --notes-file <file>` publishes them. Two things bind:
+the notes are published text that strangers read, so "What must never appear"
+governs every sentence; and `gh auth status` must show the account that owns
+this repository before any edit, since a machine can hold several.
+
 ## Before pushing
 
 Three checks, in this order. CI runs all three and fails on any of them, but
