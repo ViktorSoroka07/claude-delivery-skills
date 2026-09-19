@@ -173,6 +173,33 @@ behaviour a case is named for stays unmarked, because the no-plugin arm
 failing it is the baseline; a case whose named behaviour is marked has no
 scored row that moves when the rule is deleted.
 
+What each grader type is allowed to see decides where a case can put the
+evidence, and the four rules are not interchangeable:
+
+- **`focus` on an `llm` grader and `target` on a `regex` grader resolve one
+  literal existing file** in the run's workspace. A glob throws "does not
+  exist", a directory throws "is not a regular file", and an absent path
+  throws and is scored a fail, `not_contains` included. A grader can therefore
+  only read a file whose path is fixed before the run: where the output's name
+  would be the run's choice, the case prompt names the path, and where it
+  cannot (a memory entry the skill itself names), the grader reads the index
+  that points at the file instead.
+- **An `llm` grader with no `focus` is shown the run's final message and
+  nothing else.** A rubric about a document the run wrote is then a vote on
+  the summary of it, which is the one text that cannot hold the evidence.
+- **A `file_exists` grader reads the run's own file changes, not the
+  workspace tree.** A file the scaffold wrote and the run left alone reports
+  missing, and `exists: false` passes whether the run deleted the path or
+  never touched it - so no grader proves a deletion, and a case whose
+  behaviour is a deletion is hand-graded against the tree.
+- **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
+  `arm: with-only`: under the two-arm run it is shown and scored in neither
+  arm, and the arm without the plugin never evaluates it, so it cannot throw
+  there. It is what separates a case's fail into "the skill never loaded" and
+  "the skill loaded and its rules did not hold", which no scored grader on the
+  outcome can do. Under `--ablation none` the mark does nothing and the
+  grader is scored like any other.
+
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then
