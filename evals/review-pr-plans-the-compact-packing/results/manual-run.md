@@ -121,6 +121,93 @@ score moves on it, but its runner verdict means nothing as it stands: the
 rows' grades and anchors are regular enough for regex graders, which is what
 the runner's warning recommends.
 
+## Rebuilt as regex graders
+
+`packing-obeys-its-limits` is retired. Five regex graders over the same file
+replace it, one for each row a correct packing must have and one for the row it
+must not:
+
+| Grader | Reads |
+|---|---|
+| `packing-docs-minors-in-one-row` | a Minor row anchored in `docs/retry.md`, `docs/cli.md` or `docs/faq.md` |
+| `packing-docs-medium-alone` | a Medium row anchored at `docs/retry.md:7` |
+| `packing-uncapped-delay-alone` | a Medium row anchored at `src/http/retry.js:18` |
+| `packing-final-wait-alone` | a Minor row anchored at `src/cli/sync.js:10` |
+| `packing-docs-minors-not-spread` | no second Minor row anchored in a docs file |
+
+Each reads the grade cell and the anchor cell of a row in the column order the
+skill prescribes (thread title, grade, members, anchor) and leaves the members
+cell alone, which is the cell the judge could not read: the merge renumbers the
+findings in every run and some runs fold the two `docs/retry.md` minors into one
+grouped finding, so one correct packing writes `F3 (items 1-2), F4, F5` there,
+another `N1 (D1, D2), N2 (D3), N3 (D4)` and a third `3, 4, 5, 6`. The grades are
+identical across every run, and the anchors are fixed wherever the row has one
+member.
+
+The four failure modes the retired rubric named each take away one of those five
+checks, which is what makes the family sufficient without reading the members:
+the docs medium packed with the minors takes away the Medium row at
+`docs/retry.md:7`; the final-attempt wait riding in the docs row takes away the
+Minor row at `src/cli/sync.js:10`; the two mediums sharing a row takes away one
+of the two Medium rows; and the four docs minors spread over more than one row
+adds a second Minor docs row.
+
+### What the runner's first pass corrected
+
+The family was first written with the docs row pinned to `docs/retry.md:3`, the
+anchor all three kept baseline files use, and the spread read as a row anchored
+in `docs/cli.md` or `docs/faq.md`. Three runs through the runner scored that
+1/3: two of them packed the four docs minors correctly into one Minor row and
+anchored it at `docs/retry.md:5`, one of the two naming the member it took the
+anchor from. A row's anchor is one of its members' and which member is the run's
+choice, so both the pinned line and the pinned file were the grader's assumption
+rather than the rule's.
+
+Both graders were rewritten around that: the docs row may be anchored at any
+line of any of the three docs files, and the spread is read as *two* Minor rows
+anchored in a docs file rather than as one row anchored in a particular file.
+The new shape also catches a split the first one could not see at all - the four
+minors in two rows both anchored inside `docs/retry.md`.
+
+A regex grader keeps no `evidence` in the run JSON, only the pattern and
+"pattern not found in file". The findings file of a failing run is reachable
+anyway: the case's `llm` graders focus on the same file, and their evidence is
+that file.
+
+### Tested on every file kept, and on eleven written by hand
+
+The three findings files the release baseline kept as the retired grader's
+`evidence` - the three the judge failed three votes to none, and which pack
+correctly by hand - score 5/5, as do the three from the runner pass above. The
+hand-written files are built from one of them, one per case:
+
+| Hand-written file | Result |
+|---|---|
+| the docs medium packed into the minors' row | fails `packing-docs-medium-alone`, and only that |
+| the final-attempt wait in the docs row | fails `packing-final-wait-alone`, and only that |
+| the two mediums sharing a row | fails `packing-uncapped-delay-alone`, and only that |
+| the docs minors spread over three rows | fails `packing-docs-minors-not-spread`, and only that |
+| the docs minors split into two rows inside `docs/retry.md` | fails `packing-docs-minors-not-spread`, and only that |
+| no packing table at all | fails the four row graders; the spread grader passes |
+| bold grades, anchors without backticks | passes 5/5 |
+| an anchor cell reading `src/http/retry.js:18 (retryDelayFor)` | passes 5/5 |
+| an anchor cell listing all four members' anchors behind its own | passes 5/5 |
+| the docs row anchored at `docs/cli.md:5` | passes 5/5 |
+| a single-member row anchored at `:30` where the finding is at `:3` | fails that row's grader |
+
+The last four set the tolerance of the anchor cell. It has to open with the
+anchor and may carry anything after it, so a parenthetical or a list of the
+members' own anchors passes; and where a row has one member the line number has
+to end where the anchor does, so `:30` is not `:3`. The grade cell is the strict
+one: it holds the grade alone, since a cell naming two grades is the mixed row
+compact forbids.
+
+A file with no table fails the four row graders and passes the spread grader,
+which is right and is why `packing-table-written` - not this family - carries
+the question of whether a table was written at all. All five keep the
+`with-only` mark the retired grader had, for the reason the first runner section
+gives.
+
 ## Not tested
 
 The trigger: "my review … finish the review" names the activity. The
