@@ -269,7 +269,11 @@ instructions alone cannot:
     hands over rather than starting another task. A session has no view of its own
     meter, which is why the rule that asked it to name a seam had to become a
     measurement. The size comes from the transcript's own usage numbers, against a
-    200k window unless `DELIVERY_SKILLS_CONTEXT_WINDOW` sets another.
+    200k window unless `DELIVERY_SKILLS_CONTEXT_WINDOW` sets another - set it where
+    sessions run a larger window, since the transcript names the model but not the
+    window and the same model id runs with both. Unset on such a machine, the meter
+    reports that the window is larger than it assumes rather than telling a session
+    with room left to wind down.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
