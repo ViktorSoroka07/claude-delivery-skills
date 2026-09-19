@@ -200,6 +200,19 @@ evidence, and the four rules are not interchangeable:
   outcome can do. Under `--ablation none` the mark does nothing and the
   grader is scored like any other.
 
+**The default judge is the weakest part of the instrument.** Measured on one
+findings file of about six kilobytes that satisfies a four-condition rubric in
+full: the default judge failed three of the four conditions three votes to
+none, and a stronger judge passed the same file on the same wordings. Loosening
+the wording changed nothing; splitting the rubric into one grader per condition
+changed nothing under the default judge and was what let the stronger one grade
+each condition separately. So a rubric with more than one condition over a file
+of that size is not gradable by default, and the levers are: one condition per
+grader, `--judge-model` on the invocation (a grader cannot name its own judge —
+the key is rejected at load), and a hand grade from the `evidence` the run JSON
+keeps. A baseline taken with the default judge carries this error on every
+multi-condition rubric it contains.
+
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then
