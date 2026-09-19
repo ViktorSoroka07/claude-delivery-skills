@@ -2,7 +2,7 @@
 type: llm
 focus:
   source: file
-  path: "forge/posted.md"
+  path: ".git/forge/posted.md"
 ---
 
 Two findings carry no open question: F1 (the header's delay passed through uncapped, `src/http/retry.js:18`) and F2 (the loop waits after the final failed attempt, `src/cli/sync.js:10`). Neither duplicates a thread already on the PR.

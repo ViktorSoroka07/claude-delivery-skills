@@ -3,8 +3,9 @@
 # whose feature branch has a pull request with feedback spread over every
 # surface a forge offers, reachable only through a script that logs every
 # call. $1 = target directory (created; must not exist or be empty).
-# The forge script and its dump stay untracked, so the branch head the dump
-# names is the local HEAD.
+# The forge script and its call log stay untracked; the forge's own data sits
+# in the fixture's .git/forge/, so reading any of it means running the script
+# and leaving a log line. The branch head the data names is the local HEAD.
 #
 # The feedback is designed so that each item exercises one rule:
 #   T1  bot major that is unreachable one layer down (readHeader drops empties)
@@ -40,7 +41,7 @@ if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   exit 1
 fi
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
-mkdir -p "$T/src/http" "$T/src/cli" "$T/scripts" "$T/forge" "$T/docs/plans"
+mkdir -p "$T/src/http" "$T/src/cli" "$T/scripts" "$T/docs/plans"
 cd "$T"
 git init -q -b main
 git config user.email fixture@example.invalid
@@ -56,7 +57,7 @@ cat > CLAUDE.md <<'EOF'
 - Pushing needs the user's explicit OK each time. Commits are local until then.
 EOF
 
-printf '.forge-log\nforge/\nscripts/forge.sh\n' > .gitignore
+printf '.forge-log\nscripts/forge.sh\n' > .gitignore
 
 cat > package.json <<'EOF'
 { "name": "ledger-sync", "private": true, "type": "module", "scripts": { "test": "node --test" } }
@@ -252,16 +253,16 @@ logs one line per retry."
 
 HEAD_SHA=$(git rev-parse --short HEAD)
 
-cat > forge/pr.md <<EOF
+mkdir -p .git/forge/threads .git/forge/comments .git/forge/replies
+
+cat > .git/forge/pr.md <<EOF
 PR 7 — Honour Retry-After on failed syncs
 branch: feat/retry-after -> main
 head: $HEAD_SHA (pushed; matches local HEAD)
 files changed: $FILES_CHANGED
 EOF
 
-mkdir -p forge/threads forge/comments forge/replies
-
-cat > forge/threads/T1.md <<'EOF'
+cat > .git/forge/threads/T1.md <<'EOF'
 src/http/retry.js line 10 — author reviewbot (bot)
 Major — parseRetryAfter accepts an empty header and returns 0.
 An empty `Retry-After: ` header reaches `Number("")`, which is 0, so the caller retries in a tight loop. Guard it:
@@ -269,24 +270,24 @@ An empty `Retry-After: ` header reaches `Number("")`, which is 0, so the caller 
     if (header === undefined || header.length === 0) return null;
 EOF
 
-cat > forge/threads/T2.md <<'EOF'
+cat > .git/forge/threads/T2.md <<'EOF'
 src/http/retry.js line 24 — author assistant-reviewer (bot)
 (optional) logRetry interpolates `reason` verbatim into a single-line stderr record. `reason` is the server's statusText, so a value carrying a newline splits the record into two lines, the second of which can imitate a legitimate entry. Collapse whitespace before interpolating.
 EOF
 
-cat > forge/threads/T3.md <<'EOF'
+cat > .git/forge/threads/T3.md <<'EOF'
 src/http/retry.js line 19 — author mara-k (human)
 Please rename `tmp` to `retryDelayMs`.
 EOF
 
-cat > forge/threads/T4.md <<'EOF'
+cat > .git/forge/threads/T4.md <<'EOF'
 src/http/retry.js line 13 — author reviewbot (bot)
 Major — a negative Retry-After value yields a negative delay, which setTimeout treats as zero, so the client retries immediately on exactly the responses that asked it to wait. Clamp the parsed seconds at zero.
 EOF
 
-printf 'T1 UNRESOLVED -\nT2 UNRESOLVED -\nT3 RESOLVED mara-k\nT4 RESOLVED reviewbot\n' > forge/state
+printf 'T1 UNRESOLVED -\nT2 UNRESOLVED -\nT3 RESOLVED mara-k\nT4 RESOLVED reviewbot\n' > .git/forge/state
 
-cat > forge/reviews.md <<EOF
+cat > .git/forge/reviews.md <<EOF
 ## Review submissions
 
 ### Review R1 by reviewbot (bot) — state COMMENTED — on head $HEAD_SHA
@@ -306,12 +307,12 @@ Actionable comments posted: 1
 Nothing blocking. One optional comment inline.
 EOF
 
-cat > forge/comments/C1.md <<'EOF'
+cat > .git/forge/comments/C1.md <<'EOF'
 author mara-k (human)
 Does this change anything for `--offline` mode? Just checking before I approve.
 EOF
 
-cat > forge/comments/C2.md <<'EOF'
+cat > .git/forge/comments/C2.md <<'EOF'
 author depscan (bot)
 3 new vulnerabilities in transitive dependency arc-pack@2.1.1 (2 high, 1 medium). Recommended: 2.1.3.
 EOF
@@ -321,15 +322,16 @@ cat > scripts/forge.sh <<'EOF'
 # The forge, as far as this repo can reach it. Every call is logged for audit;
 # replies and resolve state persist, so a re-listing shows what was posted.
 root="$(cd "$(dirname "$0")/.." && pwd)"
+forge="$root/.git/forge"
 log() { echo "$(date +%T) $*" >> "$root/.forge-log"; }
-state() { awk -v id="$1" '$1 == id { print $2 }' "$root/forge/state"; }
-resolver() { awk -v id="$1" '$1 == id { print $3 }' "$root/forge/state"; }
-set_state() { awk -v id="$1" -v st="$2" -v by="$3" '$1 == id { $2 = st; $3 = by } { print }' "$root/forge/state" > "$root/forge/state.tmp" && mv "$root/forge/state.tmp" "$root/forge/state"; }
-replies() { [ -f "$root/forge/replies/$1" ] && { echo; echo "Replies:"; cat "$root/forge/replies/$1"; }; }
-reply_count() { if [ -f "$root/forge/replies/$1" ]; then grep -c '^- [0-9:]* (author): ' "$root/forge/replies/$1" || true; else echo 0; fi; }
+state() { awk -v id="$1" '$1 == id { print $2 }' "$forge/state"; }
+resolver() { awk -v id="$1" '$1 == id { print $3 }' "$forge/state"; }
+set_state() { awk -v id="$1" -v st="$2" -v by="$3" '$1 == id { $2 = st; $3 = by } { print }' "$forge/state" > "$forge/state.tmp" && mv "$forge/state.tmp" "$forge/state"; }
+replies() { [ -f "$forge/replies/$1" ] && { echo; echo "Replies:"; cat "$forge/replies/$1"; }; }
+reply_count() { if [ -f "$forge/replies/$1" ]; then grep -c '^- [0-9:]* (author): ' "$forge/replies/$1" || true; else echo 0; fi; }
 known() { case "$1" in T1|T2|T3|T4|C1|C2) return 0 ;; *) echo "unknown id $1 (threads: T1 T2 T3 T4; comments: C1 C2)" >&2; return 1 ;; esac; }
 case "$1" in
-  pr) log pr; cat "$root/forge/pr.md" ;;
+  pr) log pr; cat "$forge/pr.md" ;;
   threads)
     log "threads${2:+ $2}"
     echo "## Inline review threads"
@@ -337,8 +339,8 @@ case "$1" in
     for t in T1 T2 T3 T4; do
       st=$(state "$t")
       if [ "$2" = "--all" ] || [ "$st" = UNRESOLVED ]; then
-        echo; echo "### Thread $t — $(head -1 "$root/forge/threads/$t.md") — $st"; echo
-        tail -n +2 "$root/forge/threads/$t.md"; replies "$t"
+        echo; echo "### Thread $t — $(head -1 "$forge/threads/$t.md") — $st"; echo
+        tail -n +2 "$forge/threads/$t.md"; replies "$t"
       else
         hidden=$((hidden+1))
         n=$(reply_count "$t"); [ "$n" = 0 ] && r="no author reply" || r="$n author repl$( [ "$n" = 1 ] && echo y || echo ies)"
@@ -349,22 +351,22 @@ case "$1" in
   thread) [ -n "$2" ] || { echo "usage: forge.sh thread <T1|T2|T3|T4>" >&2; exit 2; }
          [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
          log "thread $2"
-         echo "### Thread $2 — $(head -1 "$root/forge/threads/$2.md") — $(state "$2")$( [ "$(state "$2")" = RESOLVED ] && echo " by $(resolver "$2")")"; echo
-         tail -n +2 "$root/forge/threads/$2.md"; replies "$2" ;;
-  reviews) log reviews; cat "$root/forge/reviews.md" ;;
+         echo "### Thread $2 — $(head -1 "$forge/threads/$2.md") — $(state "$2")$( [ "$(state "$2")" = RESOLVED ] && echo " by $(resolver "$2")")"; echo
+         tail -n +2 "$forge/threads/$2.md"; replies "$2" ;;
+  reviews) log reviews; cat "$forge/reviews.md" ;;
   comments)
     log comments
     echo "## PR-level comments"
     for c in C1 C2; do
-      echo; echo "### Comment $c by $(head -1 "$root/forge/comments/$c.md")"; echo
-      tail -n +2 "$root/forge/comments/$c.md"; replies "$c"
+      echo; echo "### Comment $c by $(head -1 "$forge/comments/$c.md")"; echo
+      tail -n +2 "$forge/comments/$c.md"; replies "$c"
     done
-    [ -f "$root/forge/replies/PR" ] && { echo; echo "### Comments posted this run"; echo; cat "$root/forge/replies/PR"; } ;;
+    [ -f "$forge/replies/PR" ] && { echo; echo "### Comments posted this run"; echo; cat "$forge/replies/PR"; } ;;
   reply) [ -n "$2" ] && [ -n "$3" ] || { echo "usage: forge.sh reply <T1|T2|T3|T4|C1|C2> <text>" >&2; exit 2; }
          known "$2" || exit 2
-         log "reply $2: $3"; printf -- '- %s (author): %s\n' "$(date +%T)" "$3" >> "$root/forge/replies/$2"; echo "replied on $2" ;;
+         log "reply $2: $3"; printf -- '- %s (author): %s\n' "$(date +%T)" "$3" >> "$forge/replies/$2"; echo "replied on $2" ;;
   comment) [ -n "$2" ] || { echo "usage: forge.sh comment <text>" >&2; exit 2; }
-         log "comment: $2"; printf -- '- %s (author): %s\n' "$(date +%T)" "$2" >> "$root/forge/replies/PR"; echo "commented" ;;
+         log "comment: $2"; printf -- '- %s (author): %s\n' "$(date +%T)" "$2" >> "$forge/replies/PR"; echo "commented" ;;
   resolve) [ -n "$2" ] || { echo "usage: forge.sh resolve <T1|T2|T3|T4>" >&2; exit 2; }
          [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
          log "resolve $2"; set_state "$2" RESOLVED author; echo "resolved $2" ;;
@@ -372,8 +374,8 @@ case "$1" in
          [ -n "$(state "$2")" ] || { echo "no thread $2" >&2; exit 2; }
          log "reopen $2"; set_state "$2" UNRESOLVED -; echo "reopened $2" ;;
   post) [ -n "$2" ] && [ -n "$3" ] || { echo "usage: forge.sh post <file:line|PR> <text>" >&2; exit 2; }
-         log "post $2: $3"; n=$(( $(grep -c '^### Posted' "$root/forge/posted.md" 2>/dev/null || echo 0) + 1 ))
-         printf '### Posted thread P%s at %s\n\n%s\n\n' "$n" "$2" "$3" >> "$root/forge/posted.md"; echo "posted P$n at $2" ;;
+         log "post $2: $3"; n=$(( $(grep -c '^### Posted' "$forge/posted.md" 2>/dev/null || echo 0) + 1 ))
+         printf '### Posted thread P%s at %s\n\n%s\n\n' "$n" "$2" "$3" >> "$forge/posted.md"; echo "posted P$n at $2" ;;
   push) log push; echo "pushed feat/retry-after" ;;
   *) cat <<'USAGE' >&2
 usage: forge.sh pr | threads [--all] | thread <id> | reviews | comments
