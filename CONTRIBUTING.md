@@ -395,9 +395,21 @@ Rules that held in practice, each answering a failure seen here:
   shows which graders the current text already passes, and a rule that
   loses one of them has not earned its place however well it scores on its
   own.
-- **A second fixture in a domain unlike the skill's own examples is worth more
-  than a sixth rep.** It is the only way to tell a learned category from an
-  echoed example.
+- **A rule promoted at the Strong tier is tested on a second fixture in a
+  domain unlike the skill's own examples**, and a second fixture is worth more
+  than a sixth rep anywhere else. It is the only way to tell a learned category
+  from an echoed example: reps on one fixture cannot separate a wording that
+  carries the mechanism from one that matched that fixture's vocabulary, and a
+  Strong entry is by definition claimed to hold generally. The payoff is
+  measured, not theoretical - the upstream-report rules scored high on their own
+  domain and the second domain showed most of that was the weaker model's own
+  default against blunt violations, leaving three rules doing the work the skill
+  is credited with. Where the skill has no second fixture yet, building one is
+  part of that promotion's cost and the entry waits in its tier until it exists;
+  landing on one domain and calling it general is the thing this rule forbids. A
+  wording that reaches its grader on one domain and not on the other has not
+  failed - it has found its boundary, which goes inside the rule's own sentence
+  or declines it.
 - **The operator's own instruction files come off for the batch.** A hand run
   inherits the user-level instruction file and settings of the machine it runs
   on, and any rule there that bears on the behaviour under test - a command the
