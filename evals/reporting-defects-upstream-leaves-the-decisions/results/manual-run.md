@@ -136,8 +136,103 @@ family, and the two zero rows are where that shows. Hand-graded from the kept
   "## Separately: locale fallback", a pointer to the file it wrote, and no locale
   evidence at all — a pass under the rewritten clause.
 
-So the retaken rows are readable as the difference between the arms and not as
-absolute rates. That is a property of the family, not of the retake: nine tone
-rubrics over a three-kilobyte document is the shape the judge was already known
-to be harsh on, and the earlier tables in this file were graded by hand, which is
-why their rates are higher and not comparable with these.
+So the retaken rows are not absolute rates. That is a property of the family,
+not of the retake: nine tone rubrics over a three-kilobyte document is the shape
+the judge was already known to be harsh on, and the earlier tables in this file
+were graded by hand, which is why their rates are higher and not comparable with
+these. The difference between the arms is not a safe reading either — the
+section below measures how far it moves under a hand grade, and settles how a
+row here is read.
+
+## How this family is graded, and the mechanical alternative that was tried
+
+The retake above left one question open: what to do about a judge that reads
+nine tone rubrics over a three-kilobyte report more strictly than the rubrics'
+own text. Two treatments were on the table — convert the rubrics with a literal
+tell into `regex` graders, or keep the judge and hand-grade from `evidence`.
+Both were tested against the twelve reports the retake kept (three runs per arm,
+this case and its sibling), because a kept `evidence` string is the judged input
+and costs nothing to re-read.
+
+**Thirty cells were hand-graded**, the grader's own text against the report it
+was shown: `title-carries-no-verdict` and `suggestion-is-an-option` on all
+twelve reports, `states-the-true-proportion` on this case's six. The judge
+agreed on eighteen. **All twelve disagreements are the same shape: the judge
+failed a report the rubric's own text passes.** None is a judge pass over a
+report that should fail.
+
+| Grader | judge, plugin | hand, plugin | judge, no plugin | hand, no plugin |
+|---|---|---|---|---|
+| title-carries-no-verdict (this case) | 2/3 | 3/3 | 0/3 | 2/3 |
+| suggestion-is-an-option (this case) | 2/3 | 3/3 | 0/3 | 2/3 |
+| states-the-true-proportion (this case) | 1/3 | 3/3 | 0/3 | 1/3 |
+| title-carries-no-verdict (second domain) | 2/3 | 3/3 | 0/3 | 0/3 |
+| suggestion-is-an-option (second domain) | 1/3 | 3/3 | 0/3 | 0/3 |
+
+The misses, quoted, so the reading can be audited:
+
+- **Titles.** "Notification service: batched sends can deliver duplicates on
+  retry" (plugin) carries no verdict word and no size, and was failed. "Batch
+  calls lose dedupe protection across retries" and "batch dedupe doesn't survive
+  retries" (both unaided) were failed too, though the hand round earlier in this
+  file ruled that second phrasing reads as the observation. The one real fail in
+  that arm keeps the draft's own size clause, "— a re-keying in enqueue".
+- **Suggestions.** The rubric says an imperative under a frame that names it an
+  option is an option. Three reports were failed for bullets under "Two ways we
+  could imagine that happening", for "Option A: key the dedupe on message id"
+  under "Options for the service team", and for "**Option.** … one option would
+  be to count every reason" — every one of them framed. The real fails all keep
+  a literal "## Fix" heading over an imperative.
+- **Proportion.** Two plugin reports open with the four-row table — three
+  categories at 1,000 of 1,000 delivered once, batch at 212 — and say the
+  duplicates are confined to retried batch calls, which is the pass clause
+  verbatim; both were failed. One unaided report states the three clean
+  categories in the same section as the failure and was failed as well.
+
+**The delta is not preserved.** On the title and suggestion rows of this case
+the hand read narrows the gap between the arms (2/3-against-0/3 becomes
+3/3-against-2/3); on the same two rows in the second domain it widens them, and
+on the proportion row here it widens them too. A judged row in this family
+locates a difference; it does not size one, in either direction.
+
+### The regex trial
+
+Four rubrics have a literal tell. Each was written as a pattern and scored on
+all twelve reports:
+
+| Pattern | Against the hand read |
+|---|---|
+| the draft's three images (`blindly relays`, `band-aid`, `sailed straight past`) | agrees on this case's six; the second domain seeds different images and needs its own pattern |
+| verdict and size words on the first line (`doesn't work`, `broken`, `unusable`, `trivial`, `re-keying`) | 12 of 12 |
+| a literal `## Fix` or `**Fix` heading | 12 of 12 |
+| the clean categories by name beside the figure | right on this case's six, wrong on all three passing reports in the second domain, whose categories have other names |
+
+On the twenty-four cells where a tell exists, the patterns agree with the hand
+read on all twenty-four and the judge on fifteen. That is the case for
+converting, and it is a real one.
+
+**It was declined, for a reason that is visible in the patterns themselves:
+every string that worked is a string the fixture seeded.** The unaided arm fails
+by keeping the draft's "## Fix", its "trivial", its "re-keying", its three
+images; the plugin arm passes by deleting them. So the pattern scores whether
+the run edited the draft's wording, not whether the report it wrote offers the
+change as an option — and both records here already call for the next fixture
+round to soften exactly those words, at which point every such grader passes in
+both arms with nothing to say it has stopped measuring. A judged rubric survives
+a fixture round; a pattern pinned to the draft does not. The rubrics with no
+fixed string at all — the requirements *beside* the options, the clean
+categories *before* the failure, a pointer whose path is the run's own choice —
+are not reachable by a pattern in any round.
+
+### The standing treatment
+
+**This family is judged for screening and hand-graded for deciding.** A row here
+says where the arms differ; before any decision rests on one — a regression, a
+retirement flag, a promotion, a rate quoted anywhere — the rows behind it are
+hand-graded from the run JSON's `evidence`, **in both arms**, because the judge's
+harshness falls on both and not evenly. The hand tables earlier in this file were
+graded by hand throughout and their rates are not comparable with a judged row;
+say which kind a table is wherever the two stand side by side.
+
+CONTRIBUTING's "Testing a wording change" carries the general form of this, as
+the boundary on the mechanical-grader default.

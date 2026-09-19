@@ -260,6 +260,23 @@ levers stay worth using on their own merits: one condition per grader, and a
 hand grade from the `evidence` the run JSON keeps. A baseline taken with the
 default judge carries this error on every multi-condition rubric it contains.
 
+**A shape neither judge reads: many tone rubrics over one document.** The two
+upstream-report cases put nine of them over a three-kilobyte report, and their
+rows were scored by the settled judge and then hand-graded from the kept
+`evidence`. On thirty cells it agreed on eighteen, and all twelve disagreements
+are the same shape - the judge failing a report the rubric's own text passes: a
+title carrying no verdict word and no size, an imperative under a frame the
+rubric itself names as an option, an opening that states the clean categories
+the rubric asks for. The error does not fall evenly on the two arms, so the
+difference between them is not preserved either - a hand read narrowed two rows
+in one case and widened the same two in the other. **A family of this shape is
+judged for screening and hand-graded for deciding:** a row says where the arms
+differ, and any decision resting on one - a regression, a retirement flag, a
+promotion, a rate quoted anywhere - is taken from a hand grade of both arms out
+of `evidence` first. The cells, the misses quoted, and the mechanical
+alternative tried against them are in
+[that case's record](evals/reporting-defects-upstream-leaves-the-decisions/results/manual-run.md).
+
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then

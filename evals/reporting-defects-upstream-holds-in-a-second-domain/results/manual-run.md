@@ -102,7 +102,39 @@ Two rows read further, from the kept `evidence`:
   that presents the change as decided", and a hedged heading over an option is
   neither.
 
-So this case's rows carry the same caution as its sibling's: read the difference
-between the arms, and hand-grade a plugin-arm fail from `evidence` before calling
-it a regression. The rubrics are tone judgements over a whole document, which is
-the shape the judge reads most strictly.
+So this case's rows carry the same caution as its sibling's. The rubrics are tone
+judgements over a whole document, which is the shape the judge reads most
+strictly; the next section settles what that means for reading a row, and it is
+stricter than "hand-grade a plugin-arm fail" — the unaided arm is over-failed
+here too.
+
+## How this family is graded
+
+Settled from the twelve reports both cases kept: **judged for screening,
+hand-graded for deciding.** The full statement, the thirty hand-graded cells and
+the regex trial that was tried and declined are in the sibling case's record,
+`evals/reporting-defects-upstream-leaves-the-decisions/results/manual-run.md`;
+CONTRIBUTING's "Testing a wording change" carries the general rule. What this
+case contributes to it:
+
+| Grader | judge, plugin | hand, plugin | judge, no plugin | hand, no plugin |
+|---|---|---|---|---|
+| title-carries-no-verdict | 2/3 | 3/3 | 0/3 | 0/3 |
+| suggestion-is-an-option | 1/3 | 3/3 | 0/3 | 0/3 |
+
+Every miss is the judge failing a report the rubric passes: a title reading
+"Build cache: asset-bundle lookups never hit; eviction counter may undercount",
+which carries neither a verdict word nor a size; and two framed options,
+"## Possible fix" over "One option would be applying it…" and "**Option.** …
+one option would be to count every reason". The three unaided reports fail both
+rubrics for real, all of them keeping "trivial keying slip" in the title and a
+literal "## Fix" heading over an imperative.
+
+Note which way that moves this case: the hand read **widens** the gap here,
+where in the sibling case it narrows two of the same rows. The judged delta is
+not the hand delta in either direction, which is why a row is hand-graded before
+a decision rests on it rather than adjusted by a rule of thumb.
+
+The first table in this file was graded by hand throughout, on five reps an arm
+and an earlier fixture; the retake's table is judged, on three. Their rates are
+not comparable, and the difference between the arms is what each one carries.
