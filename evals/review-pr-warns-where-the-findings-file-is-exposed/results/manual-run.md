@@ -72,3 +72,38 @@ This is the two-arm form of the hand table above, where both arms wrote the
 file because both were told to follow the skill and only the exposure
 sentence differed. The hand table is what says the sentence earns its place;
 this one says the behaviour is absent without the plugin.
+
+## The prompt names the findings file, and the retake that followed
+
+The prompt asked for "the findings file the review skill writes", which left the
+name to the run and reaches the harness's own built-in review skill besides. It
+now names `review-findings-feat-close-ticket.md`, and `findings-file-written`
+pins that path instead of a glob. `exposure-named-beside-the-path` keeps no
+`focus` on purpose: what it grades is the final message, which is where the
+warning has to reach the author, and the findings file cannot hold it.
+
+One runner pass at the head that carries the edit, three runs per arm,
+`--judge-model sonnet`, $3.67:
+
+| Grader | No plugin | Plugin | Same rows before the edit |
+|---|---|---|---|
+| exposure-named-beside-the-path | 0/3 | 2/3 | 0/3 / 3/3 |
+| findings-file-written | 3/3 | 3/3 | 0/3 / 3/3 |
+| skill-was-invoked | — | 3/3 (indicator) | not present |
+
+The file row moving to 3/3 in both arms is the edit working, not a loss: the
+unaided arm used to fail it by naming its file something else, and where that
+row sits in the sibling cases it took every file-reading grader down with it.
+Here it is a precondition — findings on disk rather than in chat — and the case's
+own behaviour is the exposure row, which still separates the arms.
+
+The plugin-arm miss is a real one. That run wrote a long and accurate paragraph
+about the hook and then undid it: "this checkout currently has it disabled …
+so it's usually safe, but a lint failure between the stash and pop would leave
+it sitting in the stash". The rubric fails a message that calls the file safe
+from the hook, and it asks for an action the author can take, which that message
+never gives. The claim is also wrong: built from the fixture, this variant sets
+`core.hooksPath` to `.githooks` and tracks that directory, so the hook resolves
+both in the checkout and in a linked read worktree — checked by hand after the
+run, because a review that mis-reads the setup and hedges is a different failure
+from one that never looked.

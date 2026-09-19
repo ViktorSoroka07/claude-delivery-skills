@@ -181,3 +181,41 @@ that makes "the reply is the path alone" ungradable, so each rep passes
 `--settings '{"outputStyle":"default"}'`. And the agent has no Write tool: all
 ten reps wrote the report with a shell heredoc, so the file handoff needs no
 tool grant.
+
+## The prompt names the findings file, and the retake that followed
+
+The prompt asked for "the findings file the review skill writes", which left the
+file's name to the run and answers to the harness's own built-in review skill
+besides. Both focus graders therefore threw wherever a run named its file
+anything else: three of six plugin runs and six of six unaided runs across the
+release baseline and its rerun, each scored a fail. Half this case's plugin arm
+was unmeasurable rather than failing, and its unaided arm entirely so. The
+prompt now names `review-findings-feat-close-ticket.md`, the branch's own name,
+which both focus graders already read, and `findings-file-written` pins that
+path instead of a glob.
+
+One runner pass at the head, three runs per arm, `--judge-model sonnet`, $7.33:
+
+| Grader | No plugin | Plugin | Same rows in the 1.9.0 rerun |
+|---|---|---|---|
+| drift-graded-as-the-repos | 0/3 | 3/3 | 0/3 (three throws) / 3/3 |
+| platform-header-seen | 3/3 | 3/3 | 0/3 (three throws) / 2/3 |
+| findings-file-written | 3/3 | 3/3 | 0/3 / 3/3 |
+| read-worktree-unmodified | 3/3 | 3/3 | 3/3 / 3/3 |
+| skill-was-invoked | — | 3/3 (indicator) | 3/3 |
+
+No grader threw in either arm. The drift row is the one this case is named for,
+and it separates cleanly: three unaided reviews filed the missing doc block on
+the new export as this change's defect, three plugin reviews graded it as the
+file's own drift.
+
+**The platform row does not separate at all now that the unaided arm can be
+read.** Three of three unaided reviews found that the vendored platform already
+sets `cache-control: no-store` and called the handler's line redundant — which
+is what the five-rep hand baseline in this file found, and why the sentence
+about absence claims reaching beneath the framework was declined rather than
+landed. Its 0/3 in the release baseline was three thrown graders and said
+nothing. A row that scores as well without the plugin as with it is the
+retirement signal the plan's rule-retirement task is about; this one has never
+had a rule behind it to retire, so what it is now is a regression guard on a
+behaviour the model has unaided.

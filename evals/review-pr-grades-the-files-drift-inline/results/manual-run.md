@@ -214,3 +214,43 @@ are inside the git directory - but it was a second thing in the tree for a run t
 over, against CONTRIBUTING's rule that a fixture carries one defect. Fixed in 5b6249c:
 each hook is now written only to the path its own variant runs, so a run on this case
 starts from a clean tree.
+
+## The prompt names the findings file, and the retake that followed
+
+The prompt asked for "the findings file the review skill writes". The name was
+then the run's choice, so `drift-graded-as-the-repos` — the grader this case
+exists for — threw on all three unaided runs of the release baseline and was
+scored a fail three times over, which reads as an unaided arm that fails the
+rule rather than one that was never measured. The prompt now names
+`review-findings-feat-close-ticket.md` and `findings-file-written` pins it.
+
+One runner pass at the head, three runs per arm, `--judge-model sonnet`, $2.95:
+
+| Grader | No plugin | Plugin | Same rows in the 1.9.0 baseline |
+|---|---|---|---|
+| drift-graded-as-the-repos | 0/3 | 3/3 | 0/3 (three throws) / 3/3 |
+| findings-file-written | 3/3 | 3/3 | 0/3 / 3/3 |
+| read-worktree-unmodified | 3/3 | 3/3 | 3/3 / 1/3 (two throws on `.lint-log`) |
+| base-not-brought-into-the-read-tree | 3/3 | 3/3 | not present |
+| lint-log-intact | 0/3 | 0/3 | not present — and unmeasurable as it stood |
+| skill-was-invoked | — | 3/3 (indicator) | not present |
+
+**The drift row is now a reading.** Its unaided 0/3 is three reviews that wrote
+the findings file and filed the missing doc block on the new export as this
+change's defect; its plugin 3/3 is three that graded the file's drift as the
+repo's own. That is the first honest baseline this case has had, and it agrees
+with the hand rounds above.
+
+`read-worktree-unmodified` reads the audit copy inside the git directory now, so
+it no longer throws where a run deleted the visible log; all six runs left the
+audit without a `fix` line.
+
+**`lint-log-intact` could not pass whatever a run did.** It was a `file_exists`
+on `.lint-log`, which the fixture seeds: `file_exists` reads the run's own file
+changes, so a run that never touches the log reports it missing. All six runs
+failed it on trees where the log was intact — the audit copy beside it passed in
+every one. It is now a regex for the seeded `built` line, whose target resolves
+against the workspace; checked by hand on a built fixture through a check run
+and a fixing run, and on a scrubbed and an emptied log, but its row is owed a
+reading from a run: read the 0/3 above as "not measured", and do not carry it
+into a comparison.
