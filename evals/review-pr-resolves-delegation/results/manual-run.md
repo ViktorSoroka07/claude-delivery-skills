@@ -158,3 +158,28 @@ fail clause gains the shape "the wiring held out in part, the mount left
 standing", and the pass clause keeps its allowance for a sentence about what
 happens once the owning task lands. The calibration row for this cell is retaken
 with the rewritten text, because a row measures the wording it was taken against.
+
+### The rewritten Suggestion rubric, and its retaken cell
+
+The rewrite landed at `9b119da`. It states the wiring — everything the branch
+added to `renderDetailPage`, the `renderRequestTable` call that puts the table
+in the page's sections included — and names in the fail clause the shape the two
+readings split on: only part of the wiring held out while the table stays
+mounted, the `fetchRequests` call dropped and `renderRequestTable` left in the
+sections. The pass clause is otherwise unchanged, the allowance for a sentence
+about what happens once the owning task lands included.
+
+Both cells were retaken against that text, the same two kept files through the
+same throwaway plugin, three reps per judge, this rubric alone in the case. Both
+judges fail both files, nine votes to nine, which is what the hand labels written
+before the retake say. The cell that was excluded is now an agreement for both
+judges, and `evals/judge-calibration.md` carries the counts (5 of 8 and 8 of 8).
+Read that cell for no more than it is: with the label a fail, a judge that fails
+nearly everything agrees for no reason worth having, and the three conditions
+beside it on the same file are what separate the judges.
+
+The other three graders were not touched, so their rows stand. What is now stale
+is this case's own runner rows for `held-the-mount-back` in the tables above:
+they were scored against the old wording. They are retaken with the next
+baseline, not on their own — the ruled reading is the one those runs were already
+failed under, so no verdict in the tables above changes sign.

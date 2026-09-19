@@ -58,8 +58,10 @@ The four graders of `review-pr-resolves-delegation` are one condition each, spli
 out of what was a single four-condition rubric. Both files judged here are real
 review output kept from that case's own runner pass (`task11-18-resolves-deleg`):
 one written by a run with the plugin loaded, 6.3 KB, and one by a run without it,
-1.7 KB. The graders were copied byte-for-byte from the case as it stands at
-`eccf6a2`; the files byte-for-byte from that run's `evidence`.
+1.7 KB. The graders were copied byte-for-byte from the case: the three unchanged ones as
+they stand at `eccf6a2`, and `held-the-mount-back` as it stands at `9b119da`,
+which is the rewrite its two cells were retaken against. The files are
+byte-for-byte from that run's `evidence`.
 
 **File A — the plugin arm's findings file (6.3 KB).**
 
@@ -68,7 +70,7 @@ one written by a run with the plugin loaded, 6.3 KB, and one by a run without it
 | one-mount-finding | pass | P P P (8/9 votes) | ✓ | P P P (9/9) | ✓ |
 | symptoms-under-one-finding | pass | F F F (1/9) | ✗ | P P P (9/9) | ✓ |
 | no-error-state-suggested | pass | F F F (0/9) | ✗ | P P P (9/9) | ✓ |
-| held-the-mount-back | contested, ruled fail | F F F (0/9) | — | F F F (0/9) | — |
+| held-the-mount-back (rewritten) | fail | F F F (0/9) | ✓ | F F F (0/9) | ✓ |
 
 **File B — the unaided arm's findings file (1.7 KB).**
 
@@ -77,38 +79,42 @@ one written by a run with the plugin loaded, 6.3 KB, and one by a run without it
 | one-mount-finding | fail | F F F (0/9) | ✓ | F F F (0/9) | ✓ |
 | symptoms-under-one-finding | fail | F F F (0/9) | ✓ | F F F (0/9) | ✓ |
 | no-error-state-suggested | pass | F F F (0/9) | ✗ | P P P (9/9) | ✓ |
-| held-the-mount-back | fail | F F F (0/9) | ✓ | F F F (0/9) | ✓ |
+| held-the-mount-back (rewritten) | fail | F F F (0/9) | ✓ | F F F (0/9) | ✓ |
 
-**Agreement, over the 7 cells whose label is not contested:** the default judge
-4 of 7, the stronger judge 7 of 7.
+**Agreement, over all 8 cells:** the default judge 5 of 8, the stronger judge
+8 of 8. Six of those cells were taken against grader text that has not changed;
+the two `held-the-mount-back` cells were retaken against the rewritten rubric
+(below), and every other grader in the family was left untouched so that its
+rows still stand.
 
-### The contested cell, and why it is not a judge measurement
+### The cell that was contested, and what settled it
 
-`held-the-mount-back` passes only where the mount finding's Suggestion is the
-single action of not shipping the detail-page wiring in this change, and allows
+`held-the-mount-back` passed only where the mount finding's Suggestion is the
+single action of not shipping the detail-page wiring in this change, and allowed
 "a sentence saying what should happen once that task lands". File A's Suggestion
 is *"hold the `fetchRequests` call and its error/paging handling out of this
 branch. Mount `renderRequestTable` against data supplied by task 102's container
 once that lands…"*. Read against the pass clause that is a hold-back plus an
 allowed sentence about the future; read against the fail clause it is a file that
 keeps the table mounted and removes only the fetch, which is repairing the wiring
-rather than not shipping it. The case record takes the second reading; the label
-written for this table took the first.
+rather than not shipping it. The case record took the second reading; the label
+first written for this table took the first, and the cell was left out of the
+counts: what it measured was a rubric two readers split on, which no judge can be
+scored against.
 
-Both judges vote fail on it, 0 of 9 each. Only the stronger judge's vote carries
-information — it passes the other three conditions on the same file, so it is
-discriminating rather than refusing — and it sides with the case record. What the
-cell measures is a rubric two readers split on, which no judge can be scored
-against. It is queued as its own task.
+**The maintainer ruled which reading is meant: the wiring includes the
+`renderRequestTable` call, so a Suggestion that holds the fetch out while the
+table stays mounted fails.** The grader now says that, naming the shape in its
+fail clause, and both cells were retaken against the rewritten text — the same
+two files, the same throwaway plugin, three reps per judge, this rubric alone in
+the case. Both judges return fail nine votes to nine on both files, which is what
+the hand labels written before the retake say, so the two cells enter the counts
+as agreements and the table above carries them.
 
-**The maintainer has since ruled which reading is meant: the wiring includes the
-`renderRequestTable` call, so this file fails the condition.** That settles the
-rubric, not the row. Both judges returned the ruled verdict, which would put the
-default judge at 5 of 8 and the stronger one at 8 of 8 — but they returned it
-against text that did not yet say so, and a row measures the wording it was taken
-against. The counts above therefore stay at 4 of 7 and 7 of 7, and this cell is
-filled in when the rewritten grader is retaken with the other grader-resolution
-fixes.
+Read the File A cell for what it is: with the label a fail, a judge that fails
+nearly everything is right here for no reason worth having. It closes the
+rubric's ambiguity rather than adding evidence about judges, and the three
+conditions beside it on the same file are what separate the two judges.
 
 ### What the two files together say that one file cannot
 
@@ -147,7 +153,7 @@ a baseline that costs upwards of $55.
 ## What to do
 
 **Run the next baseline with `--judge-model sonnet`.** It agreed with every hand
-label that was not contested, where the default judge agreed with four of seven,
+label, where the default judge agreed with five of eight,
 and it costs single-digit dollars more on a baseline of that size. The fallback
 the plan names — keeping the default judge and hand-grading every
 multi-condition rubric out of `evidence` — is the more expensive option in
@@ -163,6 +169,10 @@ it is a limitation to state in a result, not a defect to fix.
 ## The raw runs
 
 `evals/results/judge-cal-deleg-haiku.json` and
-`evals/results/judge-cal-deleg-sonnet.json`, both local only — `evals/results/`
-is git-ignored. Each keeps the judged file as every grader's `evidence`, so a
-disputed cell above can be re-read without re-running anything.
+`evals/results/judge-cal-deleg-sonnet.json` for the first eight cells, and
+`evals/results/judge-cal-deleg-30-haiku.json` and
+`evals/results/judge-cal-deleg-30-sonnet.json` for the two retaken against the
+rewritten `held-the-mount-back` — all local only, `evals/results/` being
+git-ignored. Each keeps the judged file as every grader's `evidence`, so a
+disputed cell above can be re-read without re-running anything. The two retakes
+cost $0.29 and $0.44.
