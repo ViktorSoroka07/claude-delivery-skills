@@ -16,7 +16,7 @@ The order of work lives outside the tree: the maintainer keeps a plan under `doc
 ## Backlog
 
 - **A new entry starts with a search, not with a line.** Look through `BACKLOG.md` for the mechanism — two or three words of what goes wrong, not the words an entry would have used — and where it is already there, add a sighting to that entry's parenthetical instead of a second line. Only a session that hit the mechanism itself adds a sighting; an entry carrying no count stands at the one sighting that queued it, so the first sighting added makes two.
-- Recurrence is the promotion filter: two sightings — other work or another place, never the same failure met twice in one pass — or one sighting whose failure was measured is what makes an entry worth a wording round, and an entry that has reached neither by the time a round reads it moves to Declined with "observed once, never recurred". The file's header carries the shape, CONTRIBUTING's "Where a lesson waits" the reasoning.
+- Recurrence is the promotion filter: two sightings — other work or another place, never the same failure met twice in one pass — or one sighting whose failure was measured - a rate, a run, or a failure that landed and whose cost the entry names, never a near miss caught before it cost anything - is what makes an entry worth a wording round, and an entry that has reached neither by the time a round reads it is parked, keeping its sentence and naming what a second sighting would be, which is a finding about the mechanism rather than a decline. The file's header carries the shape, CONTRIBUTING's "Where a lesson waits" the reasoning.
 
 ## Review
 

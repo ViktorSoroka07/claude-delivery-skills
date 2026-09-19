@@ -82,13 +82,13 @@ unknown-platform fallback, not a speculative reference.
 A lesson that has passed the one-sentence test but not yet been re-derived
 into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is aimed
 at. The file is tracked, so an entry meets the same bar as a skill and the
-pre-commit hook scans it like one. Promoting or declining an entry removes it
-from the queue in the same commit - a declined entry keeps one line with its
-reason, so the same lesson is not queued twice. An entry is committed by the
-session that writes it, in a commit of its own, as soon as it is written: the
-commit body carries the observation behind the sentence, which the entry
-cannot, and an uncommitted entry is a stray change every later session has to
-explain or step around.
+pre-commit hook scans it like one. Promoting, parking or declining an entry
+removes it from the queue in the same commit - a parked or declined entry
+keeps its line, so the same lesson is not queued twice. An entry is
+committed by the session that writes it, in a commit of its own, as soon as
+it is written: the commit body carries the observation behind the sentence,
+which the entry cannot, and an uncommitted entry is a stray change every
+later session has to explain or step around.
 
 **Queuing starts with a search, not with a line.** Nobody re-reads a backlog,
 and the one moment anyone has a mechanism in hand with the file open is when
@@ -109,16 +109,21 @@ carrying no count stands at the one sighting that queued it, so the first
 sighting added to it makes two.
 
 **Recurrence is the promotion filter.** A mechanism met once is a hypothesis
-about how things fail; one that bites twice is a rule, and the second sighting
-is the evidence the first one lacked - so an entry is worth a wording round
-when it carries two sightings, or one sighting whose failure was measured (a
-rate, a run, a named failure). A second sighting is other work or another
-place, never the same failure met twice in one pass. An entry that has reached
-neither by the time a round reads it moves to Declined with "observed once,
-never recurred" - a finding about the mechanism rather than a defeat, and a
-later sighting requeues it already carrying two, which makes it eligible at
-once. The tier says how much a rule would be worth; the count is what says it
-is ready to test.
+about how things fail; one that bites twice is a rule, and the second
+sighting is the evidence the first one lacked - so an entry is worth a
+wording round when it carries two sightings, or one sighting whose failure
+was measured (a rate, a run, or a failure that landed and whose cost the
+entry names - a near miss caught before it cost anything is a sighting, not
+a measurement). A second sighting is other work or another place, never the
+same failure met twice in one pass. An entry that has reached neither by the
+time a round reads it is parked - a finding about the mechanism rather than
+a defeat. A parked entry keeps its sentence, so the mechanism search above
+still matches it, and ends with the circumstance that would make it two; a
+later sighting moves it back to its tier already carrying two, which makes
+it eligible at once. Declined is the other outcome and a different one: a
+wording tested and failed, or a lesson that belongs outside the skills. The
+tier says how much a rule would be worth; the count is what says it is ready
+to test.
 
 ## Provenance without leaking
 
