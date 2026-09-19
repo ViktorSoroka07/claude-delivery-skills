@@ -158,6 +158,85 @@ printf -- '---\nname: orphan\ndescription: Use when orphaned\n---\nbody\n' > "$W
 sh "$GEN" "$WORK/t10" >/dev/null 2>&1
 check "a skill missing from the catalog fails the generator" 1 $?
 
+# 11. The eval-trend fold. Each case writes a throwaway results directory and
+#     reads back the one line the rule under test decides.
+TREND="$ROOT/scripts/eval-trend.py"
+
+mkres() { # $1 = directory under $WORK to build a run corpus in
+  R="$WORK/$1"
+  mkdir -p "$R"
+  python3 - "$R" <<'PYEOF'
+import json, os, sys
+out = sys.argv[1]
+
+def run(judge, version, cases, plugin="delivery-skills"):
+    return {"schemaVersion": 1, "partial": False,
+            "suite": {"judgeModel": judge, "ablation": "with-without",
+                      "plugins": [{"name": plugin, "version": version}]},
+            "cases": cases}
+
+def rep(graders, error=None, skipped=False):
+    return {"error": error, "skippedPaidGraders": skipped, "graders": graders}
+
+def g(name, passed, scored=True, expl=""):
+    return {"name": name, "passed": passed, "scored": scored, "explanation": expl}
+
+def case(name, w, wo):
+    return {"name": name, "arms": {"with": w, "without": wo}}
+
+files = {
+    # an earlier release where the grader held
+    "old": run("sonnet", "1.0.0", [case("case-a",
+        [rep([g("keeps-the-thing", True)]) for _ in range(3)],
+        [rep([g("keeps-the-thing", False)]) for _ in range(3)])]),
+    # the next release: the grader slid, one run was curtailed, one grader was
+    # skipped at the cost ceiling, and one is an arm-only indicator
+    "new": run("sonnet", "1.1.0", [case("case-a",
+        [rep([g("keeps-the-thing", True)]),
+         rep([g("keeps-the-thing", False)]),
+         rep([g("keeps-the-thing", False)]),
+         rep([g("keeps-the-thing", False)], error="exit 1: Reached maximum number of turns (30)"),
+         rep([g("keeps-the-thing", False, expl="skipped: cost ceiling")], skipped=True),
+         rep([g("indicator", True, scored=False)])],
+        [rep([g("keeps-the-thing", False)]) for _ in range(3)])]),
+    # graded by the default judge, so not comparable with the rows above
+    "default": run(None, "1.1.0", [case("case-a",
+        [rep([g("keeps-the-thing", True)])], [rep([g("keeps-the-thing", True)])])]),
+    # a judge-calibration probe: another plugin, another case
+    "probe": run("sonnet", "0.0.1", [case("probe",
+        [rep([g("x", True)])], [rep([g("x", False)])])], plugin="judge-calibration-probe"),
+    # flags skipped graders but carries no marker on any of them
+    "quiet": run("sonnet", "1.1.0", [case("case-b",
+        [rep([g("y", False)], skipped=True)], [rep([g("y", False)])])]),
+}
+for name, data in files.items():
+    with open(os.path.join(out, name + ".json"), "w") as fh:
+        json.dump(data, fh)
+PYEOF
+  python3 "$TREND" --dir "$R" > "$R/out.txt" 2>&1
+}
+
+mkres t11
+check "eval-trend runs over a corpus" 0 $?
+
+grep -Eq '1\.1\.0 +1/3 +0/3 +\+33 +-67' "$WORK/t11/out.txt"
+check "a grader that slid between releases shows the drop" 0 $?
+
+grep -q '2 unmeasured' "$WORK/t11/out.txt"
+check "a curtailed run and a ceiling-skipped grader are unmeasured, not failed" 0 $?
+
+grep -q 'indicator' "$WORK/t11/out.txt"
+check "an arm-only indicator is left out of the fold" 1 $?
+
+grep -q 'default.json .*judged by the default judge' "$WORK/t11/out.txt"
+check "a default-judged run is excluded by name and reason" 0 $?
+
+grep -q 'probe.json .*not this suite' "$WORK/t11/out.txt"
+check "a run of another plugin is excluded" 0 $?
+
+grep -q 'WARNING:.*no grader carries the skip marker' "$WORK/t11/out.txt"
+check "a skip the marker no longer matches warns instead of counting" 0 $?
+
 echo
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"

@@ -407,6 +407,21 @@ Rules that held in practice, each answering a failure seen here:
   case whose correct behaviour the machine forbids is otherwise unmeasurable in
   either arm.
 
+**Runs are read across releases, not one at a time.** `python3
+scripts/eval-trend.py` folds every kept run under `evals/results/` into one row
+per case, grader and release, so a grader that has been sliding for three
+releases is no longer indistinguishable from one that broke yesterday. It reads
+only runs the settled judge graded - a row judged by the default judge is not
+comparable with one judged by the model named above, and folding them together
+records that judge's noise as a trend - and only runs of this plugin's own
+suite, so a calibration probe's throwaway case stays out. What it leaves out is
+listed with the reason rather than dropped in silence. Two things it refuses to
+count as failures, because a check that could not have passed is unmeasured
+rather than failed: a run the runner curtailed, whose graders all carry a
+verdict they could not have earned, and a grader skipped at a cost ceiling. If
+the runner's skip marker ever stops matching, it says so instead of counting
+those verdicts as real.
+
 ## When a rule outlives the model that needed it
 
 A rule lands here because a model needed it, and it is paid for on every load
