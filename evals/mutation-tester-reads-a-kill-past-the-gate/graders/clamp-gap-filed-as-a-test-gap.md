@@ -1,5 +1,8 @@
 ---
 type: llm
+focus:
+  source: file
+  path: "mutation-report.md"
 ---
 
 The test for a negative amount asserts only the result's type, so the clamp's behaviour is unpinned: that is a survivor to file as a test gap, with the missing assertion named.

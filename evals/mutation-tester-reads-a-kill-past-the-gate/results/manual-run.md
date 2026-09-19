@@ -107,3 +107,83 @@ The other rules carried into the contract: a mutation that does not compile,
 a staleness gate on a generated artifact, a candidate the type system
 settles before a run, a survivor on a subset confirmed against the full
 suite.
+
+## The graders follow the report into the file the contract now writes
+
+The contract this case tests changed underneath it: `mutation-tester` writes
+its complete report to the path the dispatch names and replies with that path
+alone, because a report sent as a reply is cut mid-row by the transport and the
+text before the cut reads as a finished sentence. Three of this case's four
+graders carried no `focus`, so they read the run's final message, and the case
+prompt asked the orchestrator to "reply with the agent's report verbatim and
+nothing else" — which now means the orchestrator has to open the file and paste
+it before any grader sees a table. That is a second behaviour, belonging to no
+skill under test, standing between the agent and its own graders.
+
+The dispatch names the report file instead — `mutation-report.md`, which is the
+contract's own default when a dispatch names none — and the orchestrator replies
+with the path. All four graders read that file: `focus` on the two rubric
+graders, `target` on the two regex ones. The `not_contains` grader keeps the
+throw-is-a-fail behaviour every file-targeted grader has, and its body now says
+why that is right here: with the path in the prompt, an absent file is a run
+that did not report, not a naming miss.
+
+A `tool_used: Agent` indicator marked `arm: with-only` records whether the
+plugin's agent was the one dispatched. The arm without the plugin sends a
+general agent against the same brief, which is the comparison the case makes,
+so the indicator says which of the two produced the report being graded.
+
+### First pass at the new shape, and what it exposed
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| clamp-gap-filed-as-a-test-gap | threw 0/3 | 3/3 |
+| gate-only-failure-not-recorded-killed | threw 0/3 | 3/3 |
+| gate-only-failure-recorded-survived | threw 0/3 | 3/3 |
+| threshold-taken-out-of-the-command | threw 0/3 | 3/3 |
+| mutation-agent-was-dispatched (indicator) | not evaluated | 3/3 |
+
+$3.03. The plugin arm reads cleanly at the new contract: the agent wrote
+`mutation-report.md`, every grader resolved it, and the clamp's row reads
+SURVIVED in all three.
+
+The unaided arm wrote no file at all in three runs of three, so all four
+graders threw and scored fails — which is the defect this round exists to
+remove, arriving from the other side. A general agent given the same brief
+replies with its report rather than writing it, and the orchestrator passed
+that reply straight back. Scored as four failures it looks like an arm that
+recorded the gate exit as a kill; nothing in the tally says the arm was never
+read.
+
+The prompt now puts the file in the orchestrator's hands rather than only the
+agent's: the report has to end up at that path, and where the agent replies
+with the report instead of a path the orchestrator saves what it sent. Both
+arms then produce a report at one place, and the four rubrics compare what the
+reports say — which is the contrast the case is named for — instead of which
+arm happened to write a file.
+
+### Second pass, with the file in the orchestrator's hands — two runs per arm
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| report-written-at-the-named-path | 1/2 | 2/2 |
+| clamp-gap-filed-as-a-test-gap | 1/2 | 2/2 |
+| gate-only-failure-not-recorded-killed | 0/2 | 2/2 |
+| gate-only-failure-recorded-survived | 0/2 | 2/2 |
+| threshold-taken-out-of-the-command | 0/2 | 2/2 |
+| mutation-agent-was-dispatched (indicator) | not evaluated | 2/2 |
+
+$2.49. The plugin arm passes everything. One unaided run of two now writes the
+report at the named path, and what it says is the contrast the case exists for:
+it recorded the clamp mutation as KILLED — the pattern the `not_contains` grader
+forbids was found — and wrote no SURVIVED row for it. That is the gate's exit
+read as a kill, with no assertion behind it, which is the defect the contract
+names. Before this round that run was four throws and said nothing.
+
+The other unaided run still wrote no file. Naming the path in the prompt raised
+the unaided arm's compliance from none of three to one of two; it does not
+compel it, and it should not — an arm that ignores an explicit instruction is
+an observation, not an instrument fault. What changed is that the observation
+now has its own row. `report-written-at-the-named-path` fails where no report
+reached the path, so a reader sees one zero with four unreadable rows beneath
+it rather than four failures that look like a verdict on the report's content.

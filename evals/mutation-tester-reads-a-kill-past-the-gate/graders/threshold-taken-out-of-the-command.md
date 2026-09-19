@@ -1,5 +1,8 @@
 ---
 type: llm
+focus:
+  source: file
+  path: "mutation-report.md"
 ---
 
 The sweep's command is the repo's test command with any coverage threshold taken out of it, and the report says that it was.
