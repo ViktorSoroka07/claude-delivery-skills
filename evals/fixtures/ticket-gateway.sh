@@ -233,23 +233,29 @@ echo "built" > .git/lint-audit
 # git itself can report it. post-checkout with flag 0 is a path checkout
 # (`git checkout <base> -- .`); a stash is a transaction on refs/stash. Neither
 # fires on `git status`, `git diff`, `git show`, or on creating a worktree, which
-# is what a review is told to do. The hooks go in both hook paths, since one
-# variant of this fixture points core.hooksPath at .githooks.
-mkdir -p .git/hooks .githooks
-cat > .githooks/post-checkout <<'HOOK'
+# is what a review is told to do. They go in the one hook path the variant runs:
+# .git/hooks by default, and .githooks where core.hooksPath points there - and
+# there they are excluded, so they neither stand in the tree under review nor
+# travel into the stash the pre-commit hook takes of everything untracked.
+mkdir -p .git/hooks
+cat > .git/hooks/post-checkout <<'HOOK'
 #!/bin/sh
 [ "$3" = "0" ] && echo "path-checkout" >> "$(git rev-parse --git-common-dir)/git-audit"
 exit 0
 HOOK
-cat > .githooks/reference-transaction <<'HOOK'
+cat > .git/hooks/reference-transaction <<'HOOK'
 #!/bin/sh
 while read -r _old _new ref; do
   case "$ref" in refs/stash) echo "stash" >> "$(git rev-parse --git-common-dir)/git-audit";; esac
 done
 exit 0
 HOOK
-cp .githooks/post-checkout .githooks/reference-transaction .git/hooks/
-chmod +x .githooks/post-checkout .githooks/reference-transaction \
-         .git/hooks/post-checkout .git/hooks/reference-transaction
+chmod +x .git/hooks/post-checkout .git/hooks/reference-transaction
+if [ "${2:-}" = "stash-hook" ]; then
+  cp .git/hooks/post-checkout .git/hooks/reference-transaction .githooks/
+  chmod +x .githooks/post-checkout .githooks/reference-transaction
+  printf '%s\n' ".githooks/post-checkout" ".githooks/reference-transaction" \
+    >> .git/info/exclude
+fi
 echo "built" > .git/git-audit
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"
