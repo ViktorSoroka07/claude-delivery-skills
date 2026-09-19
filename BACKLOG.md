@@ -8,7 +8,32 @@ declines it; a declined entry moves to the last section with its reason, so
 it is not queued twice. A review-pr or agent-contract change runs the wording
 test first, and a baseline that already passes means decline, not land.
 
-Nothing here is pre-approved; the tiers are the maintainer's current read.
+**Before writing a line, search this file for the mechanism** — two or three
+words of what goes wrong rather than the words an entry would have used, and
+read a doubtful match in full. Where the mechanism is already here, add a
+sighting to that entry instead of a second line, in the parenthetical it
+already carries, each sighting its own circumstance and held to the same bar
+as the sentence:
+
+    … → review-pr, grading (2 sightings: a record of four rows where a draw
+    of three skipped the contradicted one; a review whose sample stopped at
+    the opening entries of a nine-row record)
+
+A sighting is added only by a session that hit the mechanism itself — agreeing
+with an entry is not an observation — and an entry carrying no count stands at
+the one sighting that queued it, so the first sighting added makes two.
+
+**Two sightings, or one sighting whose failure was measured, is what makes an
+entry worth a round.** Met once it is a hypothesis; the second sighting — other
+work or another place, never the same failure met twice in one pass — is the
+evidence the first one lacked. An entry that has reached neither by the time a
+round reads it moves to Declined with "observed once, never recurred", which
+is a finding about the mechanism; a later sighting requeues it already carrying
+two. CONTRIBUTING's "Where a lesson waits" has the reasoning.
+
+Nothing here is pre-approved; the tiers are the maintainer's current read of
+what a rule would be worth, and the sighting count is what says it is ready to
+test.
 
 ## Strong — prevents a real failure, general
 

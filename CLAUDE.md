@@ -13,6 +13,11 @@ The order of work lives outside the tree: the maintainer keeps a plan under `doc
 - A skill, agent or brief edit that changes behaviour is tested before it lands (CONTRIBUTING, "Testing a wording change"): a baseline that fails, one wording, five fresh sessions per arm, every grader of the case in both arms, the result written into the case's `results/manual-run.md`. A wording that costs a neighbouring grader is declined with its reason, not reworded a third time on the session's own judgement.
 - The version bump goes in the commit that changes behaviour; a bumped manifest releases on push.
 
+## Backlog
+
+- **A new entry starts with a search, not with a line.** Look through `BACKLOG.md` for the mechanism — two or three words of what goes wrong, not the words an entry would have used — and where it is already there, add a sighting to that entry's parenthetical instead of a second line. Only a session that hit the mechanism itself adds a sighting; an entry carrying no count stands at the one sighting that queued it, so the first sighting added makes two.
+- Recurrence is the promotion filter: two sightings — other work or another place, never the same failure met twice in one pass — or one sighting whose failure was measured is what makes an entry worth a wording round, and an entry that has reached neither by the time a round reads it moves to Declined with "observed once, never recurred". The file's header carries the shape, CONTRIBUTING's "Where a lesson waits" the reasoning.
+
 ## Review
 
 Most changes here are verified by something stronger than a reading before they land: wording-tested contracts, grader patterns tested on captured runs and scored by the runner, fixtures built under a hostile global git config. Do not re-review those. Review the prose that loads into sessions — `hooks/session-brief.md`, `skills/*/SKILL.md`, `agents/*.md`, `CONTRIBUTING.md`, `README.md` — as one doc-vs-code pass over its diff: each changed sentence against the file it cites and its neighbouring copies (brief core against skill, agent contract against owning skill, README paraphrase against skill). Run records and `BACKLOG.md` carry no behaviour and are not reviewed. Shell under `scripts/` and `evals/fixtures/`, and any eval case never run in both arms, get an ordinary review.

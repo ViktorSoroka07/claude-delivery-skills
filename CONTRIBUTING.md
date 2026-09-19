@@ -90,6 +90,36 @@ commit body carries the observation behind the sentence, which the entry
 cannot, and an uncommitted entry is a stray change every later session has to
 explain or step around.
 
+**Queuing starts with a search, not with a line.** Nobody re-reads a backlog,
+and the one moment anyone has a mechanism in hand with the file open is when
+they are about to queue it - so that is where recurrence gets recorded. Search
+the file for the mechanism first: two or three words of what goes wrong, not
+the words an entry would have used, because the same defect arrives described
+differently every time, and a doubtful match is read in full before a second
+line is written. Where the mechanism is already there, add a sighting to that
+entry instead of a new line, so each entry carries its own count and
+recurrence needs no separate bookkeeping. Only a session that hit the
+mechanism itself adds a sighting: reading an entry and agreeing with it is not
+an observation.
+
+The count goes in the parenthetical the entry already carries, each sighting
+its own circumstance and held to the same no-proper-nouns bar as the entry's
+sentence; [`BACKLOG.md`](BACKLOG.md)'s header shows the shape. An entry
+carrying no count stands at the one sighting that queued it, so the first
+sighting added to it makes two.
+
+**Recurrence is the promotion filter.** A mechanism met once is a hypothesis
+about how things fail; one that bites twice is a rule, and the second sighting
+is the evidence the first one lacked - so an entry is worth a wording round
+when it carries two sightings, or one sighting whose failure was measured (a
+rate, a run, a named failure). A second sighting is other work or another
+place, never the same failure met twice in one pass. An entry that has reached
+neither by the time a round reads it moves to Declined with "observed once,
+never recurred" - a finding about the mechanism rather than a defeat, and a
+later sighting requeues it already carrying two, which makes it eligible at
+once. The tier says how much a rule would be worth; the count is what says it
+is ready to test.
+
 ## Provenance without leaking
 
 A provenance note has two jobs: proving the rule came from real experience, and
