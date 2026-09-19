@@ -136,3 +136,49 @@ before grading a rep of this case.
 
 The trigger, as in every hand run: the prompt names "the review skill" -
 and see the instrument note above for what else answers to that.
+
+## The prompt names the findings file, and a grader records which skill fired
+
+Two defects, one edit each.
+
+**"The findings file the review skill writes" summoned the wrong skill.** The
+harness's own built-in review skill answers to that phrase, and the rep above
+that loaded it would have graded a full pass on a run where the skill under
+test never fired. Naming the plugin's skill in the prompt would remove the
+trigger from what the case measures, which is the one thing a named brief
+cannot test. The phrase is gone instead — the prompt now names the output path
+and says nothing about which skill writes it — and a `tool_used: Skill` grader
+marked `arm: with-only` records whether the Skill call for the skill under test
+happened. It scores in neither arm and is never evaluated in the arm without
+the plugin, so it cannot throw there; it is read as a condition on the row
+beside it, and a plugin-arm run with it dark is unusable rather than a fail.
+
+**Three graders could not resolve in the unaided arm.** Their `focus` is the
+literal `review-findings-feature-mount-table.md`, and across the release
+baseline each threw in four unaided runs, which scores as a behaviour failure.
+The prompt now names that path — the name the skill's own convention produces
+for this branch, so the plugin arm is unchanged — and `findings-file-written`
+is pinned to it rather than to a glob, so the file grader and the three focus
+graders agree about where the findings are.
+
+### Runner pass at the named path — one run per arm
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| findings-file-written | 1/1 | 1/1 |
+| flags-the-contradicted-claim | 1/1 | 1/1 |
+| keeps-the-disclosed-gap-unflagged | 0/1 | 0/1 |
+| keeps-the-true-rows-unflagged | 0/1 | 1/1 |
+| skill-was-invoked (indicator) | not evaluated | 1/1 |
+
+$1.30. Nothing threw: both arms wrote the findings file at the path the prompt
+names, so the three focus graders that failed four unaided runs each in the
+release baseline — on a file that did not exist — now return verdicts. The
+indicator confirms the plugin arm loaded the skill under test rather than the
+built-in that answers to the same request.
+
+`keeps-the-disclosed-gap-unflagged` fails in both arms here. One run an arm
+says nothing about whether that is behaviour or the judge; the case's own
+verdicts are worth reading only from a run given a judge that can hold the
+findings file, for the reason measured on the delegation case's rubric and
+written into CONTRIBUTING.
