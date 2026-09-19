@@ -221,7 +221,11 @@ evidence, and the four rules are not interchangeable:
   workspace tree.** A file the scaffold wrote and the run left alone reports
   missing, and `exists: false` passes whether the run deleted the path or
   never touched it - so no grader proves a deletion, and a case whose
-  behaviour is a deletion is hand-graded against the tree.
+  behaviour is a deletion is hand-graded against the tree. Where a
+  scaffold-seeded file's survival is the thing to grade, a regex over a line
+  the scaffold wrote does it: that target resolves against the workspace, so
+  an intact file passes, a deleted one throws and is scored a fail, and a
+  rewritten one fails on the missing line.
 - **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
   `arm: with-only`: under the two-arm run it is shown and scored in neither
   arm, and the arm without the plugin never evaluates it, so it cannot throw
