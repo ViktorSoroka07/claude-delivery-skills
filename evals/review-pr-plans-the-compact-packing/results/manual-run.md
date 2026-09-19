@@ -208,6 +208,30 @@ the question of whether a table was written at all. All five keep the
 `with-only` mark the retired grader had, for the reason the first runner section
 gives.
 
+### The corrected family through the runner
+
+Three runs per arm at the graders as they stand, the runner's own arms:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| packing-docs-minors-in-one-row (with-only) | | 3/3 |
+| packing-docs-medium-alone (with-only) | | 3/3 |
+| packing-uncapped-delay-alone (with-only) | | 3/3 |
+| packing-final-wait-alone (with-only) | | 3/3 |
+| packing-docs-minors-not-spread (with-only) | | 3/3 |
+| packing-table-written | 1/3 | 3/3 |
+| refuted-draft-dropped | 3/3 | 3/3 |
+| default-list-kept-whole | 2/3 | 3/3 |
+| report-counts-both-ways (with-only) | | 3/3 |
+| report-keeps-the-bodies-out | 1/3 | 1/3 |
+
+The five read the packing without a judge and without a hand grade, which is
+what the rebuild was for. The two rows that move are the judge's own and are
+older than this change: `default-list-kept-whole` and
+`report-keeps-the-bodies-out` split their votes on a long file and on a reply's
+tone, the same in both arms.
+
+
 ## Not tested
 
 The trigger: "my review … finish the review" names the activity. The
