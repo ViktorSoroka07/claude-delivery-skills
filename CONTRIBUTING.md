@@ -272,8 +272,9 @@ for that comparison, the same test is done by hand:
    finds the shared builder from its own path and passes the case's variant,
    which a direct call to the builder leaves out.
 2. Start five fresh sessions on the model of interest per arm, with the eval
-   prompt verbatim, each a process of its own (`claude -p`, run from the
-   fixture directory, with `--plugin-dir <that arm's worktree>` where the
+   prompt verbatim — on both models, and so twenty sessions, where the rules
+   below make the rule a restraint one — each a process of its own (`claude -p`,
+   run from the fixture directory, with `--plugin-dir <that arm's worktree>` where the
    plugin is not installed from the clone, while the files on disk hold that
    arm's text). A
    subagent dispatched from a working session is not fresh: it gets the skill
@@ -308,11 +309,27 @@ Rules that held in practice, each answering a failure seen here:
   five clean runs leave such a rule about a three-in-a-hundred chance of
   hiding, and a one-in-three failure about one in eight. Five is where the
   batch is still cheap to run and a survivor is a signal rather than luck.
-- **Sonnet as the model of interest.** The skills have to hold on the weakest
-  model a user will run them with, and the weaker model is the more sensitive
-  instrument: a rule the strongest model keeps from intent alone is the one a
-  weaker model negotiates, and that negotiation is the defect the test hunts.
-  The author's own reading is already the strong-model run.
+- **A capability rule is measured on the weakest model the plugin supports.**
+  Where a rule exists because the model does not know to do the thing, that
+  model is both where the gap is and the more sensitive instrument: a rule the
+  strongest model keeps from intent alone is the one a weaker model
+  negotiates, and that negotiation is the defect the test hunts. The instrument
+  is set to that model rather than derived from it — `--model sonnet` in the run
+  above is the floor the skills are held to — which makes it the default model
+  of interest, and for this kind of rule the author's own reading is already the
+  strong-model pass.
+- **A restraint rule is measured on the strongest model in use here as well.**
+  Where a rule exists because the model does too much, or applies something
+  everywhere, the failure scales with capability and can be absent from the
+  instrument entirely: one candidate's failure appeared in eight of ten
+  sessions on the strongest model and in none on the instrument, so a baseline
+  taken on the instrument alone would have read as a rule that tests nothing.
+  Its cost is asymmetric the same way — the strong model over-applies a wording
+  it has understood — so the case's other graders are read on the model that
+  showed the failure, which is where a wording that over-applies breaks one.
+  That candidate was declined on exactly that evidence: three wordings, each
+  reaching its own grader and each costing a neighbour. Here the author's
+  reading is not the strong-model pass; over-application shows in reps.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
