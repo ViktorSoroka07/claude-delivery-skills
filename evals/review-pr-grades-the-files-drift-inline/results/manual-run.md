@@ -205,10 +205,12 @@ which command did it, and the hand read is what separates them; the row above is
 mechanical score, and on the narrower reading - the base actually checked into the tree -
 the arms are 4/5 baseline against 2/5 treatment, which is the same verdict.
 
-The fixture leaves `.githooks/` untracked in the default variant: the hooks that fire
-are the copies in the git directory, and `core.hooksPath` is set only in the
-`stash-hook` variant, so the visible copy is inert. One rep in each arm stashed it,
-inspected it, and in the treatment arm dropped the stash holding it and then spent four
-turns restoring it from the commit. It corrupts no grader - the live hooks are inside
-the git directory - but it is a second thing in the tree for a run to trip over, against
-CONTRIBUTING's rule that a fixture carries one defect.
+The fixture left `.githooks/` untracked in the default variant for every run above:
+the hooks that fire were the copies in the git directory, and `core.hooksPath` is set
+only in the `stash-hook` variant, so the visible copy was inert. One rep in each arm
+stashed it, inspected it, and in the treatment arm dropped the stash holding it and then
+spent four turns restoring it from the commit. It corrupted no grader - the live hooks
+are inside the git directory - but it was a second thing in the tree for a run to trip
+over, against CONTRIBUTING's rule that a fixture carries one defect. Fixed in 5b6249c:
+each hook is now written only to the path its own variant runs, so a run on this case
+starts from a clean tree.
