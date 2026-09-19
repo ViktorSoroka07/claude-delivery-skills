@@ -114,15 +114,17 @@ as agreements and the table above carries them.
 Read the File A cell for what it is: with the label a fail, a judge that fails
 nearly everything is right here for no reason worth having. It closes the
 rubric's ambiguity rather than adding evidence about judges, and the three
-conditions beside it on the same file are what separate the two judges.
+conditions beside it on the same file, not this cell, are where the two judges
+separate.
 
 ### What the two files together say that one file cannot
 
 The default judge passed exactly one cell out of eight, on 9 of its 72 votes. On
 File B that produced three agreements — the right verdict for the wrong reason,
 since a judge that fails nearly everything is right whenever the answer is fail.
-File A is what separates the two: three conditions that a hand read and the
-stronger judge both pass, failed three votes to none.
+File A is what separates the two: three of its four conditions are hand-passes,
+and the default judge failed two of the three in every rep, where the stronger
+judge passed all three.
 
 **So a calibration set needs an artifact that should pass and one that should
 fail.** Against only the failing file, the default judge scores 3 of 4 and looks

@@ -242,10 +242,11 @@ evidence, and the four rules are not interchangeable:
 **The default judge is the weakest part of the instrument, and the next baseline
 is run with `--judge-model sonnet`.** Scored against hand labels on two kept
 findings files — one that should pass the rubric it is put through and one that
-should fail it — the default judge agreed on four of seven conditions and the
-stronger judge on seven of seven, and the default judge's misses were unanimous:
-three votes to none on conditions that a hand read and the stronger judge both
-pass. Consistency is not correctness. Loosening a rubric's wording moved nothing;
+should fail it — the default judge agreed on five of eight cells and the
+stronger judge on eight of eight, and every one of the default judge's three
+misses is a condition that a hand read and the stronger judge both pass, failed
+in all three reps and on twenty-six of the twenty-seven votes behind them.
+Consistency is not correctness. Loosening a rubric's wording moved nothing;
 splitting it into one grader per condition is what let the stronger judge grade
 each condition separately, and left the default judge where it was. The judge
 line is about 2% of a baseline's cost and the stronger judge adds $2.00–3.50 to
