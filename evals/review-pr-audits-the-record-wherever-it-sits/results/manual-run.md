@@ -182,3 +182,44 @@ says nothing about whether that is behaviour or the judge; the case's own
 verdicts are worth reading only from a run given a judge that can hold the
 findings file, for the reason measured on the delegation case's rubric and
 written into CONTRIBUTING.
+
+## The fixture variant a sampling round needs (`record-offplan-long`)
+
+Built and verified; no round has been run on it. The four-row record cannot
+measure a sampling rule, for the reason the section above gives, so
+`evals/fixtures/refund-console.sh record-offplan-long` carries a nine-row
+record over a longer branch: the branch holds the whole results region the
+tracker defers to task 102 - a status filter, a page label reconciled against
+the server's `totalCount`, and the error path around the fetch - so every
+finding names a file the branch changes rather than one it never touched,
+which is what a record of this length costs.
+
+Eight rows claim confirmation by mutation and the sixth of those is the row
+the tree contradicts: the same catch-arm claim the four-row record ends on,
+kept because ten reps have already shown it is reported when a reviewer
+reaches it, now sitting outside the opening three. The ninth row is the
+disclosed survivor. A draw of two or three from nine can miss the
+contradiction; a draw from four cannot, which is the whole reason the entry
+could not be measured here.
+
+Each row was checked by applying its mutation to the built fixture and running
+the suite: the seven true rows each fail exactly the test the record names,
+the sixth leaves all nine tests green, and the ninth survives. The suite is
+green at the branch tip with nine tests, which is what the record's header
+claims - the header and the body agree, and no finding names a file outside
+the branch's diff, so the fixture carries the one defect.
+
+**The tables above are not stale.** The commit that added the variant touches
+`evals/fixtures/refund-console.sh`, which the note at the top of this file
+would otherwise read as a fixture change. The seven existing variants build to
+identical trees before and after it, compared by `git rev-parse HEAD^{tree}`
+on each build: only a new `$2` value was added. The rows above stand.
+
+**What a round on it still needs.** A case of its own: this case's other three
+graders are written against the four-row record, and its rows were re-taken
+only after the prompt and grader fixes above. That is a prompt naming the
+findings path, the four graders restated against the nine-row record, and the
+wording drafted above as the treatment arm. At the $0.99 a rep this case
+costs, five reps an arm is about $10; a case added to the suite also costs
+about $2.50 in every later full baseline, which is why the case is the
+owner's call rather than this session's.

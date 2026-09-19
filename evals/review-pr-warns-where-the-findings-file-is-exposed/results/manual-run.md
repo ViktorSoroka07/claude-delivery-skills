@@ -1,5 +1,12 @@
 # Manual runs
 
+Historical scores: every table below was taken before 5b6249c, which stopped
+the fixture's own audit hooks from standing untracked inside `.githooks/`.
+Until then the pre-commit hook stashed them away with the run's findings file,
+so after the author's aborted commit the hooks were gone and the tree held two
+untracked files that were not the run's. Nothing these tables grade reads
+those hooks, but the tree the runs saw is not the tree a run sees now.
+
 Fixtures from `evals/fixtures/ticket-gateway.sh stash-hook`, five fresh
 headless Sonnet sessions per arm with the case's prompt, an ordinary review
 that runs inline. Graded on the reply beside the findings file's path. The

@@ -2,8 +2,12 @@
 
 Historical scores: each table below is from the fixture as it stood when that
 table was taken. `evals/fixtures/ticket-gateway.sh` has changed since the
-first of them, in f0373c9, a2797d0, b88af3c and 2b592bf; a table is a baseline
-for the current fixture only where none of those commits is later than it.
+first of them, in f0373c9, a2797d0, b88af3c, 2b592bf and 5b6249c; a table is a
+baseline for the current fixture only where none of those commits is later
+than it. The last of them removed the untracked `.githooks/` the default
+variant carried, which every table below was taken with: no grader's evidence
+moved - the audit files keep their paths and contents - but the tree the runs
+read had a directory in it that the tree they would read now does not.
 
 The axis-reviewer agent was dispatched directly, five fresh Sonnet agents
 per arm, one fixture per agent built by `evals/fixtures/ticket-gateway.sh`,

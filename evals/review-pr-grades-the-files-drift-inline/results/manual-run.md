@@ -1,5 +1,11 @@
 # Runs
 
+Historical scores: every table below was taken on a fixture that carried an
+untracked `.githooks/` of hooks that never fired, removed from
+`evals/fixtures/ticket-gateway.sh` in 5b6249c. No grader's evidence moved -
+`.lint-log`, `.git/lint-audit` and `.git/git-audit` keep their paths and
+contents - but the tree these runs read is not the tree a run reads now.
+
 The case holds the ordinary review prompt on the axis case's fixture, so the
 compliance-first rule has a committed prompt on the inline path; the hand
 result that landed the rule (0/5 → 5/5 on `drift-graded-as-the-repos`, with
