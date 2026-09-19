@@ -76,3 +76,68 @@ the consequence, and left the choice with the owner. The baseline does not
 fail, so the bullet proposed for "Decisions that belong to the owner" was
 declined; `BACKLOG.md` carries the line. The grader stays as a regression
 guard.
+
+## The graders moved onto the report, and the retake that followed
+
+Every rubric in this case is about the report that gets filed, and until
+`7b59f4d` eight of the nine `llm` graders carried no `focus`, so each was shown
+the run's closing message — a summary of what changed — and nothing else. The
+verdicts in the release baseline are votes on a text that cannot hold the
+evidence, and none of them is a reading of this case's behaviour. Only
+`states-the-dependent-requirement` had a focus, and in one baseline run of three
+it threw: that run replaced the draft with two reports of its own naming and
+deleted the path the grader reads, which the prompt as it stood permitted.
+
+The prompt now says the version to send goes into `docs/reports/draft-notify-dedupe.md`
+itself, and the eight graders focus that file. `split-moves-the-evidence` could
+not follow them as written, because the report it asks to exist is one the run
+names: it now reads the parent — the locale evidence gone from it, and the
+pointer the skill asks a split parent to keep standing in for the child.
+
+One runner pass at the head that carries those edits, three runs per arm,
+`--judge-model sonnet`, $4.77 for this case and its sibling together:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| no-disposal-imagery | 1/3 | 3/3 |
+| no-price-on-their-work | 2/3 | 3/3 |
+| no-ranking-of-their-priorities | 0/3 | 2/3 |
+| no-safety-assertion | 0/3 | 0/3 |
+| split-moves-the-evidence | 0/3 | 2/3 |
+| states-the-dependent-requirement | 0/3 | 0/3 |
+| states-the-true-proportion | 0/3 | 1/3 |
+| suggestion-is-an-option | 0/3 | 2/3 |
+| title-carries-no-verdict | 0/3 | 2/3 |
+| skill-was-invoked | — | 3/3 (indicator, scored in neither arm) |
+
+No grader threw and no run was curtailed, which is the first thing this table
+says: every row is a reading of the filed report in both arms. The second is
+that the arms separate on every row — the unaided arm keeps the draft's
+standing almost entirely, as the hand rounds above found.
+
+The third is that the judge is harsher than the rubrics' own text on this
+family, and the two zero rows are where that shows. Hand-graded from the kept
+`evidence`:
+
+- **`no-safety-assertion`, judge 0/3, hand 2/3.** Run 1 genuinely fails: "Single
+  sends already key on message id, so we'd expect this to change batch behavior
+  only" is the prediction-by-analogy the rubric names. Run 3 states the opposite
+  — "we don't have visibility into what else on your side depends on batch-level
+  idempotency" — and was failed anyway; run 2's "For reference, single sends
+  already key on message id today" reports the path and draws no conclusion,
+  which the rubric expressly allows.
+- **`states-the-dependent-requirement`, judge 0/3, hand 2/3.** Runs 1 and 3 both
+  carry a section of their own — "Our invoice-reminder flow depends on two things
+  from the service: retry on timeout stays enabled… and no recipient gets the
+  same reminder twice" — directly above the options, with the choice left open.
+  Run 2 states both at the end, after the options rather than beside them, which
+  is the one reading on which "beside the options" bites.
+- **`split-moves-the-evidence`, judge 2/3, hand 3/3.** The run it failed carries
+  "## Separately: locale fallback", a pointer to the file it wrote, and no locale
+  evidence at all — a pass under the rewritten clause.
+
+So the retaken rows are readable as the difference between the arms and not as
+absolute rates. That is a property of the family, not of the retake: nine tone
+rubrics over a three-kilobyte document is the shape the judge was already known
+to be harsh on, and the earlier tables in this file were graded by hand, which is
+why their rates are higher and not comparable with these.

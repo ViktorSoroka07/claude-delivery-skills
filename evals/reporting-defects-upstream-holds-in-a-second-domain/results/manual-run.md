@@ -55,3 +55,54 @@ knew better" for images that merely rate the work.
 The rules whose baseline passes five of five above, against a subtler
 draft. The trigger against a prompt that does not describe the report as
 bound for another team.
+
+## The graders moved onto the report, and the retake that followed
+
+Every rubric here is about the report that gets filed, and until `7b59f4d` all
+eight `llm` graders carried no `focus`, so each was shown the run's closing
+message and nothing else. The verdicts in the release baseline are votes on a
+summary of the rewrite; none of them reads this case's behaviour.
+
+The prompt now says the version to send goes into
+`docs/reports/draft-cache-asset-miss.md` itself, and seven graders focus that
+file. `split-moves-the-evidence` reads the parent instead — the counter
+evidence gone from it, and the pointer to wherever the run filed that defect —
+because the child's path is the run's own choice and no grader resolves one.
+
+One runner pass at the head that carries those edits, three runs per arm,
+`--judge-model sonnet`:
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| no-disposal-imagery | 2/3 | 3/3 |
+| no-price-on-their-work | 0/3 | 3/3 |
+| no-ranking-of-their-priorities | 0/3 | 3/3 |
+| no-safety-assertion | 0/3 | 3/3 |
+| split-moves-the-evidence | 0/3 | 2/3 |
+| states-the-true-proportion | 0/3 | 3/3 |
+| suggestion-is-an-option | 0/3 | 1/3 |
+| title-carries-no-verdict | 0/3 | 2/3 |
+| skill-was-invoked | — | 3/3 (indicator, scored in neither arm) |
+
+No grader threw and no run was curtailed. Six of the eight rows are 3/3 against
+0/3, which is what this case was built to show in a second domain.
+
+Two rows read further, from the kept `evidence`:
+
+- **`split-moves-the-evidence`, judge 2/3, hand 2/3 — the fail is real.** The run
+  it failed keeps both mechanisms in the report it files, under "Issue 2:
+  eviction counter reported 0 while entries disappeared", carrying the 312
+  disappearances and the `reason === 'manual'` reading in full. That is the
+  behaviour the rubric exists for, and the reply-graded version of this grader
+  could not have seen it.
+- **`suggestion-is-an-option`, judge 1/3, hand at least 2/3.** The run judged
+  first fails under a heading "## Possible fix" whose body reads "One option
+  would be applying it (or equivalent logic) to `artifact.path`… we'll leave the
+  sizing and sequencing to you". The rubric fails "a 'Fix:' line, or a heading
+  that presents the change as decided", and a hedged heading over an option is
+  neither.
+
+So this case's rows carry the same caution as its sibling's: read the difference
+between the arms, and hand-grade a plugin-arm fail from `evidence` before calling
+it a regression. The rubrics are tone judgements over a whole document, which is
+the shape the judge reads most strictly.
