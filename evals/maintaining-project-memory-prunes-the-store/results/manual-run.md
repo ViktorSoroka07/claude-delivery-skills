@@ -106,3 +106,52 @@ correct behaviour is deleting two dead directories, so a probe rep refused to de
 said so. Both files are moved aside for each batch and restored by a trap that verifies
 checksums; without that the case is unmeasurable in both arms, and the failure reads as
 the plugin's. CONTRIBUTING's "Testing a wording change" carries the general form.
+
+## `records-the-trap-once` was judging the reply, and the "regression" was that
+
+The release baseline showed this grader at 2/3 without the plugin and 0/3 with
+it, and a five-rep part run repeated the shape (1/5 with, 0/5 without). Read as
+a score it says the plugin stopped runs recording the trap. It says nothing of
+the kind: the grader carried no `focus`, so the judge was shown the run's final
+message — three or four lines saying what changed — and asked whether exactly
+one new memory file states the trap with its boundary condition inside the
+imperative and without narrating the session. None of that can be in a summary,
+so the votes were on a text that cannot hold the evidence.
+
+The grader cannot be pointed at the entry file either: the entry's name is the
+run's choice, and `focus` takes one literal path. The two runs of the pass below
+named it `project_font_path_trap.md` and `project_font_path_space_trap.md`. So
+the grader now reads the live checkout's index, `MEMORY.md`, which is where a
+name the run chose has to be declared, and asks what the index can answer:
+exactly one line for the trap, linking a file beside it, with the boundary
+condition — a space in the font path — in the hook. Whether the entry file
+itself is an imperative and keeps the session's story out is hand-graded from
+the tree, and the grader body says so.
+
+`deletes-the-dead-twins` keeps judging the reply, and that is now stated in the
+grader rather than left to be discovered: a deletion is the one outcome the
+runner cannot show a grader. `focus` throws on a path that is gone, and a
+`file_exists` grader with `exists: false` passes whether the run deleted the
+path or never touched it, because it reads the run's own file changes and not
+the workspace tree (settled by a throwaway case that deleted a scaffold file and
+left another alone: the untouched one reported missing, and the deleted one and
+a path that never existed both reported "absent as expected").
+
+## Runner pass at the fixed graders — two runs per arm
+
+| Grader | No plugin | Plugin |
+|---|---|---|
+| deletes-the-dead-twins | 0/2 | 2/2 |
+| keeps-the-live-memory-intact | 2/2 | 2/2 |
+| re-runs-the-absence-check | 2/2 | 2/2 |
+| records-the-trap-once | 2/2 | 2/2 |
+| skill-was-invoked (indicator) | not evaluated | 2/2 |
+
+$1.01. `records-the-trap-once` now resolves and votes in both arms, and both
+arms pass it: recording a learned trap in the index is not what this case
+separates, and the apparent regression was the instrument. The case's named
+behaviour, `deletes-the-dead-twins`, still moves 0/2 to 2/2.
+
+`skill-was-invoked` behaves as the mark promises: `withOnly` true, `scored`
+false, and the grader does not appear at all in the arm without the plugin, so
+it can never throw there.
