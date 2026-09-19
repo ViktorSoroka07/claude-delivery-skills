@@ -49,7 +49,7 @@ jobs:
       # Three real shell bugs shipped in these scripts before shellcheck
       # was pointed at them; it stays pointed at them.
       - name: ShellCheck the guard scripts
-        run: shellcheck .githooks/pre-commit scripts/*.sh evals/fixtures/*.sh skills/*/*.sh
+        run: shellcheck .githooks/pre-commit scripts/*.sh evals/fixtures/*.sh evals/*/fixture.sh skills/*/*.sh
 
       # The consistency gates: self-test the checkers, verify every internal
       # reference resolves, and prove the canonical inventory statements match
