@@ -42,6 +42,9 @@ Each row is one grader against one file — a cell of the calibration, not a run
 - **Hand label** — what the grader's own text says the verdict should be, read by
   hand. `contested` means two careful readings of the same text disagreed; such a
   row measures the rubric, not the judge, and is left out of the agreement counts.
+  `ruled` means the maintainer has since said which reading the rubric means — it
+  fixes the wording that is owed, not the row, which is retaken once that wording
+  lands.
 - **Reps** — three repetitions of the same case. Each rep is an independent judge
   evaluation of the same file, and each evaluation is itself three votes, so a
   cell holds nine votes. `P`/`F` is the rep's verdict; the vote count behind it is
@@ -65,7 +68,7 @@ one written by a run with the plugin loaded, 6.3 KB, and one by a run without it
 | one-mount-finding | pass | P P P (8/9 votes) | ✓ | P P P (9/9) | ✓ |
 | symptoms-under-one-finding | pass | F F F (1/9) | ✗ | P P P (9/9) | ✓ |
 | no-error-state-suggested | pass | F F F (0/9) | ✗ | P P P (9/9) | ✓ |
-| held-the-mount-back | contested | F F F (0/9) | — | F F F (0/9) | — |
+| held-the-mount-back | contested, ruled fail | F F F (0/9) | — | F F F (0/9) | — |
 
 **File B — the unaided arm's findings file (1.7 KB).**
 
@@ -96,8 +99,16 @@ Both judges vote fail on it, 0 of 9 each. Only the stronger judge's vote carries
 information — it passes the other three conditions on the same file, so it is
 discriminating rather than refusing — and it sides with the case record. What the
 cell measures is a rubric two readers split on, which no judge can be scored
-against. It is queued as its own task; until the wording says which reading is
-meant, a verdict on this grader is worth nothing from any judge.
+against. It is queued as its own task.
+
+**The maintainer has since ruled which reading is meant: the wiring includes the
+`renderRequestTable` call, so this file fails the condition.** That settles the
+rubric, not the row. Both judges returned the ruled verdict, which would put the
+default judge at 5 of 8 and the stronger one at 8 of 8 — but they returned it
+against text that did not yet say so, and a row measures the wording it was taken
+against. The counts above therefore stay at 4 of 7 and 7 of 7, and this cell is
+filled in when the rewritten grader is retaken with the other grader-resolution
+fixes.
 
 ### What the two files together say that one file cannot
 

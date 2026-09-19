@@ -150,5 +150,11 @@ about the future the rubric expressly allows; read against the fail clause it
 keeps the table mounted and removes only the fetch, which is repairing the
 wiring. Two hand readings split on it, so no judge can be scored against it, and
 the verdict it returns — fail, unanimously, from both judges — is not evidence
-about either judge. The wording has to say which reading is meant before this
-grader is read again.
+about either judge until the text says which reading it means. **The maintainer
+has ruled the first reading out: the wiring includes the `renderRequestTable`
+call, so holding the fetch out while the table stays mounted is a fail, and this
+file fails the condition.** The rubric states that rather than implying it — the
+fail clause gains the shape "the wiring held out in part, the mount left
+standing", and the pass clause keeps its allowance for a sentence about what
+happens once the owning task lands. The calibration row for this cell is retaken
+with the rewritten text, because a row measures the wording it was taken against.
