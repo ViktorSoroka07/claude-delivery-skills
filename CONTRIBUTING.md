@@ -230,19 +230,25 @@ evidence, and the four rules are not interchangeable:
   outcome can do. Under `--ablation none` the mark does nothing and the
   grader is scored like any other.
 
-**The default judge is the weakest part of the instrument.** Measured on one
-findings file of about six kilobytes that satisfies a four-condition rubric in
-full: the default judge failed three of the four conditions three votes to
-none, and a stronger judge passed the same file on the same wordings. Loosening
-the wording changed nothing; splitting the rubric into one grader per condition
-changed nothing under the default judge and was what let the stronger one grade
-each condition separately. One file is one measurement, but it is the only
-direction the evidence points, so treat a multi-condition rubric over a file of
-that size as ungraded until a judge has been shown to read it. The levers are:
-one condition per grader, `--judge-model` on the invocation (a grader cannot
-name its own judge — the key is rejected at load), and a hand grade from the
-`evidence` the run JSON keeps. A baseline taken with the default judge carries this error on every
-multi-condition rubric it contains.
+**The default judge is the weakest part of the instrument, and the next baseline
+is run with `--judge-model sonnet`.** Scored against hand labels on two kept
+findings files — one that should pass the rubric it is put through and one that
+should fail it — the default judge agreed on four of seven conditions and the
+stronger judge on seven of seven, and the default judge's misses were unanimous:
+three votes to none on conditions that a hand read and the stronger judge both
+pass. Consistency is not correctness. Loosening a rubric's wording moved nothing;
+splitting it into one grader per condition is what let the stronger judge grade
+each condition separately, and left the default judge where it was. The judge
+line is about 2% of a baseline's cost and the stronger judge adds $2.00–3.50 to
+it, which is the whole price of the difference. `evals/judge-calibration.md`
+carries the rows, the recipe for adding more for cents, and the limits of what
+they cover; treat a multi-condition rubric over a file of a few kilobytes as
+ungraded until a judge has been shown to read that shape. A grader cannot name
+its own judge — `model`, `judge_model`, `judge-model` and `judgeModel` are
+rejected at load — so this is an invocation-level decision, and the two other
+levers stay worth using on their own merits: one condition per grader, and a
+hand grade from the `evidence` the run JSON keeps. A baseline taken with the
+default judge carries this error on every multi-condition rubric it contains.
 
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains

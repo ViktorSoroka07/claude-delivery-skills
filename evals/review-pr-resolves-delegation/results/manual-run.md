@@ -131,3 +131,24 @@ four into one bit. What no case file can fix is the judge: the runner takes
 `judge_model`, `judge-model` and `judgeModel` are all rejected at load). A
 verdict on this case is worth reading only from a run given a judge that can
 hold a six-kilobyte findings file.
+
+### The four graders, scored against hand labels
+
+Both kept files were put back through the four graders as they now stand, under
+the runner's default judge and under `--judge-model sonnet`, three reps each.
+The rows are in `evals/judge-calibration.md`, which is the suite-wide record;
+what belongs here is what they say about this case.
+
+Three of the four conditions are read correctly by the stronger judge on both
+files and misread by the default judge on the plugin-arm file, which is the
+measurement the graders' closing note refers to. The fourth,
+`held-the-mount-back`, is a rubric this case still owes a fix: the plugin-arm
+file's Suggestion holds the fetch call and its error and paging handling out of
+the branch and then says to mount the table against the owning task's data once
+that lands. Read against the pass clause that is a hold-back plus the sentence
+about the future the rubric expressly allows; read against the fail clause it
+keeps the table mounted and removes only the fetch, which is repairing the
+wiring. Two hand readings split on it, so no judge can be scored against it, and
+the verdict it returns — fail, unanimously, from both judges — is not evidence
+about either judge. The wording has to say which reading is meant before this
+grader is read again.
