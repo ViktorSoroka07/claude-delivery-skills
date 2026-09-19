@@ -2,8 +2,8 @@
 name: git-sync-reports-every-repo
 tags: [git-sync, git]
 runs: 5
-max_turns: 30
-timeout_seconds: 420
+max_turns: 60
+timeout_seconds: 900
 allowed_tools: [Read, Grep, Glob, Bash, Skill]
 ---
 
