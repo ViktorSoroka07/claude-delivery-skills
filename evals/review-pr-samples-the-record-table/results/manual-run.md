@@ -1,8 +1,60 @@
 # Runs
 
-**None yet.** The case is written and its graders have never been run, so
-nothing here is a baseline. It gets an ordinary review before or with its first
-round, which is what this repo does with a case never run in both arms.
+## Baseline arm, five reps - and the baseline does not fail
+
+The runner, `--ablation none --judge-model sonnet --model sonnet --runs 5`,
+against the current skill text: five fresh headless reps, $6.34 of the round's
+$13.32 (the other five are the sibling nine-row case, run in the same round).
+Nothing threw, no run errored, no paid grader was skipped, and the
+`skill-was-invoked` indicator fired in all five.
+
+| Grader | Judge | Hand |
+|---|---|---|
+| findings-file-written | 5/5 | 5/5 |
+| **flags-the-contradicted-claim** | **5/5** | **5/5** |
+| keeps-the-disclosed-gap-unflagged | 5/5 | 5/5 |
+| keeps-the-true-rows-unflagged | 4/5 | 5/5 |
+| skill-was-invoked (indicator) | 5/5 | - |
+
+The one neighbour fail is the judge, on split votes (one pass, two fails), and
+it does not survive a hand read: the rep's negative sentence about the fourth
+row's subject is a *code* finding - `check_batch` accepts a reading number equal
+to the last accepted one, against its own docstring - not a claim that the
+fourth row's mutation record is false, and the same file records that its
+verifier "spot-checked runbook rows 1-6 and 8 by applying each named mutation to
+a scratch copy and confirmed the named test fails as claimed in every case".
+
+**Every rep reported the seventh row as a defect, so there is nothing here for a
+wording to improve.** CONTRIBUTING's first rule for a round is to stop when the
+baseline does not fail; on this domain it does not fail at all.
+
+## The draw, read from each rep's own tool calls
+
+Taken from the commands that write a source file, as in the sibling case:
+
+| Rep | Rows re-applied, of nine | Reached the seventh? | flags-the-contradicted-claim |
+|---|---|---|---|
+| 1 | **7** | yes | PASS |
+| 2 | 1-8 | yes | PASS |
+| 3 | all nine | yes | PASS |
+| 4 | **7** | yes | PASS |
+| 5 | all nine | yes | PASS |
+
+Two reps re-applied every row unaided; two re-applied the false row **and
+nothing else**, which means they picked it out of nine before applying
+anything. One candidate explanation the fixture supplies: rows 1 and 7 credit
+the same test by name, so a reader scanning the "test it failed" column meets
+`test_skips_unparsable_rows` twice, and one rep's own text reasons from exactly
+that - "it says deleting the `try/except` is caught by `test_skips_unparsable_rows`,
+but that test's malformed row has only 3 fields". **This is unconfirmed**: only
+one of the five says so in the text the trace keeps, and the other single-row
+rep's reasoning is not recorded.
+
+If it holds, this case cannot measure a sampling rule as it stands, because its
+planted row is findable by reading the record rather than by drawing it - which
+is a property of the table shape the case was built to introduce, not a defect
+in the fixture. A second domain that keeps the table shape and removes the
+duplicate test name is what would separate the two.
 
 ## What the case is for
 
@@ -102,6 +154,8 @@ otherwise), row 7 green, row 9 green.
 
 ## Not tested
 
-The graders themselves, in either arm - no run has been bought. Whether the
-table shape changes how a reviewer samples, which is the question the case
-exists to answer and needs both cases run in the same round.
+Any arm but the current text: no wording was run here, because the baseline
+does not fail. Whether the table shape changes how a reviewer samples is still
+open - the two cases ran in the same round and differ by 5/5 against 2/5 on the
+graded row, but the duplicated test name above is an unexcluded explanation for
+that difference, and it is a property of this fixture rather than of the shape.
