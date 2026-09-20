@@ -618,6 +618,34 @@ reaches the remote is fixed only by rewriting history.
 3. `sh scripts/check-refs.sh` - verifies the tree's internal references
    resolve.
 
+A fourth check is not a script: **one doc-vs-code pass over the prose that loads
+into sessions**, each changed sentence read against the file it cites and its
+neighbouring copies. `CLAUDE.md`'s review section says what that means and what
+is exempt; what belongs here is the range it runs over, because that is what
+decides whether it runs at all.
+
+**The range is a watermark, not the last push.**
+
+    git diff prose-passed..HEAD -- hooks skills agents CLAUDE.md CONTRIBUTING.md README.md
+
+`prose-passed` is a lightweight local tag marking the commit through which this
+prose has actually been read - lightweight so that `git push --follow-tags`
+never carries it, and created at the last release tag in a clone that has none.
+Anchoring the pass to the push instead is what let one range reach four passes'
+worth unread: a push deferred by choice is an event that may never arrive, and
+the range grows without bound while the instruction still reads as scheduled.
+
+**The pass is its own unit of work**, never started inside a task - reading tens
+of commits' prose for sense and executing a task well do not share one session's
+attention. It is due when the diff passes about 150 changed lines, when a push
+is about to be handed over whatever the size, or when two task units have landed
+since the last one, whichever comes first. It closes by fixing what it found,
+one workstream per commit, and then moving the tag to the head it read
+(`git tag -f prose-passed <sha>`). **Moving the tag is the pass's only durable
+output**, so a pass that skips it will be redone from the wrong place - and a
+session that finds the threshold crossed says so at its stop rather than
+absorbing the pass into the task in hand.
+
 ## If something already landed
 
 Do not just delete it in a new commit; the old blob stays reachable. Rewrite the
