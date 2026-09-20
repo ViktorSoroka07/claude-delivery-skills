@@ -15,6 +15,10 @@
 # the guard the record credits. A rule that holds on both is a rule about
 # records rather than about one record's shape.
 #
+# Every guard the record credits is a line the branch adds: the base is the
+# naive ingest, and nothing in the record can be narrowed away as covering code
+# the diff never touched, which would shorten the record a sample is drawn from.
+#
 # Readings carry a counter rather than a timestamp: the guard needs an order,
 # not a calendar, and the repo's leak guard blocks date-shaped literals on
 # sight - correctly, since it cannot know an invented one from a real one.
@@ -50,15 +54,10 @@ printf 'review-findings-*.md\n__pycache__/\n' > .gitignore
 
 cat > src/readings.py <<'EOF'
 def parse_rows(lines):
-    """Parse export lines into readings. Returns (rows, skipped)."""
+    """Parse export lines into readings."""
     rows = []
-    skipped = 0
     for line in lines:
-        parts = line.strip().split(",")
-        if len(parts) != 4:
-            skipped += 1
-            continue
-        meter, reading_no, units, tariff = parts
+        meter, reading_no, units, tariff = line.strip().split(",")
         rows.append(
             {
                 "meter": meter,
@@ -67,17 +66,7 @@ def parse_rows(lines):
                 "tariff": tariff,
             }
         )
-    return rows, skipped
-EOF
-
-cat > src/validate.py <<'EOF'
-def check_batch(rows):
-    """Return the rejection reasons for a batch, in row order."""
-    problems = []
-    for row in rows:
-        if row["units"] < 0:
-            problems.append((row["meter"], "negative reading"))
-    return problems
+    return rows
 EOF
 
 cat > src/billing.py <<'EOF'
@@ -85,7 +74,7 @@ RATES = {"standard": 0.12, "economy7": 0.08}
 
 
 def rate_for(tariff):
-    return RATES.get(tariff, RATES["standard"])
+    return RATES[tariff]
 
 
 def charge(units, tariff):
@@ -97,11 +86,9 @@ EOF
 cat > src/export.py <<'EOF'
 from src.billing import charge
 
-HEADER = "meter,units,tariff,cents"
-
 
 def export_lines(rows):
-    lines = [HEADER]
+    lines = []
     for row in rows:
         lines.append(
             "%s,%s,%s,%d"
@@ -120,42 +107,9 @@ from src.readings import parse_rows
 
 class ParseRows(unittest.TestCase):
     def test_reads_a_well_formed_row(self):
-        rows, skipped = parse_rows(["m-1,41,12.5,standard"])
-        self.assertEqual(skipped, 0)
+        rows = parse_rows(["m-1,41,12.5,standard"])
         self.assertEqual(rows[0]["meter"], "m-1")
         self.assertEqual(rows[0]["units"], 12.5)
-
-    def test_skips_unparsable_rows(self):
-        rows, skipped = parse_rows(["m-1,41,12.5,standard", "m-2,42,9.0"])
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(skipped, 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
-EOF
-
-cat > tests/test_validate.py <<'EOF'
-import unittest
-
-from src.validate import check_batch
-
-
-def reading(meter, units, tariff="standard", reading_no=41):
-    return {
-        "meter": meter,
-        "reading_no": reading_no,
-        "units": units,
-        "tariff": tariff,
-    }
-
-
-class CheckBatch(unittest.TestCase):
-    def test_accepts_a_clean_batch(self):
-        self.assertEqual(check_batch([reading("m-1", 10.0), reading("m-2", 4.0)]), [])
-
-    def test_rejects_a_negative_reading(self):
-        self.assertEqual(check_batch([reading("m-1", -3.0)]), [("m-1", "negative reading")])
 
 
 if __name__ == "__main__":
@@ -184,19 +138,19 @@ EOF
 cat > tests/test_export.py <<'EOF'
 import unittest
 
-from src.export import HEADER, export_lines
+from src.export import export_lines
 
 
 class ExportLines(unittest.TestCase):
-    def test_writes_the_header_once(self):
+    def test_writes_one_line_per_reading(self):
         lines = export_lines(
             [
                 {"meter": "m-1", "units": 10.0, "tariff": "standard"},
                 {"meter": "m-2", "units": 4.0, "tariff": "economy7"},
             ]
         )
-        self.assertEqual(lines[0], HEADER)
-        self.assertEqual([line for line in lines if line == HEADER], [HEADER])
+        self.assertEqual(len(lines), 2)
+        self.assertTrue(lines[0].startswith("m-1,"))
 
 
 if __name__ == "__main__":
@@ -289,6 +243,20 @@ def export_lines(rows):
 def export_name(run_no):
     """The billing file's name for a run."""
     return "billing-%04d.csv" % run_no
+EOF
+
+cat > src/billing.py <<'EOF'
+RATES = {"standard": 0.12, "economy7": 0.08}
+
+
+def rate_for(tariff):
+    return RATES.get(tariff, RATES["standard"])
+
+
+def charge(units, tariff):
+    """Charge in whole cents for the units read on this tariff."""
+    cents = units * rate_for(tariff) * 100
+    return int(cents + 0.5)
 EOF
 
 cat > tests/test_readings.py <<'EOF'
