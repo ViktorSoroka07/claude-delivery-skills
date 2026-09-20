@@ -635,6 +635,11 @@ Anchoring the pass to the push instead is what let one range reach four passes'
 worth unread: a push deferred by choice is an event that may never arrive, and
 the range grows without bound while the instruction still reads as scheduled.
 
+`BACKLOG.md` is outside that pathspec deliberately - its entries are not
+reviewed, and they change often enough to drive the threshold below on their
+own - so the one part of it a session obeys, its header, is read in the same
+pass from a diff over that file alone.
+
 **The pass is its own unit of work**, never started inside a task - reading tens
 of commits' prose for sense and executing a task well do not share one session's
 attention. It is due when the diff passes about 150 changed lines, when a push
