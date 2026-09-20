@@ -321,15 +321,15 @@ for that comparison, the same test is done by hand:
 2. Start five fresh sessions on the model of interest per arm, with the eval
    prompt verbatim — on both models, and so twenty sessions, where the rules
    below make the rule a restraint one — each a process of its own (`claude -p`,
-   run from the fixture directory, with `--plugin-dir <that arm's worktree>` where the
-   plugin is not installed from the clone, while the files on disk hold that
-   arm's text). A
-   subagent dispatched from a working session is not fresh: it gets the skill
-   and agent text its parent loaded at start, so an arm produced by swapping
-   a file under a live session runs the other arm's text. Confirm the arm
-   from each transcript, by a phrase only one text has. An agent contract is
-   run as the agent (`--agent`), and a rule about what a later message must
-   hold is run as two turns (`--resume`), which the runner cannot do.
+   run from the fixture directory, with `--plugin-dir <that arm's worktree>`
+   where the plugin is not installed from the clone, while the files on disk
+   hold that arm's text). A subagent dispatched from a working session is not
+   fresh: it gets the skill and agent text its parent loaded at start, so an
+   arm produced by swapping a file under a live session runs the other arm's
+   text. Confirm the arm from each transcript, by a phrase only one text has.
+   An agent contract is run as the agent (`--agent`), and a rule about what a
+   later message must hold is run as two turns (`--resume`), which the runner
+   cannot do.
 3. Grade every run against the grader criteria in the case directory, reading
    the tree the run left behind rather than its reply: a run has reported a
    rewrite it never wrote. Where the graded behaviour is an act rather than an
@@ -379,10 +379,10 @@ Rules that held in practice, each answering a failure seen here:
   model is both where the gap is and the more sensitive instrument: a rule the
   strongest model keeps from intent alone is the one a weaker model
   negotiates, and that negotiation is the defect the test hunts. The instrument
-  is set to that model rather than derived from it — `--model sonnet` in the run
-  above is the floor the skills are held to — which makes it the default model
-  of interest, and for this kind of rule the author's own reading is already the
-  strong-model pass.
+  is set to that model rather than derived from it — `--model sonnet` on the
+  runner invocation above is the floor the skills are held to — which makes it
+  the default model of interest, and for this kind of rule the author's own
+  reading is already the strong-model pass.
 - **A restraint rule is measured on the strongest model in use here as well.**
   Where a rule exists because the model does too much, or applies something
   everywhere, the failure scales with capability and can be absent from the
@@ -467,7 +467,7 @@ them is a rule to retire.
    converges the arms for free — `exists: false` on a path the run never touched
    passes either way, and a rubric with no `focus` votes on a final message that
    holds no evidence in either arm. Show that the row can fail before reading
-   its convergence — twenty of this suite's seventy-one `llm` graders carry no
+   its convergence — twenty of this suite's `llm` graders carry no
    `focus`, so this is the common shape and not an exotic one.
 2. **Nothing landed behind the row.** A case scores every grader it was given,
    not only the behaviour it is named for, so a row can guard something the
