@@ -240,7 +240,8 @@ instructions alone cannot:
   `review-pr`, `implementation-gates`, and `verifying-before-sending` otherwise restate in
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
-  use them when present; dispatch prompts shrink to axis, worktree, SHA, and scope.
+  use them when present; dispatch prompts shrink to axis, worktree, SHA, scope, and
+  the file the report goes to.
 - **Six hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
