@@ -272,9 +272,11 @@ instructions alone cannot:
     measurement. The size comes from the transcript's own usage numbers, against a
     200k window unless `DELIVERY_SKILLS_CONTEXT_WINDOW` sets another - set it where
     sessions run a larger window, since the transcript names the model but not the
-    window and the same model id runs with both. Unset on such a machine, the meter
-    reports that the window is larger than it assumes rather than telling a session
-    with room left to wind down.
+    window and the same model id runs with both. Left unset there, it warns from 70%
+    of the window it assumes, which is a session with most of its own window still
+    to run; once the session passes that window - the one fact that disproves the
+    assumption - it reports the window as bigger than it assumes rather than
+    repeating an instruction built on a number just shown to be wrong.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
