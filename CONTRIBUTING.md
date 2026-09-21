@@ -209,7 +209,7 @@ failing it is the baseline; a case whose named behaviour is marked has no
 scored row that moves when the rule is deleted.
 
 What each grader type is allowed to see decides where a case can put the
-evidence, and the four rules are not interchangeable:
+evidence, and the five rules are not interchangeable:
 
 - **`focus` on an `llm` grader and `target` on a `regex` grader resolve one
   literal existing file** in the run's workspace. A glob throws "does not
@@ -231,6 +231,19 @@ evidence, and the four rules are not interchangeable:
   the scaffold wrote does it: that target resolves against the workspace, so
   an intact file passes, a deleted one throws and is scored a fail, and a
   rewritten one fails on the missing line.
+- **A `tool_used` grader's `input_match` is tested against the call's whole
+  input JSON, the free prose in it included** - `Bash`'s `description` field,
+  which the model writes for a reader, and any comment the command itself
+  carries. A pattern on a bare identifier matches those as readily as the
+  code, and scores a call that changed something else as the act: two matched
+  that way in the round the record-audit graders were calibrated on. The
+  breadth reaches inside a file body as well, because a heredoc or a `Write`
+  carries the whole file with its untouched lines, so a pattern on the line
+  the act would change reads a file that still holds that line as the act
+  applied - where a hand parse looking for the rewrite reads the same call as
+  nothing applied. Anchor on the transformation rather than on either half of
+  it: the replaced text together with the line that replaces it, or a whole
+  body written without the part the act removes.
 - **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
   `arm: with-only`: under the two-arm run it is shown and scored in neither
   arm, and the arm without the plugin never evaluates it, so it cannot throw
