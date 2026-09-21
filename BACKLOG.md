@@ -10,7 +10,7 @@ intake:
 |---|---|
 | this one | the queue — what a round can still take up |
 | [`backlog/parked.md`](backlog/parked.md) | met once and not since; keeps its sentence, and names what would make it two |
-| [`backlog/declined.md`](backlog/declined.md) | tested and failed, below the instrument, or belonging outside the skills |
+| [`backlog/declined.md`](backlog/declined.md) | answered rather than awaited — tested, measured, or outside the skills; its preamble has the grounds |
 
 An entry leaves the queue in the commit that promotes it (re-derived per
 CONTRIBUTING, never pasted), parks it or declines it, and keeps its line in
@@ -58,9 +58,12 @@ anything is a sighting, not a measurement. An entry that has reached neither by
 the time a round reads it moves to `backlog/parked.md`, which is a finding
 about the mechanism and not a defeat: it keeps its sentence so the search above
 still matches it, and ends with what a second sighting would be. Declined is
-the other outcome and a different one — a wording tested and failed, or a
-lesson that belongs outside the skills. CONTRIBUTING's "Where a lesson waits"
-has the reasoning.
+the other outcome and a different one: the entry has been answered rather than
+left waiting, so an effect measured and found too small for the instrument to
+separate is declined on that ground and never parked — parking is for what is
+untested and short a sighting. `backlog/declined.md`'s preamble names the
+grounds a decline can rest on; CONTRIBUTING's "Where a lesson waits" has the
+reasoning.
 
 Nothing here is pre-approved; the tiers are the maintainer's current read of
 what a rule would be worth, and the sighting count is what says it is ready to

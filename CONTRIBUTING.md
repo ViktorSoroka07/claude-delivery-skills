@@ -127,10 +127,14 @@ time a round reads it is parked - a finding about the mechanism rather than
 a defeat. A parked entry keeps its sentence, so the mechanism search above
 still matches it, and ends with the circumstance that would make it two; a
 later sighting moves it back to its tier already carrying two, which makes
-it eligible at once. Declined is the other outcome and a different one: a
-wording tested and failed, or a lesson that belongs outside the skills. The
-tier says how much a rule would be worth; the count is what says it is ready
-to test.
+it eligible at once. Declined is the other outcome and a different one: the
+entry has been answered rather than left waiting, and the grounds a decline
+rests on are in [`backlog/declined.md`](backlog/declined.md)'s preamble. They
+are not one finding - a wording tested and failed and an effect measured and
+below the instrument are different things to have learned, as the floor below
+says - and an entry still untested and short a sighting is parked, never
+declined. The tier says how much a rule would be worth; the count is what says
+it is ready to test.
 
 ## Provenance without leaking
 
