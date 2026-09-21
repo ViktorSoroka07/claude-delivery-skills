@@ -476,6 +476,18 @@ verdict they could not have earned, and a grader skipped at a cost ceiling. If
 the runner's skip marker ever stops matching, it says so instead of counting
 those verdicts as real.
 
+**A round's arms are named in the file, never inferred from it.** The two arms
+of a wording round are two runs of one case at one release with different skill
+text, so they share that fold's whole key and would sit in one row as though
+the declined wording were the shipped text - and no field in the run's own JSON
+separates them, the ablation mode least of all, since both arms run with
+`--ablation none`. Copy a round in as `<round>@baseline.json` and
+`<round>@<wording>.json`: those runs are kept out of the release trend and
+reported under `Named arms`, where a round's arms are read against each other
+and against no release. What a name cannot fix, the fold flags - a release row
+fed by two plugin checkouts is marked and warned about, because one version
+run from two working trees is two bodies of text it has no way to tell apart.
+
 ## When a rule outlives the model that needed it
 
 A rule lands here because a model needed it, and it is paid for on every load

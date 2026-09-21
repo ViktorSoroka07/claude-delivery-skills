@@ -169,10 +169,12 @@ mkres() { # $1 = directory under $WORK to build a run corpus in
 import json, os, sys
 out = sys.argv[1]
 
-def run(judge, version, cases, plugin="delivery-skills"):
+def run(judge, version, cases, plugin="delivery-skills", path="/checkout/main"):
     return {"schemaVersion": 1, "partial": False,
             "suite": {"judgeModel": judge, "ablation": "with-without",
-                      "plugins": [{"name": plugin, "version": version}]},
+                      "root": path,
+                      "plugins": [{"name": plugin, "version": version,
+                                   "path": path}]},
             "cases": cases}
 
 def rep(graders, error=None, skipped=False):
@@ -208,6 +210,24 @@ files = {
     # flags skipped graders but carries no marker on any of them
     "quiet": run("sonnet", "1.1.0", [case("case-b",
         [rep([g("y", False)], skipped=True)], [rep([g("y", False)])])]),
+    # a wording round: two runs of one case at one release with different skill
+    # text, named in the file name because nothing in the JSON says which is
+    # which. Neither may move the release row above.
+    "wording-round@baseline": run("sonnet", "1.1.0", [case("case-a",
+        [rep([g("keeps-the-thing", i == 0)]) for i in range(4)], [])],
+        path="/checkout/main"),
+    "wording-round@candidate": run("sonnet", "1.1.0", [case("case-a",
+        [rep([g("keeps-the-thing", i < 3)]) for i in range(4)], [])],
+        path="/checkout/wt-candidate"),
+    # an arm name this fold cannot read, folded into no release row
+    "two@at@once": run("sonnet", "1.1.0", [case("case-a",
+        [rep([g("keeps-the-thing", True)])], [rep([g("keeps-the-thing", True)])])]),
+    # one release fed by two checkouts, which no name says are the same text
+    "c-here": run("sonnet", "1.1.0", [case("case-c",
+        [rep([g("z", True)])], [rep([g("z", False)])])], path="/checkout/main"),
+    "c-elsewhere": run("sonnet", "1.1.0", [case("case-c",
+        [rep([g("z", False)])], [rep([g("z", False)])])],
+        path="/checkout/wt-elsewhere"),
 }
 for name, data in files.items():
     with open(os.path.join(out, name + ".json"), "w") as fh:
@@ -236,6 +256,27 @@ check "a run of another plugin is excluded" 0 $?
 
 grep -q 'WARNING:.*no grader carries the skip marker' "$WORK/t11/out.txt"
 check "a skip the marker no longer matches warns instead of counting" 0 $?
+
+grep -Eq 'wording-round +case-a +keeps-the-thing +baseline +1\.1\.0 +1/4' "$WORK/t11/out.txt"
+check "a round's arm named in the file name is reported as its own row" 0 $?
+
+grep -Eq 'wording-round +case-a +keeps-the-thing +candidate +1\.1\.0 +3/4 +- +\+50' \
+  "$WORK/t11/out.txt"
+check "the second arm is read against the first, not against the release" 0 $?
+
+# The release row for case-a is checked above at 1/3; eight arm reps of the
+# same case and grader at the same release would move it if they were folded.
+grep -Eq 'case-a +keeps-the-thing +1\.1\.0 +1/3' "$WORK/t11/out.txt"
+check "a named arm leaves the release row where it was" 0 $?
+
+grep -Eq 'case-c +z +1\.1\.0\*! ' "$WORK/t11/out.txt"
+check "a release row fed by two checkouts is marked" 0 $?
+
+grep -q 'fold runs from 2 plugin checkouts' "$WORK/t11/out.txt"
+check "two checkouts at one version warn that one version is not one text" 0 $?
+
+grep -q 'two@at@once.json .*an arm this fold cannot read' "$WORK/t11/out.txt"
+check "a name that means to be an arm and is not is excluded, not folded" 0 $?
 
 echo
 if [ $fails -eq 0 ]; then
