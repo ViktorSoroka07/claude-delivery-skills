@@ -364,12 +364,12 @@ Rules that held in practice, each answering a failure seen here:
   five - 5/5 against 1/5, or 4/5 against 0/5 - while 5/5 against 2/5 is the
   kind of split a fair coin produces often enough to mean nothing. Ten an arm
   buys a half - 10/10 against 5/10 - and no better; 10/10 against 9/10 is a
-  coin toss at any rep count anyone here will pay for. At the three reps a
-  release baseline runs, only a clean sweep separates the arms at all, and it
-  does so exactly. So the floor is roughly this: an effect of one run in five
-  needs about twenty-five reps an arm to show, and one run in ten about
-  forty-five - ninety runs for a single row, several times what a tested
-  promotion is worth.
+  coin toss at any rep count anyone here will pay for. At three reps - what a
+  row pinned below the suite's five gives - only a clean sweep separates the
+  arms at all, and it does so exactly. So the floor is roughly this: an effect
+  of one run in five needs about twenty-five reps an arm to show, and one run
+  in ten about forty-five - ninety runs for a single row, several times what a
+  tested promotion is worth.
   **A candidate whose expected effect is smaller than that is restated so it
   binds every run, or declined** - and where it is declined, the entry says
   that the effect was below the instrument rather than that the wording
