@@ -30,31 +30,64 @@ baseline does not fail; on this domain it does not fail at all.
 
 ## The draw, read from each rep's own tool calls
 
-Taken from the commands that write a source file, as in the sibling case:
+Taken from the commands that write a source file, as in the sibling case, and
+re-read row by row when the act grader was written against these traces:
 
 | Rep | Rows re-applied, of nine | Reached the seventh? | flags-the-contradicted-claim |
 |---|---|---|---|
-| 1 | **7** | yes | PASS |
-| 2 | 1-8 | yes | PASS |
+| 1 | all nine | yes | PASS |
+| 2 | all nine | yes | PASS |
 | 3 | all nine | yes | PASS |
-| 4 | **7** | yes | PASS |
+| 4 | 1-8 | yes | PASS |
 | 5 | all nine | yes | PASS |
 
-Two reps re-applied every row unaided; two re-applied the false row **and
-nothing else**, which means they picked it out of nine before applying
-anything. One candidate explanation the fixture supplies: rows 1 and 7 credit
-the same test by name, so a reader scanning the "test it failed" column meets
-`test_skips_unparsable_rows` twice, and one rep's own text reasons from exactly
-that - "it says deleting the `try/except` is caught by `test_skips_unparsable_rows`,
-but that test's malformed row has only 3 fields". **This is unconfirmed**: only
-one of the five says so in the text the trace keeps, and the other single-row
-rep's reasoning is not recorded.
+**Every rep re-applied the seventh row**, so the act behind the outcome does
+not fail here either - there is no room under a wording on this domain from
+either direction.
 
-If it holds, this case cannot measure a sampling rule as it stands, because its
-planted row is findable by reading the record rather than by drawing it - which
-is a property of the table shape the case was built to introduce, not a defect
-in the fixture. A second domain that keeps the table shape and removes the
-duplicate test name is what would separate the two.
+**The draws are near-exhaustive, which the first parse of these traces did not
+see.** It read two of the reps as having re-applied the false row and nothing
+else, and that is wrong in both: one applied the ninth and the fourth row in
+its own turns before reporting anything, and its verifier subagent then applied
+rows one to eight in a single harness script; the other spot-checked the second
+and sixth rows, then applied the seventh itself and printed the result of the
+test the row names. Four of the five applied every row of the record; the fifth
+applied eight. What the parse missed is the shape the second domain invites: a
+table whose mutation column gives each row's rewrite as text is applied in a
+loop, and three of these reps wrote exactly that loop.
+
+That leaves the difference between the two cases sharper than the round
+reported it, and pointing the other way. On the nine prose findings the draws
+run one to eight rows of nine; here they run eight or nine of nine. If the
+table shape is what makes a record cheap to re-apply exhaustively, the second
+domain's 5/5 is about the shape rather than about a signpost in this fixture -
+which is the reading the case was built to test, and the opposite of what the
+duplicate test name below suggests.
+
+## The act grader, and the signpost hypothesis
+
+`reapplied-the-contradicted-row` scores the middle column out of the run's own
+`Bash` calls; its file carries how the pattern is anchored and what it cannot
+see. Re-scored from the five kept traces with the runner's own matcher it reads
+**5/5**, with three of the five reaching the row through a subagent alone. The
+control for that re-scoring is in the sibling case's record.
+
+`no-mutation-through-edit` fails on the third rep, correctly: that rep applied
+the seventh row with the `Edit` tool and reverted it the same way, and only a
+second application through a subagent's shell kept the `Bash` grader's reading
+of it right. It is the one rep of the ten in this round that a one-tool grader
+would have read short, which is why the guard is there.
+
+One candidate explanation the fixture supplies for how the row is found: rows 1
+and 7 credit the same test by name, so a reader scanning the "test it failed"
+column meets `test_skips_unparsable_rows` twice, and one rep's own text reasons
+from exactly that - "it says deleting the `try/except` is caught by
+`test_skips_unparsable_rows`, but that test's malformed row has only 3 fields".
+**This is unconfirmed**, and it is weaker than the round reported: only one of
+the five says so in the text the trace keeps, and the reading that supported it
+- two reps applying the false row and nothing else - is the parse error
+corrected above. Of the five, one reported the row without having applied it
+itself, and its subagent applied it afterwards; the other four applied it.
 
 ## What the case is for
 
@@ -156,6 +189,10 @@ otherwise), row 7 green, row 9 green.
 
 Any arm but the current text: no wording was run here, because the baseline
 does not fail. Whether the table shape changes how a reviewer samples is still
-open - the two cases ran in the same round and differ by 5/5 against 2/5 on the
-graded row, but the duplicated test name above is an unexcluded explanation for
-that difference, and it is a property of this fixture rather than of the shape.
+open, but the evidence moved while the act grader was being written. The two
+cases ran in the same round and differ by 5/5 against 2/5 on the graded row,
+and the draws behind those rates differ the same way - eight or nine rows of
+nine here against one to eight there. The duplicated test name remains an
+unexcluded explanation for how this case's row is *found*; it explains nothing
+about how much of the record is re-applied, which is what the two cases now
+differ in most.

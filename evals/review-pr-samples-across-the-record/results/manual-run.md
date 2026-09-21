@@ -43,21 +43,66 @@ filter call. An anchor has to be the transformation the row names.
 | 2 | 5 | no | FAIL |
 | 3 | 3, 5, 7, 9 | no | FAIL |
 | 4 | 3, **6**, 9 | **yes** | PASS |
-| 5 | 1, 2, 3, 7, 9 | no | PASS |
+| 5 | 1, 2, 3, 4, **6**, 7, 8, 9 | **yes** | PASS |
 
-**Reaching the row is what decides the verdict, and four of five reps line up
-exactly.** The one rep that re-applied the sixth row reported the contradiction;
-three of the four that did not, missed it. The fifth found it without applying
-it - by reading what the two tests stub (`globalThis.fetch` always resolves) and
-concluding the `catch` arm is dead code as far as the suite can tell, which the
-grader's rubric allows as a pass.
+**The fifth row is a correction**, made when the act grader was written against
+these same traces and disagreed with the hand parse. The rep applied the sixth
+row in a `python3` here-doc that replaces the try/catch block with its body,
+asserts the replacement changed something, writes the file and runs the suite -
+which stayed green, the contradiction seen rather than reasoned about. Its own
+findings file says so: "re-ran the exact catch-removal mutation independently;
+9/9 tests still pass". Two more of its draws were missed as well - the fourth
+row's `startsWith` and the eighth row's dropped zero-total guard, both applied
+by its verifier subagent as whole-file writes into a scratch copy of the tree.
+A whole-file write is the shape that is hard to read either way: the body it
+writes carries every unchanged line, so a hand parse looking for a rewrite sees
+nothing to count, while a pattern anchored on one identifier sees every row at
+once - in the call that dropped the zero-total guard, the untouched `+ 1` and
+clamp read as two further rows applied.
 
-**What the draws are not is narrow in the way the entry assumed.** Three of the
-five draws are already spread across the record - 3,5,7,9 and 1,2,3,7,9 and
-3,6,9 - rather than stopping at its opening entries. What they lack is
-coverage: one to five rows of nine, and the contradicted row is one specific
-row, so a spread sample of two or three misses it most of the time by
-arithmetic alone.
+**Reaching the row is what decides the verdict, and five of five line up.**
+Both reps that re-applied the sixth row reported the contradiction, and the
+three that did not, missed it. No call in those three names the `catch` arm at
+all - in any tool, main agent or subagent - so nothing in the traces supports
+the earlier reading that one rep found the contradiction without applying it.
+
+**What the draws are not is narrow in the way the entry assumed.** They run
+from one row of nine to eight - 5,9 / 5 / 3,5,7,9 / 3,6,9 / 1,2,3,4,6,7,8,9 -
+and not one of the five stops at the record's opening entries. What they lack
+is coverage, and the contradicted row is one specific row, so a spread sample
+of two or three misses it most of the time by arithmetic alone.
+
+## The act grader, and what a round can now read
+
+`reapplied-the-contradicted-row` scores that middle column out of the run's own
+`Bash` calls, and two `no-mutation-through-*` graders beside it report the
+blind spot a one-tool grader has. The grader's own file carries how its pattern
+is anchored and what it cannot see; what belongs here is what it measures on
+this baseline and what that leaves the sampling entry.
+
+Re-scored from the five kept traces with the runner's own matcher - tool name
+equal, `input_match` tested against `JSON.stringify(input)`, count against
+`min`/`max` - it reads **2/5**, the reps that applied the row being exactly the
+reps that reported it. The same run over `skill-was-invoked` reproduces the
+explanation string the runner itself recorded for all ten reps of the round,
+which is the control that says the re-scoring is the runner's arithmetic and
+not a second implementation of it. The traces, and a `regrade.mjs` that does
+this, are kept beside the round's `aggregate-result.json`.
+
+**The arithmetic the entry was waiting on does not come out.** The route was
+bought on a reading of 1/5, against which a perfect treatment arm would have
+been the four-in-five gap five reps an arm can separate. At 2/5 the largest gap
+available is three in five, under the floor - and it is the same rate the
+judged outcome grader already gives, on the same two reps. What the act grader
+buys is not a wider gap: it is a rate that costs nothing per rep, cannot be
+misread by a judge, and moves with the act the rule prescribes rather than with
+the outcome, which a rep can reach by reading the tests. A round that decides
+the entry is still a ten-rep round (10/10 against 4/10), and the one reading
+that would separate the arms at five is a count of rows drawn per rep rather
+than a rate - the draws run 2, 1, 4, 3, 8 of nine, which nine row-graders would
+report directly. That instrument is a different one from this grader: counting
+coverage wants recall, and a grader whose fail decides a verdict wants
+precision.
 
 ## Why the treatment arm was not run
 
@@ -65,21 +110,21 @@ The wording drafted for this round (kept in the sibling four-row case's record)
 asks for "a draw spread across the record rather than its opening entries" once
 a record holds more than five rows. Two things follow from the baseline:
 
-- **The behaviour it asks for is most of what the baseline already does.** Its
-  "all of them" clause binds only records of five rows or fewer, and this record
-  has nine, so on this case the wording reduces to a spread - which three of
-  five reps produce unaided.
+- **The behaviour it asks for is what the baseline already does.** Its "all of
+  them" clause binds only records of five rows or fewer, and this record has
+  nine, so on this case the wording reduces to a spread - and no rep of the five
+  stopped at the record's opening entries.
 - **Even a perfect treatment arm could not be read at five reps.** The baseline
   scores 2/5 on the graded row, so the largest gap available is 5/5 against 2/5,
   a three-in-five split; CONTRIBUTING's floor is that five reps an arm separate
   only a four-in-five gap. The row would have been noise whichever way it fell.
 
 So the arm was not bought, and the $6.97 that would have gone to it is the
-saving. What a deciding round needs instead: a
-wording about **coverage** rather than spread, at ten reps an arm (10/10 against
-4/10 is readable where 5/5 against 2/5 is not) - about $20 more - or a
-mechanical grader over the act itself, which at five reps an arm separates
-1/5 from 5/5 on "did the rep re-apply the contradicted row".
+saving. What a deciding round needs instead is a wording about **coverage**
+rather than spread, at ten reps an arm - 10/10 against 4/10 is readable where
+5/5 against 2/5 is not - which is about $20 more. The act grader written after
+this round does not change that arithmetic, for the reason the section above
+gives: it reads the same 2/5, mechanically.
 
 ## What the case is for
 
@@ -127,9 +172,14 @@ where the first round on this case starts.
 
 ## How to grade a round here
 
-The scored grader is `flags-the-contradicted-claim`; the other three are watched
-in both arms, as every round in this repo grades every grader. Read the draw
-itself from the run's Bash calls rather than from the findings file - a rep has
-re-applied rows and written about none of them - and confirm the `Skill` call in
-every plugin-arm transcript before grading it, since the harness's own review
-skill answers to a review request.
+The two graders the case turns on are `flags-the-contradicted-claim`, the
+outcome, and `reapplied-the-contradicted-row`, the act - on this baseline they
+agree rep for rep. The others are graded in both arms as well, as every round
+in this repo grades every grader. The draw beyond the contradicted row is not
+graded: read it from the run's own commands that write a source file, as the
+table above does, and remember that a whole-file write carries every unchanged
+line with it. Confirm the `Skill` call in every plugin-arm transcript before
+grading it, since the harness's own review skill answers to a review request.
+A fail on either `no-mutation-through-*` grader means that rep mutated source
+through a tool the act grader cannot see, so read that rep's draw by hand
+before counting it.
