@@ -13,8 +13,9 @@ intake:
 | [`backlog/declined.md`](backlog/declined.md) | answered rather than awaited — tested, measured, or outside the skills; its preamble has the grounds |
 
 An entry leaves the queue in the commit that promotes it (re-derived per
-CONTRIBUTING, never pasted), parks it or declines it, and keeps its line in
-the file it moves to, so the same lesson is not queued twice. A review-pr or
+CONTRIBUTING, never pasted), parks it or declines it; a parked or declined one
+keeps its line in the file it moves to, so the same lesson is not queued twice,
+while a promoted one keeps none and lives in its skill. A review-pr or
 agent-contract change runs the wording test first, and a baseline that
 already passes means decline, not land.
 

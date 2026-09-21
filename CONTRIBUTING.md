@@ -83,14 +83,16 @@ A lesson that has passed the one-sentence test but not yet been re-derived
 into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is
 aimed at. The file is tracked, so an entry meets the same bar as a skill and
 the pre-commit hook scans it like one. Promoting, parking or declining an
-entry removes it from the queue in the same commit and files its line beside
-the queue - parked in [`backlog/parked.md`](backlog/parked.md), declined in
+entry removes it from the queue in the same commit; a parked or declined
+entry keeps its line beside the queue - parked in
+[`backlog/parked.md`](backlog/parked.md), declined in
 [`backlog/declined.md`](backlog/declined.md), both tracked and scanned the
-same way - so the same lesson is not queued twice. An entry is committed by
-the session that writes it, in a commit of its own, as soon as it is
-written: the commit body carries the observation behind the sentence, which
-the entry cannot, and an uncommitted entry is a stray change every later
-session has to explain or step around.
+same way - so the same lesson is not queued twice. A promoted one keeps no
+line: the mechanism is in the skill it was re-derived into. An entry is
+committed by the session that writes it, in a commit of its own, as soon as
+it is written: the commit body carries the observation behind the sentence,
+which the entry cannot, and an uncommitted entry is a stray change every
+later session has to explain or step around.
 
 **Queuing starts with a search, not with a line.** Nobody re-reads a
 backlog, and the one moment anyone has a mechanism in hand with the file
