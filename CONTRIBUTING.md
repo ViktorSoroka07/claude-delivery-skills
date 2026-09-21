@@ -390,8 +390,17 @@ Rules that held in practice, each answering a failure seen here:
 - **Before the floor, check that a rep reaches the condition the rule fires
   on.** The floor sizes the gap two arms can separate; it does not ask the
   prior question, whether a rep ever puts the model in the state the rule
-  governs. Where staging that condition means changing the fixture in the one
-  way that removes it - shrinking the window a rule about remaining room would
+  governs. **A condition no rep reaches on its own may still be stageable,
+  and those are two findings rather than one.** What the kept runs show is
+  whether the condition has occurred, never whether a fixture can be made to
+  produce it, so what answers it is the case format's own inputs and not the
+  traces: `context.history_file` seeds a prior conversation, resuming a
+  transcript the case ships, so a rule about what a second message must do is
+  reachable although every case in the suite is a single prompt. A rule whose
+  condition the format can seed is untested rather than untestable, and what
+  stands between it and a round is a fixture nobody has built. Where staging
+  that condition means changing the fixture in the one way that removes it -
+  shrinking the window a rule about remaining room would
   be measured against - the rule is untestable by this instrument rather than
   unproven, and the entry says that rather than that the effect was too small,
   which are different findings again. One candidate closed on this check
