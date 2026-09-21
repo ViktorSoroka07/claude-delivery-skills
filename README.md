@@ -424,6 +424,7 @@ the portable parts are yours to lift.
 These skills are distilled from real delivery work on production repositories.
 Identifying details are removed; the mechanisms — each one paid for by an actual
 incident — are what remain. [`CONTRIBUTING.md`](CONTRIBUTING.md) explains how that line is
-kept, and [`BACKLOG.md`](BACKLOG.md) holds what has been learned and not yet distilled.
+kept, [`BACKLOG.md`](BACKLOG.md) holds what has been learned and not yet distilled,
+and [`backlog/`](backlog/) what waits on a second sighting or was tried and declined.
 
 A personal project — not affiliated with or endorsed by Anthropic.

@@ -80,27 +80,34 @@ unknown-platform fallback, not a speculative reference.
 ## Where a lesson waits
 
 A lesson that has passed the one-sentence test but not yet been re-derived
-into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is aimed
-at. The file is tracked, so an entry meets the same bar as a skill and the
-pre-commit hook scans it like one. Promoting, parking or declining an entry
-removes it from the queue in the same commit - a parked or declined entry
-keeps its line, so the same lesson is not queued twice. An entry is
-committed by the session that writes it, in a commit of its own, as soon as
-it is written: the commit body carries the observation behind the sentence,
-which the entry cannot, and an uncommitted entry is a stray change every
-later session has to explain or step around.
+into its skill goes in [`BACKLOG.md`](BACKLOG.md), naming the skill it is
+aimed at. The file is tracked, so an entry meets the same bar as a skill and
+the pre-commit hook scans it like one. Promoting, parking or declining an
+entry removes it from the queue in the same commit and files its line beside
+the queue - parked in [`backlog/parked.md`](backlog/parked.md), declined in
+[`backlog/declined.md`](backlog/declined.md), both tracked and scanned the
+same way - so the same lesson is not queued twice. An entry is committed by
+the session that writes it, in a commit of its own, as soon as it is
+written: the commit body carries the observation behind the sentence, which
+the entry cannot, and an uncommitted entry is a stray change every later
+session has to explain or step around.
 
-**Queuing starts with a search, not with a line.** Nobody re-reads a backlog,
-and the one moment anyone has a mechanism in hand with the file open is when
-they are about to queue it - so that is where recurrence gets recorded. Search
-the file for the mechanism first: two or three words of what goes wrong, not
-the words an entry would have used, because the same defect arrives described
-differently every time, and a doubtful match is read in full before a second
-line is written. Where the mechanism is already there, add a sighting to that
-entry instead of a new line, so each entry carries its own count and
-recurrence needs no separate bookkeeping. Only a session that hit the
-mechanism itself adds a sighting: reading an entry and agreeing with it is not
-an observation.
+**Queuing starts with a search, not with a line.** Nobody re-reads a
+backlog, and the one moment anyone has a mechanism in hand with the file
+open is when they are about to queue it - so that is where recurrence gets
+recorded. Search all three files for the mechanism first - `grep -rin` over
+`BACKLOG.md` and `backlog/`, because a mechanism that has already been
+parked or declined is exactly the one a fresh line duplicates, and a search
+stopping at the queue cannot see it. Search on two or three words of what
+goes wrong, not the words an entry would have used, because the same defect
+arrives described differently every time, and a doubtful match is read in
+full before a second line is written. Where the mechanism is already in the
+queue, add a sighting to that entry instead of a new line, so each entry
+carries its own count and recurrence needs no separate bookkeeping; where it
+is parked, the move back carries the sighting; where it is declined, the
+reason there answers the line rather than licensing it. Only a session that
+hit the mechanism itself adds a sighting: reading an entry and agreeing with
+it is not an observation.
 
 The count goes in the parenthetical the entry already carries, each sighting
 its own circumstance and held to the same no-proper-nouns bar as the entry's
@@ -682,10 +689,10 @@ Anchoring the pass to the push instead is what let one range reach four passes'
 worth unread: a push deferred by choice is an event that may never arrive, and
 the range grows without bound while the instruction still reads as scheduled.
 
-`BACKLOG.md` is outside that pathspec deliberately - its entries are not
-reviewed, and they change often enough to drive the threshold below on their
-own - so the one part of it a session obeys, its header, is read in the same
-pass from a diff over that file alone.
+`BACKLOG.md` and `backlog/` are outside that pathspec deliberately - their
+entries are not reviewed, and they change often enough to drive the threshold
+below on their own - so the parts a session obeys, the three files' headers,
+are read in the same pass from a diff over those files alone.
 
 **The pass is its own unit of work**, never started inside a task - reading tens
 of commits' prose for sense and executing a task well do not share one session's

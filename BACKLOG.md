@@ -2,19 +2,36 @@
 
 Mechanisms learned in real work that have not yet been re-derived into a
 skill. Each entry is one sentence with no proper nouns — what goes wrong and
-why — and names the skill it is aimed at. An entry leaves this file in the
-commit that promotes it (re-derived per CONTRIBUTING, never pasted) or
-declines it; an entry still short of the evidence for a round moves to
-Parked, and a declined entry to the last section with its reason, so neither
-is queued twice. A review-pr or agent-contract change runs the wording
-test first, and a baseline that already passes means decline, not land.
+why — and names the skill it is aimed at. This file is the queue; two files
+beside it hold what has left the queue, and all three are one search at
+intake:
 
-**Before writing a line, search this file for the mechanism** — two or three
-words of what goes wrong rather than the words an entry would have used, and
-read a doubtful match in full. Where the mechanism is already here, add a
-sighting to that entry instead of a second line, in the parenthetical it
-already carries, each sighting its own circumstance and held to the same bar
-as the sentence:
+| File | What it holds |
+|---|---|
+| this one | the queue — what a round can still take up |
+| [`backlog/parked.md`](backlog/parked.md) | met once and not since; keeps its sentence, and names what would make it two |
+| [`backlog/declined.md`](backlog/declined.md) | tested and failed, below the instrument, or belonging outside the skills |
+
+An entry leaves the queue in the commit that promotes it (re-derived per
+CONTRIBUTING, never pasted), parks it or declines it, and keeps its line in
+the file it moves to, so the same lesson is not queued twice. A review-pr or
+agent-contract change runs the wording test first, and a baseline that
+already passes means decline, not land.
+
+**Before writing a line, search all three files for the mechanism** — a search
+that stops at this one writes a new line for a mechanism already filed, which
+is the failure the split exists to avoid:
+
+    grep -rin '<word>' BACKLOG.md backlog/
+
+run once for each of two or three words of what goes wrong, rather than the
+words an entry would have used, because the same defect arrives described
+differently every time; read a doubtful match in full. What a hit means
+depends on where it lands, and each of the three has its own action.
+
+**A hit in the queue below** — add a sighting to that entry, in the
+parenthetical it already carries, instead of a second line; each sighting is
+its own circumstance, held to the same bar as the sentence:
 
     … → review-pr, grading (2 sightings: a record of four rows where a draw
     of three skipped the contradicted one; a review whose sample stopped at
@@ -24,17 +41,26 @@ A sighting is added only by a session that hit the mechanism itself — agreeing
 with an entry is not an observation — and an entry carrying no count stands at
 the one sighting that queued it, so the first sighting added makes two.
 
+**A hit in `backlog/parked.md`** — move the entry back to its tier here with
+your own circumstance added. It arrives carrying two sightings, which makes it
+eligible for a round at once.
+
+**A hit in `backlog/declined.md`** — read the reason rather than writing the
+line; it is the answer to the entry you were about to queue, and where a
+decline is re-openable that entry says so and on what.
+
 **Two sightings, or one sighting whose failure was measured, is what makes an
 entry worth a round.** Met once it is a hypothesis; the second sighting — other
 work or another place, never the same failure met twice in one pass — is the
 evidence the first one lacked. Measured means a rate, a run, or a failure that
 landed and whose cost the entry names; a near miss caught before it cost
-anything is a sighting, not a measurement. An entry that has reached neither by the time a
-round reads it moves to Parked below, which is a finding about the mechanism
-and not a defeat: it keeps its sentence so the search above still matches it,
-and ends with what a second sighting would be. Declined is the other outcome
-and a different one — a wording tested and failed, or a lesson that belongs
-outside the skills. CONTRIBUTING's "Where a lesson waits" has the reasoning.
+anything is a sighting, not a measurement. An entry that has reached neither by
+the time a round reads it moves to `backlog/parked.md`, which is a finding
+about the mechanism and not a defeat: it keeps its sentence so the search above
+still matches it, and ends with what a second sighting would be. Declined is
+the other outcome and a different one — a wording tested and failed, or a
+lesson that belongs outside the skills. CONTRIBUTING's "Where a lesson waits"
+has the reasoning.
 
 Nothing here is pre-approved; the tiers are the maintainer's current read of
 what a rule would be worth, and the sighting count is what says it is ready to
@@ -74,64 +100,3 @@ test.
 - A closing-ledger item carried forward from the previous message is never re-tested against the rule that admitted it, so one belonging to a different owner survives every round once it enters, and the drift is silent because a reader cannot tell an item is not theirs to answer and replies from what they do know: the list is re-derived each round from who owns each outstanding item, never carried over and edited. → tracking-open-asks, the closing table (1 sighting, a landed failure: an item addressed to a third party on a durable surface was carried in the requester's own closing list for several exchanges, costing two round trips in which they answered first that they had no view on it and then that they could not tell what it was about or whose it was)
 
 
-## Parked — observed once, never recurred
-
-Each of these was met once and has not come back. Parking is a finding about
-the mechanism, not a judgement on the sentence: nothing here was tested, and
-what it lacks is a second occurrence rather than a better wording. Each keeps
-its sentence so the search at the top of this file matches it, and ends with
-the circumstance that would make it two. A session that hits one moves it back
-to its tier with its own circumstance added, already carrying two sightings,
-which makes it eligible at once.
-
-- A committed credential is a "rotate" finding, never a "remove" one — history keeps the value reachable on every branch that contains the commit. → review-pr (Parked until a review files a committed secret with removal alone as its fix; a round starts by checking the baseline, which a model that already knows history keeps the value reachable will pass)
-- A finding graded down because another layer already guards the behaviour is regraded when a second finding in the same review rewrites that guard, since an author applying both is left with neither; before a grade rests on a guard, check whether any other finding in the same list changes it. → review-pr, the Pass 2 merge (untested; parked until a second review has one finding rewrite the guard another finding's grade rests on)
-- A comment asserting that two things behave the same way is checked per item, because one of them can reach that state by a different mechanism the comment's author did not know about; and a comment stating a platform's behaviour is evidence for the claim, never the authority behind it, so the tier it describes is read before a finding rests on it. → review-pr, doc-vs-code axis (untested; one such comment named two codes as unreachable and was false for one of them, which a locally-registered handler reached by another route; parked until a second comment's equivalence claim holds for one member and fails for another)
-- A severity prefix that reads as a claim about effort as well as importance is wrong on a merged thread, because packing can put several edits across several files behind the word that tells a triaging author this one is small; a merged thread's header states how many edits it asks for. → review-pr, posting reference (untested; one merged thread carried three edits, two of them in files the change does not touch, under a prefix meaning "trivial"; parked until a second merged thread's prefix understates the edits it asks for)
-- A spec's out-of-scope deferral binds only while the sentence justifying it holds; a change that removes the precondition is no longer covered by the deferral. → review-pr (Parked until a second change removes the precondition a deferral rests on)
-- A generated artifact unchanged after a source edit is not evidence regeneration failed; confirm what the generator embeds from that source before reporting a missed sync. → review-pr, doc-vs-code axis (Parked until a second finding reads an unchanged generated file as a missed regeneration)
-- Prose cross-references no tool checks dangle silently when a change renumbers or removes sections; grep inbound citations before merging such a change. → review-pr, doc-vs-doc (Parked until a second renumbering leaves inbound citations dangling)
-- A confirmed mechanism is not a confirmed consequence: a finding names the failure the mechanism produces, and when the code path shows the worst case is waste rather than breakage, the grade follows the consequence. → review-pr, grading (Parked until a second finding is graded on its mechanism where the code path caps the cost at waste)
-- A file-writing tool can turn an escape sequence in a posting script into the character it names, and the content read-back cannot see it, because the corruption happens before the payload is built and the stored text then matches the sent text exactly; the script asserts that no invisible or control characters are in any body before it sends. → review-pr, posting reference (distinct from the declined encoding-traps entry, whose outcome the read-back does catch; parked until a second body is corrupted before it is sent)
-- When the changed production surface is a single expression, the measuring axis and the reading axis return the same gap, because a reader can enumerate every input that would distinguish the mutant; run one of the two, not both. → review-pr, axis triage (untested; both axes independently found one unpinned call-site argument in one pass; parked until a second pass has the two axes return one gap on a one-expression surface)
-- A work item's out-of-scope clause and its what-to-build list can require opposite things, so a scope finding first names which section the change followed; the finding is then about the reporting rather than the choice, and it says which other item needs re-scoping for what the change consumed. → review-pr, delegation resolution (untested; parked until a second item's two sections require opposite things)
-- A premise resting only on prose about a dependency's behaviour can often be read straight out of that dependency's shipped artifact using the runtime's own reflection, so a missing decompiler is not the limit it appears to be; read it before grading a finding unverifiable or letting it rest on a comment. → review-pr, absence claims (untested; parked until a second premise rests on prose where the shipped artifact could be read instead)
-- A dependency tree copied between checkouts can hold a version the lockfile does not pin while every suite stays green, so a finding whose mechanism rests on a dependency's source compares the installed version against the pin and, on a mismatch, fetches the pinned copy and diffs the files it read — the diff is usually cheaper than the caveat it replaces. → review-pr (untested; a two-minor-version skew was present and both read files proved byte-identical, so no finding needed a caveat; parked until a skew whose read files actually differ, which this one did not produce)
-- An exclusion that names its own compensating control — a coverage-ignore entry stating which suite guards the excluded file instead — is the binding authority for what must be pinned at that boundary, so a change routing new load-bearing behaviour through an excluded file is measured against the named suite rather than against the gate it is exempt from. → review-pr, absence claims (untested; the exclusion's own note named the suite that already pinned every neighbouring route of the same kind, which turned a vague "this is untested" into a located one-line gap; parked until a second exclusion's note names the suite that binds)
-- A short reply can flip a standing rule when it is read as answering the wrong thread; when a reply could change a rule, ask which ask it answers before acting on it. → tracking-open-asks (Parked until a second reply is read as answering the wrong outstanding ask; no circumstance was recorded for the first)
-- When a message and the document it cites ship together, every figure and status the two share is checked to match; pushback is answered from the document. → verifying-before-sending (Parked until a second pair disagrees on a figure they share)
-- A tool that sets a repo-local git identity for its own commits leaves it in place for everyone; check the repo-local identity before a session's first commit. → implement-plan (Parked until a second tool leaves an identity behind)
-- In teaching or lesson code the comments are the deliverable, beside the line each explains; this inverts the zero-comment default. → writing-code-comments, as a boundary (Parked until a session strips the explanation from code whose deliverable it is; the arm at risk is the one carrying the zero-comment default, so this is a boundary on a landed rule rather than a new rule)
-- A policy hook that swallows its dependency's failure as "nothing found" fails open; enforcement code blocks on any setup error and fails open only on a positive allow-list of transient signatures. → no home yet; a candidate for a skill on writing enforcement hooks (Parked until an owning skill exists or the mechanism recurs)
-- A tracker item's state lags work that lands through a path the tracker does not sync back; read the item's links before treating an untouched state as no work done. → landing-merged-work (Parked until a second item's state lags work that landed)
-- A containment query that matches nothing still exits successfully, so a check chained on its exit status reports a commit as pushed when no remote holds it; read the output, not the status. → addressing-review-feedback, reply timing (Parked until a second check is chained on that exit status)
-- A change that closes more than one tracker item is described one section per item, each with its own what-changed and not-changed, because a reader who arrives from one item must find its slice without reading the other's, and a single merged list makes every bullet look like it belongs to both. → writing-pr-descriptions (Parked until a second description merges two items' changes)
-- A behavior change with a visible surface ships its description with one visible placeholder per screenshot, each named for the state it shows, and the screenshots reach the author as files to drop in, saved outside any temporary directory the harness may clear before they act, because no forge API uploads an image into a description and an unfilled placeholder is what stops the description from quietly shipping without them. → writing-pr-descriptions (Parked until a second description ships without the screenshots it needed)
-- A change that makes a swallowed failure visible draws a review finding about the recovery path for that failure, which existed unchanged before the change; the reply names the evidence that the state predates it (a test or fixture that exercised it, the code path's age), scopes the recovery as its own item, and states which sub-case the change did make recoverable, because a reviewer reading only the diff sees the failure and the missing retry appear together. → addressing-review-feedback (Parked until a second finding is drawn on a path the change only made visible)
-- A design that stops and asks the user when an automated step hits an ambiguity is wrong when the system can always produce a result and a later review step already judges every result; the stop adds a state, a button and a prompt the user must learn, while a flag on the result that names what to check keeps the flow moving and puts the judgement where it already happens. → plan-feature, design review (Parked until a second design stops where a flag on the result would do)
-- A proposed value judged against the values a codebase already uses is supported only by the precedents that serve the same purpose, because a raw tally across fields holding names, record descriptions and user-typed explanations reads as either no convention or the most common number, while grouping the fields by what they hold shows which precedent applies; group by purpose before comparing values. → implementation-gates, evidence for a claimed value (Parked until a second value is argued from a raw tally across unlike fields)
-- A memory entry passes the duplicate test only at the moment it is written, and shipped code that absorbs the procedure it documents turns it into a stale duplicate with no signal, because the merge touches no memory file; the close-out re-runs that test against the entries the merged work touches and cuts each back to the residue the code cannot report. → maintaining-project-memory (not yet tested: the fixture has no entry that merged code made redundant; parked until a second store has shipped code absorb an entry, and the fixture gains one)
-- A file an outside party can read never names who made a mistake, narrates a correction done on someone's behalf, or explains a local-only exclusion by naming what it hides, because the explanation publishes what the exclusion withholds and the record of an action belongs in the tracker; state such a rule with its subject removed. → writing-for-audiences, audience gate (Parked until a second published file names the person, or what an exclusion hides)
-
-## Declined, with the reason
-
-- An audit that re-applies two or three rows of a written verification record draws them any way it likes unless told how, and an audit that drew three of four rows skipped the contradicted one and then spent its next mutation on a fresh one of its own; the sample is drawn from across the record, each row alone against a green baseline, and a passing sample says nothing of the rows it did not touch. → review-pr, record audit. Declined on the ground that the effect is below the instrument rather than that a wording failed, and re-openable on either count below. Measured in one round over two nine-row records, ten fresh headless reps at the current text: the graded row sits at two of five on the prose record and five of five on the table record in a second domain, so that domain's baseline does not fail at all and the other offers a three-in-five gap at best, under the four-in-five that five reps an arm separate. The draws refute the sentence's own premise as well: not one of the five stops at the record's opening entries, and what they lack is coverage - one to eight rows of nine on the prose record, eight or nine of nine on the table - so a wording about spread asks for what the baseline already does unaided. Reaching the contradicted row is what decides the verdict, in five reps of five. Those draws were first parsed by hand and were wrong in the deciding cell; the grader that now scores the act mechanically corrected them, and it reads the same two of five the judged outcome grader does, so it does not lift a five-rep round over the floor. The deciding round is therefore a wording about coverage rather than spread at ten reps an arm, which is the route the maintainer chose once that was measured; both cases' records carry the numbers.
-- Restating each read-only boundary where the inline review path reads it, as the act that triggers it rather than as a class. The defect is real and measured in both arms of two rounds: on a diff small enough to review inline, one rep in five in each arm ran the repo's fixing lint in the tree it was reading, and three of five baseline reps and five of five treatment reps wrote into that tree with a git command the agent contract forbids a dispatched reader. Both wordings failed on the inline case. Naming the class moved the graded row by one rep in five; naming the acts - the stash, the base checkout, the reset, with the scratch-directory export given as the remedy - took the row from two of five to none of five, because the stash arrives as the precursor to that very export, in the same shell line, and a prohibition that supplies no reason the export needs no clean tree leaves the instinct reaching for it untouched. Two treatment reps quoted the rule while undoing themselves, so the sentence is read and fires as an audit after the act rather than while the command is composed: at the fork sentence it is read once at skill load, and the gate comparison is composed dozens of turns later. What is left is a carrier other than that sentence - the line that sends a reviewer to run the gates, where the act is chosen - or a mechanism outside the prose; both rounds are in the inline case's run record.
-- Replying on a thread the review bot resolved itself before the author replied. Real (the reply-then-resolve convention still wants the reply), but three wordings tested on the forge fixture each made the weaker model reply on that thread in five of five reps and each also sent it into the human-resolved thread beside it (read in four of five, its code edited in one to three of five), which the same case forbids. No shape found that reaches the one thread and no other; the listing's resolver and reply count remain the way to identify it.
-- A session naming its own stopping point (the seam) at every checkpoint. Tested as a brief rule in two wordings on a two-turn fixture: the seam line held in none of five and then two of five, and the fresh-session opener in none of ten, because the session cannot see the context meter the rule asks it to act on. Not a sentence; the remaining work was a harness hook that reads the transcript's size and injects the meter past a threshold, which the operator has since built. Tiering that hook's message by how much room is left — name a seam below nine tenths of the window, hand over above it — is declined on the other kind of ground: the effect is below the instrument, not a wording that failed. The meter has fired forty-five times across thirty-five uncompacted sessions; ten of those firings fall in the band a tier would reword, each was followed by twelve to eighty further turns of work, and four of those six sessions carried on past the window they had been measured against — so the premature hand-over a gentler wording prevents has not once occurred. Nor could a round see it: on the largest window in use the band sits above every context those sessions ever reached (the high-water mark is three fifths of it), and the suite's runs whose traces survive peak between a sixth and a third of the smallest window the hook assumes, short of the seven tenths at which it first fires, so no rep has been seen to fire it at any wording; shrinking the assumed window until a rep crosses the band takes the rep's remaining room with it, and the fixture no longer holds the condition a tier exists for.
-- A condition the requester only has to keep holding while a run lasts ("keep the app closed until it finishes") listed as a waiting item. Real on the strong model (eight of ten two-turn sessions list it; the weaker model never does), but three wordings each cost something a neighbouring grader watches: "never listed" emptied the list; "the list holds what needs a reply" dropped the strong model's restating of the real questions from five of five to three of five; describing the condition's own output ("one sentence in the body ... the table is unchanged by it") kept restating whole but had the weaker model repeat the condition in the body in every rep. No shape found that removes it from the list without inducing another repetition; record in the open-asks case.
-- Widening a field to optional wakes a dormant optional-chain equality (`a?.x === y` holds when both are undefined). Tested on a fixture: the weaker model caught it unaided in every rep, so a sentence adds nothing.
-- Passing the reading axes' predicted survivors to the mutation agent. The control mutation is already the agent's last step; the rest needs a multi-agent fixture to test and did not earn it.
-- Tracker edit-history mechanics for a negative claim. The trap is already in verifying-before-sending; the API call is a lookup a session can make.
-- Posting-script encoding traps. The content read-back already catches the outcome.
-- History sanitizing as a skill. CONTRIBUTING's domain.
-- Filing a new index line under its heading rather than at the file's end. Tested on a fixture: the weaker model filed it under the matching heading unaided in every rep, so a sentence adds nothing.
-- Reading a survived row in a mutation record as the author's disclosed gap rather than a contradicted claim. Tested on the record fixture with a disclosed survivor: the weaker model kept it unflagged unaided in every rep (five hand runs and one runner run), so a sentence adds nothing.
-- Re-running the check behind a convention recorded from absence. Tested on the memory-store fixture with a "no CI" entry the checkout had since falsified: the weaker model checked it against the checkout and deleted it as answered by the repo, unaided, in five of five reps.
-- A decision request stating the capability requirements the dependent work relies on. Tested on the report fixture with an options section carrying risks only: the weaker model pulled both requirements from the notes and set them beside the options, unaided, in five of five reps.
-- An absence claim that must reach beneath the framework to the runtime platform. Tested on a fixture whose vendored platform already sets the header a change adds: the weaker model's correctness axis found the platform's line, called the change unobservable and the test tautological, unaided, in five of five reps.
-- Snapshotting the memory store around harness runs. A procedure for the operator, not a rule a session negotiates: no fixture can show the weaker model failing without it.
-- Passing platform and slug explicitly behind an SSH host alias. A lookup for the platform reference, not a judgement; one line there when it is next touched.
-- A deny rule matching anywhere in a compound command. The harness's own behaviour, recorded where the operator configures it; a skill cannot teach it and no fixture holds it.
-- Never running the suite while a push is in flight. No fixture can hold a push in flight for a run to collide with, so the sentence cannot be tested; the trap stays in the operator's own notes.
-- Verifying placement through the per-comment endpoint when the per-review listing returns null fields. A lookup for the platform reference, not a judgement; one line there when it is next touched.
