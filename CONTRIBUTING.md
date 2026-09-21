@@ -374,6 +374,17 @@ Rules that held in practice, each answering a failure seen here:
   binds every run, or declined** - and where it is declined, the entry says
   that the effect was below the instrument rather than that the wording
   failed, which are different findings about the mechanism.
+- **Before the floor, check that a rep reaches the condition the rule fires
+  on.** The floor sizes the gap two arms can separate; it does not ask the
+  prior question, whether a rep ever puts the model in the state the rule
+  governs. Where staging that condition means changing the fixture in the one
+  way that removes it - shrinking the window a rule about remaining room would
+  be measured against - the rule is untestable by this instrument rather than
+  unproven, and the entry says that rather than that the effect was too small,
+  which are different findings again. One candidate closed on this check
+  alone: its rule is carried by a hook that fires past a context threshold and
+  every rep the runner keeps peaks well under that threshold, so both arms
+  would have scored alike for a reason having nothing to do with the wording.
 - **A capability rule is measured on the weakest model the plugin supports.**
   Where a rule exists because the model does not know to do the thing, that
   model is both where the gap is and the more sensitive instrument: a rule the
