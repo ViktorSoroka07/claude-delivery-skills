@@ -479,9 +479,11 @@ those verdicts as real.
 **A round's arms are named in the file, never inferred from it.** The two arms
 of a wording round are two runs of one case at one release with different skill
 text, so they share that fold's whole key and would sit in one row as though
-the declined wording were the shipped text - and no field in the run's own JSON
-separates them, the ablation mode least of all, since both arms run with
-`--ablation none`. Copy a round in as `<round>@baseline.json` and
+the declined wording were the shipped text - and nothing in the run's own JSON
+says which arm a run is: the ablation mode reads `none` in both, each arm being
+its own invocation, and the checkout path says only that two runs came from
+different trees, never which text either held. Copy a round in as
+`<round>@baseline.json` and
 `<round>@<wording>.json`: those runs are kept out of the release trend and
 reported under `Named arms`, where a round's arms are read against each other
 and against no release. What a name cannot fix, the fold flags - a release row
