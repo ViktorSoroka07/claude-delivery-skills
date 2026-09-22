@@ -338,6 +338,19 @@ of `evidence` first. The cells, the misses quoted, and the mechanical
 alternative tried against them are in
 [that case's record](evals/reporting-defects-upstream-leaves-the-decisions/results/manual-run.md).
 
+**And the rate on such a rubric moves with how much the run writes about its
+subject, which is what a wording changes.** A rubric asking whether the
+findings report any of a record's true rows as unsupported held at four of five
+on a baseline and fell to none of five - three votes to none in every rep -
+under a wording that made each run re-apply every row and write a per-row
+verdict list. Every one of those files affirms the rows by name; what the judge
+answered is that the findings report on them. Read as a rate it is a regression
+the tree does not contain, and it would have declined a wording that costs
+nothing. So where a wording changes how much a run writes about what a rubric
+judges, that rubric's rate is not comparable across the arms at all: hand-grade
+the row in both arms, and say so in the case's record, because the next round
+there will read the same rate.
+
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then
@@ -452,6 +465,16 @@ Rules that held in practice, each answering a failure seen here:
   That candidate was declined on exactly that evidence: three wordings, each
   reaching its own grader and each costing a neighbour. Here the author's
   reading is not the strong-model pass; over-application shows in reps.
+- **A limit one arm crosses and the other does not is a difference between
+  the arms that is not the rule.** A run the turn cap or the timeout curtails
+  is unmeasured rather than failed, and its graders all carry a verdict no run
+  could have earned - so it is replaced, not counted. But the reason it
+  curtailed is the finding: a rule that asks for more work costs more turns,
+  and one rep in five crossed a case's sixty-turn cap under a wording whose own
+  sentence prices the work it asks for. Read the turn and duration spread of
+  both arms before reading any grader, and where the treated arm sits near the
+  cap, raise `max_turns` and `timeout_seconds` in both arms and re-take, rather
+  than comparing an arm that finished against one that was stopped.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
