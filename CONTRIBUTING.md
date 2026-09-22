@@ -469,14 +469,18 @@ Rules that held in practice, each answering a failure seen here:
   reading is not the strong-model pass; over-application shows in reps.
 - **A limit one arm crosses and the other does not is a difference between
   the arms that is not the rule.** A run the turn cap or the timeout curtails
-  is unmeasured rather than failed, and its graders all carry a verdict no run
-  could have earned - so it is replaced, not counted. But the reason it
-  curtailed is the finding: a rule that asks for more work costs more turns,
-  and one rep in five crossed a case's sixty-turn cap under a wording whose own
-  sentence prices the work it asks for. Read the turn and duration spread of
-  both arms before reading any grader, and where the treated arm sits near the
-  cap, raise `max_turns` and `timeout_seconds` in both arms and re-take, rather
-  than comparing an arm that finished against one that was stopped.
+  is unmeasured rather than failed: the graders that read output it never
+  reached carry a verdict the cap produced rather than the run - so the rep is
+  replaced, not counted. Its trace is not discarded with it. On the rep that
+  met this, three of the eight graders still scored the calls it had made, the
+  act grader among them, and that rep's draw was read by hand from those calls
+  like every other's. The reason it curtailed is itself a finding: a rule that
+  asks for more work costs more turns, and one rep in five crossed a case's
+  sixty-turn cap under a wording whose own sentence prices the work it asks
+  for. Read the turn and duration spread of both arms before reading any
+  grader, and where the treated arm sits near the cap, raise `max_turns` and
+  `timeout_seconds` in both arms and re-take, rather than comparing an arm that
+  finished against one that was stopped.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
