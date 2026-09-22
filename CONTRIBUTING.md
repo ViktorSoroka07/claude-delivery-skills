@@ -476,13 +476,18 @@ Rules that held in practice, each answering a failure seen here:
   with the suite configured `with-without`, the case reported a single arm: a
   replay case contributes no ablation row, so it neither produces a retirement
   signal nor can be read as one, and its wording round is two `--ablation none`
-  runs on two trees like every other. What does bind is the freezing. The
-  seeded copy is the brief as it stood when the fixture was generated, so a
-  wording that changes the brief never reaches the treated arm: a replay round
-  tests a wording that lands in the skill's own text, which the run loads live,
-  and the fixture is regenerated whenever the brief moves - by a generator that
-  reads the brief rather than holding a copy, and deterministically, so that
-  regenerating it and finding no diff is the check. Should a later run report
+  runs on two trees like every other. What does bind is the freezing, and it binds
+  harder than it first read. The seeded copy is the brief as it stood when the
+  fixture was generated, so a wording that changes the brief does not reach a
+  rep on the fixture alone; the answer written here was that a replay round
+  therefore tests a wording landing in the skill's own text, which the run
+  loads live. The first replay run falsified that: the reps never called the
+  Skill tool, so the skill's text is not live to them either, and neither
+  carrier reaches a rep by default. **A replay round tests a brief wording, and
+  regenerates the fixture once per arm so each arm's seeded copy carries its
+  own text** - by a generator that reads the brief rather than holding a copy,
+  and deterministically, so that regenerating it and finding no diff is the
+  staleness check against the live file. Should a later run report
   both arms, the seeded brief reaches the arm meant to be without the plugin,
   and that row understates it.
 - **A capability rule is measured on the weakest model the plugin supports.**
