@@ -276,7 +276,20 @@ evidence, and the five rules are not interchangeable:
   there. It is what separates a case's fail into "the skill never loaded" and
   "the skill loaded and its rules did not hold", which no scored grader on the
   outcome can do. Under `--ablation none` the mark does nothing and the
-  grader is scored like any other.
+  grader is scored like any other. **And a skill whose condition is a standing
+  rule rather than a named task is not reached through that tool at all.**
+  Across this suite's kept runs the indicator stands at 59/59 on the cases
+  whose prompt names work the skill owns - review this, sync these, file that,
+  prune the store - and at 0/13 on the two whose skill fires on how a message
+  ends, which no prompt ever asks for; a hand read of ten of those traces found
+  no Skill call and no sentence of the skill's own body anywhere in them. The
+  brief reaching the model is a different event and does not imply it: in those
+  same ten reps the brief arrived and the skill was invoked in none, so a brief
+  that names a skill and tells the session to call it is no evidence the
+  session will. A rule living in such a skill's body therefore cannot be moved
+  by any round the runner can buy, the reps never having read it. Check the
+  indicator before designing the arms, not after: the round is either restated
+  to land where every rep does read, or it is not a runner round at all.
 
 **A new grader is mechanical unless its condition is irreducibly semantic.**
 `regex`, `file_exists` and `tool_used` cost nothing per rep, return the same
@@ -361,7 +374,15 @@ reports an error on every case and costs nothing. With that cleared, a case
 whose run uses git can still die inside the sandbox where the system's git is
 a shim that writes a cache file outside it; such a run leaves no tree to
 grade and is unusable, never a fail, and a real git first on the path ends
-it. The runner's two arms are the plugin and no plugin at all, which answers
+it. **The path that matters is the sandbox's own, which the host's is no
+answer to** - `which -a git` on the machine can put the working binary first
+while the sandbox still hands its runs the stub - so a case whose graded act is
+a git command splits on whether a rep discovers the absolute path to a working
+one: seven of ten did in one round while three reported the act as blocked and
+escalated it to the requester, which is the right thing to do with an act that
+cannot be performed. Both the act's own grader and any grader reading the list
+that act belongs on are then unusable for that round rather than failed, and
+they stay so until the sandbox's PATH is fixed. The runner's two arms are the plugin and no plugin at all, which answers
 whether the plugin changes behaviour; whether one edited sentence does is a
 run of the old text against the new, by hand or as two runner runs with
 `--ablation none` on two worktrees. Until the machine allows the runner, and
