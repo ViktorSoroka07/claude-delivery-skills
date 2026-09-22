@@ -308,14 +308,40 @@ the run.
 passes recovers; two do not, and the negative control holds under both
 wordings, so the repair is not a rubric that accepts everything.
 
-**What separates w3 from w1 and w2 is the second condition, and it is
-contested.** All three name `post compact` among the modes the reader may ask
+**What separated w3 from w1 and w2 was the second condition, and the skill
+settled it.** `skills/review-pr/SKILL.md` asks to "name the applicable modes in
+the closing message, in one line - not a menu, and only what the user could
+sensibly want next. After a review that is post, post compact, apply, or a
+deeper pass." Naming `post compact` among the modes is therefore the behaviour
+the case exists to measure, and w1 and w2 do exactly that; w3's extra "if you
+want fewer threads later" is more than the skill asks for. A rubric on the
+strict reading would have failed runs for following the skill correctly.
+
+A third wording says so in as many words, and was tested the same way over the
+same six files, alongside both earlier ones:
+
+| File | Hand | Original | First repair | Landed wording |
+|---|---|---|---|---|
+| w1 | pass | 0/3 | 0/3 | **3/3** |
+| w2 | pass | 0/3 | 0/3 | **3/3** |
+| w3 | pass | 0/3 | 1/3 | **3/3** |
+| n1, n2, n3 | fail | 0/3 | 0/3 | 0/3 |
+
+Agreement with the hand labels: 3/6, 3/6, **6/6**. The negative control holds
+under all three, so the landed wording is not one that accepts anything. Note
+also that the first repair scored w3 3/3 in one invocation and 1/3 in the next,
+on the same file and judge - judge variance between invocations, which is a
+reason to read a cell of three reps as a cell rather than a number.
+
+**What was contested, for the record.** All three name `post compact` among the modes the reader may ask
 for; only w3 also says a compact table is recorded "if you want fewer threads
 later". One reading of "tells the reader they can ask for the compact form" is
 satisfied by naming the mode - that is the hand label above - and the other
-wants the option offered in so many words. Two careful readings differ, which
-by `evals/judge-calibration.md` measures the rubric rather than the judge, and
-the wording that is owed is a ruling on which reading the case means: whether
-listing `post compact` as an available mode is the behaviour this case asks
-for, or whether the reviewer must actively offer fewer threads. That ruling is
-not this session's to make, and nothing here is landed on either reading.
+wants the option offered in so many words. Two careful readings differed, which by
+`evals/judge-calibration.md` measures the rubric rather than the judge - and
+the rubric is owed a wording, not the judge a verdict. The owner, asked which
+reading the case means, said they did not know and to take the costlier one.
+The skill answers it the other way, and the skill is what a grader must
+measure: the strict reading would fail a run for naming the modes in one line
+and not padding it, which is what the skill asks for in as many words. That is
+why the landed wording is the lenient one, with the skill quoted beside it.
