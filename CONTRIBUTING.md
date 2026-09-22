@@ -370,22 +370,26 @@ rubric judges, that rubric's rate is not comparable across the arms at all:
 hand-grade the row in both arms, and say so in the case's record, because the
 next round there will read the same rate.
 
-**A repair to the instrument moves such a rubric exactly as a wording does,
-which is the harder case to see coming** - the arms differ by a fix everyone
-agrees was needed, so the new rate looks like the truth the old one obscured.
+**A judged rate read across a repair to the instrument is two readings, not a
+trend, and the move between them can be the judge's alone** - the two sides
+differ by a fix everyone agrees was needed, so the new rate looks like the
+truth the old one obscured, and the mechanism above offers a cause ready-made.
 The same grader as above, on a sibling case, held ten of ten before the
-sandbox's git was staged and five of eight after, with the model and the rubric
-unchanged; a hand read of all eight files scored eight of eight. What moved was
-how much the runs wrote about the record: a working git let them re-apply the
-mutations they were auditing, so they now report "all 9 tests stay green" and
-"two mutations survive, not one" beside the very record the rubric asks about,
-and the judge read that verdict language as evidence against it. Every one of
-those runs flagged only the record's planted false row and left the seven true
-ones alone, two of them saying in as many words that they had checked the rest
-and found no other contradiction. So a rate taken before an instrument fix and
-one taken after are two readings, not a trend: hand-grade the row on both sides
-before either number is carried, and treat a rate that improves for the
-instrument's sake with the same suspicion as one that falls.
+sandbox's git was staged and five of eight after, with the model, the rubric
+and the judge unchanged; a hand read scored both sides in full, every file
+flagging the record's planted false row and none of the seven true ones. The
+ready-made cause is that a working git let the runs re-apply the mutations they
+audit, so they wrote verdict language beside the record for the judge to
+misread - "all 9 tests stay green", "two mutations survive (Findings 6 and 9),
+not one". The ten runs before the repair refute it: each reached a working git
+by its full path, each re-applied the contradicted row, and one wrote
+"reapplying it leaves all 9 tests green" and "Findings 6 and 9 both survive,
+not just 9" in a file the judge passed. The same judge had already failed three
+files of ten that a hand read passes, on that case's baseline arm, before any
+repair. So hand-grade the row on both sides before either number is carried,
+test a cause for the move against the side the repair had not reached before
+writing it down, and treat a rate that improves for the instrument's sake with
+the same suspicion as one that falls.
 
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
