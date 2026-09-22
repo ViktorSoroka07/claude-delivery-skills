@@ -5,3 +5,6 @@ here=$(cd "$(dirname "$0")" && pwd)
 f="$here/../fixtures/fee-schedule.sh"
 [ -f "$f" ] || { echo "scaffold: $f not found (script $0, cwd $(pwd))" >&2; exit 1; }
 sh "$f" . >/dev/null
+
+# a working git first on the run's PATH; the sandbox's plain `git` is a stub
+sh "$here/../fixtures/stage-git.sh" || exit 1
