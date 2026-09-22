@@ -340,18 +340,19 @@ of `evidence` first. The cells, the misses quoted, and the mechanical
 alternative tried against them are in
 [that case's record](evals/reporting-defects-upstream-leaves-the-decisions/results/manual-run.md).
 
-**And the rate on such a rubric moves with how much the run writes about its
-subject, which is what a wording changes.** A rubric asking whether the
-findings report any of a record's true rows as unsupported held at four of five
-on a baseline and fell to none of five - three votes to none in every rep -
-under a wording that made each run re-apply every row and write a per-row
-verdict list. Every one of those files affirms the rows by name; what the judge
-answered is that the findings report on them. Read as a rate it is a regression
-the tree does not contain, and it would have declined a wording that costs
-nothing. So where a wording changes how much a run writes about what a rubric
-judges, that rubric's rate is not comparable across the arms at all: hand-grade
-the row in both arms, and say so in the case's record, because the next round
-there will read the same rate.
+**And a rubric's rate moves with how much the run writes about its subject,
+which is what a wording changes - a mechanism the tone family above shares
+rather than owns.** One content rubric on a review case, asking whether the
+findings report any of a record's true rows as unsupported, held at four of
+five on a baseline and fell to none of five - three votes to none in every
+rep - under a wording that made each run re-apply every row and write a
+per-row verdict list. Every one of those files affirms the rows by name; what
+the judge answered is that the findings report on them. Read as a rate it is a
+regression the tree does not contain, and it would have declined a wording that
+costs nothing. So where a wording changes how much a run writes about what a
+rubric judges, that rubric's rate is not comparable across the arms at all:
+hand-grade the row in both arms, and say so in the case's record, because the
+next round there will read the same rate.
 
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
