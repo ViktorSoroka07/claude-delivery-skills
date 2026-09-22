@@ -373,19 +373,35 @@ next round there will read the same rate.
 A Bash-granting case runs under the OS sandbox, and the sandbox refuses to
 start when the Docker configuration directory in the home folder contains
 a symbolic link (Docker Desktop's CLI plugins are links); the run then
-reports an error on every case and costs nothing. With that cleared, a case
-whose run uses git can still die inside the sandbox where the system's git is
-a shim that writes a cache file outside it; such a run leaves no tree to
-grade and is unusable, never a fail. **The path that matters is the sandbox's
-own, which the host's is no answer to** - `which -a git` on the machine can put
-the working binary first while the sandbox still hands its runs the stub - so a
-case whose graded act is a git command splits on whether a rep discovers the
-absolute path to a working one: seven of ten did in one round while three
-reported the act as blocked and escalated it to the requester, which is the
-right thing to do with an act that cannot be performed. Both the act's own
-grader and any grader reading the list that act belongs on are then unusable
-for that round rather than failed, and they stay so until a working git is
-first on the path the sandbox hands its runs.
+reports an error on every case and costs nothing. With that cleared, **a git
+act inside the sandbox needs a git the sandbox can find, which is not the one
+the machine finds**. The system's `git` there is a shim that dies writing a cache file
+outside the paths the sandbox allows, and the working binary loses the PATH
+search from any position, being a symbolic link into a tree the sandbox will
+not let the shell stat - so the lookup skips it and falls through to the shim,
+while that same path still runs when named in full. Prepending its directory
+therefore changes nothing, which is why the failure reads as a PATH order
+problem and is not one. Every case's `fixture.sh` calls
+`evals/fixtures/stage-git.sh`, which writes a real wrapper into the run's own
+home and a `.zshenv` putting its directory first - the one init file of six
+that the run's shell reads, and one the sandbox denies the run itself writing.
+**A new case is not finished until its scaffold carries that line**, whether or
+not its graded act is a git command, because without it the failure is silent:
+it costs the reps turns, it splits them on whether one discovers the absolute
+path - seven of ten did in the round that measured it, while three reported the
+act as blocked and escalated it, which is the right thing to do with an act
+that cannot be performed and a fail of the act's grader all the same - and both
+that grader and any grader reading the list the act belongs on are unusable for
+the round rather than failed. With the line, ten of ten performed the act on
+the re-take and none of them named a path.
+
+Settle a question about what a run's environment holds from what a run keeps,
+not from the runner's flags or from how the runner must work. `--keep-temp`
+leaves the run root, whose `config/settings.json` is the sandbox policy itself -
+which paths are writable, which readable - and whose `out/trace.jsonl` holds
+every command a rep ran with its output. A case file's `execution.env` is real
+but takes `EVAL_*` keys only; everything else a run's environment needs comes
+from the shell the runner is invoked from, or from the scaffold.
 
 The runner's two arms are the plugin and no plugin at all, which answers
 whether the plugin changes behaviour; whether one edited sentence does is a
