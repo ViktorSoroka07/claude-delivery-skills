@@ -472,11 +472,13 @@ Rules that held in practice, each answering a failure seen here:
   case it feeds has no second arm.** The start hook does not fire on a resume -
   its matcher covers a startup, a clear and a compaction, and a resume is none
   of them - so a replay fixture carries the always-on brief itself, as the
-  attachment a recorded session writes. In the one run that has used the field,
-  with the suite configured `with-without`, the case reported a single arm: a
-  replay case contributes no ablation row, so it neither produces a retirement
-  signal nor can be read as one, and its wording round is two `--ablation none`
-  runs on two trees like every other. What does bind is the freezing, and it binds
+  attachment a recorded session writes. The one run of such a case under
+  `with-without` - the probe that established the replay - reported a single
+  arm, and the only other kept runs reporting one arm under that flag are ones
+  the runner marks `partial` for having been interrupted: a replay case
+  contributes no ablation row, so it neither produces a retirement signal nor
+  can be read as one, and its wording round is two `--ablation none` runs on
+  two trees like every other. What does bind is the freezing, and it binds
   harder than it first read. The seeded copy is the brief as it stood when the
   fixture was generated, so a wording that changes the brief does not reach a
   rep on the fixture alone; the answer written here was that a replay round
@@ -487,9 +489,9 @@ Rules that held in practice, each answering a failure seen here:
   regenerates the fixture once per arm so each arm's seeded copy carries its
   own text** - by a generator that reads the brief rather than holding a copy,
   and deterministically, so that regenerating it and finding no diff is the
-  staleness check against the live file. Should a later run report
-  both arms, the seeded brief reaches the arm meant to be without the plugin,
-  and that row understates it.
+  staleness check against the live file. Should a later run report both arms,
+  the seeded brief reaches the arm meant to be without the plugin, and that
+  row understates it.
 - **A capability rule is measured on the weakest model the plugin supports.**
   Where a rule exists because the model does not know to do the thing, that
   model is both where the gap is and the more sensitive instrument: a rule the
