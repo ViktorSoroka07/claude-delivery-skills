@@ -626,12 +626,12 @@ only runs the settled judge graded - a row judged by the default judge is not
 comparable with one judged by the model named above, and folding them together
 records that judge's noise as a trend - and only runs of this plugin's own
 suite, so a calibration probe's throwaway case stays out. What it leaves out is
-listed with the reason rather than dropped in silence. Two things it refuses to
-count as failures, because a check that could not have passed is unmeasured
-rather than failed: a run the runner curtailed, whose graders all carry a
-verdict they could not have earned, and a grader skipped at a cost ceiling. If
-the runner's skip marker ever stops matching, it says so instead of counting
-those verdicts as real.
+listed with the reason rather than dropped in silence. Two things it lifts out
+of the count, because a check that could not have passed is unmeasured rather
+than failed: a run the runner curtailed, lifted whole since some of its graders
+read output the run never reached and nothing in a verdict says which, and a
+grader skipped at a cost ceiling. If the runner's skip marker ever stops
+matching, it says so instead of counting those verdicts as real.
 
 **A round's arms are named in the file, never inferred from it.** The two arms
 of a wording round are two runs of one case at one release with different skill
