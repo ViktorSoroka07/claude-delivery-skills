@@ -238,3 +238,47 @@ The trigger: "my review … finish the review" names the activity. The
 posting half: assembling a compact thread from a table row, the lost
 suggestion blocks, and resolving a grouped thread by item number have no
 case yet.
+
+## The re-take under the staged git, and what it found instead (task 44)
+
+Three reps an arm, `--ablation with-without --model sonnet --judge-model sonnet
+--runs 3 -j 2 --keep-temp`, plugin 1.10.0 on CLI 2.1.278, kept as
+`round-44@packing.json`. $3.17 and 382 seconds. Bought because kept traces of
+this case showed the sandbox's broken git, and any rate a git act touches was a
+floor until that was staged.
+
+**It changed nothing here, and the judge change that rode with it changed three
+rows to zero.** The nearest kept arm, `task9-packing-regex-graders-2.json`, ran
+on the default judge, so these rows differ in two things at once and the hand
+grade is the arbiter:
+
+| Grader | Old, default judge | New, sonnet judge | Hand, new |
+|---|---|---|---|
+| `packing-table-written` | 3/3 | **0/3** | **3/3** |
+| `report-counts-both-ways` | 3/3 | **0/3** | **3/3** |
+| `report-keeps-the-bodies-out` | 1/3 | **0/3** | **2/3** |
+| `packing-docs-minors-in-one-row` | 3/3 | 2/3 | 2/3, mechanical |
+| the other six | unchanged | unchanged | - |
+
+All three reps wrote the packing table the case is named for - thread title,
+grade, members, anchor, the four docs minors in one row - and all three gave
+both thread counts and named the compact form as an ask. No trace shows the git
+stub. So the behaviour is where it was and **three of this case's four judged
+graders now fail work that satisfies their own pass clauses.**
+
+**Two causes, one of them a defect in the graders.** `packing-table-written`
+focuses a file of 6.8-9.2k characters, and the runner itself prints "long file;
+llm judges are noisy on long inputs, prefer a regex grader for large artifacts"
+on two of the three reps. `report-counts-both-ways` is worse than noisy: its
+preamble says the report "does not restate the findings", while its sibling
+`report-keeps-the-bodies-out` says in as many words that an index line **may**
+carry a finding's title, grade, id and anchor. Every rep writes such an index.
+A judge reading the preamble as a condition fails all three, and the pass
+clause below it - both counts as numbers, and the reader told they can ask for
+the compact form - is met by all three. Two graders of one case contradict each
+other, and the weaker judge hid it.
+
+**Nothing here is landed on that reading.** The rows above are the record; the
+graders are unchanged, and repairing them is an instrument change that belongs
+to whoever takes it, with the kept evidence in `round-44@packing.json` enough
+to re-score by judging the same files again for cents.

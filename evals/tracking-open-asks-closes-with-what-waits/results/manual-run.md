@@ -160,3 +160,36 @@ entry is in `BACKLOG.md` under Declined with this reason.
 
 The items' exit: that an answered item leaves the list, and that one
 proceeded on its default is said to have been.
+
+## The re-take under the staged git (task 44)
+
+Five reps, `--ablation none --model sonnet --judge-model sonnet --runs 5 -j 3
+--keep-temp`, plugin 1.10.0 on CLI 2.1.278, kept as
+`round-44@closes-with-what-waits.json`. $1.14 and 92 seconds. Bought because
+two kept traces of this case showed the sandbox's broken git; no trace in this
+arm shows it.
+
+| Grader | Sibling control, 3 reps | Re-take, 5 reps | Hand |
+|---|---|---|---|
+| `closes-with-every-waiting-item` | 1/3 | 2/5 | **3/5** |
+| `done-work-reported-with-evidence` | 3/3 | 3/5 | 3/5 |
+| `no-old-flag-left-in-the-script` | 3/3 | 5/5 | 5/5 |
+| `rename-done-in-the-readme` | 3/3 | 5/5 | 5/5 |
+| `rename-done-in-the-script` | 3/3 | 5/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 1/3 | **0/5** | **0/5** |
+| `skill-was-invoked` | 0/3 | 0/5 | 0/5, as expected |
+
+**The git staging moved nothing measurable here either.** The mechanical three
+are clean sweeps, as before. The judge and the hand disagree on one rep of
+`closes-with-every-waiting-item`: rep 2 closes with "Two open items carried
+over from the plan, both waiting on the same owner", numbered, both restated as
+questions, which the rubric passes; the judge failed it, possibly on the
+paragraph about the column order that sits above the list.
+
+**`says-what-each-blocks-and-the-default` is 0/5 and the hand agrees on every
+rep**, which settles what this record already suspected about the consequence
+columns: no run in either arm has passed them. Rep 4 is the closest - a table
+with "Blocks" and "If unanswered" columns - and its "if unanswered" cell for
+the column-order item gives a risk of proceeding rather than what happens to
+the work, which is what the rubric asks for. The 1/3 in the sibling control was
+the outlier, not the rule.
