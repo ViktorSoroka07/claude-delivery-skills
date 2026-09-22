@@ -283,13 +283,16 @@ evidence, and the five rules are not interchangeable:
   prune the store - and at 0/13 on the two whose skill fires on how a message
   ends, which no prompt ever asks for; a hand read of ten of those traces found
   no Skill call and no sentence of the skill's own body anywhere in them. The
-  brief reaching the model is a different event and does not imply it: in those
-  same ten reps the brief arrived and the skill was invoked in none, so a brief
-  that names a skill and tells the session to call it is no evidence the
-  session will. A rule living in such a skill's body therefore cannot be moved
-  by any round the runner can buy, the reps never having read it. Check the
-  indicator before designing the arms, not after: the round is either restated
-  to land where every rep does read, or it is not a runner round at all.
+  brief reaching the model is a different event and does not imply it: a probe
+  on the same seeded file answered that the brief was present, while the ten
+  reps that resumed that file invoked the skill in none - so a brief that names
+  a skill and tells the session to call it is no evidence the session will.
+  That first half takes a probe of its own: a rep's trace carries its own turns
+  only, so what a resume put in context is not readable from it. A rule living
+  in such a skill's body therefore cannot be moved by any round the runner can
+  buy, the reps never having read it. Check the indicator before designing the
+  arms, not after: the round is either restated to land where every rep does
+  read, or it is not a runner round at all.
 
 **A new grader is mechanical unless its condition is irreducibly semantic.**
 `regex`, `file_exists` and `tool_used` cost nothing per rep, return the same
