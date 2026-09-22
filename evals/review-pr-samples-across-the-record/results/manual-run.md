@@ -353,13 +353,28 @@ were over this case's 60-turn cap. The sibling case shows the same shape, and
 between them they put a second candidate cause under the curtailment the
 turn-cost instrument rule was drawn from.
 
-**One row moved far enough to matter and is not read here.**
-`keeps-the-true-rows-unflagged` falls from 10/10 to 5/8. It is judged, over
-findings files of several kilobytes, and it moved in the opposite direction
-from the same grader in the sibling case - which is itself a reason to distrust
-either reading. There is a behavioural hypothesis worth testing rather than
-assuming: with a working git a rep can actually re-apply a mutation and restore
-the tree, so it produces verified claims where before it produced none, and
-some of those may report a true row as surviving. Settling that means a hand
-read of eight files against the record's seven true rows, which this session
-did not buy.
+**One row moved far enough to matter, and the hand read says the behaviour did
+not move at all.** `keeps-the-true-rows-unflagged` falls from 10/10 to 5/8 on
+the judge. All eight files were then read by hand against the record's seven
+true rows: **8/8**. The three reps the judge failed each flag exactly one claim
+- the doc's Finding 6, that removing the `catch` arm around the fetch fails a
+named test - which is not among the seven and is the planted false one. Two of
+the three go further and say so: one reports that "the verifier also
+independently spot-checked that Findings 1-5, 7-8 in the resolution doc still
+match the code they describe, and found no other contradictions", which is the
+"mentioning them as checked and holding" the rubric explicitly allows. Nothing
+in any of the eight reports one of the seven as false, contradicted,
+unsupported or surviving. The five the judge passed were screened the same way,
+and the one hit - a rep naming `result.items` beside the word "contradict" - is
+a description of the filter defect, not a verdict on the record.
+
+**So the drop is the judge, and what moved it is the repair.** The model and
+the rubric are the same as in the arm that scored 10/10. What changed is how
+much the reps write about the record: with a working git they can re-apply a
+mutation and restore the tree, so they now report "all 9 tests stay green",
+"two mutations survive (Findings 6 and 9), not one" and "the doc's tally
+undercounts by one" - verdict language, sitting next to the record, which the
+judge appears to read as evidence against it. **A rubric's rate moves with how
+much a run writes about its subject, and a repair to the instrument moves it
+exactly as a wording change does.** The rate to carry forward for this row is
+the hand grade.
