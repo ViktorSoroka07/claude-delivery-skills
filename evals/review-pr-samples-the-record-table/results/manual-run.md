@@ -1,6 +1,79 @@
 # Runs
 
-## Baseline arm, five reps - and the baseline does not fail
+## The coverage wording, watched here rather than treated
+
+The sibling nine-row prose case decided that wording at ten reps an arm; this
+case was run once under it, to see what it costs on a domain whose baseline
+does not fail. Five reps, `--ablation none --model sonnet --judge-model
+sonnet`, kept as `round-40@coverage-table.json` with a sixth in
+`round-40@coverage-table-topup.json`, traces beside them. $9.09.
+
+**One rep of the five was curtailed and is replaced, not counted.** It reached
+the case's 60-turn cap and left no findings file, so five of its graders carry
+a verdict no run could have earned. The sixth rep is its replacement, at 29
+turns. That curtailment is the wording's clearest cost here: turns run 27, 38,
+5, 40, 6 on the baseline and 61, 4, 55, 6, 6 under the wording, and mean
+duration goes from about 455 seconds to about 557. The rule states that cost in
+its own sentence - one row costs one suite run - so it is the price rather than
+a defect, but **a later round on this case raises `max_turns` in both arms
+before measuring**, because a cap that one arm crosses and the other does not
+is a difference between the arms that has nothing to do with the rule.
+
+| Grader | Baseline judge | Baseline hand | Coverage judge | Coverage hand |
+|---|---|---|---|---|
+| findings-file-written | 5/5 | 5/5 | 5/5 | 5/5 |
+| flags-the-contradicted-claim | 5/5 | 5/5 | 5/5 | 5/5 |
+| keeps-the-disclosed-gap-unflagged | 5/5 | 5/5 | 5/5 | 5/5 |
+| **keeps-the-true-rows-unflagged** | 4/5 | 5/5 | **0/5** | **5/5** |
+| reapplied-the-contradicted-row | 5/5 | 5/5 | 5/5 | 5/5 |
+| no-mutation-through-edit | 4/5 | - | 4/5 | - |
+| no-mutation-through-write | 5/5 | - | 3/5 | - |
+| skill-was-invoked (indicator) | 5/5 | - | 5/5 | - |
+
+**Nothing the wording changed costs this domain, and the one row that moves is
+the judge.** Every rep re-applied the seventh row - confirmed by hand from its
+own calls, the curtailed one included - and every rep that wrote a file
+reported the claim as false. The act and the outcome were already at five of
+five here, so there was nothing for a wording to gain; what this arm was bought
+for is what it could lose, and by hand it loses nothing.
+
+**`keeps-the-true-rows-unflagged` reads zero of five from the judge, three
+votes to none in every rep, against four of five with split votes on the
+baseline.** Read as a rate that is the wording destroying a neighbour. It does
+not survive the hand read, and not narrowly: the reps affirm the other rows by
+name - "No issues were found in the other 7 runbook rows (1, 2, 3, 5, 6, 8, 9)
+- each was either re-executed live or traced against source and matches its
+stated mutation and test"; "Cross-checked rows 1-6 and 8 independently by
+mutation testing - all genuinely fail their named test, so row 7 is the only
+false record"; "(The other eight rows of the table were independently
+re-derived and are accurate, including row 9's honest disclosure that
+`export_name` is unproven.)" The rubric fails a file only where one of the
+seven is reported false, contradicted, unsupported or surviving, and these
+files are the opposite.
+
+**What changed is the surface, not the behaviour.** Under the wording every rep
+re-applies all nine rows and then writes a per-row verdict list, so the rubric
+meets a document that adjudicates each of the seven by name, one of them beside
+a REFUTED - and it answers that the findings do report on those rows. The
+baseline's reps write no such list, which is why its judge fails were one and
+split rather than five and unanimous. **The consequence for this case is that
+this rubric is no longer a screen under the coverage wording**: a later round
+here hand-grades that row in both arms or replaces the rubric, and reading its
+rate would report a regression the tree does not contain.
+
+**One rep read the disclosure clause below its bound.** The replacement rep
+applied rows 1, 7 and 9 and wrote: "Remaining rows (2-6, 8) were not
+independently re-mutated given the diff's size and the credibility of the rows
+checked; their described mutations map onto code and tests that were read
+directly during Pass 1 and appear consistent with the table's claims." The
+wording scopes that disclosure to records above twelve rows; this record holds
+nine, where it asks for every row instead. The sentence is honest and passes
+the rubric by hand - it reports the reviewer's own coverage, not a verdict
+against the rows - but it is the sentence the wording's own design note wanted
+kept out of the measured path, and it arrived there anyway in one rep of six.
+That is what to watch if the sentence is ever tightened.
+
+## The baseline arm, five reps - and the baseline does not fail
 
 The runner, `--ablation none --judge-model sonnet --model sonnet --runs 5`,
 against the current skill text: five fresh headless reps, $6.34 of the round's

@@ -112,14 +112,18 @@ the rest "verified by direct reasoning/execution against the pure functions".
 The rule moved what it claims and most of what it does; that rep is the shape
 to watch if the sentence is ever tightened.
 
-## What this round did not buy
+## The second domain, watched under the same wording
 
-The second-domain case, `review-pr-samples-the-record-table`, was not run under
-the treatment text. Its record holds nine rows as well, so the new bound asks
-of it what its baseline already does - eight or nine rows of nine in every rep,
-at 5/5 on both graders - and the wording can only cost there. The approved
-spend was this case alone, so that watch is the one condition of a landing that
-this round leaves unobserved; it is five reps and about $7.
+`review-pr-samples-the-record-table` was run once under the treatment text,
+five reps plus a replacement for one the turn cap curtailed, for $9.09. By hand
+it holds at five of five on every grader, so the wording costs that domain
+nothing and the round's last condition is met. Two things came out of it that
+belong in any later reading of this family, and its own record carries them:
+the wording pushes reps past that case's 60-turn cap, so a round there raises
+`max_turns` in both arms first; and `keeps-the-true-rows-unflagged` drops from
+four of five to zero of five on the judge while staying at five of five by
+hand, because a per-row verdict list is a document that rubric misreads. The
+rate is a regression the tree does not contain.
 
 ## The first round: the baseline at five reps, and the spread wording that was not bought
 
