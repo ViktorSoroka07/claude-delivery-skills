@@ -100,19 +100,22 @@ replaced, the way a curtailed rep is, rather than counted as a fail.
 and a resume is neither - so the fixture carries the brief as the
 `hook_additional_context` attachment a recorded session writes, with the
 `rendered` system-reminder beside it, both copied from a real transcript's
-shape. The probe that established the replay measured a run answering that the
-brief was absent, but that probe predates the attachment line in the generator,
-so it says nothing about a fixture that carries one. Two things answer it in
-the first reps: `skill-was-invoked`, since the brief is what sends a session to
-the skill, and a hand read of the first rep's draw. The skills stay advertised
-by their own descriptions either way, which is the other route in.
+shape. The probe that established the replay kept a result showing a resumed
+run answering that the brief was absent; what it did not keep is whether the
+file it resumed carried the attachment, and the generator's own note presents
+that attachment as the remedy for exactly that answer - so a fixture carrying
+one is untested either way. Two things answer it in the first reps:
+`skill-was-invoked`, since the brief is what sends a session to the skill, and
+a hand read of the first rep's draw. The skills stay advertised by their own
+descriptions either way, which is the other route in.
 
-**The arm without the plugin receives the brief too.** The fixture is a case
-input and the arm is a plugin choice, so a two-arm release baseline resumes the
-same file in both arms and hands the plugin's always-on text to the arm that is
-supposed to be without it. This case's ablation row therefore understates the
-plugin and must not be read as a retirement signal. It costs the wording round
-nothing: there both arms hold the plugin, and the brief is identical in each.
+**This case has no second arm.** The one earlier run that used
+`context.history_file`, with the suite configured `with-without`, reported a
+single arm for that case: a replay case contributes no ablation row, so nothing
+here can be read as a retirement signal in either direction. It costs the
+wording round nothing, where both arms hold the plugin and differ only in the
+skill's text. Should a run report both arms, the seeded brief reaches the arm
+meant to be without the plugin and that row understates it.
 
 **What the fixture freezes.** `history.jsonl` carries the brief as it stood
 when it was generated. `make-history.py` beside it reads `hooks/session-brief.md`
