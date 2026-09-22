@@ -562,13 +562,20 @@ Rules that held in practice, each answering a failure seen here:
   replaced, not counted. Its trace is not discarded with it. On the rep that
   met this, three of the eight graders still scored the calls it had made, the
   act grader among them, and that rep's draw was read by hand from those calls
-  like every other's. The reason it curtailed is itself a finding: a rule that
-  asks for more work costs more turns, and one rep in five crossed a case's
-  sixty-turn cap under a wording whose own sentence prices the work it asks
-  for. Read the turn and duration spread of both arms before reading any
-  grader, and where the treated arm sits near the cap, raise `max_turns` and
-  `timeout_seconds` in both arms and re-take, rather than comparing an arm that
-  finished against one that was stopped.
+  like every other's. The reason it curtailed is itself a finding, with two
+  sources only its trace separates: a rule that asks for more work costs more
+  turns, and a defect in the instrument costs every rep of both arms turns,
+  which leaves both less room and lets the arm asking for more meet the cap
+  first - so the crossing reads as the wording's cost alone. The rep this rule
+  was drawn from crossed a case's sixty-turn cap under a wording whose own
+  sentence prices the work it asks for, and with at least eight of its sixty
+  calls spent on a broken git every rep of both arms shared; with the git
+  repaired, that case's reps under the same wording peaked at thirty-six. Read
+  the turn and duration spread of both arms before reading any grader, and
+  read what a curtailed rep spent its turns on: where the instrument took them,
+  repair it and re-take; where the treated arm's own work brings it near the
+  cap, raise `max_turns` and `timeout_seconds` in both arms and re-take, rather
+  than comparing an arm that finished against one that was stopped.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
