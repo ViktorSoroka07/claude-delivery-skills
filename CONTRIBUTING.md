@@ -572,11 +572,15 @@ Rules that held in practice, each answering a failure seen here:
   sentence prices the work it asks for, and with at least eight of its sixty
   calls spent on a broken git every rep of both arms shared; with the git
   repaired, that case's reps under the same wording peaked at thirty-six. Read
-  the turn and duration spread of both arms before reading any grader, and
-  read what a curtailed rep spent its turns on: where the instrument took them,
-  repair it and re-take; where the treated arm's own work brings it near the
-  cap, raise `max_turns` and `timeout_seconds` in both arms and re-take, rather
-  than comparing an arm that finished against one that was stopped.
+  the turn and duration spread of both arms before reading any grader - from
+  each trace's `result` records, not the run JSON's `turns`, which keeps only
+  the last of them: a rep that dispatches a subagent can write one record for
+  its work and another for the short tail after the agent reports, so a rep
+  that ran sixty-five turns reads as six - and read what a curtailed rep spent
+  its turns on: where the instrument took them, repair it and re-take; where
+  the treated arm's own work brings it near the cap, raise `max_turns` and
+  `timeout_seconds` in both arms and re-take, rather than comparing an arm that
+  finished against one that was stopped.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
