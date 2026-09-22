@@ -20,3 +20,9 @@ CLAUDE.local.md
 
 # plugin eval run output
 evals/results/
+
+# a replay case's continuation transcripts: the runner writes one per rep into
+# the case directory, beside the fixture it resumes from, each thick with the
+# sandbox's own environment. The fixture itself is tracked.
+evals/*/*.jsonl
+!evals/*/history.jsonl

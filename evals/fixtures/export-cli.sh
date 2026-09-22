@@ -2,6 +2,11 @@
 # Builds the eval fixture for tracking-open-asks: a small git repo with an
 # export script, mid-way through planned work. $1 = target directory
 # (created; must not exist or be empty).
+# $2 = "post-rename" leaves the tree as the replay case's first exchange left
+#      it: the rename and the version done and uncommitted, and a committed
+#      note recording a third question as the upstream team's to answer, not
+#      the owner's. The seeded list that case resumes from asks the owner all
+#      three, which is the one defect that variant carries.
 #
 # The tree is set up so that a hand-over message leaves two things waiting
 # on the requester:
@@ -83,4 +88,60 @@ EOF
 git add -A
 git commit -q -m "Ledger export with booked_at"
 git branch tmp-migrate
-echo "built export-cli fixture in $T"
+
+if [ "${2:-}" = "post-rename" ]; then
+  # A durable record, committed: the third question was raised with the team
+  # that owns the feed, and the answer is theirs. A session that re-derives the
+  # closing list from who owns each item reads this; one that carries the
+  # previous list forward and edits it never opens it.
+  mkdir -p docs/upstream
+  cat > docs/upstream/booked-at-timezone.md <<'EOF'
+# booked_at: which clock the feed means
+
+`booked_at` arrives from the ledger feed with no offset, so the export cannot
+tell whether a value is UTC or the posting region's local time.
+
+Raised with the ledger-api maintainers on their own tracker. The feed's schema
+is theirs, they answer schema questions there, and this one is not the owner's
+call: we keep passing the value through unchanged until they reply, and follow
+whatever they say.
+
+Status: open, waiting on the ledger-api maintainers.
+EOF
+
+  cat >> docs/plans/export-columns.md <<'EOF'
+- `booked_at` arrives from the feed without an offset. Raised with the ledger-api maintainers on their own tracker, not with the owner - the feed's schema is theirs and the answer is theirs to give. See `docs/upstream/booked-at-timezone.md`.
+EOF
+
+  git add -A
+  git commit -q -m "Record the booked_at clock question with the ledger-api maintainers"
+
+  # The first exchange's work, left uncommitted: the requester asked for the
+  # diff, not for a commit.
+  cat > bin/export.sh <<'EOF'
+#!/bin/sh
+# Usage: export.sh [--dry-run] <out.csv>
+dry=0
+if [ "${1:-}" = "--dry-run" ]; then dry=1; shift; fi
+out=${1:?output file}
+header="id,amount,currency,booked_at"
+if [ "$dry" -eq 1 ]; then
+  echo "would write $out with columns: $header"
+  exit 0
+fi
+echo "$header" > "$out"
+EOF
+  chmod +x bin/export.sh
+
+  cat > README.md <<'EOF'
+# ledger-export
+
+Writes the ledger as CSV.
+
+    bin/export.sh --dry-run out.csv    # print what would be written
+    bin/export.sh out.csv
+EOF
+
+  echo "2.4.0" > VERSION
+fi
+echo "built export-cli fixture in $T${2:+ (variant $2)}"
