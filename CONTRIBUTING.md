@@ -560,9 +560,10 @@ Rules that held in practice, each answering a failure seen here:
   is unmeasured rather than failed: the graders that read output it never
   reached carry a verdict the cap produced rather than the run - so the rep is
   replaced, not counted. Its trace is not discarded with it. On the rep that
-  met this, three of the eight graders still scored the calls it had made, the
-  act grader among them, and that rep's draw was read by hand from those calls
-  like every other's. The reason it curtailed is itself a finding, with two
+  met this, four of the eight graders still scored the calls it had made -
+  three passing, the act grader among them, and one failing on the edits the
+  rep really made - and that rep's draw was read by hand from those calls like
+  every other's. The reason it curtailed is itself a finding, with two
   sources only its trace separates: a rule that asks for more work costs more
   turns, and a defect in the instrument costs every rep of both arms turns,
   which leaves both less room and lets the arm asking for more meet the cap
