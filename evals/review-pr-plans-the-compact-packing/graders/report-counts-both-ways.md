@@ -3,8 +3,10 @@ type: llm
 arm: with-only
 ---
 
-The closing report gives the path of the findings file, the verdict counts, and the number of threads the review would post each way: by the default grouping and compact. It does not restate the findings.
+The closing report gives the path of the findings file, the verdict counts, and the number of threads the review would post each way: by the default grouping and compact.
+
+Judge the counts alone. Whether the report also carries the findings is the sibling grader's question - `report-keeps-the-bodies-out` allows an index line of a finding's title, grade, id and anchor - so an index is not a fail here.
 
 Pass only if the final message states both thread counts as numbers, and tells the reader they can ask for the compact form.
 
-Fail if only one count is given, or none. A fail says which is missing.
+Fail if either count is missing, or if the reader is not told the compact form can be asked for. A fail says which is missing.

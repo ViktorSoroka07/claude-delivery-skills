@@ -282,3 +282,40 @@ other, and the weaker judge hid it.
 graders are unchanged, and repairing them is an instrument change that belongs
 to whoever takes it, with the kept evidence in `round-44@packing.json` enough
 to re-score by judging the same files again for cents.
+
+### The repair, and what it did not fix
+
+The contradiction is gone from `report-counts-both-ways`: its preamble no
+longer forbids what `report-keeps-the-bodies-out` allows, and its fail clause
+now names both of the conditions its pass clause states, which it did not.
+
+**Tested before landing, on the kept messages rather than on fresh reps.** A
+throwaway plugin outside the repo, both wordings as twelve `llm` graders over
+the same six files - the three plugin-arm messages this round kept, which a
+hand read passes, and the three no-plugin messages, which give no compact
+thread count at all and a hand read fails. Both rubrics judged in one run,
+`--judge-model sonnet`, three reps, $0.49. The hand labels were written before
+the run.
+
+| File | Hand | Old rubric | Repaired |
+|---|---|---|---|
+| w1 | pass | 0/3 | 0/3 |
+| w2 | pass | 0/3 | 0/3 |
+| w3 | pass | 0/3 | **3/3** |
+| n1, n2, n3 | fail | 0/3 each | 0/3 each |
+
+**So the contradiction was real and was not the whole cause.** One of the three
+passes recovers; two do not, and the negative control holds under both
+wordings, so the repair is not a rubric that accepts everything.
+
+**What separates w3 from w1 and w2 is the second condition, and it is
+contested.** All three name `post compact` among the modes the reader may ask
+for; only w3 also says a compact table is recorded "if you want fewer threads
+later". One reading of "tells the reader they can ask for the compact form" is
+satisfied by naming the mode - that is the hand label above - and the other
+wants the option offered in so many words. Two careful readings differ, which
+by `evals/judge-calibration.md` measures the rubric rather than the judge, and
+the wording that is owed is a ruling on which reading the case means: whether
+listing `post compact` as an available mode is the behaviour this case asks
+for, or whether the reviewer must actively offer fewer threads. That ruling is
+not this session's to make, and nothing here is landed on either reading.
