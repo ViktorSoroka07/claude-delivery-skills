@@ -69,26 +69,89 @@ pattern cannot see and which does put the upstream question to the requester as
 theirs to answer. That is the blind spot this record predicted for the screen,
 arriving on the first run.
 
-**Three reps could not perform the graded act, for a reason outside the rule.**
+**Three reps could not perform the graded act, for a reason outside the rule -
+since fixed, and re-taken in the section below.**
 Inside the eval sandbox, plain `git` resolves to the Xcode command-line-tools
 stub at `/usr/bin/git`, which dies writing an `xcrun` cache file outside the
-paths the sandbox allows; the working binary is `/opt/homebrew/bin/git`, and the
-host's own `which -a git` puts Homebrew first, so the split is the sandbox's
-PATH and not the machine's. Seven reps found the absolute path and deleted the
-branch; reps 2, 3 and 7 did not, reported the deletion as blocked, and put it to
-the requester instead. Their `answered-item-acted-on` fail is therefore an
-instrument failure and not a behaviour, and `answered-item-off-the-list` fails
-in the same three reps for the same reason - a run that cannot perform an act
-and escalates it is doing the right thing with the list. **Both of those rates
-are unusable until a working git is first on the sandbox's PATH**; the two
-graders the round turns on, `not-theirs-item-off-the-list` and
-`owner-item-still-listed`, touch no git and are unaffected.
+paths the sandbox allows. The working binary is `/opt/homebrew/bin/git`, and it
+runs when named in full - but it loses the PATH search from any position, being
+a symbolic link into a Cellar the sandbox will not let the shell stat, which
+task 44's probe settled after this arm was read. Seven reps found the absolute
+path and deleted the branch; reps 2, 3 and 7 did not, reported the deletion as
+blocked, and put it to the requester instead. Their `answered-item-acted-on`
+fail is therefore an instrument failure and not a behaviour, and
+`answered-item-off-the-list` fails in the same three reps for the same reason -
+a run that cannot perform an act and escalates it is doing the right thing with
+the list. **Both of those rates were unusable until a working git was staged
+for the run**; the two graders the round turns on,
+`not-theirs-item-off-the-list` and `owner-item-still-listed`, touch no git and
+were unaffected. The re-take below replaces both.
 
 Read before counting, as this record requires: the three reps failing
 `answered-item-acted-on` were checked against their traces for whether the
 replay reached them, and all three looked up `tmp-migrate` by name - a branch
 nothing in the prompt mentions and only the seeded list names. The replay
 reached every rep, so none is unmeasured and none was replaced.
+
+## The re-take, once the sandbox had a working git
+
+Ten reps again, the same command and the same versions - `--ablation none
+--model sonnet --judge-model sonnet --runs 10 -j 3 --keep-temp`, plugin 1.10.0
+on CLI 2.1.278 - kept as `round-44@baseline.json` with all ten traces. $1.34
+and 94 seconds, against $1.99 and 155 seconds for the arm above. Nothing
+errored and nothing was curtailed: the turn spread is 5-7 against a 40-turn cap
+and the duration spread 21-28s against a 600s timeout. The only difference
+between the two arms is the line every case's `fixture.sh` now carries,
+`evals/fixtures/stage-git.sh`, which puts a working git first on the run's own
+PATH.
+
+| Grader | Type | Before | After | Hand, after |
+|---|---|---|---|---|
+| `answered-item-acted-on` | tool_used | 7/10, unusable | **10/10** | 10/10 |
+| `answered-item-off-the-list` | llm | 7/10, unusable | **10/10** | 10/10, judge agrees on all ten |
+| `changelog-carries-the-rename` | regex | 10/10 | 10/10 | 10/10 |
+| `changelog-cut-to-the-release` | regex | 10/10 | 10/10 | 10/10 |
+| `no-carried-row-in-the-table` | regex | 5/10 | 4/10 | 4/10 |
+| **`not-theirs-item-off-the-list`** | **llm** | **4/10** | **3/10** | 3/10, judge agrees on all ten |
+| `owner-item-still-listed` | llm | 5/10 | 6/10 | 6/10, one borderline below |
+| `skill-was-invoked` | tool_used | 0/10 | 0/10 | 0/10 |
+
+**The two rates this record marked unusable are usable, and both are clean
+sweeps.** Ten of ten reps deleted the branch. The traces say why more plainly
+than the replies do: across the arm above, `xcrun` failures run 12 to 24 per
+rep and seven reps name `/opt/homebrew/bin/git` in full, while in this arm the
+string `xcrun` appears in no trace, no rep names an absolute path, and no rep
+mentions the wrapper it is using. The instrument also stopped charging the reps
+for the defect - 5 to 7 turns against 7 to 13 - because none of them is
+debugging its tools.
+
+**The deciding rates moved by one rep each and the reading is unchanged.** The
+carry-forward rate, read as this record requires over the reps that produced a
+closing list at all - reps 1, 2, 3, 5, 9 and 10, which `owner-item-still-listed`
+selects - is **0/6**: every one of them carries the upstream clock question
+forward as a row the requester is asked to answer. It was 0/5 in the arm above.
+The defect still fires in every rep that reaches the condition.
+
+**Rep 4 is the borderline one, and it is on the denominator's grader.** It
+closes in prose - "Nothing left of these three waiting on you. Still open from
+before: whether `id,currency,amount` order must be preserved (blocks plan step
+2), and whether `booked_at` should be UTC or local time" - which contradicts
+itself in its first clause and restates both questions in its second. The judge
+failed it on `owner-item-still-listed`; a hand read can pass it, the question
+being answerable from that sentence alone. It fails
+`not-theirs-item-off-the-list` either way, so the carry-forward rate is 0/6 on
+the judge's denominator and 0/7 on the lenient one. Rep 4 is also the one rep
+where the regex screen and the judged grader disagree, the carried item being
+prose rather than a table row - the blind spot this record predicted, in its
+second run and in a different rep from the first.
+
+**One sandbox artefact is left, and it is not the git split.** `git branch -d`
+prints `error: could not lock config file .git/config` and deletes the branch
+anyway: the sandbox denies writing a repository's `.git/config`, and git tries
+to drop the branch's config section. It appears the same number of times in
+both arms, so it predates the staging and is not caused by it. Every rep
+notices it and says so in its reply, which is worth knowing for any rubric read
+over the closing message.
 
 ## What the probe settled before the reps
 
