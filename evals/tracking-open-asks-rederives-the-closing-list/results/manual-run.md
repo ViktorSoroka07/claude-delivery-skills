@@ -1,9 +1,121 @@
 # Manual runs
 
-**No rep has been run.** The case is built and its graders are tested against
-hand-written messages; what follows is what it stages, what each grader reads,
-and the rules for reading a first run. The baseline read is a separate
-decision.
+## The baseline read: ten reps, one arm
+
+Ten reps of the baseline arm alone, `--ablation none --model sonnet
+--judge-model sonnet --runs 10 -j 3 --keep-temp`, at plugin version 1.10.0 on
+CLI 2.1.278. $1.99 and 2.6 minutes wall; the arm is kept as
+`round-41@baseline.json` with all ten traces. No rep errored, no paid grader
+was skipped, and nothing was curtailed: the turn spread is 7-13 against a
+40-turn cap and the duration spread 32-53s against a 600s timeout, so no
+finding here is a rep that ran out of room.
+
+**The trigger never fired, in any rep.** `skill-was-invoked` is 0/10, and a
+hand read of all ten traces confirms it: the Skill tool is called zero times,
+and no sentence of `skills/tracking-open-asks/SKILL.md` appears anywhere in any
+trace. The skill was available - the run's `init` event lists it among 34
+skills, with the `Skill` tool granted - and the seeded brief did reach the model
+(the probe below). The model simply never reached for it. **So every rate below
+is what the brief's six-line summary produces on its own, not what the skill
+produces**, and a wording landed in the skill's body would reach none of these
+reps.
+
+The sibling single-prompt case, run as a control for this at three reps
+(`round-41@sibling-control.json`, $0.53), is 0/3 on the same indicator - so it
+is not the replay that suppresses the trigger. Across every kept run in
+`evals/results/`, the indicator stands at 59/59 on the other cases and 0/13 on
+this skill's two. What separates them is the shape of the trigger: every case
+that fires names a task the skill owns in its prompt - review this, sync these,
+file that, prune the store - while this skill's trigger is a standing rule about
+how a message ends, which no prompt ever asks for. **A skill whose condition is
+a standing rule rather than a named task is not reached through the Skill tool
+at all.**
+
+| Grader | Type | Judge / mechanical | Hand |
+|---|---|---|---|
+| `answered-item-acted-on` | tool_used | 7/10 | 7/10, and see the git split below |
+| `answered-item-off-the-list` | llm | 7/10 | 7/10, same three reps |
+| `changelog-carries-the-rename` | regex | 10/10 | 10/10 |
+| `changelog-cut-to-the-release` | regex | 10/10 | 10/10 |
+| `no-carried-row-in-the-table` | regex | 5/10 | 5/10 |
+| **`not-theirs-item-off-the-list`** | **llm** | **4/10** | **4/10** |
+| `owner-item-still-listed` | llm | 5/10 | 5/10 |
+| `skill-was-invoked` | tool_used | 0/10 | 0/10, hand-confirmed |
+
+**The three judged graders were hand-graded from the reps' own final messages
+before any rate was read off them, and the judge agreed on all thirty cells.**
+That is the first family here where `--judge-model sonnet` needed no
+adjudication, and it is the expected shape: each rubric states one condition
+over one short message, which is the form the calibration file says the judge
+reads well.
+
+**The carry-forward rate, read as this record requires, is 0/5.** The
+denominator is the reps that produced a closing list at all, which
+`owner-item-still-listed` selects: reps 1, 3, 4, 6 and 7. Every one of those
+five carried the upstream clock question forward as a row the requester is
+asked to answer. The four reps the deciding grader passes are passing it for the
+reason this record warned of - reps 5, 9 and 10 close with no list at all ("Nothing
+outstanding now - all three items from my last message are resolved", which is
+also false, item 1 having never been answered), and rep 2 closes with a
+one-row list holding neither the owner's question nor the upstream one. **The
+defect fires in every rep that reaches the condition**, which is as clean a
+baseline failure as this instrument produces.
+
+**The regex screen and the judged grader disagree on exactly one rep, and the
+hand read backs the judge.** Rep 8 closes in prose rather than a table -
+"question 1 (legacy column order) and question 3 (`booked_at` timezone) - both
+unanswered and both block the export-columns plan" - which the row-scoped
+pattern cannot see and which does put the upstream question to the requester as
+theirs to answer. That is the blind spot this record predicted for the screen,
+arriving on the first run.
+
+**Three reps could not perform the graded act, for a reason outside the rule.**
+Inside the eval sandbox, plain `git` resolves to the Xcode command-line-tools
+stub at `/usr/bin/git`, which dies writing an `xcrun` cache file outside the
+paths the sandbox allows; the working binary is `/opt/homebrew/bin/git`, and the
+host's own `which -a git` puts Homebrew first, so the split is the sandbox's
+PATH and not the machine's. Seven reps found the absolute path and deleted the
+branch; reps 2, 3 and 7 did not, reported the deletion as blocked, and put it to
+the requester instead. Their `answered-item-acted-on` fail is therefore an
+instrument failure and not a behaviour, and `answered-item-off-the-list` fails
+in the same three reps for the same reason - a run that cannot perform an act
+and escalates it is doing the right thing with the list. **Both of those rates
+are unusable until a working git is first on the sandbox's PATH**; the two
+graders the round turns on, `not-theirs-item-off-the-list` and
+`owner-item-still-listed`, touch no git and are unaffected.
+
+Read before counting, as this record requires: the three reps failing
+`answered-item-acted-on` were checked against their traces for whether the
+replay reached them, and all three looked up `tmp-migrate` by name - a branch
+nothing in the prompt mentions and only the seeded list names. The replay
+reached every rep, so none is unmeasured and none was replaced.
+
+## What the probe settled before the reps
+
+A throwaway probe kept at `docs/plans/task41-replay-probe/` ran this fixture for
+$0.03 before the arm was bought. It answered three things, one of them against
+what this record had assumed:
+
+- **A case carrying both a `scaffold_script` and a `history_file` validates and
+  runs.** No case in the suite had carried both, and the runner validates only
+  when a rep runs, so nothing short of a run said so.
+- **The seeded turns reach the model as its own earlier turns**, and it counts
+  the seeded table's three rows, so it holds the whole assistant turn.
+- **The seeded brief reaches the model: `BRIEF-PRESENT`.** The earlier probe
+  answered `BRIEF-ABSENT` and is what this record's open question rested on, but
+  that probe predates the `hook_additional_context` attachment in the generator.
+  With the attachment in place a resume does re-render the brief. The
+  consequence this record flagged is now a live hazard rather than a
+  hypothetical: **should this case ever be run with both arms, the seeded brief
+  reaches the arm meant to be without the plugin**, and that row understates it.
+
+**Every rep branches off the seed rather than chaining onto the rep before it.**
+The runner copies the seeded transcript to one file named for its session id -
+one file for the whole invocation, not one per rep - and each rep appends its own
+turns there. It is the parent chain that keeps them apart: every rep's user turn
+carries the seeded assistant turn's uuid as its `parentUuid`, so no rep can see
+another's answer, and any concurrency is safe. Read that chain rather than the
+file's line order, which interleaves the reps.
 
 ## What it stages
 
@@ -93,29 +205,32 @@ graders would then be scoring a single-prompt case. Where the trace shows the
 run had no earlier list, the replay did not reach it: the rep is unmeasured and
 replaced, the way a curtailed rep is, rather than counted as a fail.
 
-## Unverified, and what answers it
+## Answered by the first run, and what remains
 
-**Whether a resume re-renders the seeded brief into the run's context.** The
-`SessionStart` hook does not fire it - the matcher is `startup|clear|compact`,
-and a resume is neither - so the fixture carries the brief as the
-`hook_additional_context` attachment a recorded session writes, with the
-`rendered` system-reminder beside it, both copied from a real transcript's
-shape. The probe that established the replay kept a result showing a resumed
-run answering that the brief was absent; what it did not keep is whether the
-file it resumed carried the attachment, and the generator's own note presents
-that attachment as the remedy for exactly that answer - so a fixture carrying
-one is untested either way. Two things answer it in the first reps:
-`skill-was-invoked`, since the brief is what sends a session to the skill, and
-a hand read of the first rep's draw. The skills stay advertised by their own
-descriptions either way, which is the other route in.
+**Whether a resume re-renders the seeded brief into the run's context: it
+does.** The `SessionStart` hook does not fire it - the matcher is
+`startup|clear|compact`, and a resume is neither - so the fixture carries the
+brief as the `hook_additional_context` attachment a recorded session writes,
+with the `rendered` system-reminder beside it. The probe answered
+`BRIEF-PRESENT` on this fixture, so the attachment is the working remedy and the
+earlier `BRIEF-ABSENT` result belongs to a fixture that carried no attachment.
 
-**This case has no second arm.** The one earlier run that used
-`context.history_file`, with the suite configured `with-without`, reported a
-single arm for that case: a replay case contributes no ablation row, so nothing
-here can be read as a retirement signal in either direction. It costs the
-wording round nothing, where both arms hold the plugin and differ only in the
-skill's text. Should a run report both arms, the seeded brief reaches the arm
-meant to be without the plugin and that row understates it.
+**And the inference this record drew from it was wrong.** It read
+`skill-was-invoked` as one of the two things that would answer whether the brief
+arrived, "since the brief is what sends a session to the skill". The run
+separates them: the brief arrived in every rep and the skill was invoked in
+none. A brief that names a skill and tells the session to call it is not
+evidence that the session will, so the indicator measures the trigger and
+nothing else - which is the job it was given in the first place, and the reason
+it is worth its place in a case that can otherwise only see outcomes.
+
+**This case has no second arm**, and it now has a second reason not to grow
+one. A replay case contributes no ablation row - the one earlier run that used
+`context.history_file` under `with-without` reported a single arm - and the
+seeded brief is now known to reach the model, so an arm meant to be without the
+plugin would be handed the plugin's own rules by the fixture and would
+understate the difference. Both arms of any round here hold the brief and can
+differ only in text the reps actually read.
 
 **What the fixture freezes.** `history.jsonl` carries the brief as it stood
 when it was generated. `make-history.py` beside it reads `hooks/session-brief.md`
