@@ -447,6 +447,21 @@ Rules that held in practice, each answering a failure seen here:
   alone: its rule is carried by a hook that fires past a context threshold and
   every rep the runner keeps peaks well under that threshold, so both arms
   would have scored alike for a reason having nothing to do with the wording.
+- **A seeded prior conversation is a frozen copy of instruction text that both
+  arms share.** The start hook does not fire on a resume - its matcher covers a
+  startup, a clear and a compaction, and a resume is none of them - so a replay
+  fixture carries the always-on brief itself, as the attachment a recorded
+  session writes, and the runner resumes that one file whichever arm it is
+  running. Two things follow, and neither shows in a score. The arm without the
+  plugin receives the plugin's own always-on text, so a replay case's ablation
+  row understates the plugin and is not readable as the retirement signal the
+  next section describes. And the seeded copy is frozen at the moment the
+  fixture was generated, so a wording that changes the brief never reaches the
+  treated arm: a replay round tests a wording that lands in the skill's own
+  text, which the run loads live, and the fixture is regenerated whenever the
+  brief moves - by a generator that reads the brief rather than holding a copy,
+  and deterministically, so that regenerating it and finding no diff is the
+  check.
 - **A capability rule is measured on the weakest model the plugin supports.**
   Where a rule exists because the model does not know to do the thing, that
   model is both where the gap is and the more sensitive instrument: a rule the
