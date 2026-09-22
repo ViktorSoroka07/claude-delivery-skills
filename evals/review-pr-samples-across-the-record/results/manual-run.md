@@ -368,13 +368,20 @@ unsupported or surviving. The five the judge passed were screened the same way,
 and the one hit - a rep naming `result.items` beside the word "contradict" - is
 a description of the filter defect, not a verdict on the record.
 
-**So the drop is the judge, and what moved it is the repair.** The model and
-the rubric are the same as in the arm that scored 10/10. What changed is how
-much the reps write about the record: with a working git they can re-apply a
-mutation and restore the tree, so they now report "all 9 tests stay green",
-"two mutations survive (Findings 6 and 9), not one" and "the doc's tally
-undercounts by one" - verdict language, sitting next to the record, which the
-judge appears to read as evidence against it. **A rubric's rate moves with how
-much a run writes about its subject, and a repair to the instrument moves it
-exactly as a wording change does.** The rate to carry forward for this row is
-the hand grade.
+**So the drop is the judge's, and nothing the repair changed explains it.**
+The model, the rubric and the judge are the same as in the arm that scored
+10/10. The explanation first written here - that a working git let the reps
+re-apply mutations and restore the tree, so they now write verdict language
+beside the record for the judge to misread - is refuted by that earlier arm's
+own kept runs. Every one of its ten traces reaches the Homebrew git by its full
+path, 29 to 40 times a rep; its hand grade has `reapplied-the-contradicted-row`
+at 10/10; its reps make as many source edits as these eight, about eleven a
+rep on either side; and the rep at index 2 of its `arms.with` writes
+"reapplying it leaves all 9 tests green (the mutation survives)" and "Findings
+6 and 9 both survive, not just 9" - the same verdict on the record's tally as
+the "two mutations survive (Findings 6 and 9), not one" of the failed rep at
+index 8 of `round-44@coverage.json` - in a file the judge passed. The same judge had already
+failed three files of ten that a hand read passes on this row, in the baseline
+arm of round 40, before any repair. **A judged rate read across a repair to the
+instrument is two readings, and the move between them can be the judge's
+alone.** The rate to carry forward for this row is the hand grade.
