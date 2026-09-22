@@ -256,7 +256,18 @@ evidence, and the five rules are not interchangeable:
   applied - where a hand parse looking for the rewrite reads the same call as
   nothing applied. Anchor on the transformation rather than on either half of
   it: the replaced text together with the line that replaces it, or a whole
-  body written without the part the act removes.
+  body written without the part the act removes. **The tools such a grader does
+  not name are a blind spot its two arms need not share**, because the
+  instruction under test is what chooses the tool: a wording asking for every
+  row of a record one at a time reads as a rule to use the editing tool, whose
+  protocol states one-at-a-time as a unique `old_string`, and it moved six reps
+  of ten onto `Edit` - where the `Bash`-anchored grader read four of ten
+  against a hand reading of ten of ten, and the round it was built to decide
+  would have scored as no difference. Keep a companion grader over each tool
+  the act could arrive through, read those rates across the arms rather than a
+  run at a time, and hand-read the draw of every rep one of them fails - which
+  needs `--keep-temp` on the invocation, since the runner deletes each run's
+  workspace and a fail whose trace is gone cannot be read at all.
 - **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
   `arm: with-only`: under the two-arm run it is shown and scored in neither
   arm, and the arm without the plugin never evaluates it, so it cannot throw
