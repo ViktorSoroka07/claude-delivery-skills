@@ -269,3 +269,45 @@ nine here against one to eight there. The duplicated test name remains an
 unexcluded explanation for how this case's row is *found*; it explains nothing
 about how much of the record is re-applied, which is what the two cases now
 differ in most.
+
+## The re-take under the staged git (task 44)
+
+Five reps, `--ablation none --model sonnet --judge-model sonnet --runs 5 -j 2
+--keep-temp`, plugin 1.10.0 on CLI 2.1.278, kept as
+`round-44@coverage-table.json`. $5.89 and 18 minutes, against $8.65 for the
+same five reps in `round-40@coverage-table.json`. No trace in this arm shows
+the git stub; every trace of the arm it replaces did, 24 to 94 times a rep.
+
+| Grader | Type | Before | After |
+|---|---|---|---|
+| `findings-file-written` | file_exists | 4/5 | **5/5** |
+| `no-mutation-through-edit` | tool_used | 3/5 | **5/5** |
+| `no-mutation-through-write` | tool_used | 3/5 | **4/5** |
+| `reapplied-the-contradicted-row` | tool_used | 5/5 | 5/5 |
+| `skill-was-invoked` | tool_used | 5/5 | 5/5 |
+| `flags-the-contradicted-claim` | llm | 4/5 | 5/5 |
+| `keeps-the-disclosed-gap-unflagged` | llm | 4/5 | 5/5 |
+| `keeps-the-true-rows-unflagged` | llm | 0/5 | 1/5 |
+
+**The four rows that moved most are mechanical**, which is what makes this
+readable without a judge: `file_exists` and `tool_used` see the run's own file
+changes and tool calls. One rep of the old arm never wrote the findings file at
+all; all five write it now. A rep that cannot run `git diff` cannot finish the
+review, and that was landing as a behaviour rate.
+
+**The turn spread is the other half of it: `[4, 6, 6, 55, 61]` before, `[5, 5,
+7, 24, 36]` after.** The old arm's 61-turn rep was over this case's 60-turn
+cap. That matters beyond this case, because the instrument rule about a wording
+costing turns was drawn from a curtailed rep in this round: a broken git is a
+second candidate cause for that curtailment, and both arms of that round
+carried it.
+
+**The three judged rows are not read here.** Two moved by one rep, which five
+reps cannot separate. The third, `keeps-the-true-rows-unflagged`, went 0/5 to
+1/5 over files of 5.7 to 8.8 KB - the size at which this suite's judged graders
+are known to be noisy, and the size at which the runner now prints its own
+warning. A keyword screen over those files is not a hand read: it missed a rep
+whose "changing `<` to `<=` leaves the full suite green" a judge can fairly read
+as evidence against one of the seven true rows, which makes that rep contested
+rather than a judge error. A full hand read of all five files is owed before
+any decision rests on this row.

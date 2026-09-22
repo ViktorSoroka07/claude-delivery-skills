@@ -313,3 +313,53 @@ as in their behaviour. The coverage round is the case in point, at 7/10 against
 2/10 on `no-mutation-through-edit`. Run every arm with `--keep-temp`: the runner
 deletes each workspace otherwise, and a `no-mutation-through-*` fail whose
 trace is gone cannot be read by hand at all.
+
+## The re-take under the staged git, and the reps the harness lost (task 44)
+
+Two invocations, same settings as the arm they replace (`--ablation none
+--model sonnet --judge-model sonnet --keep-temp`, plugin 1.10.0 on CLI
+2.1.278): ten reps at `-j 2` (`round-44@coverage.json`, $7.04) and a five-rep
+top-up at `-j 1` (`round-44@coverage-topup.json`, $4.18). **Seven of those
+fifteen reps never started**, so the rates below stand on eight measured reps
+against the ten of `round-40@coverage.json`.
+
+**The lost reps are an instrument failure, not a result, and they are
+unexplained.** Each died in one second with no turns, no run root and no trace,
+on `the run directory (or a directory inside it) is no longer the one the
+harness listed, or cannot be listed - moved, removed, replaced by a link, made
+unreadable, or too deep or too large to walk`. What is known: the error appears
+in no kept run before today; it survives `-j 1`, so it is not a race between
+concurrent reps; it cannot be the scaffold, which runs inside a root that never
+existed; no other case in the suite has produced it, including the sibling run
+the same hour; the scaffolded tree is 76 entries and 220 KB, so "too large to
+walk" does not fit; and the disk had 118 GB free with 122 kept run roots in
+`/private/tmp`. An errored rep is unmeasured and replaced, never counted - the
+top-up is that replacement, and it lost two of its own five the same way.
+
+| Grader | Type | Before, 10 reps | After, 8 reps |
+|---|---|---|---|
+| `findings-file-written` | file_exists | 10/10 | 8/8 |
+| `skill-was-invoked` | tool_used | 10/10 | 8/8 |
+| `no-mutation-through-edit` | tool_used | 2/10 | 2/8 |
+| `no-mutation-through-write` | tool_used | 5/10 | 5/8 |
+| `reapplied-the-contradicted-row` | tool_used | 4/10 | 5/8 |
+| `flags-the-contradicted-claim` | llm | 7/10 | 6/8 |
+| `keeps-the-disclosed-gap-unflagged` | llm | 8/10 | 6/8 |
+| **`keeps-the-true-rows-unflagged`** | **llm** | **10/10** | **5/8** |
+
+**The turn spread lost its two over-cap reps**: `[4, 5, 7, 7, 31, 36, 46, 57,
+63, 66]` before, against `[4, 6, 7, 29, 42, 48, 55, 56]` now, where 63 and 66
+were over this case's 60-turn cap. The sibling case shows the same shape, and
+between them they put a second candidate cause under the curtailment the
+turn-cost instrument rule was drawn from.
+
+**One row moved far enough to matter and is not read here.**
+`keeps-the-true-rows-unflagged` falls from 10/10 to 5/8. It is judged, over
+findings files of several kilobytes, and it moved in the opposite direction
+from the same grader in the sibling case - which is itself a reason to distrust
+either reading. There is a behavioural hypothesis worth testing rather than
+assuming: with a working git a rep can actually re-apply a mutation and restore
+the tree, so it produces verified claims where before it produced none, and
+some of those may report a true row as surviving. Settling that means a hand
+read of eight files against the record's seven true rows, which this session
+did not buy.
