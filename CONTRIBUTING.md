@@ -326,15 +326,21 @@ evidence, and the five rules are not interchangeable:
   not one does, and a pull request create or a subagent's own act is
   unmeasured. No case yet reaches the memory stop. It matches the directory the
   session keeps memory in, the one under the config directory a run's
-  environment names included, so a rep writing its own memory under
-  `config/projects/` would be stopped; but when this was written the 198
-  traces in the kept run roots showed reps reading that directory and never
-  writing it, and the
-  memory case stages its store under `store/projects/`, which the stop does not
-  match. A case that wants the stop aims a write at a path the stop matches -
-  the gate runs before the run's permission check, so it stops even a write the
-  run then refuses - and grades the stop and the load rather than a written
-  file. A rule in the body
+  environment names included, but the runner's deny rules cover a run's
+  config directory: a shell write the gate parses, naming its own memory under
+  `config/projects/` as the run's `CLAUDE_CONFIG_DIR` spells it, would be
+  stopped and then refused, and a `Write` or `Edit` there is refused before
+  the gate sees it, since those tools check deny rules while validating their
+  input, which the CLI does ahead of every hook (read from 2.1.280). When this
+  was written the 198 traces in all the kept run roots held 47 calls naming a
+  run's memory directory, every one a listing or a read and every one refused,
+  and none a write; and the memory case stages its store under
+  `store/projects/`, which the stop does not match. A case that wants the stop
+  has the rep write through the shell to a path the stop matches - the gate
+  runs before the shell's permission check, so it stops even a write that
+  check then refuses - or `Write` a new file where the stop matches and no
+  deny rule covers the path, and grades the stop and the load rather than a
+  written file. A rule in the body
   of a standing-rule skill that neither moment reaches on the case, or of
   `tracking-open-asks` in a resumed conversation, still cannot be moved by
   any round the runner can buy, the reps never having read it.
