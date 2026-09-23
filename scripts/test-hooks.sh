@@ -223,6 +223,10 @@ land_payload 'gh pr merge --help' | "$PY" "$LAND_HOOK" 2>/dev/null
 check "landing hook ignores a help invocation" 0 $?
 land_payload 'git merge --abort' | "$PY" "$LAND_HOOK" 2>/dev/null
 check "landing hook ignores an aborted merge" 0 $?
+land_payload 'test -d .git/rebase-merge && echo rebasing' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook does not read a path through .git as a merge" 0 $?
+land_payload 'git --no-pager -C . merge feature/x' | "$PY" "$LAND_HOOK" 2>/dev/null
+check "landing hook reads a merge behind git's own options" 2 $?
 
 # 17. Landing hook: a merge named inside a quoted message is message text, and
 #     a failed tool call is not a landing.

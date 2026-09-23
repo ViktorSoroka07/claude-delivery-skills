@@ -30,7 +30,7 @@ FORGE_MERGE = re.compile(
     r"|\bglab\b[^|;&]*\bmr\b[^|;&]*\bmerge(?![-\w])"
     r"|\baz\b[^|;&]*\brepos\b[^|;&]*\bpr\b[^|;&]*--status\s+completed\b"
 )
-LOCAL_MERGE = re.compile(r"\bgit\b[^|;&]*\bmerge(?![-\w])")
+LOCAL_MERGE = re.compile(r"\bgit(?:\s+-[\w-]+(?:=\S*)?|\s+-[Cc]\s+\S+)*\s+merge(?![-\w])")
 INERT = re.compile(r"--(abort|continue|quit|help|dry-run)\b|\s-h\b")
 
 ADVICE = (
