@@ -272,53 +272,77 @@ whose each item is would cost: a closing that hands the requester's own items
 to a third party is the carry-forward defect turned round, and a round on a
 second wording would need a grader for it.
 
-## The exit clause alone: ten reps
+## The exit clause alone: two draws of ten
 
-**It moves the owner's question in the expected direction and does not clear
-the bar set before the run.** The one clause of the treated arm above that
-moved - the requester's own items kept until one of three exits - run on its
-own, appended to the same bullet:
+**It moves the owner's question and stays below the instrument: 16/20 by hand
+against 11/20, where the bar set before the second draw was 18/20.** The one
+clause of the treated arm above that moved - the requester's own items kept
+until one of three exits - run on its own, appended to the same bullet:
 
 > An item of the requester's stays on the list until they answer it, the work
 > goes ahead on its stated default, or it is no longer needed, and each exit is
 > said.
 
-Ten reps with the same command, CLI 2.1.280, kept as
-`round-41b@exit-clause.json`; $1.50 and 92 seconds; turns 5-8 from the
-`result` records against a 40-turn cap, nothing curtailed. Its arrival was
-checked as the arm above's was: "stays on the list until they answer it" is in
-both copies of the regenerated seeded attachment and nowhere on `main`.
+Two draws of ten reps with the same command, CLI 2.1.280, kept as
+`round-41b@exit-clause.json` and `round-41b@exit-clause-draw2.json`; $1.50 and
+$1.43, about 90 seconds each; turns 5-8 from the `result` records against a
+40-turn cap, nothing curtailed. Arrival was checked as the arm above's was:
+"stays on the list until they answer it" is in both copies of the regenerated
+seeded attachment and nowhere on `main`, and in the transcript each draw
+resumed. Draw 1's transcript was moved aside before draw 2, so each draw's
+file holds its own ten reps only. Both hold the seeded attachment three times
+under one uuid where the arm above's holds it once, which the parent chain
+resolves to one node; all twenty reps branch off the one seeded assistant turn.
 
-**The bar, written before any rep ran:** `owner-item-still-listed` by hand at
-10/10 against the two baseline arms pooled, 11/20 - p = 0.012, inside the
-separating examples CONTRIBUTING gives - since 9/10 (p = 0.062) sits where its
-examples say a gap is noise. The pooled arms differ from this one in CLI and,
-for `round-41@baseline.json`, in the broken git; this grader touches no git.
+**The bars, each written before the draw it judges.** Before draw 1:
+`owner-item-still-listed` by hand at 10/10 against the two baseline arms
+pooled, 11/20 - p = 0.012, inside the separating examples CONTRIBUTING gives -
+since 9/10 (p = 0.062) sits where its examples say a gap is noise. Draw 1 read
+9/10, and before draw 2 the bar became 18/20 across both draws (p = 0.016).
+The pooled arms differ from these in CLI and, for `round-41@baseline.json`, in
+the broken git; this grader touches no git.
 
-| Grader | Baseline (round-44), hand | Treated, judge | Treated, hand |
-|---|---|---|---|
-| `owner-item-still-listed` | 6/10 (pooled with round-41: 11/20) | 8/10 | **9/10**, one of them borderline |
-| `not-theirs-item-off-the-list` | 3/10 | 0/10 | 0/10 |
-| `answered-item-off-the-list` | 10/10 | 10/10 | 10/10 |
-| `no-carried-row-in-the-table` | 4/10 | 2/10 | 2/10 |
-| the three mechanical graders | 10/10 each | 10/10 each | 10/10 each |
-| `skill-was-invoked` | 0/10 | 0/10 | 0/10 |
+| Grader | Baseline (round-44), hand | Draw 1, judge / hand | Draw 2, judge / hand | Both draws, hand |
+|---|---|---|---|---|
+| `owner-item-still-listed` | 6/10 (pooled with round-41: 11/20) | 8/10 / 9/10 | 6/10 / 7/10 | **16/20** (p = 0.088) |
+| `not-theirs-item-off-the-list` | 3/10 | 0/10 / 0/10 | 1/10 / 1/10 | 1/20 |
+| `answered-item-off-the-list` | 10/10 | 10/10 / 10/10 | 10/10 / 10/10 | 20/20 |
+| `no-carried-row-in-the-table` | 4/10 | 2/10 | 4/10 | 6/20 |
+| the three mechanical graders | 10/10 each | 10/10 each | 10/10 each | 20/20 each |
+| `skill-was-invoked` | 0/10 | 0/10 | 0/10 | 0/20 |
 
-**9/10 by hand, 8/10 read strictly.** Rep 3 closes with "items 1 and 3 from
-before (column order, `booked_at` timezone)", a reference rather than the
-question, and fails. Rep 7 writes "the `id,currency,amount` vs.
-`id,amount,currency,booked_at` column-order question" - a choice named rather
-than a question asked, the form the neighbour's hand read below passes too -
-and the judge fails it. No rep closes with "nothing outstanding". Against the
-bar that is not a landing, strict or lenient.
+**Where hand and judge part, it is over a question put indirectly or as a
+choice.** Draw 1's rep 7 writes "the `id,currency,amount` vs.
+`id,amount,currency,booked_at` column-order question" and draw 2's rep 9
+"whether `id,amount,currency,booked_at` should revert to the legacy
+`id,currency,amount` order"; the hand read passes both, the judge fails both,
+and a strict reading that wants a question asked rather than a choice named
+fails the first only - 15/20 (p = 0.16). Every reading misses the bar.
 
-**`not-theirs-item-off-the-list` falls to 0/10 and is no cost.** Every rep
-writes a list now, and every list carries the clock question, as every
-list-writing baseline rep did; the baseline's three passes are its three reps
-closing with a false "nothing outstanding". The rate moved with the
-denominator, which is the hazard the carry-forward rate is read over list
-writers to avoid. Numbering: the eight tables renumber the carried item from 3
-to 2, and the two prose closings keep "#1" and "#3 from before".
+**The four hand fails are three shapes.** Draw 1's rep 3 refers to "items 1
+and 3 from before" without restating either. Draw 2's rep 8 closes with no
+list at all. **Draw 2's reps 2 and 4 keep only the upstream clock question and
+drop the owner's own** - the carry-forward defect and the owner's loss in one
+closing, a shape no earlier arm produced. The false "nothing outstanding" the
+baseline wrote three times appears in none of the twenty.
+
+**`not-theirs-item-off-the-list` at 1/20 is no cost.** Nineteen reps write a
+list and every one carries the clock question, as every list-writing baseline
+rep did; the baseline's three passes are its three reps closing with a false
+"nothing outstanding", and the one pass here is draw 2's rep 8, which writes
+no list. The rate moved with the denominator, which is what reading the
+carry-forward rate over list writers avoids. Numbering: every table renumbers
+the carried item from 3 to 2; of the closings in prose, draw 1's two keep "1"
+and "3 from before", and draw 2's rep 2 numbers the lone clock question 1.
+
+**So the clause is below the instrument rather than a wording that failed.**
+Across the three arms that carry it - 41a's and both draws here - the owner's
+question is listed in 26 of 30 reps against 11 of 20 in the baseline, roughly
+eighty-five per cent against fifty-five; each ten-rep arm separates only a
+half, and the twenty here needed 18 against the baseline's 11, a gap of seven
+in twenty. Pooling 41a in would clear the bar, and is not done: 41a is a
+different wording, and choosing that pooling after reading the draws is the
+move a bar set in advance exists to prevent.
 
 **Neighbour**: five reps of the sibling case, kept as
 `round-41b@exit-clause-neighbour.json`, $0.85, turns 13-18 against a 30-turn
