@@ -498,9 +498,14 @@ the case list's entries from the runner's read-only set (`Read`, `Glob`,
 `Grep`, `Skill`, `Agent` and a few more). A tool the invocation grants is
 allowed whether the case lists it or not, and a gated tool the case lists
 without a grant is only reported as not granted. Every tool that is neither
-granted nor in that read-only set is withheld from the session, so no call to
-it can occur, not even a refused one; the read-only set is never withheld. The
-`init` event near the head of each trace lists the tools the session holds.
+granted nor in that read-only set is withheld from the session, bar a few the
+runner never withholds - `ToolSearch` and, beside a granted `Edit` or `Write`,
+`NotebookEdit` among them, both listed in every `init` event counted below
+though neither is in that read-only set and no invocation on record grants
+either - so a call to a withheld tool never runs, though the model can still
+name one and the trace keeps the attempt; the read-only set is never
+withheld. The `init` event near the head of each trace lists the tools the
+session holds.
 When this rule was written the run JSONs under `evals/results/` pointed to 192
 kept run roots holding a trace, across seven cases, and in every one that list
 names tools the case never did - on the commit case, whose list names none of
