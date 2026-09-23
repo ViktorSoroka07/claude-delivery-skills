@@ -196,7 +196,7 @@ the outlier, not the rule.
 
 ## The first-tool-call line: the round that landed it (task 48, 48b)
 
-This case is the round for the brief line landed at `f754b47`, which makes a
+This case is the round for the brief line landed at `59bde35`, which makes a
 conversation's first tool call the Skill tool with `tracking-open-asks`. The
 treated arm is task 48's probe, `round-48@first-tool-call.json`: five reps,
 `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
@@ -243,6 +243,6 @@ loaded the skill in none of five reps under the same line, its first call
 reading as spent (that case's record, "The first-tool-call line on a resumed
 conversation").
 
-**What `skill-was-invoked` means here from `f754b47` on:** the line loads the
+**What `skill-was-invoked` means here from `59bde35` on:** the line loads the
 skill first in every fresh rep whatever the prompt asks, so this row now reads
 the line firing, not the prompt reaching the skill's trigger.

@@ -191,7 +191,7 @@ it rather than four failures that look like a verdict on the report's content.
 ## The skill gate and the first-tool-call line, read by hand (48b)
 
 Five fresh headless sessions on the plugin carrying the skill gate
-(`9f4f543`) and the brief's first-tool-call line (`f754b47`), bought at the
+(`d738357`) and the brief's first-tool-call line (`59bde35`), bought at the
 owner's ask after 48b landed both, $1.16 in all. **Not through the runner**:
 Docker Desktop was running and had to stay up, and the runner needs `~/.docker`
 moved aside, which is unsafe under a live Docker. Each rep scaffolded

@@ -388,8 +388,8 @@ alone.** The rate to carry forward for this row is the hand grade.
 
 ## The skill gate and the first-tool-call line as a neighbour (48b)
 
-One invocation of five reps on a worktree carrying the skill gate (`9f4f543`)
-and the brief's first-tool-call line (`f754b47`), `--ablation none --model
+One invocation of five reps on a worktree carrying the skill gate (`d738357`)
+and the brief's first-tool-call line (`59bde35`), `--ablation none --model
 sonnet --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280: $3.78, 565
 seconds, `round-48b@coverage-gate-line.json`. **Two of the five died in one
 second** on the error the section above describes - no run root, no turns, no

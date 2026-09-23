@@ -2,14 +2,14 @@
 
 ## The outcome graders, recalibrated on the landed log (task 51)
 
-Until `c083573` the case asked the run to reply with
+Until `2988647` the case asked the run to reply with
 `git log --format='%B' -n 3`, and three graders read that reply on the
 assumption that it quotes the commits. It need not: five of ten Sonnet replies
 pasted none of it, one saying only that the output was "above". A reply that pastes nothing passes
 a grader that looks for what the commits must not carry, so all 21 commits
 carried the harness's default trailer while `no-default-trailer` read 5 of 10
 passing. The run now redirects the same command into `commits.txt`, and every
-outcome grader reads that file (`89e50c0`, `d406247`, `80f3137`, `0ca229b`):
+outcome grader reads that file (`601e5d2`, `4a5e99c`, `5e085e3`, `995c1f8`):
 
 - `no-default-trailer` and `no-narration`: regex, `not_contains`, over the file.
 - `two-workstreams-two-commits`: a regex that counts the run's new commits by
@@ -90,7 +90,7 @@ The Haiku reps also found a defect the Sonnet calibration could not see,
 since no Sonnet body contains "also". The narration list held the prompt's
 own words, and four landed Haiku commits paraphrased them: "Also fix the
 wording", "Also improved", "Also corrected", "After demo feedback". At
-`89e50c0` the grader passed all four. `d406247` widened the list to "also"
+`601e5d2` the grader passed all four. `4a5e99c` widened the list to "also"
 plus a second edit's verb stem, "after (the) demo" and "review/demo
 feedback". That brought Haiku to the hand count, left Sonnet at 10/10, and
 still passes a body saying the change "also shows" something.
@@ -195,7 +195,7 @@ What the table shows:
   subject, not the currency body.
 - **The body condition alone agrees with the hand label on all six files,**
   one of them a real fail. It is the grader now, byte for byte as probed
-  (`80f3137`).
+  (`5e085e3`).
 - **The subject condition alone is unstable.** It passes "Fix punctuation in
   the request table row-count comment" in reps 1 and 3, and fails "Fix
   punctuation in the request table's row-count comment" (rep 2) and "…heading
@@ -225,7 +225,7 @@ grader passing a bad subject. The probe therefore took ten logs:
 Same throwaway recipe, $0.81. **Every cell agreed with the hand label written
 before the run, nine votes of nine:** the seven real logs pass and the three
 swapped ones fail. `subjects-state-the-outcome` is that text byte for byte
-(`0ca229b`).
+(`995c1f8`).
 
 ### Where the evidence lives
 
@@ -251,7 +251,7 @@ Usage is in each script's header.
 ## The skill gate and the first-tool-call line as a neighbour (48b)
 
 Three draws of five Sonnet reps on a worktree carrying the skill gate
-(`9f4f543`) and the brief's first-tool-call line (`f754b47`), each
+(`d738357`) and the brief's first-tool-call line (`59bde35`), each
 `--ablation none --judge-model sonnet -j 3 --keep-temp` on CLI 2.1.280:
 $0.87, $0.89 and $0.85, in `round-48b@commit-gate-line.json`, `-draw2` and
 `-draw3`. The line reached every rep, read from each trace's `SessionStart`

@@ -524,7 +524,7 @@ either arm has yet passed.
 
 ## The first-tool-call line on a resumed conversation (task 48)
 
-Task 48's probe ran this case under the brief line later landed at `f754b47` -
+Task 48's probe ran this case under the brief line later landed at `59bde35` -
 make a conversation's first tool call the Skill tool with
 `tracking-open-asks` - five reps, `--ablation none --model sonnet
 --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280, in
