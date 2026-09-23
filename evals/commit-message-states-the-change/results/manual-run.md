@@ -9,16 +9,16 @@ pasted none of it, one saying only that the output was "above". A reply that pas
 a grader that looks for what the commits must not carry, so all 21 commits
 carried the harness's default trailer while `no-default-trailer` read 5 of 10
 passing. The run now redirects the same command into `commits.txt`, and every
-outcome grader reads that file (`89e50c0`, `d406247`, `80f3137`):
+outcome grader reads that file (`89e50c0`, `d406247`, `80f3137`, `0ca229b`):
 
 - `no-default-trailer` and `no-narration`: regex, `not_contains`, over the file.
 - `two-workstreams-two-commits`: a regex that counts the run's new commits by
   which of the fixture's two subjects the three-entry log still shows.
-- `currency-body-says-why`: a judged grader on the same file, asking one of
-  the old rubric's two other conditions - that the currency commit's body say
-  why the currency appears. The other, that every subject state its commit's
-  outcome, has no grader: its judge split near-identical subjects (the probe
-  below), and which reading the rubric means waits on the maintainer.
+- `subjects-state-the-outcome` and `currency-body-says-why`: two judged
+  graders on the same file, one per condition of the old rubric's other half.
+  One asks that every subject name what its commit changed and where. The
+  other asks that the currency commit's body say why the currency appears.
+  Each is the text a judge probe calibrated (below).
 
 `skill-was-invoked` is unchanged.
 
@@ -70,6 +70,7 @@ every landed commit command, taken at task 48's stop and re-read here:
 | `no-default-trailer` | 0/10 | 5/10 | 0/10 |
 | `no-narration` | 10/10 | 9/10 | 10/10 |
 | `two-workstreams-two-commits` | 10/10 | 2/10, judged on the reply | 10/10 |
+| `subjects-state-the-outcome` | 10/10 | - | judged; not re-graded |
 | `currency-body-says-why` | 10/10 | - | judged; not re-graded |
 
 The old narration fail was a reply saying it had dropped the "reviewer asked"
@@ -108,13 +109,12 @@ intended (`edges.mjs`):
 
 ### What the calibration does not settle
 
-- **The judged grader's calibration is the probe below, not these reps.** A
-  judge runs only inside a run, so the 10/10 above is a hand grade of the ten
+- **The judged graders' calibration is the two probes below, not these reps.**
+  A judge runs only inside a run, so each 10/10 above is a hand grade of the ten
   simulated files (`*.commits.txt` beside the traces). Gate rep 1 and gate
   rep 3 on Sonnet give the reason and then an imperative ("Render
   batch.currency…"); the rubric asks why the currency appears, not what tense
   the body uses. So hand grading passes both.
-- **No grader reads the subjects.** See the probe below for why.
 - **A rep that never writes `commits.txt` fails all three regex graders and
   the judged one** as "grader threw". That is a missing file, not a trailer or
   a narration, so read the rep's trace before counting it.
@@ -125,8 +125,8 @@ intended (`edges.mjs`):
 ### Reading a first run of the rewritten case
 
 - Check that every rep wrote `commits.txt` before reading any rate.
-- Hand-read any `currency-body-says-why` fail from the file the run JSON
-  keeps as its evidence. The probe calibrated the grader on six files, which
+- Hand-read any fail of the two judged graders from the file the run JSON
+  keeps as its evidence. The probes calibrated them on six and ten files, which
   is too few to trust a fail unread.
 - Read a rise in `no-default-trailer` against the 0/10 above. It is the
   measured failure queued against `writing-commit-messages`, not an
@@ -195,19 +195,37 @@ What the table shows:
   subject, not the currency body.
 - **The body condition alone agrees with the hand label on all six files,**
   one of them a real fail. It is the grader now, byte for byte as probed
-  (`80f3137`). Its "judged elsewhere" clause scopes the judge; it is not a
-  claim that another grader reads the subjects.
+  (`80f3137`).
 - **The subject condition alone is unstable.** It passes "Fix punctuation in
   the request table row-count comment" in reps 1 and 3, and fails "Fix
   punctuation in the request table's row-count comment" (rep 2) and "…heading
   comment" (rep 4).
-- **The subject split is also a rubric question, not only a judge one.** The
-  hand label reads such a subject as stating the outcome, because it names the
+- **The subject split was also a rubric question, not only a judge one.** The
+  hand label read such a subject as stating the outcome, because it names the
   change and its place. The skill's own line for a tiny change, "say what is
-  now correct", reads the other way.
-- **Until the maintainer rules which reading the rubric means, no grader reads
-  the subjects.** A grader the judge splits on near-identical input would
-  report the judge.
+  now correct", reads the other way. **The maintainer ruled for the first
+  reading:** a subject that names what its commit changed and where states the
+  outcome, whatever verb it opens with.
+
+### The subject grader, reworded to the ruling and probed
+
+The subject condition was reworded to the ruling. A subject passes when it
+names the change and the code or text it is in, and the rubric says the
+opening verb does not matter. It names the empty forms that fail: "Fix typo",
+"Update summary", "Address review comments", "WIP".
+
+The whole of the ruled side passes, so the kept logs alone could not show the
+grader passing a bad subject. The probe therefore took ten logs:
+
+- five from the first run;
+- two from round 48 whose comment subjects open "Clarify the…" and "Fix the
+  comma splice in…";
+- three copies of rep 2, each with one subject swapped for an empty form.
+
+Same throwaway recipe, $0.81. **Every cell agreed with the hand label written
+before the run, nine votes of nine:** the seven real logs pass and the three
+swapped ones fail. `subjects-state-the-outcome` is that text byte for byte
+(`0ca229b`).
 
 ### Where the evidence lives
 
@@ -223,8 +241,9 @@ maintainer's machine, holds:
   `evals/results/round-51@confirm.json`, whose `evidence` field holds each
   file the judge was shown.
 
-`evals/results/task51-judge-probe/` holds the probe's throwaway plugin with
-its hand labels and both batch scripts. The probe's run JSON is
-`evals/results/round-51@judge-probe.json`.
+`evals/results/task51-judge-probe/` holds both probes' throwaway plugins
+(`plugin/`, `plugin-subjects/`) with their hand labels, and the batch scripts.
+The probes' run JSONs are `evals/results/round-51@judge-probe.json` and
+`round-51@subject-probe.json`.
 
 Usage is in each script's header.
