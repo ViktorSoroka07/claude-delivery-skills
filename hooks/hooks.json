@@ -32,6 +32,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-gate.py\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [

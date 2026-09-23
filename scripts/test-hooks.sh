@@ -387,6 +387,123 @@ lacks "uncommitted hook does not name the old side of a rename" "$out" "f.py"
 out=$(stop_payload "$WORK" s20d | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
 empty "uncommitted hook stays silent outside a repository" "$out"
 
+echo
+GATE_HOOK="$ROOT/hooks/skill-gate.py"
+GSTATE="$WORK/gate-state"
+mkdir -p "$GSTATE"
+
+gate() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
+  "$PY" -c 'import json, sys
+tool, session, agent, transcript, value = sys.argv[1:6]
+key = {"Bash": "command", "Write": "file_path", "Edit": "file_path", "Agent": "prompt"}[tool]
+p = {"hook_event_name": "PreToolUse", "session_id": session, "transcript_path": transcript,
+     "tool_name": tool, "tool_input": {key: value}}
+if agent:
+    p["agent_id"] = agent
+print(json.dumps(p))' "$@" | TMPDIR="$GSTATE" "$PY" "$GATE_HOOK"
+}
+
+skill_call() { # $1 = skill; one transcript line holding a Skill tool call
+  printf '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"delivery-skills:%s"}}]}}\n' "$1"
+}
+
+DENY='"permissionDecision": "deny"'
+MEM="$WORK/home/.claude/projects/-work-repo/memory"
+printf '{"type":"user","message":{"content":"ship it"}}\n' > "$WORK/t-none.jsonl"
+skill_call writing-commit-messages > "$WORK/t-commit.jsonl"
+printf '{"type":"user","message":{"content":"<command-name>/delivery-skills:writing-commit-messages</command-name>"}}\n' > "$WORK/t-slash.jsonl"
+printf '{"type":"user","message":{"content":"Call the Skill tool with delivery-skills:writing-commit-messages"}}\n' > "$WORK/t-prose.jsonl"
+
+# 21. Skill gate: an act the session chose on its own is stopped once until the
+#     skill that owns it is loaded, and never twice - a second stop on the same
+#     act is a block.
+printf '' | TMPDIR="$GSTATE" "$PY" "$GATE_HOOK"
+check "skill gate fails open on empty stdin" 0 $?
+
+out=$(gate Bash g1 '' "$WORK/t-none.jsonl" 'git commit -m x')
+check "skill gate exits 0 when it stops" 0 $?
+contains "skill gate stops a commit with no load in the transcript" "$out" "$DENY"
+contains "skill gate names the commit's skill" "$out" "delivery-skills:writing-commit-messages"
+contains "skill gate's reason opens by saying it is no error" "$out" "Not an error"
+out=$(gate Bash g1 '' "$WORK/t-none.jsonl" 'git commit -m x')
+empty "skill gate stands aside on the retry of a stopped act" "$out"
+
+out=$(gate Bash g2 '' "$WORK/t-commit.jsonl" 'git commit -m x')
+empty "skill gate passes a commit once its skill is loaded" "$out"
+out=$(gate Bash g3 '' "$WORK/t-slash.jsonl" 'git commit -m x')
+empty "skill gate counts a slash-command load" "$out"
+out=$(gate Bash g4 '' "$WORK/t-prose.jsonl" 'git commit -m x')
+contains "skill gate does not count the skill's name in prose as a load" "$out" "$DENY"
+
+out=$(gate Bash g5 '' "$WORK/t-none.jsonl" 'gh pr create --title t --body b')
+contains "skill gate stops a GitHub pull request create" "$out" "delivery-skills:writing-pr-descriptions"
+out=$(gate Bash g6 '' "$WORK/t-none.jsonl" 'az repos pr create --title t')
+contains "skill gate stops an Azure DevOps pull request create" "$out" "delivery-skills:writing-pr-descriptions"
+out=$(gate Write g7 '' "$WORK/t-none.jsonl" "$MEM/feedback.md")
+contains "skill gate stops a Write into a memory directory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Edit g8 '' "$WORK/t-none.jsonl" "$MEM/MEMORY.md")
+contains "skill gate stops an Edit in a memory directory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g9 '' "$WORK/t-none.jsonl" "cat > \"$MEM/note.md\" <<'EOF'
+body
+EOF")
+contains "skill gate stops a shell redirect into a memory directory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Agent g10 '' "$WORK/t-none.jsonl" 'review the diff')
+contains "skill gate stops the first subagent dispatch" "$out" "delivery-skills:delegating-to-subagents"
+
+out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cat $MEM/MEMORY.md 2>/dev/null")
+empty "skill gate passes a read of the memory store" "$out"
+out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cp $MEM/MEMORY.md $WORK/backup.md")
+empty "skill gate passes a copy out of the memory store" "$out"
+out=$(gate Write g11 '' "$WORK/t-none.jsonl" "$WORK/repo/memory/notes.md")
+empty "skill gate passes a write to a memory directory outside the store" "$out"
+
+out=$(gate Bash g12 '' "$WORK/t-none.jsonl" 'echo "then git commit -m x and gh pr create"')
+empty "skill gate does not read quoted text as an act" "$out"
+out=$(gate Bash g12 '' "$WORK/t-none.jsonl" "$(printf 'cat <<EOF\ngit commit -m x\nEOF')")
+empty "skill gate does not read a heredoc body as an act" "$out"
+out=$(gate Bash g12 '' "$WORK/t-none.jsonl" 'git log --grep "gh pr create"')
+empty "skill gate does not read a quoted search term as an act" "$out"
+out=$(gate Bash g12 '' "$WORK/t-none.jsonl" 'git help commit')
+empty "skill gate does not read git help commit as a commit" "$out"
+out=$(gate Bash g12 '' "$WORK/t-none.jsonl" 'git commit --help')
+empty "skill gate passes a help invocation" "$out"
+out=$(gate Bash g13 '' "$WORK/t-none.jsonl" "$(printf 'git commit -q -F - <<EOF\nNote the PR\n\nOpen it with gh pr create later.\nEOF')")
+contains "skill gate stops a heredoc commit as a commit" "$out" "delivery-skills:writing-commit-messages"
+lacks "skill gate does not read the heredoc body's pull request as an act" "$out" "writing-pr-descriptions"
+
+out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
+contains "skill gate names every unloaded act of a command in one stop" "$out" "writing-pr-descriptions"
+contains "skill gate's combined stop names the commit's skill too" "$out" "writing-commit-messages"
+out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
+empty "skill gate stands aside on the combined command's retry" "$out"
+
+mkdir -p "$WORK/parent/subagents"
+skill_call writing-commit-messages > "$WORK/parent.jsonl"
+printf '{"type":"user","message":{"content":"commit the fix"}}\n' > "$WORK/parent/subagents/agent-a1.jsonl"
+skill_call writing-commit-messages > "$WORK/parent/subagents/agent-a2.jsonl"
+out=$(gate Bash g15 '' "$WORK/parent.jsonl" 'git commit -m x')
+empty "skill gate passes the parent whose own transcript has the load" "$out"
+out=$(gate Bash g15 a1 "$WORK/parent.jsonl" 'git commit -m x')
+contains "skill gate stops a subagent whose parent loaded the skill and it did not" "$out" "$DENY"
+out=$(gate Bash g15 a2 "$WORK/parent.jsonl" 'git commit -m x')
+empty "skill gate passes a subagent that loaded the skill itself" "$out"
+out=$(gate Bash g1 a3 "$WORK/t-none.jsonl" 'git commit -m x')
+contains "skill gate's stop of the parent does not let a subagent's act through" "$out" "$DENY"
+
+out=$(gate Bash g16 a9 "$WORK/no-such-parent.jsonl" 'git commit -m x')
+contains "skill gate stops once where the transcript is absent" "$out" "$DENY"
+out=$(gate Bash g16 a9 "$WORK/no-such-parent.jsonl" 'git commit -m x')
+empty "skill gate never blocks where the transcript is absent" "$out"
+out=$(printf '{"tool_name":"Bash","tool_input":{"command":"git commit -m x"}}' | TMPDIR="$GSTATE" "$PY" "$GATE_HOOK")
+empty "skill gate passes an input with no session to key its stop on" "$out"
+out=$(printf '{"session_id":"g17","tool_name":"Bash","tool_input":"git commit -m x"}' | TMPDIR="$GSTATE" "$PY" "$GATE_HOOK")
+empty "skill gate passes a tool input that is not an object" "$out"
+mkdir -p "$WORK/blocked-state"
+printf 'x' > "$WORK/blocked-state/delivery-skills-gate"
+out=$(printf '{"session_id":"g18","transcript_path":"%s","tool_name":"Bash","tool_input":{"command":"git commit -m x"}}' "$WORK/t-none.jsonl" | TMPDIR="$WORK/blocked-state" "$PY" "$GATE_HOOK")
+check "skill gate exits 0 where its stop cannot be recorded" 0 $?
+empty "skill gate does not stop an act whose stop it cannot record" "$out"
+
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
   exit 0
