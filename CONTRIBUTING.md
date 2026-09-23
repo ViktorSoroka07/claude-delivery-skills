@@ -551,6 +551,38 @@ Rules that held in practice, each answering a failure seen here:
   binds every run, or declined** - and where it is declined, the entry says
   that the effect was below the instrument rather than that the wording
   failed, which are different findings about the mechanism.
+- **A draw bought to re-check a reading is read without the draw that
+  prompted it.** A rate that looks wrong is what buys the extra reps, so
+  pooling them with the draw that looked wrong counts that draw twice - once
+  as the reason the re-check was bought and again as evidence for what it
+  found - and a draw picked out for looking wrong overstates the gap on
+  average, which pooling carries into the verdict. Size the re-check by the
+  floor above on its own draws, and set its bar on those draws alone before
+  they run. The same holds for every purchase after it: a re-check whose own
+  reading comes back undecided and buys more draws is itself a prompting
+  reading, so the new draws are read without it too, unless the extension
+  and its bar on all the draws were fixed before the first of them ran. The
+  pooled rate may stand beside the bar, never in its place. A re-check that
+  does not convict leaves a gap below its floor open, not cleared. And
+  whenever one grader of many crosses a threshold - the one that prompted a
+  re-check included - say how many were read, since the more graders a round
+  reads, the likelier one of them crosses by chance alone. The instance is
+  the commit case, read on the suite's model as a neighbour of the brief's
+  first-tool-call line and the skill gate. The grader asking the currency
+  commit's body to say why read 2/5 on the first draw of the plugin carrying
+  both, against 14/15 by hand on fifteen earlier reps with neither the line
+  nor a gate that fired, ten of them on the case's earlier prompt. The
+  re-check's bar, set on its own five draws before they ran, met 3/5 and came
+  back undecided; the session then pooled, read 5/10 against 14/15 as a cost,
+  and five more draws were bought, reading 4/5 - every draw by hand as by the
+  judge. Pooled, 9/15 against 14/15 is p ≈ 0.04, one-sided by an exact test,
+  and a bar the session had set on the pooled rate said decline; read without
+  what prompted them, the second draw is p ≈ 0.14 and the third p ≈ 0.45 -
+  7/10 together, p ≈ 0.16 - and fourteen graders had been read across the two
+  cases watched as neighbours. The line landed, and since ten reps against
+  14/15 convict only an observed gap of about four in ten or wider (5/10 is
+  p ≈ 0.02, 6/10 p ≈ 0.06), its body row stays a watched cost that the case's
+  next round reads first.
 - **Before the floor, check that a rep reaches the condition the rule fires
   on.** The floor sizes the gap two arms can separate; it does not ask the
   prior question, whether a rep ever puts the model in the state the rule
