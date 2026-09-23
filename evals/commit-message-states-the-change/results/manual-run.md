@@ -9,14 +9,16 @@ pasted none of it, one saying only that the output was "above". A reply that pas
 a grader that looks for what the commits must not carry, so all 21 commits
 carried the harness's default trailer while `no-default-trailer` read 5 of 10
 passing. The run now redirects the same command into `commits.txt`, and every
-outcome grader reads that file (`89e50c0`, `d406247`):
+outcome grader reads that file (`89e50c0`, `d406247`, `80f3137`):
 
 - `no-default-trailer` and `no-narration`: regex, `not_contains`, over the file.
 - `two-workstreams-two-commits`: a regex that counts the run's new commits by
   which of the fixture's two subjects the three-entry log still shows.
-- `messages-state-the-change`: the old rubric's other half, a judged grader on
-  the same file. It checks for outcome subjects and a body saying why the
-  currency appears.
+- `currency-body-says-why`: a judged grader on the same file, asking one of
+  the old rubric's two other conditions - that the currency commit's body say
+  why the currency appears. The other, that every subject state its commit's
+  outcome, has no grader: its judge split near-identical subjects (the probe
+  below), and which reading the rubric means waits on the maintainer.
 
 `skill-was-invoked` is unchanged.
 
@@ -68,7 +70,7 @@ every landed commit command, taken at task 48's stop and re-read here:
 | `no-default-trailer` | 0/10 | 5/10 | 0/10 |
 | `no-narration` | 10/10 | 9/10 | 10/10 |
 | `two-workstreams-two-commits` | 10/10 | 2/10, judged on the reply | 10/10 |
-| `messages-state-the-change` | 10/10 | - | judged; not re-graded |
+| `currency-body-says-why` | 10/10 | - | judged; not re-graded |
 
 The old narration fail was a reply saying it had dropped the "reviewer asked"
 framing. No commit it made carries the phrase.
@@ -106,13 +108,13 @@ intended (`edges.mjs`):
 
 ### What the calibration does not settle
 
-- **`messages-state-the-change` is read by hand, not by its rate.** A judge
-  runs only inside a run, so its 10/10 here is a hand grade of the ten
+- **The judged grader's calibration is the probe below, not these reps.** A
+  judge runs only inside a run, so the 10/10 above is a hand grade of the ten
   simulated files (`*.commits.txt` beside the traces). Gate rep 1 and gate
-  rep 3 on Sonnet write the reason and then an imperative ("Render
+  rep 3 on Sonnet give the reason and then an imperative ("Render
   batch.currency…"); the rubric asks why the currency appears, not what tense
-  the body uses. So hand grading passes both. The first run's judge disagreed
-  with the hand grade in three reps of five (next section).
+  the body uses. So hand grading passes both.
+- **No grader reads the subjects.** See the probe below for why.
 - **A rep that never writes `commits.txt` fails all three regex graders and
   the judged one** as "grader threw". That is a missing file, not a trailer or
   a narration, so read the rep's trace before counting it.
@@ -123,8 +125,9 @@ intended (`edges.mjs`):
 ### Reading a first run of the rewritten case
 
 - Check that every rep wrote `commits.txt` before reading any rate.
-- Hand-grade `messages-state-the-change` from the file the run JSON keeps as
-  its evidence.
+- Hand-read any `currency-body-says-why` fail from the file the run JSON
+  keeps as its evidence. The probe calibrated the grader on six files, which
+  is too few to trust a fail unread.
 - Read a rise in `no-default-trailer` against the 0/10 above. It is the
   measured failure queued against `writing-commit-messages`, not an
   instrument change.
@@ -144,7 +147,7 @@ ran 8 or 9 turns.
 | `no-default-trailer` | 0/5 | 0/5 - all ten commits carry the trailer |
 | `no-narration` | 5/5 | 5/5 |
 | `two-workstreams-two-commits` | 5/5 | 5/5 |
-| `messages-state-the-change` | 1/5 | 4/5 |
+| `messages-state-the-change`, since replaced | 1/5 | 4/5 |
 | `skill-was-invoked` | 5/5 | 5/5 |
 
 The mechanical graders read as calibrated. The judged one does not:
@@ -157,13 +160,54 @@ The mechanical graders read as calibrated. The judged one does not:
 - The one rep it passed is the one whose comment commit's subject does not
   open with "Fix". Reps 1 to 4 open "Fix punctuation in…", and rep 5 opens
   "Correct the … punctuation".
-- The likely reading is that the judge matches "Fix punctuation" against the
-  rubric's "fix typo". That is unconfirmed: the runner keeps no judge
-  rationale, and this is only the one variable separating the pass from the
-  fails.
+- That one variable is the cause. The probe below changed only that word in
+  rep 2's file and flipped the verdict.
 
-Until a judge probe on these five files settles the cause
-(`evals/judge-calibration.md` has the recipe), read this grader by hand.
+### The judge probe, and the grader it left
+
+These five files were put back through the judge, following the recipe in
+`evals/judge-calibration.md`:
+
+- a throwaway plugin whose scaffold writes each file as `commits.txt`;
+- a sixth file, rep 2's with only "Fix" changed to "Correct" in its comment
+  subject;
+- three graders: the old rubric byte for byte, and its two conditions as one
+  grader each;
+- three reps per file under `--judge-model sonnet`, with the agent on Haiku,
+  since its only task is to reply with one word;
+- hand labels written before any verdict was read.
+
+Cost: $0.92. Every cell was unanimous, nine votes of nine either way.
+
+| File | Old rubric | Subjects alone | Currency body alone | Hand (all three) |
+|---|---|---|---|---|
+| rep 1 | F | P | P | P, P, P |
+| rep 2 | F | F | P | P, P, P |
+| rep 2, "Correct" | P | P | P | P, P, P |
+| rep 3 | F | P | P | P, P, P |
+| rep 4 | F | F | F | F, P, F |
+| rep 5 | P | P | P | P, P, P |
+
+What the table shows:
+
+- **The one-word change flips the old rubric** from no votes of nine to all
+  nine. That confirms the cause: the comment commit's "Fix punctuation…"
+  subject, not the currency body.
+- **The body condition alone agrees with the hand label on all six files,**
+  one of them a real fail. It is the grader now, byte for byte as probed
+  (`80f3137`). Its "judged elsewhere" clause scopes the judge; it is not a
+  claim that another grader reads the subjects.
+- **The subject condition alone is unstable.** It passes "Fix punctuation in
+  the request table row-count comment" in reps 1 and 3, and fails "Fix
+  punctuation in the request table's row-count comment" (rep 2) and "…heading
+  comment" (rep 4).
+- **The subject split is also a rubric question, not only a judge one.** The
+  hand label reads such a subject as stating the outcome, because it names the
+  change and its place. The skill's own line for a tiny change, "say what is
+  now correct", reads the other way.
+- **Until the maintainer rules which reading the rubric means, no grader reads
+  the subjects.** A grader the judge splits on near-identical input would
+  report the judge.
 
 ### Where the evidence lives
 
@@ -178,5 +222,9 @@ maintainer's machine, holds:
 - the first run's five traces (`confirm-rep*.jsonl`). Its run JSON is
   `evals/results/round-51@confirm.json`, whose `evidence` field holds each
   file the judge was shown.
+
+`evals/results/task51-judge-probe/` holds the probe's throwaway plugin with
+its hand labels and both batch scripts. The probe's run JSON is
+`evals/results/round-51@judge-probe.json`.
 
 Usage is in each script's header.
