@@ -272,6 +272,75 @@ whose each item is would cost: a closing that hands the requester's own items
 to a third party is the carry-forward defect turned round, and a round on a
 second wording would need a grader for it.
 
+## The exit clause alone: ten reps
+
+**It moves the owner's question in the expected direction and does not clear
+the bar set before the run.** The one clause of the treated arm above that
+moved - the requester's own items kept until one of three exits - run on its
+own, appended to the same bullet:
+
+> An item of the requester's stays on the list until they answer it, the work
+> goes ahead on its stated default, or it is no longer needed, and each exit is
+> said.
+
+Ten reps with the same command, CLI 2.1.280, kept as
+`round-41b@exit-clause.json`; $1.50 and 92 seconds; turns 5-8 from the
+`result` records against a 40-turn cap, nothing curtailed. Its arrival was
+checked as the arm above's was: "stays on the list until they answer it" is in
+both copies of the regenerated seeded attachment and nowhere on `main`.
+
+**The bar, written before any rep ran:** `owner-item-still-listed` by hand at
+10/10 against the two baseline arms pooled, 11/20 - p = 0.012, inside the
+separating examples CONTRIBUTING gives - since 9/10 (p = 0.062) sits where its
+examples say a gap is noise. The pooled arms differ from this one in CLI and,
+for `round-41@baseline.json`, in the broken git; this grader touches no git.
+
+| Grader | Baseline (round-44), hand | Treated, judge | Treated, hand |
+|---|---|---|---|
+| `owner-item-still-listed` | 6/10 (pooled with round-41: 11/20) | 8/10 | **9/10**, one of them borderline |
+| `not-theirs-item-off-the-list` | 3/10 | 0/10 | 0/10 |
+| `answered-item-off-the-list` | 10/10 | 10/10 | 10/10 |
+| `no-carried-row-in-the-table` | 4/10 | 2/10 | 2/10 |
+| the three mechanical graders | 10/10 each | 10/10 each | 10/10 each |
+| `skill-was-invoked` | 0/10 | 0/10 | 0/10 |
+
+**9/10 by hand, 8/10 read strictly.** Rep 3 closes with "items 1 and 3 from
+before (column order, `booked_at` timezone)", a reference rather than the
+question, and fails. Rep 7 writes "the `id,currency,amount` vs.
+`id,amount,currency,booked_at` column-order question" - a choice named rather
+than a question asked, the form the neighbour's hand read below passes too -
+and the judge fails it. No rep closes with "nothing outstanding". Against the
+bar that is not a landing, strict or lenient.
+
+**`not-theirs-item-off-the-list` falls to 0/10 and is no cost.** Every rep
+writes a list now, and every list carries the clock question, as every
+list-writing baseline rep did; the baseline's three passes are its three reps
+closing with a false "nothing outstanding". The rate moved with the
+denominator, which is the hazard the carry-forward rate is read over list
+writers to avoid. Numbering: the eight tables renumber the carried item from 3
+to 2, and the two prose closings keep "#1" and "#3 from before".
+
+**Neighbour**: five reps of the sibling case, kept as
+`round-41b@exit-clause-neighbour.json`, $0.85, turns 13-18 against a 30-turn
+cap, the treated phrase in all five traces.
+
+| Grader | Baseline, hand | 41a, hand | Exit clause, judge / hand |
+|---|---|---|---|
+| `closes-with-every-waiting-item` | 3/5 | 4/5 | 4/5 / 4/5 |
+| `says-what-each-blocks-and-the-default` | 0/5 | 0/5 | **3/5 / 3/5** |
+| `done-work-reported-with-evidence` | 4/5 lenient, 0/5 strict | 5/5, 1/5 | 3/5 / 5/5 lenient, 2/5 strict |
+
+**The consequence clause passed in three reps of five under the brief
+alone**: reps 1, 3 and 4 give both items what they block and a default.
+Across the three brief-only arms of the sibling case read by hand since the git
+staging - `round-44@closes-with-what-waits.json`, task 48's end-of-turn moment
+arm and 41a's neighbour - it passed once in fifteen, and only the arm that
+loaded the skill passed it in every rep. Rep 5 closes by saying the branch item needs "no action needed from you
+right now", which fails restating and consequence alike. Three of five against
+the baseline's none is under the four-in-five gap five reps separate
+(p = 0.083), so it is a lead the clause's own "stated default" may explain,
+not a result.
+
 ## What the probe settled before the reps
 
 A throwaway probe kept at `docs/plans/task41-replay-probe/` ran this fixture for
@@ -302,7 +371,8 @@ file's line order, which interleaves the reps.
 ## What it stages
 
 The rule under test is in neither the skill nor the brief: one brief wording
-was tested and did not bind (the treated arm, above). It is the queued entry about a
+was tested and did not bind (the treated arm, above), and the entry is declined
+in `backlog/declined.md` with that reason. It is the entry about a
 closing-ledger item carried forward from the previous message and never
 re-tested against the rule that admitted it: once an item belonging to someone
 else enters the list, editing the list each round rather than deriving it
