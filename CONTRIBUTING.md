@@ -846,12 +846,14 @@ are read in the same pass from a diff over those files alone.
 **The pass is its own unit of work**, never started inside a task - reading tens
 of commits' prose for sense and executing a task well do not share one session's
 attention. It is due when the diff passes about 150 changed lines, when a push
-is about to be handed over whatever the size, or when two task units have landed
-since the last one, whichever comes first. It closes by fixing what it found,
-one workstream per commit, and then moving the tag to the head it read
-(`git tag -f prose-passed <sha>`). **Moving the tag is the pass's only durable
-output**, so a pass that skips it will be redone from the wrong place - and a
-session that finds the threshold crossed says so at its stop rather than
+is about to be handed over whatever the size, or when two task units that
+changed that pathspec or one of the three files' headers have landed since the
+last one, whichever comes first - a unit that wrote only run records, eval
+files or backlog entries leaves the pass nothing to read. It closes by fixing
+what it found, one workstream per commit, and then moving the tag to the head
+it read (`git tag -f prose-passed <sha>`). **Moving the tag is the pass's only
+durable output**, so a pass that skips it will be redone from the wrong place -
+and a session that finds the threshold crossed says so at its stop rather than
 absorbing the pass into the task in hand.
 
 ## If something already landed
