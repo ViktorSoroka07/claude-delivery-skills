@@ -7,14 +7,15 @@ arm: with-only
 ---
 
 The prompt does not name the skill. Whether the run loads it is the trigger
-test, and it carries a second job here: the rule under test lives in the skill's
-own text, so a rep that never loads it cannot show a wording change either way.
+test and nothing else. No rep of this case has called the Skill tool, so the
+skill's own text reaches none of them, and a wording round here tests the
+brief's text instead - which this grader cannot see, reading 0 in both arms.
 Marked `arm: with-only` — the arm without the plugin cannot pass it, so it is
 shown as a plugin-fired indicator and scored in neither arm.
 
 A resumed run gets no `SessionStart` brief from the hook, whose matcher is
 `startup|clear|compact`; the fixture carries the brief as the attachment a
-recorded session writes. Whether a resume re-renders that attachment into the
-run's context is unverified, so this grader's rate across the first reps is also
-the answer to it: the skill advertised by its own description is the other route
-in.
+recorded session writes, and a resume does re-render it into the run's context
+(the case record has the probe that settled it). So an arm's brief text is
+confirmed from its regenerated `history.jsonl`, by a phrase only that arm's
+text has, not from this grader.
