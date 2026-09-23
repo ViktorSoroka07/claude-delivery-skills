@@ -318,6 +318,20 @@ no pattern reaches it, and a judged rubric is the instrument even where it
 grades harshly. Both were tried on one family and the trial is written up under
 the judge paragraph below.
 
+**A calibration whose reps all land on one side of a grader tests only one of
+its two errors.** Reps that all pass can show it failing a good rep, never
+passing a bad one, and reps that all fail show the reverse. The gap is widest
+on a pattern that must not match, because the side left out is the failure the
+grader exists to catch: on a set with no failure in it, a pattern that matches
+nothing reads exactly as well as one that matches every failure. The commit
+case's narration list read ten of ten on ten reps of the suite's model, none of
+which narrated, and five of five on five reps of a smaller model run on the
+same fixture, three of which narrate by hand in words the list lacked; only the
+second set could show it. Calibrate a grader on reps from both sides of its
+line - a smaller model's, a baseline arm's, or artifacts written to sit just
+across it, which a regex scores for nothing - and where no rep from the other
+side exists, say beside the rate which of its errors is untested.
+
 **The default judge is the weakest part of the instrument, and the next baseline
 is run with `--judge-model sonnet`.** Scored against hand labels on two kept
 findings files — one that should pass the rubric it is put through and one that
