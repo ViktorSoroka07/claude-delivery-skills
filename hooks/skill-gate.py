@@ -2,11 +2,14 @@
 """PreToolUse hook (Bash, Write, Edit, Agent): stop an act once until the
 skill that owns it is loaded.
 
-A skill loads when the request names its work. A commit, a pull request, a
-memory write or a subagent dispatch the session chooses on its own names
-nothing, and the skill that owns the act stays unread. Context added here
-arrives beside the call's result, one act too late for a commit whose message
-is already in the command, so the gate stops the call instead: once per act per
+A skill the user does not invoke by name loads only when the model decides to:
+reliably only where the request names its work, and not always then. A commit,
+a pull request, a memory write or a subagent dispatch the session chooses on
+its own names no such work, and in the sessions behind this repo most of those
+that committed or wrote memory did so with the owning skill unread, as did
+five of the thirteen that opened a pull request. Context added here arrives
+beside the call's result, one act too late for a commit whose message is
+already in the command, so the gate stops the call instead: once per act per
 conversation, with a reason naming the skill, so the session loads it and runs
 the act again, rewritten where the skill changes it. A session that declines
 the skill loses one turn.
