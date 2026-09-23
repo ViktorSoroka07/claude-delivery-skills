@@ -274,7 +274,18 @@ evidence, and the five rules are not interchangeable:
   through, read those rates across the arms rather than a run at a time, and
   hand-read the draw of every rep one of them fails - which needs `--keep-temp`
   on the invocation, since the runner deletes each run's workspace and a fail
-  whose trace is gone cannot be read at all.
+  whose trace is gone cannot be read at all. **And the runner counts a call a
+  hook refused as a call**: it keeps every `tool_use` in the trace and flags a
+  refused one, but reads that flag only for mock tallies, so a grader on an act
+  a hook can stop reads the stopped attempt as the act. The plugin's own skill
+  gate stops a commit, a pull request create, a memory write and a subagent
+  dispatch once each until the skill that owns the act is loaded, so under it a
+  `min: 1` grader on `Agent` passes a rep whose one dispatch was refused, and a
+  pattern over `git commit` commands reads a narrated message the gate turned
+  away as the one that landed. Anchor a grader on such an act in what the act
+  leaves behind - the log the commits landed in, the file a dispatch was told to
+  write - or count the refused calls out of the trace by hand before its rate is
+  read.
 - **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
   `arm: with-only`: under the two-arm run it is shown and scored in neither
   arm, and the arm without the plugin never evaluates it, so it cannot throw
