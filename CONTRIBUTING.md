@@ -300,31 +300,33 @@ evidence, and the five rules are not interchangeable:
   outcome can do. Under `--ablation none` the mark does nothing and the
   grader is scored like any other. **And a skill whose condition is a standing
   rule rather than a named task is not reached through that tool by being
-  named.** Across this suite's kept runs the indicator stood at 59/59 on the
-  cases whose prompt names work the skill owns - review this, sync these,
-  file that, prune the store - and at 0/13 on the two whose skill fires on
-  how a message ends, which no prompt ever asks for, though the brief named
-  that skill and its trigger; a hand read of ten of those traces found no
-  Skill call and no sentence of the skill's own body anywhere in them. The
-  brief reaching the model is a different event and does not imply it: a
-  probe on the same seeded file answered that the brief was present, while
-  the ten reps that resumed that file invoked the skill in none - so a brief
-  that names a skill and tells the session to call it is no evidence the
-  session will. That first half takes a probe of its own: a rep's trace
-  carries its own turns only, so what a resume put in context is not readable
-  from it. **What reaches such a skill is a moment the session acts on.** The
-  brief makes a conversation's first tool call a load of
-  `tracking-open-asks`, which put it first in five reps of five on a fresh
-  conversation and in none of five resumed ones, whose first call reads as
-  spent; and the skill gate stops a commit, a pull request create, a memory
-  write and a subagent dispatch once each until the skill owning the act is
-  loaded. In every kept rep it stopped - a commit on a smaller model, a
-  dispatch on the suite's - the first call it made after the stop loaded that
-  skill, though the retry passes whether or not one does, and a pull request
-  create or a subagent's own act is unmeasured. No case yet reaches the
-  memory stop, which matches only a path through
-  `.claude/projects/<project>/memory`: a run's own memory sits under its
-  config directory at `config/projects/`, outside that pattern, and the
+  named.** Across the kept runs this was first measured on, all on the
+  suite's model, the indicator stood at 59/59 on the cases whose prompt names
+  work the skill owns - review this, sync these, file that, prune the store -
+  and at 0/13 on the two whose skill fires on how a message ends, which no
+  prompt ever asks for, though the brief named that skill and its trigger; a
+  hand read of ten of those traces found no Skill call and no sentence of the
+  skill's own body anywhere in them. The brief reaching the model is a
+  different event and does not imply it: a probe on the same seeded file
+  answered that the brief was present, while the ten reps that resumed that
+  file invoked the skill in none - so a brief that names a skill and tells
+  the session to call it is no evidence the session will. That first half
+  takes a probe of its own: a rep's trace carries its own turns only, so what
+  a resume put in context is not readable from it. **What reaches such a
+  skill is a moment the session acts on.** The brief makes a conversation's
+  first tool call a load of `tracking-open-asks`, which put it first in every
+  fresh rep measured, all on the suite's model - five of five under an
+  earlier wording with the same imperative, twenty-three of twenty-three
+  under the landed one - and loaded it in none of five reps resuming a
+  conversation under that earlier wording; and the skill gate stops a commit,
+  a pull request create, a memory write and a subagent dispatch once each
+  until the skill owning the act is loaded. In every kept rep it stopped - a
+  commit on a smaller model, a dispatch on the suite's - the first call it
+  made after the stop loaded that skill, though the retry passes whether or
+  not one does, and a pull request create or a subagent's own act is
+  unmeasured. No case yet reaches the memory stop, which matches only a path
+  through `.claude/projects/<project>/memory`: a run's own memory sits under
+  its config directory at `config/projects/`, outside that pattern, and the
   memory case stages its store under `store/projects/`. A case that wants the
   stop aims a write at a path the pattern matches - the gate runs before the
   run's permission check, so it stops even a write the run then refuses - and
