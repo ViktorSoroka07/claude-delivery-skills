@@ -395,7 +395,7 @@ mkdir -p "$GSTATE"
 gate() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
   "$PY" -c 'import json, sys
 tool, session, agent, transcript, value = sys.argv[1:6]
-key = {"Bash": "command", "Write": "file_path", "Edit": "file_path", "Agent": "prompt"}[tool]
+key = {"Bash": "command", "Write": "file_path", "Edit": "file_path", "Agent": "prompt", "Task": "prompt"}[tool]
 p = {"hook_event_name": "PreToolUse", "session_id": session, "transcript_path": transcript,
      "tool_name": tool, "tool_input": {key: value}}
 if agent:
@@ -449,6 +449,8 @@ EOF")
 contains "skill gate stops a shell redirect into a memory directory" "$out" "delivery-skills:maintaining-project-memory"
 out=$(gate Agent g10 '' "$WORK/t-none.jsonl" 'review the diff')
 contains "skill gate stops the first subagent dispatch" "$out" "delivery-skills:delegating-to-subagents"
+out=$(gate Task g24 '' "$WORK/t-none.jsonl" 'review the diff')
+contains "skill gate stops a dispatch under the tool's other name" "$out" "delivery-skills:delegating-to-subagents"
 
 out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cat $MEM/MEMORY.md 2>/dev/null")
 empty "skill gate passes a read of the memory store" "$out"
@@ -537,6 +539,14 @@ done < "$WORK/commands"
 out=$(printf '{"session_id":"g19","transcript_path":"%s","tool_name":"Bash","tool_input":{"command":"git commit -m x"}}' "$WORK/t-none.jsonl" \
   | env PATH="$WORK/shim:$PATH" TMPDIR="$GSTATE" CLAUDE_PLUGIN_ROOT="$ROOT" sh -c "$(grep skill-gate.py "$WORK/commands")")
 contains "registration runs the gate where its script is present" "$out" "$DENY"
+for tool in Bash Write Edit Agent Task; do
+  "$PY" -c 'import json, re, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"]["PreToolUse"]:
+    if any("skill-gate.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0 if re.fullmatch(matcher["matcher"], sys.argv[2]) else 1)
+sys.exit(1)' "$ROOT/hooks/hooks.json" "$tool"
+  check "registration routes $tool to the gate" 0 $?
+done
 
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"

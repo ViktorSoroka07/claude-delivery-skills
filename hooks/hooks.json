@@ -34,7 +34,7 @@
         ]
       },
       {
-        "matcher": "Bash|Write|Edit|Agent",
+        "matcher": "Bash|Write|Edit|Agent|Task",
         "hooks": [
           {
             "type": "command",

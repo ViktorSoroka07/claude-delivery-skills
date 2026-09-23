@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""PreToolUse hook (Bash, Write, Edit, Agent): stop an act once until the
-skill that owns it is loaded.
+"""PreToolUse hook (Bash, Write, Edit, and the dispatch tool under either of
+its names, Agent or Task): stop an act once until the skill that owns it is
+loaded.
 
 A skill the user does not invoke by name loads only when the model decides to:
 reliably only where the request names its work, and not always then. A commit,
@@ -97,7 +98,7 @@ def acts_of(payload):
     tool_input = payload.get("tool_input")
     if not isinstance(tool_input, dict):
         return []
-    if tool == "Agent":
+    if tool in ("Agent", "Task"):
         return ["dispatch"]
     if tool in ("Write", "Edit"):
         return ["memory"] if MEMORY_PATH.search(tool_input.get("file_path") or "") else []
