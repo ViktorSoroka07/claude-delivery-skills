@@ -247,3 +247,56 @@ The probes' run JSONs are `evals/results/round-51@judge-probe.json` and
 `round-51@subject-probe.json`.
 
 Usage is in each script's header.
+
+## The skill gate and the first-tool-call line as a neighbour (48b)
+
+Three draws of five Sonnet reps on a worktree carrying the skill gate
+(`9f4f543`) and the brief's first-tool-call line (`f754b47`), each
+`--ablation none --judge-model sonnet -j 3 --keep-temp` on CLI 2.1.280:
+$0.87, $0.89 and $0.85, in `round-48b@commit-gate-line.json`, `-draw2` and
+`-draw3`. The line reached every rep, read from each trace's `SessionStart`
+output. Every rep's first call was the Skill tool with `tracking-open-asks`,
+and every rep then loaded `writing-commit-messages` before its first commit,
+so the gate stopped nothing, as on round 48's Sonnet arms. Turns ran 10 to 16
+against 8 or 9 on the first run of the rewritten case.
+
+The comparison is the plugin without either, read by hand: this record's
+first run (five reps) and round 48's ten Sonnet reps, whose logs were re-read
+at 48b for the body condition.
+
+| Grader | With both, runner | With both, hand | Without, hand |
+|---|---|---|---|
+| `no-default-trailer` | 0/15 | 0/15 | 0/15 |
+| `no-narration` | 15/15 | 15/15 | 15/15 |
+| `two-workstreams-two-commits` | 15/15 | 15/15 | 15/15 |
+| `subjects-state-the-outcome` | 15/15 | 15/15 | 15/15 |
+| **`currency-body-says-why`** | **9/15** (2, 3, 4 by draw) | **9/15** | **14/15** |
+| `skill-was-invoked` | 15/15 | 15/15 | 15/15 |
+
+**The body row is a watched cost, not a settled one.** The hand reading
+passes a body naming what the missing currency did - ambiguous totals, no
+unit, a unit left implicit, a page with no way to show it - and fails one
+saying only what the code now does, or restating that the currency was
+missing. Two bodies sit on that line: draw 2's rep 2, "so the batch summary
+always rendered without it", fails as a restatement, and draw 3's rep 2,
+"reported the total without indicating its currency", passes as saying what
+the absence did to the total. The same reading gives the fifteen comparison
+bodies 14/15, the fail being the first run's rep 4. Pooled, 9/15 against 14/15
+is p ≈ 0.04 one-sided; but draws 2 and 3 were bought because draw 1 read 2/5,
+and those two alone read 7/10 against 14/15, p ≈ 0.16; and about thirteen
+graders were read across the two neighbour cases, so one near p = 0.04 is weak
+evidence. No mechanism is identified: the one difference on this case is a
+skill load ahead of the commit skill, which still loaded before every commit.
+The line was landed on that reading. **The next round of this case reads this
+row first, by hand, against 14/15**; if a fresh ten reps stay near 9/15, the
+cost is real and the line is that round's subject.
+
+**`skill-was-invoked` now reads a moment as well as the prompt.** A rep that
+reaches a commit without the skill is stopped by the gate and loads it, so
+this row reads 15/15 whichever of the two delivered the load. On Sonnet the
+load came before every commit unprompted, so here it was the prompt.
+
+The trailer rule held in none of the thirty commits, as before. One rep of
+draw 1 first committed both edits without the trailer, then re-made them with
+it - the skill's rule held at the first commit and the harness default at the
+second.
