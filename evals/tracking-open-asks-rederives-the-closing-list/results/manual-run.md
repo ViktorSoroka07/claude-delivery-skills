@@ -153,6 +153,125 @@ both arms, so it predates the staging and is not caused by it. Every rep
 notices it and says so in its reply, which is worth knowing for any rubric read
 over the closing message.
 
+## The treated arm: one brief wording, ten reps
+
+**The wording does not land: it reached every rep and moved the carry-forward
+rate by one rep, which is not the behaviour.** Ten reps against
+`round-44@baseline.json` with the same command - `--ablation none --model
+sonnet --judge-model sonnet --runs 10 -j 3 --keep-temp` - at plugin 1.10.0 on
+CLI 2.1.280, the baseline having run on 2.1.278; kept as
+`round-41a@rebuilt-list.json` with all ten traces. $1.59 and 110 seconds.
+Nothing errored and nothing was curtailed: read from each trace's `result`
+record, the turn spread is 6-8 against the baseline's 5-7 and a 40-turn cap,
+and the duration 11-16s against 10-15s - 24-32s against 21-28s in the runner's
+own figure, which counts the rep's start-up as well.
+
+The treated text is the brief's closing-list bullet with one addition after
+"(one item a sentence, two or more a numbered table)":
+
+> The list is rebuilt each message, never copied from the last one and edited:
+> check each item against where it is recorded (the plan, the tracker, the
+> thread that raised it) for whether it is still open and whether the requester
+> is the one to answer it. An item of theirs stays until they answer it, the
+> work goes ahead on its stated default, or it is no longer needed, and each
+> exit is said; an item someone else must answer leaves with one sentence
+> naming whose it is; a surviving item keeps its number.
+
+**It reached every rep, confirmed from the fixture rather than from
+`skill-was-invoked`.** `make-history.py` regenerated `history.jsonl` in the
+treated tree, and "never copied from the last one and edited" is in both the
+`content` and the `rendered` copy of its seeded attachment and in neither on
+`main`, whose own regeneration came back byte-identical. The continuation
+transcript the runner wrote beside it carries the same attachment, and all ten
+reps' user turns branch off the seeded assistant turn, so the ten resumed that
+file.
+
+| Grader | Type | Baseline, judge / hand | Treated, judge | Treated, hand |
+|---|---|---|---|---|
+| `answered-item-acted-on` | tool_used | 10/10 / 10/10 | 10/10 | 10/10 |
+| `answered-item-off-the-list` | llm | 10/10 / 10/10 | 10/10 | 10/10 |
+| `changelog-carries-the-rename` | regex | 10/10 | 10/10 | 10/10 |
+| `changelog-cut-to-the-release` | regex | 10/10 | 10/10 | 10/10 |
+| `no-carried-row-in-the-table` | regex | 4/10 | 2/10 | 2/10, one of them the screen's blind spot |
+| **`not-theirs-item-off-the-list`** | **llm** | **3/10 / 3/10** | **1/10** | **1/10** |
+| `owner-item-still-listed` | llm | 6/10 / 6/10 | 9/10 | 10/10 |
+| `skill-was-invoked` | tool_used | 0/10 | 0/10 | 0/10 |
+
+Both arms were hand-graded from the traces' final messages before any rate was
+read. **Judge and hand disagree on one cell of thirty**: treated rep 6 restates
+the owner's question as "Keep the legacy column order `id,currency,amount`, or
+use the new `id,amount,currency,booked_at`?", which can be answered from that
+line alone; the judge failed it.
+
+**The carry-forward rate is 1/10 against 0/6, and the one pass is a silent
+drop.** Every treated rep closes with a list holding the owner's column-order
+question, so the denominator is all ten rather than six. Nine carry the
+upstream clock question forward as item 2 for the requester to answer - eight
+as a table row, rep 1 as a numbered line the regex screen cannot see, which is
+why the screen reads 2/10. Rep 8, the one pass, closes with the owner's
+question as a single sentence and says nothing of the clock question at all,
+where the wording asks for one sentence naming whose it is. Against the
+baseline's 0/6 a separation needs about two in three of the treated
+denominator - 6/10 here, by the one-sided Fisher test calibrated on
+CONTRIBUTING's own examples, where 4/5 against 0/5 separates at p = 0.024 and
+9/10 against 5/10 does not at 0.070. 1/10 is p = 0.63.
+
+**No rep in either arm opened the record the wording names.** Across the full
+tool inputs of all twenty traces, no call reads `docs/plans/export-columns.md`
+or `docs/upstream/booked-at-timezone.md`; one treated rep ran `ls docs` and
+went no further. The clause asking for that check needs a read the work gives
+the session no other reason to make, and it bound in no rep. **The clause that
+needs no act did move**: "an item of theirs stays until ..." took the owner's
+own question from 6/10 to 10/10 by hand, and no treated rep closes with
+"nothing outstanding", where three baseline reps did. That is below the floor
+at ten reps an arm - 10/10 against 6/10 is p = 0.043, against the lenient
+7/10 p = 0.105 - and pooling `round-41@baseline.json`'s 5/10 into the baseline
+gives p = 0.012, which is suggestive only, the pooled arm having run on another
+CLI and a broken git (this grader touches no git).
+
+**The numbering clause did not bind, and this fixture can read numbering only
+on the carried item.** The owner's question is item 1 in the seeded list and
+stays 1 in every list of both arms, which renumbering from one produces too, so
+the number the clause protects is unreadable there. The carried clock question
+is readable: it was 3 in the seeded list and is 2 in all nine treated lists
+that carry it, as in all six baseline lists. The renumbering the clause targets
+is in the baseline already.
+
+### The neighbour: the sibling case under the same brief
+
+Five reps of `tracking-open-asks-closes-with-what-waits` under the treated
+plugin, the same command at `--runs 5`, kept as
+`round-41a@rebuilt-list-neighbour.json`, against
+`round-44@closes-with-what-waits.json`. $0.93 and 92 seconds; turns 13-16 in
+both arms against a 30-turn cap. The case is a single prompt, so its brief
+comes from the hook, and the treated phrase is in all five traces.
+
+| Grader | Baseline, judge / hand | Treated, judge / hand |
+|---|---|---|
+| `closes-with-every-waiting-item` | 2/5 / 3/5 | 2/5 / 4/5 |
+| `says-what-each-blocks-and-the-default` | 0/5 / 0/5 | 0/5 / 0/5 |
+| `done-work-reported-with-evidence` | 3/5 / 4/5 | 4/5 / 5/5 |
+| the four mechanical graders | 5/5 each | 5/5 each |
+| `skill-was-invoked` | 0/5 | 0/5 |
+
+**The wording costs the neighbour nothing.** Treated reps 1 and 3 name the
+column-order item as a choice - "legacy `id,currency,amount` vs the new
+header" - rather than as a question, which the hand read passes and the judge
+splits on; rep 5 closes with a sentence referring to both items instead of
+restating them. The consequence clause is 0/5 in both arms. The done-work
+rubric is read leniently in both arms - the value set, named beside the
+changelog entry it came from - and a strict reading, which wants the reason
+stated, gives 1/5 against 0/5.
+
+**One direction of cost no grader reads.** All five treated reps say the
+requester's own two questions wait on "the owner" - "not mine to resolve",
+"waiting on their owners" - against two of five baseline reps. The word is the
+fixture's, whose plan writes "Asked the owner", and five reps an arm separate
+only a four-in-five gap, so this is no finding. But it is the way a rule asking
+whose each item is would cost: a closing that hands the requester's own items
+to a third party is the carry-forward defect turned round, and a round on a
+second wording would need a grader for it.
+
 ## What the probe settled before the reps
 
 A throwaway probe kept at `docs/plans/task41-replay-probe/` ran this fixture for
@@ -182,7 +301,8 @@ file's line order, which interleaves the reps.
 
 ## What it stages
 
-The rule under test is not in the skill yet. It is the queued entry about a
+The rule under test is in neither the skill nor the brief: one brief wording
+was tested and did not bind (the treated arm, above). It is the queued entry about a
 closing-ledger item carried forward from the previous message and never
 re-tested against the rule that admitted it: once an item belonging to someone
 else enters the list, editing the list each round rather than deriving it
@@ -303,6 +423,7 @@ the staleness check - run it after any change to the brief.
 ## Not tested here
 
 That an item left on a default is said to have been; that the numbers stay the
-same from message to message, which this case's answered item makes moot; and
+same from message to message, which this case reads only on the carried item,
+the owner's being first on the seeded list (the treated arm, above); and
 the consequence columns, which the sibling case measures and which no run in
 either arm has yet passed.
