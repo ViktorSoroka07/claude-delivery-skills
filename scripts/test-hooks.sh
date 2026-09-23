@@ -470,6 +470,15 @@ empty "skill gate passes a help invocation" "$out"
 out=$(gate Bash g13 '' "$WORK/t-none.jsonl" "$(printf 'git commit -q -F - <<EOF\nNote the PR\n\nOpen it with gh pr create later.\nEOF')")
 contains "skill gate stops a heredoc commit as a commit" "$out" "delivery-skills:writing-commit-messages"
 lacks "skill gate does not read the heredoc body's pull request as an act" "$out" "writing-pr-descriptions"
+out=$(gate Bash g20 '' "$WORK/t-none.jsonl" "$(printf "cat <<'EOF' > %s/note.md\nbody\nEOF" "$MEM")")
+contains "skill gate stops a memory write whose heredoc marker comes first" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g21 '' "$WORK/t-none.jsonl" "$(printf "cat <<'EOF' | git commit -F -\nNote the PR\n\nOpen it with gh pr create later.\nEOF")")
+contains "skill gate stops a commit piped from a heredoc" "$out" "delivery-skills:writing-commit-messages"
+lacks "skill gate does not read the piped heredoc's pull request as an act" "$out" "writing-pr-descriptions"
+out=$(gate Bash g22 '' "$WORK/t-none.jsonl" "$(printf "cat <<'EOF' | gh pr create --title t --body-file -\nbody\nEOF")")
+contains "skill gate stops a pull request piped from a heredoc" "$out" "delivery-skills:writing-pr-descriptions"
+out=$(gate Bash g23 '' "$WORK/t-none.jsonl" "$(printf "cat <<'EOF' | tee %s/note.md\nit's the body\nEOF" "$MEM")")
+contains "skill gate stops a tee into memory fed by a heredoc" "$out" "delivery-skills:maintaining-project-memory"
 
 out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
 contains "skill gate names every unloaded act of a command in one stop" "$out" "writing-pr-descriptions"

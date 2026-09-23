@@ -57,12 +57,19 @@ ACTS = {
 }
 
 
+def blank_body(m):
+    start = m.start("body") - 1 - m.start()
+    return m.group(0)[:start] + " " * (len(m.group(0)) - start)
+
+
 def blank(command):
-    """Quoted spans and heredoc bodies carry message text, which names acts
-    without running them. Blanking keeps offsets, so a span found in the
-    blanked text reads the same span of the original."""
-    command = HEREDOC.sub(lambda m: " " * len(m.group(0)), command)
-    return QUOTED.sub(lambda m: " " * len(m.group(0)), command)
+    """Heredoc bodies and quoted spans carry message text, which names acts
+    without running them, while the rest of a heredoc's opening line is a
+    command. Blanking keeps offsets, so a span found in the blanked text reads
+    the same span of the original. Returns the command with its heredoc bodies
+    blanked, then with its quoted spans blanked as well."""
+    unfenced = HEREDOC.sub(blank_body, command)
+    return unfenced, QUOTED.sub(lambda m: " " * len(m.group(0)), unfenced)
 
 
 def writes_memory(raw, stripped):
@@ -96,8 +103,7 @@ def acts_of(payload):
         return ["memory"] if MEMORY_PATH.search(tool_input.get("file_path") or "") else []
     if tool != "Bash":
         return []
-    command = tool_input.get("command") or ""
-    stripped = blank(command)
+    command, stripped = blank(tool_input.get("command") or "")
     acts = []
     start = 0
     for end in [m.start() for m in SEPARATOR.finditer(stripped)] + [len(stripped)]:

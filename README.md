@@ -274,8 +274,9 @@ instructions alone cannot:
     conversation, so a session that declines the skill loses one turn, and a
     subagent's acts are keyed apart from its parent's. It reads a shell command by
     pattern, taking a memory write only where a redirect, copy, move, `tee` or
-    in-place edit names the path in full, so a form it does not parse - an act
-    written after a heredoc marker among them - passes.
+    in-place edit names the path in full, so a form it does not parse passes - an
+    act run through `sh -c`, or a write by bare filename after a `cd` into the
+    directory, among them.
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero
