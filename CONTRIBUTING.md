@@ -280,8 +280,8 @@ evidence, and the five rules are not interchangeable:
   call as a call**: it keeps every `tool_use` in the trace and flags one that a
   hook or the run's permission settings refused, but reads that flag only for
   mock tallies, so a grader on an act either can stop reads the stopped attempt
-  as the act. The settings refuse calls with no hook involved: the traces kept
-  under `evals/results/` from before the gate hold 35 such refusals, and in
+  as the act. The settings refuse calls with no hook involved: the trace copies
+  kept under `evals/results/` from before the gate hold 35 such refusals, and in
   three reps `reapplied-the-contradicted-row` counted a refused source mutation,
   each beside one that ran, so no verdict moved. The plugin's own skill
   gate stops a commit, a pull request create, a memory write and a subagent
@@ -484,6 +484,38 @@ which paths are writable, which readable - and whose `out/trace.jsonl` holds
 every command a rep ran with its output. A case file's `execution.env` is real
 but takes `EVAL_*` keys only; everything else a run's environment needs comes
 from the shell the runner is invoked from, or from the scaffold.
+
+**Which tools a run had is settled the same way: a case's `allowed_tools` is
+neither the tool set nor the grant.** The runner starts each run in `dontAsk`
+mode, where a call that would have to ask is refused, and passes it an allow
+list made of every tool the invocation's `--allow-tools` grants - the
+file-writing ones scoped to the workspace and the run's temp directory - plus
+the case list's entries from the runner's read-only set (`Read`, `Glob`,
+`Grep`, `Skill`, `Agent` and a few more). A tool the invocation grants is
+allowed whether the case lists it or not, and a gated tool the case lists
+without a grant is only reported as not granted. Every tool that is neither
+granted nor in that read-only set is withheld from the session, so no call to
+it can occur, not even a refused one; the read-only set is never withheld. The
+`init` event near the head of each trace lists the tools the session holds.
+When this rule was written the run JSONs under `evals/results/` pointed to 192
+kept run roots holding a trace, across seven cases, and in every one that list
+names tools the case never did - on the commit case, whose list names none of
+the three, `Edit` and `Write`, which the invocation granted, and `Task`, the
+name `init` gives the dispatch tool the cases list as `Agent`. Every refusal
+those traces record is of a tool its case does list, turned away by a path
+check - a directory the run's deny rules cover, a file outside the workspace
+under `dontAsk`, a `cd` the checker cannot resolve - or by the skill gate; and
+the one tool the session held that any rep called off its list ran every time.
+The mutation case leaves out `Skill`, so its runs held the tool without an
+allow rule for it; in the arm of its runner re-take that carries the
+first-tool-call line every rep called it twice, the Skill tool's own
+permission check let each call through, and each returned "Launching skill".
+The allow and deny lists are passed on the run's command line and the run root
+keeps neither: its `config/settings.json` carries the sandbox's path policy
+and no block of tool permissions. So read which tools a run had from its
+`init` event, and whether a call to one could run from that call's result,
+never from the case file - nor from the call's presence in the trace, since
+the runner counts a refused call as a call (the `tool_used` rules above).
 
 The runner's two arms are the plugin and no plugin at all, which answers
 whether the plugin changes behaviour; whether one edited sentence does is a
