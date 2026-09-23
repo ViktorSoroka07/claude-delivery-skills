@@ -276,10 +276,14 @@ evidence, and the five rules are not interchangeable:
   through, read those rates across the arms rather than a run at a time, and
   hand-read the draw of every rep one of them fails - which needs `--keep-temp`
   on the invocation, since the runner deletes each run's workspace and a fail
-  whose trace is gone cannot be read at all. **And the runner counts a call a
-  hook refused as a call**: it keeps every `tool_use` in the trace and flags a
-  refused one, but reads that flag only for mock tallies, so a grader on an act
-  a hook can stop reads the stopped attempt as the act. The plugin's own skill
+  whose trace is gone cannot be read at all. **And the runner counts a refused
+  call as a call**: it keeps every `tool_use` in the trace and flags one that a
+  hook or the run's permission settings refused, but reads that flag only for
+  mock tallies, so a grader on an act either can stop reads the stopped attempt
+  as the act. The settings refuse calls with no hook involved: the traces kept
+  under `evals/results/` from before the gate hold 35 such refusals, and in
+  three reps `reapplied-the-contradicted-row` counted a refused source mutation,
+  each beside one that ran, so no verdict moved. The plugin's own skill
   gate stops a commit, a pull request create, a memory write and a subagent
   dispatch once each until the skill that owns the act is loaded, so under it a
   `min: 1` grader on `Agent` passes a rep whose one dispatch was refused, and a
