@@ -294,11 +294,11 @@ evidence, and the five rules are not interchangeable:
   outcome can do. Under `--ablation none` the mark does nothing and the
   grader is scored like any other. **And a skill whose condition is a standing
   rule rather than a named task is not reached through that tool by being
-  named.** Across this suite's kept runs, under a brief that named each skill
-  and its trigger, the indicator stood at 59/59 on the cases whose prompt names
-  work the skill owns - review this, sync these, file that, prune the store -
-  and at 0/13 on the two whose skill fires on how a message ends, which no
-  prompt ever asks for; a hand read of ten of those traces found
+  named.** Across this suite's kept runs the indicator stood at 59/59 on the
+  cases whose prompt names work the skill owns - review this, sync these, file
+  that, prune the store - and at 0/13 on the two whose skill fires on how a
+  message ends, which no prompt ever asks for, though the brief named that
+  skill and its trigger; a hand read of ten of those traces found
   no Skill call and no sentence of the skill's own body anywhere in them. The
   brief reaching the model is a different event and does not imply it: a probe
   on the same seeded file answered that the brief was present, while the ten
