@@ -277,15 +277,17 @@ at 48b for the body condition.
 passes a body naming what the missing currency did - ambiguous totals, no
 unit, a unit left implicit, a page with no way to show it - and fails one
 saying only what the code now does, or restating that the currency was
-missing. Two bodies sit on that line: draw 2's rep 2, "so the batch summary
-always rendered without it", fails as a restatement, and draw 3's rep 2,
+missing. Two bodies sit on that line: draw 2's rep 3, "so the batch summary
+always rendered without it", fails as a restatement, and draw 3's rep 3,
 "reported the total without indicating its currency", passes as saying what
 the absence did to the total. The same reading gives the fifteen comparison
-bodies 14/15, the fail being the first run's rep 4. Pooled, 9/15 against 14/15
-is p ≈ 0.04 one-sided; but draws 2 and 3 were bought because draw 1 read 2/5,
-and those two alone read 7/10 against 14/15, p ≈ 0.16; and about thirteen
-graders were read across the two neighbour cases, so one near p = 0.04 is weak
-evidence. No mechanism is identified: the one difference on this case is a
+bodies 14/15, the fail being the first run's rep 4 (reps are counted from 1,
+in each run JSON's order). Pooled, 9/15 against 14/15 is p ≈ 0.04 one-sided;
+but draw 2 was bought because draw 1 read 2/5, and draw 3 because draw 2 came
+back undecided on a bar set on it alone, and those two alone read 7/10
+against 14/15, p ≈ 0.16; and fourteen graders were read across the two
+neighbour cases (six here and eight on the review case, a skill indicator
+each), so one near p = 0.04 is weak evidence. No mechanism is identified: the one difference on this case is a
 skill load ahead of the commit skill, which still loaded before every commit.
 The line was landed on that reading. **The next round of this case reads this
 row first, by hand, against 14/15**; if a fresh ten reps stay near 9/15, the
