@@ -521,3 +521,19 @@ same from message to message, which this case reads only on the carried item,
 the owner's being first on the seeded list (the treated arm, above); and
 the consequence columns, which the sibling case measures and which no run in
 either arm has yet passed.
+
+## The first-tool-call line on a resumed conversation (task 48)
+
+Task 48's probe ran this case under the brief line later landed at `f754b47` -
+make a conversation's first tool call the Skill tool with
+`tracking-open-asks` - five reps, `--ablation none --model sonnet
+--judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280, in
+`round-48@first-tool-call.json`, with `history.jsonl` regenerated in the
+treated worktree so the seeded brief carried the line. **`skill-was-invoked`
+read 0/5**, confirmed from the traces: the conversation this case resumes
+already holds a finished turn, so "your first tool call in a conversation"
+reads as spent though that turn made no call. The same wording loaded the skill
+as the first call in five of five on the fresh sibling case. The other graders
+sat inside this case's baseline range and were read by the judge only; no
+decision rests on them. A rule in the skill's body therefore still does not
+reach a resumed conversation, and the brief remains this case's only carrier.

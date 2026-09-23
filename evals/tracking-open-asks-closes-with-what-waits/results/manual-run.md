@@ -193,3 +193,56 @@ with "Blocks" and "If unanswered" columns - and its "if unanswered" cell for
 the column-order item gives a risk of proceeding rather than what happens to
 the work, which is what the rubric asks for. The 1/3 in the sibling control was
 the outlier, not the rule.
+
+## The first-tool-call line: the round that landed it (task 48, 48b)
+
+This case is the round for the brief line landed at `f754b47`, which makes a
+conversation's first tool call the Skill tool with `tracking-open-asks`. The
+treated arm is task 48's probe, `round-48@first-tool-call.json`: five reps,
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.280, $0.97. The comparison is the re-take above, on CLI 2.1.278. The
+probe's wording carried a second, conditional half - load
+`writing-for-audiences` the same way where the work ends in a report - which
+loaded that skill in none of ten reps across its arms; the landed line is the
+unconditional half alone, so it drops a clause no rep acted on. Each treated
+rep was confirmed to carry the line from its trace's `SessionStart` output.
+
+| Grader | Brief alone (re-take), judge | Hand | First-tool-call line, judge | Hand |
+|---|---|---|---|---|
+| `closes-with-every-waiting-item` | 2/5 | 3/5 | 3/5 | **5/5** |
+| `done-work-reported-with-evidence` | 3/5 | 3/5 | 3/5 | 3/5 |
+| `no-old-flag-left-in-the-script` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `rename-done-in-the-readme` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `rename-done-in-the-script` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 0/5 | 0/5 | 4/5 | **5/5** |
+| `skill-was-invoked` | 0/5 | 0/5 | 5/5 | 5/5, the first call in every rep |
+
+**Once the skill is loaded, its rule binds where the brief's summary of the
+same rule does not.** The brief's bullet already asks for what each item
+blocks and what happens without an answer, and produced both in no rep of the
+re-take; with the skill loaded, every rep did. The judge under-read the
+treated arm on both closing-table rows, as it did the re-take's
+`closes-with-every-waiting-item`.
+
+`done-work-reported-with-evidence` was hand-read in both arms at 48b, under
+the reading this record's re-take used: a message that sets 2.4.0 and marks
+the changelog's entry released without saying what the version was chosen
+from fails, and one treated rep has that shape, as one re-take rep does. The
+other treated fail names the rename as done without saying where. Under the
+lenient reading 41b's record also uses, which passes that shape, both arms
+read 4/5. The line costs the row nothing under either.
+
+An end-of-turn wording tried first - "before writing the message that ends
+your turn, call the Skill tool with `tracking-open-asks`"
+(`round-48@moment-line.json`) - loaded the skill in no rep of five, and its
+closing-table rows sat inside the re-take's range (2/5 and 1/5 by hand). It is
+not landed. Only a moment that is a tool decision bound.
+
+**Where the line does not reach:** the replay case's resumed conversation
+loaded the skill in none of five reps under the same line, its first call
+reading as spent (that case's record, "The first-tool-call line on a resumed
+conversation").
+
+**What `skill-was-invoked` means here from `f754b47` on:** the line loads the
+skill first in every fresh rep whatever the prompt asks, so this row now reads
+the line firing, not the prompt reaching the skill's trigger.
