@@ -187,3 +187,61 @@ an observation, not an instrument fault. What changed is that the observation
 now has its own row. `report-written-at-the-named-path` fails where no report
 reached the path, so a reader sees one zero with four unreadable rows beneath
 it rather than four failures that look like a verdict on the report's content.
+
+## The skill gate and the first-tool-call line, read by hand (48b)
+
+Five fresh headless sessions on the plugin carrying the skill gate
+(`9f4f543`) and the brief's first-tool-call line (`f754b47`), bought at the
+owner's ask after 48b landed both, $1.16 in all. **Not through the runner**:
+Docker Desktop was running and had to stay up, and the runner needs `~/.docker`
+moved aside, which is unsafe under a live Docker. Each rep scaffolded
+`evals/fixtures/fee-schedule.sh` into its own scratch workspace and ran the
+case prompt as `claude -p` with the runner's own permission settings -
+`--permission-mode dontAsk --allowedTools Read Grep Glob Bash Write Edit
+Agent`, 60 turns, 900 seconds - on Sonnet, CLI 2.1.280, default output style.
+The maintainer's global instruction files stayed in place, since other sessions
+were running; nothing in them concerns coverage thresholds.
+
+**The case's tool list does not take the Skill tool away.** `Skill` is absent
+from `allowed_tools`, but under `dontAsk` a Skill call is not refused: every
+rep loaded `tracking-open-asks` as its first call. So this read exercises the
+gate's ordinary path here, not the stop reason's clause for a session without
+the tool. Whether the runner refuses `Skill` on this case is unknown - no
+runner trace of it is kept.
+
+**The gate did what it was built to do.** Reps 1 to 4 were stopped once at
+their `mutation-tester` dispatch, loaded `delegating-to-subagents` as the next
+call and re-dispatched; rep 5 loaded that skill unprompted before dispatching,
+so the gate stood aside. Turns 8 or 9, 65 to 82 seconds a rep.
+`mutation-agent-was-dispatched` passes all five, and in reps 1 to 4 on two
+calls, one refused - so a rep that gave up after its refusal would pass it
+too, which is the refused-call rule's instance on this case.
+
+| Grader | Hand, this read | Kept runner arms on the same texts, hand |
+|---|---|---|
+| `report-written-at-the-named-path` | 5/5 | 5/5 |
+| `gate-only-failure-recorded-survived` | 5/5 (the regex) | 5/5 |
+| `gate-only-failure-not-recorded-killed` | 5/5 (the regex) | 5/5 |
+| `clamp-gap-filed-as-a-test-gap` | 5/5 | 5/5 |
+| **`threshold-taken-out-of-the-command`** | **2/5** | **5/5** |
+| `mutation-agent-was-dispatched` | 5/5, indicator | 5/5 |
+
+The comparison is `task11-18-mutation.json` and `-rerun.json`, five runner reps
+taken after the last change to the agent contract and the delegation skill,
+so on today's texts; their reports were re-read by hand for the threshold row,
+and each strips the threshold from its baseline and says so.
+
+**The threshold row dropped, and nothing seen ties it to the gate.** The
+contract has the baseline taken with the test command's coverage threshold
+taken out. Reps 2 and 3 did. Reps 1 and 4 took a green baseline with `npm
+test` as given and then swept with the threshold removed, which the rubric
+fails; rep 5 swept with the threshold in and separated the gate's exits
+afterwards. The orchestrator's dispatch briefs are the channel the gate could
+have changed, and they do not split the reps: every brief, before the stop and
+after it, passes `npm test` with a note that it fails under full coverage, and
+the rewrites after the stop change nothing about the threshold. What does
+differ from the comparison is the instrument (hand sessions against the
+runner), the CLI (2.1.280 against 2.1.273) and a working git. 2/5 against 5/5
+is under the four-in-five gap five reps separate. **A runner re-take of this
+case in both arms, once Docker can be closed, is what separates the
+instrument from the change.**
