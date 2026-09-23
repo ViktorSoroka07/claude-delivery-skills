@@ -106,12 +106,13 @@ intended (`edges.mjs`):
 
 ### What the calibration does not settle
 
-- **`messages-state-the-change` has no judge verdict yet.** A judge runs only
-  inside a run, so its 10/10 is a hand grade of the ten simulated files
-  (`*.commits.txt` beside the traces). Gate rep 1 and gate rep 3 on Sonnet
-  write the reason and then an imperative ("Render batch.currency…"); the
-  rubric asks why the currency appears, not what tense the body uses. So hand
-  grading passes both.
+- **`messages-state-the-change` is read by hand, not by its rate.** A judge
+  runs only inside a run, so its 10/10 here is a hand grade of the ten
+  simulated files (`*.commits.txt` beside the traces). Gate rep 1 and gate
+  rep 3 on Sonnet write the reason and then an imperative ("Render
+  batch.currency…"); the rubric asks why the currency appears, not what tense
+  the body uses. So hand grading passes both. The first run's judge disagreed
+  with the hand grade in three reps of five (next section).
 - **A rep that never writes `commits.txt` fails all three regex graders and
   the judged one** as "grader threw". That is a missing file, not a trailer or
   a narration, so read the rep's trace before counting it.
@@ -131,6 +132,39 @@ intended (`edges.mjs`):
 The Sonnet reps ran 8 to 11 turns against a cap of 30. The redirect costs no
 extra call.
 
+### The first run of the rewritten case
+
+Five Sonnet reps of the plugin arm, `--judge-model sonnet --ablation none`,
+on CLI 2.1.280: $0.90, 52 seconds. Every rep saved the log by redirecting the
+named command into `commits.txt`, none added the file to a commit, and each
+ran 8 or 9 turns.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `no-default-trailer` | 0/5 | 0/5 - all ten commits carry the trailer |
+| `no-narration` | 5/5 | 5/5 |
+| `two-workstreams-two-commits` | 5/5 | 5/5 |
+| `messages-state-the-change` | 1/5 | 4/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+
+The mechanical graders read as calibrated. The judged one does not:
+
+- By hand, rep 4 fails. Its currency body says only that a field was added,
+  with a USD default, and not why.
+- The other four currency bodies say why: amounts were ambiguous, or had no
+  unit.
+- The judge failed reps 1 to 3 as well, three votes to none each.
+- The one rep it passed is the one whose comment commit's subject does not
+  open with "Fix". Reps 1 to 4 open "Fix punctuation in…", and rep 5 opens
+  "Correct the … punctuation".
+- The likely reading is that the judge matches "Fix punctuation" against the
+  rubric's "fix typo". That is unconfirmed: the runner keeps no judge
+  rationale, and this is only the one variable separating the pass from the
+  fails.
+
+Until a judge probe on these five files settles the cause
+(`evals/judge-calibration.md` has the recipe), read this grader by hand.
+
 ### Where the evidence lives
 
 `evals/results/task51-commit-traces/`, git-ignored and local to the
@@ -140,6 +174,9 @@ maintainer's machine, holds:
 - `regrade.mjs`, the re-grader;
 - `edges.mjs`, the synthetic logs;
 - `dump-logs.mjs`, which writes each rep's simulated log;
-- the ten Sonnet `*.commits.txt`.
+- the ten Sonnet `*.commits.txt`;
+- the first run's five traces (`confirm-rep*.jsonl`). Its run JSON is
+  `evals/results/round-51@confirm.json`, whose `evidence` field holds each
+  file the judge was shown.
 
 Usage is in each script's header.
