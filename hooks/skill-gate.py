@@ -37,7 +37,7 @@ HEREDOC = re.compile(
     r"<<-?\s*(?P<q>[\"']?)(?P<tag>\w+)(?P=q)[^\n]*\n(?P<body>.*?)\n[ \t]*(?P=tag)[ \t]*(?=\n|$)",
     re.DOTALL,
 )
-SEPARATOR = re.compile(r"[|;&\n]")
+SEPARATOR = re.compile(r"(?<!>)\||[;&\n]")
 
 GIT_COMMIT = re.compile(r"\bgit(?:\s+-[\w-]+(?:=\S*)?|\s+-[Cc]\s+\S+)*\s+commit(?![-\w])")
 PR_CREATE = re.compile(
@@ -47,7 +47,8 @@ PR_CREATE = re.compile(
 INERT = re.compile(r"--help\b|\s-h\b|--dry-run\b")
 STORE = r"/projects/[^/\s\"']+/memory"
 ROOTED = re.compile(r"(?:[A-Za-z]:)?/")
-REDIRECT = re.compile(r">>?")
+REDIRECT = re.compile(r">>?\|?")
+REDIRECT_WORD = re.compile(r"\d*[<>]|&>")
 IN_PLACE = re.compile(r"\b(?:sed|perl)\b.*\s(?:-[a-zA-Z]*i\b|--in-place\b)")
 COPY = re.compile(r"\b(?:mv|cp|tee)\b")
 
@@ -131,9 +132,14 @@ def writes_memory(raw, stripped, memory):
             words = shlex.split(raw[copy.start():])
         except ValueError:
             return False
+        words = words[:next((i for i, w in enumerate(words) if REDIRECT_WORD.match(w)), len(words))]
         args = [w for w in words[1:] if not w.startswith("-")]
         if words[0] == "tee":
             return any(memory.search(a) for a in args)
+        targets = [w.split("=", 1)[1] for w in words if w.startswith("--target-directory=")]
+        targets += [t for flag, t in zip(words, words[1:]) if flag == "-t"]
+        if targets:
+            return any(memory.search(t) for t in targets)
         return len(args) >= 2 and bool(memory.search(args[-1]))
     return False
 

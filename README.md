@@ -281,8 +281,8 @@ instructions alone cannot:
     files, so a directory named in managed settings or on the command line is not
     seen. It reads a shell command by pattern, taking a memory write only where a
     redirect, copy, move, `tee` or in-place edit names the path in full, so a form it
-    does not parse passes - an act run through `sh -c`, or a write by bare filename
-    after a `cd` into the directory, among them.
+    does not parse passes - an act inside `sh -c` or an interpreter's own code, or a
+    write by a path relative to the working directory, among them.
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero

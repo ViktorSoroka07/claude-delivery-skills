@@ -489,6 +489,17 @@ contains "skill gate reads that directory written from the home prefix" "$out" "
 out=$(gate Write g32 '' "$WORK/t-none.jsonl" 'C:\Users\x\.claude\projects\-w\memory\a.md')
 contains "skill gate stops a memory write whose path uses backslashes" "$out" "delivery-skills:maintaining-project-memory"
 
+out=$(gate Bash g33 '' "$WORK/t-none.jsonl" "echo x >| $MEM/a.md")
+contains "skill gate stops a clobbering redirect into memory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g34 '' "$WORK/t-none.jsonl" "cp -t $MEM/ a.md")
+contains "skill gate stops a copy whose target directory comes first" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g35 '' "$WORK/t-none.jsonl" "mv --target-directory=$MEM a.md")
+contains "skill gate stops a move naming its target directory as an option" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g36 '' "$WORK/t-none.jsonl" "cp a.md $MEM/ 2>/dev/null")
+contains "skill gate stops a copy into memory followed by a redirect" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Bash g37 '' "$WORK/t-none.jsonl" "tee /tmp/x < $MEM/note.md")
+empty "skill gate passes a tee that reads the memory store" "$out"
+
 out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cat $MEM/MEMORY.md 2>/dev/null")
 empty "skill gate passes a read of the memory store" "$out"
 out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cp $MEM/MEMORY.md $WORK/backup.md")
