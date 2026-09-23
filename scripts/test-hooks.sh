@@ -504,6 +504,31 @@ out=$(printf '{"session_id":"g18","transcript_path":"%s","tool_name":"Bash","too
 check "skill gate exits 0 where its stop cannot be recorded" 0 $?
 empty "skill gate does not stop an act whose stop it cannot record" "$out"
 
+echo
+# 22. Registration: a checkout at a commit older than a hook lacks its script,
+#     and exit 2 from a PreToolUse, Stop or UserPromptSubmit hook is a block, so
+#     each registered command exits 0 where its script is absent and still runs
+#     the script where it is present.
+OLD="$WORK/old-checkout"
+mkdir -p "$OLD/hooks" "$WORK/shim"
+if [ "$(basename "$PY")" != python3 ]; then
+  { echo '#!/bin/sh'; echo "exec \"$PY\" \"\$@\""; } > "$WORK/shim/python3"
+  chmod +x "$WORK/shim/python3"
+fi
+"$PY" -c 'import json, sys
+for event in json.load(open(sys.argv[1]))["hooks"].values():
+    for matcher in event:
+        for hook in matcher["hooks"]:
+            print(hook["command"])' "$ROOT/hooks/hooks.json" > "$WORK/commands"
+while IFS= read -r cmd; do
+  name=${cmd##*/hooks/}
+  printf '' | env PATH="$WORK/shim:$PATH" CLAUDE_PLUGIN_ROOT="$OLD" sh -c "$cmd" >/dev/null 2>&1
+  check "registration exits 0 without ${name%%.py*}.py" 0 $?
+done < "$WORK/commands"
+out=$(printf '{"session_id":"g19","transcript_path":"%s","tool_name":"Bash","tool_input":{"command":"git commit -m x"}}' "$WORK/t-none.jsonl" \
+  | env PATH="$WORK/shim:$PATH" TMPDIR="$GSTATE" CLAUDE_PLUGIN_ROOT="$ROOT" sh -c "$(grep skill-gate.py "$WORK/commands")")
+contains "registration runs the gate where its script is present" "$out" "$DENY"
+
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
   exit 0

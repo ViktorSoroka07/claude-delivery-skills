@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/comment-discipline.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/comment-discipline.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/landed-branch.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/landed-branch.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/comment-discipline-commit.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/comment-discipline-commit.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-gate.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/skill-gate.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session-brief.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/session-brief.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/uncommitted-changes.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/uncommitted-changes.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
@@ -72,7 +72,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/context-meter.py\"",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/context-meter.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
           }
         ]
