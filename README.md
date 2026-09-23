@@ -261,14 +261,18 @@ instructions alone cannot:
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
   - **Skill gate** — stops a commit, a pull request create (`gh` or `az`), a write
-    into a memory directory, or a subagent dispatch until the conversation has loaded
-    the skill that owns it: `writing-commit-messages`, `writing-pr-descriptions`,
-    `maintaining-project-memory`, `delegating-to-subagents`. A skill loads when the
-    request names its work and mostly not when the session chooses the act itself.
-    It stops rather than warns because a warning reaches the session beside the
-    call's result, one act too late for a commit whose message is already in the
-    command. Each act is stopped once per conversation, so a session that declines
-    the skill loses one turn, and a subagent's acts are keyed apart from its parent's.
+    into a project's memory under `.claude/projects/`, or a subagent dispatch until
+    the conversation has loaded the skill that owns it: `writing-commit-messages`,
+    `writing-pr-descriptions`, `maintaining-project-memory`,
+    `delegating-to-subagents`. A skill loads when the request names its work and
+    mostly not when the session chooses the act itself. It stops rather than warns
+    because a warning reaches the session beside the call's result, one act too late
+    for a commit whose message is already in the command. Each act is stopped once
+    per conversation, so a session that declines the skill loses one turn, and a
+    subagent's acts are keyed apart from its parent's. It reads a shell command by
+    pattern, taking a memory write only where a redirect, copy, move, `tee` or
+    in-place edit names the path in full, so a form it does not parse - an act
+    written after a heredoc marker among them - passes.
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero
