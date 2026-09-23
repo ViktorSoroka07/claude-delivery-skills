@@ -261,7 +261,7 @@ instructions alone cannot:
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
   - **Skill gate** — stops a commit, a pull request create (`gh` or `az`), a write
-    into a project's memory under `.claude/projects/`, or a subagent dispatch until
+    into the session's memory directory, or a subagent dispatch until
     the conversation has loaded the skill that owns it: `writing-commit-messages`,
     `writing-pr-descriptions`, `maintaining-project-memory`,
     `delegating-to-subagents`. A skill the user does not invoke by name loads only
@@ -272,11 +272,17 @@ instructions alone cannot:
     warning reaches the session beside the call's result, one act too late for a
     commit whose message is already in the command. Each act is stopped once per
     conversation, so a session that declines the skill loses one turn, and a
-    subagent's acts are keyed apart from its parent's. It reads a shell command by
-    pattern, taking a memory write only where a redirect, copy, move, `tee` or
-    in-place edit names the path in full, so a form it does not parse passes - an
-    act run through `sh -c`, or a write by bare filename after a `cd` into the
-    directory, among them.
+    subagent's acts are keyed apart from its parent's. It finds the memory directory
+    where Claude Code keeps it - under the `projects/` of the config directory,
+    `~/.claude` or the one `CLAUDE_CONFIG_DIR` names, or of the directory
+    `CLAUDE_CODE_REMOTE_MEMORY_DIR` names, or at the path
+    `CLAUDE_COWORK_MEMORY_PATH_OVERRIDE` or the `autoMemoryDirectory` setting names -
+    but reads that setting only from the user's, the project's and the local settings
+    files, so a directory named in managed settings or on the command line is not
+    seen. It reads a shell command by pattern, taking a memory write only where a
+    redirect, copy, move, `tee` or in-place edit names the path in full, so a form it
+    does not parse passes - an act run through `sh -c`, or a write by bare filename
+    after a `cd` into the directory, among them.
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero

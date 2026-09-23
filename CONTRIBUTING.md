@@ -324,13 +324,17 @@ evidence, and the five rules are not interchangeable:
   commit on a smaller model, a dispatch on the suite's - the first call it
   made after the stop loaded that skill, though the retry passes whether or
   not one does, and a pull request create or a subagent's own act is
-  unmeasured. No case yet reaches the memory stop, which matches only a path
-  through `.claude/projects/<project>/memory`: a run's own memory sits under
-  its config directory at `config/projects/`, outside that pattern, and the
-  memory case stages its store under `store/projects/`. A case that wants the
-  stop aims a write at a path the pattern matches - the gate runs before the
-  run's permission check, so it stops even a write the run then refuses - and
-  grades the stop and the load rather than a written file. A rule in the body
+  unmeasured. No case yet reaches the memory stop. It matches the directory the
+  session keeps memory in, the one under the config directory a run's
+  environment names included, so a rep writing its own memory under
+  `config/projects/` would be stopped; but when this was written the 198
+  traces in the kept run roots showed reps reading that directory and never
+  writing it, and the
+  memory case stages its store under `store/projects/`, which the stop does not
+  match. A case that wants the stop aims a write at a path the stop matches -
+  the gate runs before the run's permission check, so it stops even a write the
+  run then refuses - and grades the stop and the load rather than a written
+  file. A rule in the body
   of a standing-rule skill that neither moment reaches on the case, or of
   `tracking-open-asks` in a resumed conversation, still cannot be moved by
   any round the runner can buy, the reps never having read it.

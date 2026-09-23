@@ -45,7 +45,8 @@ PR_CREATE = re.compile(
     r"|\baz\b.*\brepos\s+pr\s+create(?![-\w])"
 )
 INERT = re.compile(r"--help\b|\s-h\b|--dry-run\b")
-MEMORY_PATH = re.compile(r"/\.claude/projects/[^/\s\"']+/memory(?:/|$)")
+STORE = r"/projects/[^/\s\"']+/memory"
+ROOTED = re.compile(r"(?:[A-Za-z]:)?/")
 REDIRECT = re.compile(r">>?")
 IN_PLACE = re.compile(r"\b(?:sed|perl)\b.*\s(?:-[a-zA-Z]*i\b|--in-place\b)")
 COPY = re.compile(r"\b(?:mv|cp|tee)\b")
@@ -73,12 +74,56 @@ def blank(command):
     return unfenced, QUOTED.sub(lambda m: " " * len(m.group(0)), unfenced)
 
 
-def writes_memory(raw, stripped):
+def slashed(path):
+    return path.replace("\\", "/")
+
+
+def setting(path, key):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh).get(key)
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
+def memory_path(payload):
+    """Where a session keeps memory: the projects store under the default
+    config directory, under CLAUDE_CONFIG_DIR or under a remote memory
+    directory, or a directory an override or the autoMemoryDirectory setting
+    names outright. The setting is read from the user's, the project's and the
+    local settings files, so a directory named in managed settings or on the
+    command line is not seen."""
+    home = slashed(os.path.expanduser("~"))
+    config = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(home, ".claude")
+    project = os.environ.get("CLAUDE_PROJECT_DIR") or payload.get("cwd") or ""
+    stores = [r"/\.claude"] + [re.escape(slashed(os.environ[v]).rstrip("/"))
+                               for v in ("CLAUDE_CONFIG_DIR", "CLAUDE_CODE_REMOTE_MEMORY_DIR")
+                               if os.environ.get(v)]
+    named = [os.environ.get("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"),
+             setting(os.path.join(config, "settings.json"), "autoMemoryDirectory")]
+    if project:
+        named += [setting(os.path.join(project, ".claude", f), "autoMemoryDirectory")
+                  for f in ("settings.json", "settings.local.json")]
+    dirs = []
+    for d in named:
+        if not isinstance(d, str):
+            continue
+        if d.startswith("~/"):
+            dirs.append(d.rstrip("/"))
+            d = home + d[1:]
+        d = slashed(d).rstrip("/")
+        if ROOTED.match(d) and len(d) >= 3:
+            dirs.append(d)
+    alternatives = ["(?:%s)%s" % ("|".join(stores), STORE)] + [re.escape(d) for d in dirs]
+    return re.compile(r"(?:%s)(?:/|$)" % "|".join(alternatives))
+
+
+def writes_memory(raw, stripped, memory):
     for m in REDIRECT.finditer(stripped):
         rest = raw[m.end():].split(None, 1)
-        if rest and MEMORY_PATH.search(rest[0]):
+        if rest and memory.search(rest[0]):
             return True
-    if IN_PLACE.search(stripped) and MEMORY_PATH.search(raw):
+    if IN_PLACE.search(stripped) and memory.search(raw):
         return True
     copy = COPY.search(stripped)
     if copy:
@@ -88,8 +133,8 @@ def writes_memory(raw, stripped):
             return False
         args = [w for w in words[1:] if not w.startswith("-")]
         if words[0] == "tee":
-            return any(MEMORY_PATH.search(a) for a in args)
-        return len(args) >= 2 and bool(MEMORY_PATH.search(args[-1]))
+            return any(memory.search(a) for a in args)
+        return len(args) >= 2 and bool(memory.search(args[-1]))
     return False
 
 
@@ -101,10 +146,12 @@ def acts_of(payload):
     if tool in ("Agent", "Task"):
         return ["dispatch"]
     if tool in ("Write", "Edit"):
-        return ["memory"] if MEMORY_PATH.search(tool_input.get("file_path") or "") else []
+        path = slashed(tool_input.get("file_path") or "")
+        return ["memory"] if memory_path(payload).search(path) else []
     if tool != "Bash":
         return []
     command, stripped = blank(tool_input.get("command") or "")
+    memory = memory_path(payload)
     acts = []
     start = 0
     for end in [m.start() for m in SEPARATOR.finditer(stripped)] + [len(stripped)]:
@@ -116,7 +163,7 @@ def acts_of(payload):
             acts.append("commit")
         if PR_CREATE.search(seg):
             acts.append("pr")
-        if writes_memory(raw, seg):
+        if writes_memory(raw, seg, memory):
             acts.append("memory")
     return sorted(set(acts), key=list(ACTS).index)
 

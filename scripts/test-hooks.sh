@@ -393,10 +393,18 @@ empty "uncommitted hook stays silent outside a repository" "$out"
 
 echo
 GATE_HOOK="$ROOT/hooks/skill-gate.py"
+NW=$(cd "$WORK" && { pwd -W 2>/dev/null || pwd; })
 GSTATE="$WORK/gate-state"
 mkdir -p "$GSTATE"
 
-gate() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
+# The hook reads the memory directory from its environment and the settings
+# files it can reach, so each run starts from none of the operator's.
+gate_hook() { # $@ = NAME=value pairs added to the hook's environment
+  env -u CLAUDE_CONFIG_DIR -u CLAUDE_CODE_REMOTE_MEMORY_DIR -u CLAUDE_COWORK_MEMORY_PATH_OVERRIDE \
+    -u CLAUDE_PROJECT_DIR HOME="$NW/home" USERPROFILE="$NW/home" TMPDIR="$GSTATE" "$@" "$PY" "$GATE_HOOK"
+}
+
+gate_payload() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
   "$PY" -c 'import json, sys
 tool, session, agent, transcript, value = sys.argv[1:6]
 key = {"Bash": "command", "Write": "file_path", "Edit": "file_path", "Agent": "prompt", "Task": "prompt"}[tool]
@@ -404,8 +412,10 @@ p = {"hook_event_name": "PreToolUse", "session_id": session, "transcript_path": 
      "tool_name": tool, "tool_input": {key: value}}
 if agent:
     p["agent_id"] = agent
-print(json.dumps(p))' "$@" | TMPDIR="$GSTATE" "$PY" "$GATE_HOOK"
+print(json.dumps(p))' "$@"
 }
+
+gate() { gate_payload "$@" | gate_hook; }
 
 skill_call() { # $1 = skill; one transcript line holding a Skill tool call
   printf '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"delivery-skills:%s"}}]}}\n' "$1"
@@ -455,6 +465,29 @@ out=$(gate Agent g10 '' "$WORK/t-none.jsonl" 'review the diff')
 contains "skill gate stops the first subagent dispatch" "$out" "delivery-skills:delegating-to-subagents"
 out=$(gate Task g24 '' "$WORK/t-none.jsonl" 'review the diff')
 contains "skill gate stops a dispatch under the tool's other name" "$out" "delivery-skills:delegating-to-subagents"
+
+CFG="$NW/cfg"
+mkdir -p "$CFG" "$NW/proj/.claude"
+out=$(gate_payload Write g25 '' "$WORK/t-none.jsonl" "$CFG/projects/-w/memory/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
+contains "skill gate stops a memory write under a moved config directory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Write g25 '' "$WORK/t-none.jsonl" "$CFG/projects/-w/memory/a.md")
+empty "skill gate takes a moved store from the environment, not from the path" "$out"
+out=$(gate_payload Write g26 '' "$WORK/t-none.jsonl" "$NW/remote/projects/-w/memory/a.md" | gate_hook CLAUDE_CODE_REMOTE_MEMORY_DIR="$NW/remote")
+contains "skill gate stops a memory write under a remote memory directory" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate_payload Bash g27 '' "$WORK/t-none.jsonl" "echo x > $NW/cowork/a.md" | gate_hook CLAUDE_COWORK_MEMORY_PATH_OVERRIDE="$NW/cowork")
+contains "skill gate stops a write into an overridden memory directory" "$out" "delivery-skills:maintaining-project-memory"
+printf '{"autoMemoryDirectory": "%s"}\n' "$NW/notes" > "$CFG/settings.json"
+out=$(gate_payload Edit g28 '' "$WORK/t-none.jsonl" "$NW/notes/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
+contains "skill gate stops an edit in the directory the user's settings name" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate_payload Write g29 '' "$WORK/t-none.jsonl" "$NW/notes-old/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
+empty "skill gate passes a sibling that shares the named directory's prefix" "$out"
+printf '{"autoMemoryDirectory": "~/proj-notes"}\n' > "$NW/proj/.claude/settings.local.json"
+out=$(gate_payload Write g30 '' "$WORK/t-none.jsonl" "$NW/home/proj-notes/a.md" | gate_hook CLAUDE_PROJECT_DIR="$NW/proj")
+contains "skill gate stops a write in the directory a project's local settings name" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate_payload Bash g31 '' "$WORK/t-none.jsonl" 'echo x >> ~/proj-notes/b.md' | gate_hook CLAUDE_PROJECT_DIR="$NW/proj")
+contains "skill gate reads that directory written from the home prefix" "$out" "delivery-skills:maintaining-project-memory"
+out=$(gate Write g32 '' "$WORK/t-none.jsonl" 'C:\Users\x\.claude\projects\-w\memory\a.md')
+contains "skill gate stops a memory write whose path uses backslashes" "$out" "delivery-skills:maintaining-project-memory"
 
 out=$(gate Bash g11 '' "$WORK/t-none.jsonl" "cat $MEM/MEMORY.md 2>/dev/null")
 empty "skill gate passes a read of the memory store" "$out"
