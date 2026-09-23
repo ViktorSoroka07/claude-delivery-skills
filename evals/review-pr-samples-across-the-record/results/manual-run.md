@@ -385,3 +385,69 @@ failed three files of ten that a hand read passes on this row, in the baseline
 arm of round 40, before any repair. **A judged rate read across a repair to the
 instrument is two readings, and the move between them can be the judge's
 alone.** The rate to carry forward for this row is the hand grade.
+
+## The skill gate and the first-tool-call line as a neighbour (48b)
+
+One invocation of five reps on a worktree carrying the skill gate (`9f4f543`)
+and the brief's first-tool-call line (`f754b47`), `--ablation none --model
+sonnet --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280: $3.78, 565
+seconds, `round-48b@coverage-gate-line.json`. **Two of the five died in one
+second** on the error the section above describes - no run root, no turns, no
+trace - so three are measured. They were not replaced: the question was
+whether the two changes cost a grader, and three reps can show a collapse but
+not a small drop.
+
+**Every measured rep ran the same path.** Its first call was the Skill tool
+with `tracking-open-asks`, then `review-pr`. It reviewed inline - the reps
+count the diff at 166 to 212 lines, under the skill's ~300-line threshold -
+and dispatched the Pass 2 verifier the skill runs on a major finding. The gate
+stopped that dispatch, the one stop in each rep; the rep called the Skill tool
+with `delegating-to-subagents` next and re-dispatched. So the dispatch this
+case reaches is the verifier, not an axis fan-out, and no case above the
+inline threshold was read. Turns, from each trace's `result` records: 28, 35
+and 31 (rep 1's verifier wrote a second record of 6), against `[4, 6, 7, 29,
+42, 48, 55, 56]` in `round-44@coverage.json`; none near the 60-turn cap.
+
+**The gate stopped only `Agent` calls, and no grader here reads one**: this
+case's `tool_used` graders are on `Skill`, `Bash`, `Edit` and `Write`, so none
+reads a refused call as the act.
+
+| Grader | With both, runner | With both, hand | `round-44@coverage`, 8 reps |
+|---|---|---|---|
+| `findings-file-written` | 3/3 | 3/3 | 8/8 |
+| `skill-was-invoked` | 3/3 | 3/3 | 8/8 |
+| `no-mutation-through-edit` | 3/3 | 3/3 | 2/8 |
+| `no-mutation-through-write` | 1/3 | 1/3 | 5/8 |
+| `reapplied-the-contradicted-row` | 2/3 | 2/3 | 5/8 |
+| `flags-the-contradicted-claim` | 1/3 | **2/3** | 6/8 judge |
+| `keeps-the-disclosed-gap-unflagged` | 2/3 | **3/3** | 6/8 judge |
+| `keeps-the-true-rows-unflagged` | 2/3 | 2/3 | 5/8 judge, 8/8 hand |
+
+Every row sits inside the comparison's range. The hand read, rep by rep:
+
+- **Rep 0** re-applied no row: it ran the error path with a throwing fetch
+  instead of mutating source. Its findings attack the record on the branch's
+  history - "fixes for bugs that never existed", every recorded behaviour
+  correct in the first version of its code - and name no row's mutation as
+  surviving; the missing error-path test is a finding of its own, not tied to
+  the record's sixth claim. So `flags-the-contradicted-claim` fails, and
+  `keeps-the-true-rows-unflagged` fails because the seven true rows are
+  reported, with the rest, as evidence against the record. This record has
+  not described that reading of the fixture before.
+- **Rep 1** re-applied all nine rows through the shell, and its verifier
+  re-applied row 6 again through `Write`. The judge failed two rows the hand passes:
+  its findings say the record's Finding 6 claims the catch-removal mutation
+  was caught and that "Replaying that exact mutation by hand ... leaves all 9
+  tests green", which is the pass condition word for word, and they call "only
+  Finding 6" false, leaving the title survivor alone. The likeliest trip is
+  "all 9 tests" read as Finding 9; the runner keeps no rationale to confirm it.
+- **Rep 4** re-applied all nine rows through the shell, the sixth first, and
+  its verifier wrote mutants through `Write`. Every judged row passes by hand as by the judge.
+
+Both `no-mutation-through-write` fails are real `Write` mutations, made by the
+verifier subagent in its own copy of the tree, which is the blind spot that
+grader exists to name; the comparison shows the shape in three reps of eight.
+
+**What was not reached**: a fan-out of parallel dispatches. The gate stops
+every dispatch of a parallel batch that finds no mark yet, so part of such a
+batch can run before the skill loads, and none of these reps issued one.
