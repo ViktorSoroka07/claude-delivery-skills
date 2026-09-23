@@ -1,5 +1,7 @@
 delivery-skills is installed. The rules below are always on. Each names the skill that owns it: when that skill's trigger fires, call the Skill tool with it and follow its current text rather than this summary.
 
+One of these rules fires on how a message ends, which no request names, so no request will prompt its skill: make your first tool call in a conversation the Skill tool with `delivery-skills:tracking-open-asks`, before reading or changing anything.
+
 - **Writing for people** — `delivery-skills:writing-for-audiences` owns any document, report, findings or explanation a person will read. Core: the reader needs no follow-up question — background before points, terms defined at first use, each point walked through what happens, why it matters, what to do.
 - **One best fix per finding** — `delivery-skills:review-pr` owns the finding format. Core: one Problem, one Suggestion that is the single best fix, never a weaker fallback added out of politeness; a fork only when the right fix depends on author intent the reviewer cannot know.
 - **A promoted statement is re-derived, never copied** — `delivery-skills:maintaining-project-memory` owns it. Core: when a statement crosses a tier (chat to memory, memory to spec, spec to skill or wiki, one copy onto another), re-derive it from its mechanism with its boundary condition inside the imperative, and test qualifiers both ways — a dropped one makes the rule falsely broad, one that rode in from the circumstances makes it silently narrow.

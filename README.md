@@ -274,7 +274,9 @@ instructions alone cannot:
     best fix per finding, re-derive what you promote, memory stays minimal, zero
     comments by default, every message ends with what waits on the requester. Each is a pointer to the skill that owns it plus a
     one-sentence core, so a user's `CLAUDE.md` no longer needs a copy — they travel
-    with the plugin. The text is [`hooks/session-brief.md`](hooks/session-brief.md).
+    with the plugin. It also makes a fresh conversation's first tool call a load of
+    `tracking-open-asks`, since how a message ends is work no request names. The
+    text is [`hooks/session-brief.md`](hooks/session-brief.md).
   - **Context meter** — on each prompt past 70% of the context window, injects one
     line naming how far into the window the session has run, so it reaches a seam and
     hands over rather than starting another task. A session has no view of its own

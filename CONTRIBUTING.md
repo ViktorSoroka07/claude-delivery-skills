@@ -171,7 +171,12 @@ points at a file its executor cannot read runs no gate.
 `hooks/session-brief.md` is the strictest case: it loads into every session,
 so each rule there is a pointer to the skill that owns it plus a one-sentence
 core, never the full statement. A change to a rule lands in its skill; the
-brief changes only when the pointer or the core does.
+brief changes only when the pointer or the core does. The one sentence above
+the rules is no rule: it makes a conversation's first tool call a load of
+`tracking-open-asks`, because how a message ends is work no request names, so
+a pointer to that skill is never followed. A moment that is a tool decision is
+the one form measured to load a skill no request names, and it binds only in
+a fresh conversation.
 
 ## The README paraphrases; the skill files own
 
