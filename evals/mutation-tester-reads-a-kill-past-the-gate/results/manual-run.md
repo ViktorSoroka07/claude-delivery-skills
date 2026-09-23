@@ -242,6 +242,35 @@ after it, passes `npm test` with a note that it fails under full coverage, and
 the rewrites after the stop change nothing about the threshold. What does
 differ from the comparison is the instrument (hand sessions against the
 runner), the CLI (2.1.280 against 2.1.273) and a working git. 2/5 against 5/5
-is under the four-in-five gap five reps separate. **A runner re-take of this
-case in both arms, once Docker can be closed, is what separates the
-instrument from the change.**
+is under the four-in-five gap five reps separate. **The runner re-take below
+answers it: the drop was the hand instrument's, not the change's.**
+
+## The runner re-take in both arms (48b)
+
+Once Docker could be closed, the owner bought both arms through the runner:
+five Sonnet reps each, `--ablation none --model sonnet --judge-model sonnet
+-j 3 --keep-temp`, CLI 2.1.280. The arm without the change ran from a worktree
+at the commit before the gate (`round-48b@mutation-baseline.json`, $3.81), the
+arm with the gate and the line from the main checkout
+(`round-48b@mutation-gate-line.json`, $4.26). The case, its fixture, the agent
+contracts and the skills are byte-identical between the two; they differ only
+by the gate and the line.
+
+**Every grader reads 5/5 in both arms**, by the runner and by hand. The hand
+read covered the two judged rows in all ten reports: each report strips the
+coverage threshold from its baseline and says so, and each files the clamp as
+a test gap with `assert.equal(fee(-5, "gold", false), 0)` or its equivalent.
+
+**The arm with the change ran the gate's ordinary path in every rep**: its
+first call loaded `tracking-open-asks`, the `mutation-tester` dispatch was
+stopped once, the next call loaded `delegating-to-subagents`, and the
+re-dispatch went through. The runner does not refuse the Skill tool here
+although the case's `allowed_tools` omits it: the run's `init` event lists
+`Skill`, and the first call returns "Launching skill". So the stop reason's
+clause for a session without the tool is not reached on this case either.
+`mutation-agent-was-dispatched` passes on two calls in each rep of that arm,
+one of them refused.
+
+The change cost each rep one stopped call and two skill loads: main-thread
+turns 8 to 11 against 3 to 6, and about $0.79 a rep against $0.76.
+
