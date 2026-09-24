@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: implementation-gates-names-what-the-gate-read
+context:
+  scaffold_script: fixture.sh
