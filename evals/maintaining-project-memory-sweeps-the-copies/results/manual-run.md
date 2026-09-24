@@ -229,3 +229,63 @@ narrow search.
 Nothing else was bought. The extension belonged to a 2-3/5 baseline, and the
 neighbours only to a treated arm that lands. Spent on the round: $0.77 and
 $0.90, **$1.67** of the approved ~$3.50 for the case (up to ~$17 in all).
+
+## A second treated arm: the search step restated, and a stop at the write
+
+The round after this one restated the sweep's search step and added a
+stop at the write: the same text with the section's fourth test, the brief's
+last clause and two red-flag rows asking for a search in any letter case,
+once by the subject's name in every spelling and once by a word a shortened
+copy would keep from each thing the owning text said before the change; and
+a fifth act for the plugin's skill gate, stopping a write into a `SKILL.md`,
+an instruction file or an agent contract once until
+`maintaining-project-memory` is loaded. That text, the verifier pass it had
+before any draw and the live check of the stop are recorded in
+`maintaining-project-memory-sweeps-the-unnamed-copy`, the sibling built for
+the round, whose short form names its subject only by a paraphrase.
+
+**The stop reaches this case**: every rep edits `skills/handoff/SKILL.md`,
+so a rep that has not loaded the skill is stopped at that edit, and
+`skill-was-invoked` reads the stop rather than the trigger in this arm. The
+case's lower-case `handoff` - in the README's lead and in the short form's
+path - also lets any case-insensitive name search reach every copy, so this
+arm reads the letter-case half of the step and not the second search, which
+the sibling reads. Its baseline is this record's 0/5; the bar, fixed before
+any draw, is 4/5.
+
+Five reps from a detached worktree at the sibling's commit, the same flags:
+$1.15, kept as `round-49c@copies-treated.json`, traces and trees under
+`evals/results/task49c-copies-treated-traces/`. Nothing curtailed: one
+`result` record per trace, all `success`, 15-17 turns and 35-43 seconds.
+Arm membership and the stop, read from every trace before any grader: the
+start hook carries the treated bullet's words in five of five; reps 1, 2 and
+3 loaded the skill before their first write into the handoff skill, and reps
+4 and 5 were stopped at that write and loaded it with their next call.
+**The condition: met in all five.** Every rep searched, and every search was
+in any letter case:
+
+| Rep | How the skill loaded | Search | checklist | README | short form | all three |
+|---|---|---|---|---|---|---|
+| 1 | before its first write | `hand-over\|handoff\|hand over` | pass | pass | pass | **pass** |
+| 2 | before its first write | `hand-over\|handoff` with the items' headlines, before any edit | pass | pass | pass | **pass** |
+| 3 | before its first write | `hand-over note\|hand over note\|handoff`, then the new item's words | pass | pass | pass | **pass** |
+| 4 | the gate's stop | `hand-over\|handoff`; after its edits, the old and new items' words | pass | pass | pass | **pass** |
+| 5 | the gate's stop | `hand-over\|handoff\|hand over`, then a shell `grep -i` of both copies | pass | pass | pass | **pass** |
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 5/5 | 5/5 |
+| `short-form-carries-it` | 5/5 | 5/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+| **all three copies** | **5/5** | **5/5** |
+
+Runner and hand agree on all twenty cells; rep 3's copies name the item as
+"how to undo", which the undo alternation carries. **This arm clears its bar,
+five of five against four** - but the round lands only when every treated arm
+that decides clears its bar, and the sibling's, on a 0/5 baseline, came to
+1/5: its misses ran the name search and never the second, and there the
+name search cannot reach the short form. So on this case the letter-case
+clause bound in five of five (one of four searching reps under this record's
+first treated text), and the second search's worth is read on the sibling,
+not here.

@@ -110,3 +110,142 @@ on both sides of the line: s02 against s03 (the item added, or the bullet cut
 to a pointer), s10 against s05 and s12 (a new bullet that names the note, or
 one that names another thing), and s11, whose phrase and item both break
 across lines. The trees and the harness are kept with the round's results.
+
+## The treated text, and the one verifier before any draw
+
+The treated arm carries the first case's tested text - four tests appended
+to "A memory write is a promotion", a boundary on "Promotion into a skill",
+a red-flag row, and the brief's bullet restated - with the search step
+restated in the section's fourth test, in the brief's last clause and in two
+red-flag rows, and with a fifth act for the plugin's skill gate: a write into
+a `SKILL.md`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md` or `GEMINI.md` in
+any letter case, a `.md` directly under a directory named `agents`, or a
+`.md` under `skills/<name>/references/`, by `Edit`, `Write` or a shell
+segment's own target words, stopped once until `maintaining-project-memory`
+is loaded. It runs from a detached worktree at the case's commit; the whole
+diff is kept under `evals/results/task49c-verifier/`.
+
+One scoped blind verifier read the restated search and its evidence, the
+brief's last clause, both rows and the gate's code, and every finding
+adopted was reproduced at source first. It confirmed the evidence clause's
+counts against the first case's traces and the gate's memory verdicts
+against its code before the change (5,196 commands, no difference), and
+changed four things. "A distinctive word" of each old item steered to the
+owner's elaboration - `deploy`, `unfinished`, `dashboard` find only the
+skill's own file in both variants - so the section's test now asks for "a
+word of each thing the owning text said before the change that a shortened
+copy would keep - from each item it listed, its headline rather than its
+elaboration", and the brief for "a word a shortened copy would keep from
+each thing the owning text said before the change". The brief's "before
+calling it landed" became "before calling what you wrote landed". Both rows
+now state the name in every spelling and a word of each old item. And the
+gate's parse gained four fixes, each with a test that fails without it: a
+quoted `git -C` path, a trailing comment, `sed` or `perl` only as the
+command word, and `perl -0pi`. The brief bullet came to 205 words.
+
+## The gate, live, before any arm
+
+Three one-rep throwaway sessions of the treated plugin, same flags, $0.44:
+an `Edit` of `CLAUDE.md` was stopped, the next call loaded
+`maintaining-project-memory`, and the retried `Edit` ran; an
+`echo ... >> AGENTS.md` was stopped, loaded, and ran on the retry; a
+session told to load the skill first edited `CLAUDE.md` with no stop.
+
+## The baseline arm: five reps, all measured, none pass
+
+Five reps of the plugin at the case's commit plus one backlog-only commit
+another session landed meanwhile (`BACKLOG.md` alone, so the plugin is the
+same bytes), `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp` on CLI 2.1.280: $0.58, kept as `round-49c@sibling-baseline.json`
+with each rep's trace and tree under
+`evals/results/task49c-sibling-baseline-traces/`. Nothing curtailed: one
+`result` record per trace, all `success`, 5-7 turns against 40 and 11-22
+seconds against 600. Arm membership read from every trace: the brief
+arrived, without the treated bullet's words, and no rep was stopped. The
+runner's kept directories seal each run's home (mode 000); the trees were
+read after opening them as its notice says, without running git inside.
+
+**The condition: met in all five.** Every rep read the skill, landed the
+item in the owner section and ran no search at all.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 4/5 | 4/5 |
+| `readme-carries-it` | 0/5 | 0/5 |
+| `short-form-carries-it` | 0/5 | 0/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+| **all three copies** | **0/5** | **0/5** |
+
+Reps 1, 2, 3 and 5 brought the checklist in the same file into line; rep 4
+edited the owner section alone; none opened `README.md` or `CLAUDE.md`.
+Runner and hand agree on all twenty cells. **By the bar, 0/5 buys the
+treated arm's five reps, landing at 4/5 or better.**
+
+## The treated arm: five reps, all measured, one passes - below the bar
+
+Five reps of the treated plugin, same flags: $1.09, kept as
+`round-49c@sibling-treated.json`, traces and trees under
+`evals/results/task49c-sibling-treated-traces/`. Nothing curtailed: one
+`result` record per trace, all `success`, 10-17 turns and 29-65 seconds.
+**Arm membership and the stop, read from every trace before any grader:**
+the start hook carries the treated bullet's "once for the subject's name in
+each spelling" in five of five; reps 1, 2 and 3 loaded the skill before
+their first write into the handoff skill, and reps 4 and 5, which had not,
+were stopped at that write and loaded it with their next call. So every rep
+had the section's restated test loaded, and every rep is measured.
+**The condition: met in all five.**
+
+| Rep | How the skill loaded | Name search | Search on the old items' words | checklist | README | short form | all three |
+|---|---|---|---|---|---|---|---|
+| 1 | before its first write | `hand-over\|handoff\|rollback\|roll back\|undo`, any case, under `skills/` only | none | pass | fail | fail | fail |
+| 2 | before its first write | `hand-over\|handoff`, one case | none | pass | pass | fail | fail |
+| 3 | before its first write | `hand-over\|hand over\|handoff`, any case; then the new item's words | none | pass | pass | fail | fail |
+| 4 | the gate's stop | `hand-over\|handoff\|hand over`, any case | none | pass | pass | fail | fail |
+| 5 | the gate's stop | `hand-over\|handoff`, any case, with the items' headlines `What was done\|What is still open\|How to check the current state` in the same pattern | the headlines | pass | pass | pass | **pass** |
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 3/5 | 4/5 |
+| `short-form-carries-it` | 1/5 | 1/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+| **all three copies** | **1/5** | **1/5** |
+
+Runner and hand agree on nineteen of twenty cells. Rep 2's README reads "how
+to roll each deployed or migrated change / back": five words inside "roll
+... back", across a line, where the grader's window takes three; the hand
+read passes it, and no rep's verdict moves, since rep 2 left `CLAUDE.md`
+untouched.
+
+**Reading, by the bar fixed before any draw: the sweep does not land.** One
+of five against a bar of four, on a 0/5 baseline. The four misses are one
+mechanism, and it is not the one the restated step was written against:
+
+- **Every rep searched, and nine of the ten treated reps across both cases
+  searched in any letter case** - against one of four searching reps under
+  the first case's text. The letter-case half binds.
+- **The second search did not run in any miss.** Each ran the name search -
+  rep 3 the new item's words as well - brought what it found into line and
+  closed: reps 2, 3 and 4 the README and the checklist, rep 1 the checklist
+  alone. The short form, which only the old items' words reach, stayed as it
+  was in all four. The
+  one pass is the one rep whose pattern carried the old items' words. So the
+  text in front of all five, loaded in all five, did not bind the search
+  that nothing else in the work calls for - the same boundary the section's
+  third test states for a read no act of the work makes.
+- **Rep 1's search could not have found either copy**: it searched under
+  `skills/` alone, and closed "No other file references the handoff note's
+  contents, so this is the only copy to update."
+- **The stop delivered the skill every time it was needed** - reps 4 and 5
+  here - and loading it decided nothing: both stopped reps loaded it and
+  searched, one passing and one not, and the three that loaded it unprompted
+  all searched and all missed.
+- **No rep searched as the text asks and missed a copy**, so nothing here
+  says the restated step is wrong where it runs; rep 5 is that case, and it
+  found all three.
+
+Nothing else was bought. The extension belonged to a 2-3/5 baseline and the
+neighbours to a landing. Spent on the round, both cases: $0.44 for the live
+check, $0.58 for this baseline, $1.15 for the first case's treated arm and
+$1.09 for this one - **$3.25** of the approved ~$3.15 for the case arms (up
+to ~$14.60 with the extension and the neighbours).
