@@ -93,3 +93,139 @@ under `evals/results/task49r-calibration/`.
 What the patterns cannot see and the hand read covers: a copy removed
 outright or reformatted past its heading or bullet lead fails the pattern;
 every failing rep's tree is read before its fail is counted.
+
+## The draft, and the two verification passes before any draw
+
+The treated arm carries task 49's draft - A, four tests appended to "A
+memory write is a promotion"; A2, a boundary on "Promotion into a skill"'s
+pointer bullet; one red-flag row; and B, the brief's bullet 3 restated -
+after two verification passes, each finding re-checked at source before
+anything was adopted. The blind pass (ten claims, pinned at `eec58d3`,
+barred from the plan's reasoning) corrected four of the draft's examples
+against their records: the prohibition example (all five treated reps of
+the drift case stashed, and the rule fired as an audit after the act rather
+than being "recognised and broken in one step"), the skill gate (it stops an
+act once, not "until the document is open"), the short form the fourth
+landing left behind (the repository's instruction file, not the brief) and
+the trigger example's second failure. It also showed that B's trigger had
+dropped the current bullet's "one copy onto another" and that B's last
+clause, "every other place that lists it", read with "it" as the rule
+exempts exactly the stale copies. The delta check on the changed sentences,
+the second pass and the one where the protocol stops, confirmed the figures
+and their dates, and moved B's search to "its subject, not the new wording"
+and its copies to every place that "states or lists" it. Two of its
+suggestions were declined: "in the same commit" for "before calling it
+landed", which a session told not to commit reads as not applying, and an
+example list for the short form naming "an instruction file", which names
+this case's own short form. B came to 178 words, against 71 today and the
+longest bullet's 162; the skill to 2,523 words from 1,807. The full diff is
+kept as `evals/results/task49r-treated-traces/treated-wording.diff`, with
+each finding's disposition beside it.
+
+## The baseline arm: five reps, all measured, none pass
+
+Five reps of the plugin at `6216416` (the case's commit, no draft),
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp` on
+CLI 2.1.280: $0.77 and 34 seconds wall, kept as `round-49r@baseline.json`,
+each rep's trace and final tree under `evals/results/task49r-baseline-traces/`.
+Nothing curtailed: one `result` record per trace, all `success`, 5-6 turns
+against a 40-turn cap and 13-17 seconds against 600. The brief reached every
+rep, and every rep's first call loaded `tracking-open-asks`.
+
+**The condition, read from each tree before any grader: met in all five.**
+Every rep read `skills/handoff/SKILL.md`, and only that file, and added the
+rollback as a fourth (or second) item of what a note carries. No top-up was
+needed. The runner's per-rep score was printed beside the run summary before
+the hand grades were taken; the hand grades below were taken from the trees'
+diffs against a fresh build of the fixture.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 4/5 | 4/5 |
+| `readme-carries-it` | 0/5 | 0/5 |
+| `short-form-carries-it` | 0/5 | 0/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+| **all three copies** | **0/5** | **0/5** |
+
+Four reps brought the checklist in the same file into line - the one copy
+in front of them - and none opened `README.md` or `CLAUDE.md`; rep 1 edited
+the owner section alone. Every closing reply reports the work as complete:
+"Nothing else changed; no open items remain" (rep 1), "a matching checklist
+line" (reps 2-5). Runner and hand agree on all twenty cells. Whether the
+fixture's `CLAUDE.md` was in each rep's context is not readable from the
+trace, which carries no system prompt.
+
+**By the bar fixed before the draw, 0/5 buys the treated arm's five reps,
+landing at 4/5 or better.**
+
+## The treated arm: five reps, all measured, three pass - below the bar
+
+Five reps of the plugin from a detached worktree at `6216416` carrying the
+draft, the same flags: $0.90 and 76 seconds wall, kept as
+`round-49r@treated.json`, traces and trees under
+`evals/results/task49r-treated-traces/`. Nothing curtailed: one `result`
+record per trace, all `success`, 6-15 turns and 13-46 seconds - the sweep
+roughly doubles a rep's turns. Arm membership read from every trace: the
+start hook's output carries B's phrase "states or lists that subject into
+line", which only the treated text has, in five of five.
+
+**The condition: met in all five.**
+
+| Rep | Searched for other copies | checklist | README | short form | all three | skill loaded |
+|---|---|---|---|---|---|---|
+| 1 | `hand-over\|handoff\|rollback\|roll back`, case-insensitive: 3 files | pass | pass | pass | **pass** | no |
+| 2 | `hand-over note\|handoff`, case-sensitive: 3 files | pass | pass | pass | **pass** | yes |
+| 3 | no search | pass | fail | fail | fail | no |
+| 4 | `hand-over\|handoff`, case-sensitive: 3 files | pass | pass | pass | **pass** | yes |
+| 5 | `hand-over note\|handoff note`, case-sensitive: 1 file | pass | fail | fail | fail | yes |
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 3/5 | 3/5 |
+| `short-form-carries-it` | 3/5 | 3/5 |
+| `skill-was-invoked` | 3/5 | 3/5 |
+| **all three copies** | **3/5** | **3/5** |
+
+Runner and hand agree on all twenty cells. Rep 4's short form names the
+item as "the step that undoes it"; the pattern's undo alternation carries
+it, and so does the hand read.
+
+**Reading, by the bar fixed before any draw: the wording does not land.**
+Three of five against a bar of four. The clause moved the act it names - a
+search for other copies in four treated reps against none in the baseline,
+and each rep that searched and found them rewrote them, one quoting B's own
+clause back ("per the 'bring every other place that states or lists that
+subject into line' rule") - but three in five against none in five is a
+gap five reps an arm cannot separate, and the section reads a treated arm
+below its bar as the brief clause unbound, which is 49b's question.
+
+What the two failures are, since they are different mechanisms:
+
+- **Rep 3 never searched.** B reached it and it acted as the baseline did:
+  the owner section, the checklist in view, done. The clause did not bind.
+- **Rep 5 searched, and its search could not have found the copies.** It
+  loaded the skill, grepped the workspace for `hand-over note|handoff note`
+  case-sensitively, found only the file it had edited, and closed "No other
+  copies to sync. Done." `CLAUDE.md` says "Hand-over notes" and the README
+  says "**handoff**", so neither matches. The clause bound; the search it
+  asked for came back empty for a reason having nothing to do with whether
+  copies existed - the check-result family's mechanism, a result that could
+  not have come out the other way, met here inside the sweep.
+
+**The passes rest partly on the fixture's own pointer.** Reps 2 and 4
+searched case-sensitively as well, and found `CLAUDE.md` only because its
+bullet ends in the path `skills/handoff/SKILL.md`, whose "handoff" matched;
+"Hand-over notes" did not. Only rep 1's case-insensitive search would have
+found a short form carrying no path. So the sweep's weak point, after
+whether it runs at all, is what it searches for: a subject's words in the
+reader's own spelling and case, not in the owner's.
+
+**Skill loading did not decide the rep.** It loaded in three treated reps
+and none of the baseline's; two of the three passed, and rep 1 passed
+without it. The skill's fourth test was in front of rep 5 when it ran the
+narrow search.
+
+Nothing else was bought. The extension belonged to a 2-3/5 baseline, and the
+neighbours only to a treated arm that lands. Spent on the round: $0.77 and
+$0.90, **$1.67** of the approved ~$3.50 for the case (up to ~$17 in all).
