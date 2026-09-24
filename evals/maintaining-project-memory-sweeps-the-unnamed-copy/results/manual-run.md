@@ -249,3 +249,69 @@ neighbours to a landing. Spent on the round, both cases: $0.44 for the live
 check, $0.58 for this baseline, $1.15 for the first case's treated arm and
 $1.09 for this one - **$3.25** of the approved ~$3.15 for the case arms (up
 to ~$14.60 with the extension and the neighbours).
+
+## A second treated arm: a hook that hands the stale copies at the turn's end
+
+The round above showed the sibling's miss exactly: every treated rep
+searched, but only for the subject's name, which this short form does not
+carry, and never for the old items' own words. This arm runs that second
+search outside the model, as a hook on `UserPromptSubmit` and `Stop` that
+hands the session, at the turn's end, the lines elsewhere still carrying
+what its change to a rule file replaced. What the hook reads and hands, the
+offline gate it passed before any draw, the two blind readers and the live
+check are recorded in `maintaining-project-memory-sweeps-the-copies`, which
+ran the same arm. On this fixture the hook reads the old items from the
+list the change joined, so it reaches the short form through "What was
+done", "What is still open" and "How to check the current state", none of
+which is the subject's name.
+
+**The baseline, re-taken on CLI 2.1.281:** five reps of the plugin at the
+head, the same flags as this record's earlier arms, $0.64. Nothing
+curtailed: one `success` record per trace, 6-8 turns against 40 and 11-21
+seconds against 600. Every trace names the plugin at the head, without the
+hook, and the brief arrived in each. **The condition: met in all five.**
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 0/5 | 0/5 |
+| `short-form-carries-it` | 0/5 | 0/5 |
+| `skill-was-invoked` | 1/5 | 1/5 |
+| **all three copies** | **0/5** | **0/5** |
+
+Every rep edited `skills/handoff/SKILL.md` alone; rep 4 loaded the skill
+first and still ran no search. Replayed offline on each kept tree, the hook
+hands exactly `CLAUDE.md` and `README.md` in all five. **By the bar fixed
+before any draw, 0/5 buys the treated arm's five reps, landing at 4/5 or
+better.**
+
+**The treated arm: five reps of the plugin with the hook, the same flags,
+$0.88.** Nothing curtailed: one `success` record per trace, 10-11 turns and
+20-47 seconds. Every trace names the plugin with the hook. **Measured, read
+before any grader:** the condition is met in all five, and each rep's
+transcript carries one hand-off after its edits to the handoff skill, naming
+`CLAUDE.md:6-8` and `README.md:10-12`, its record read as seen.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 5/5 | 5/5 |
+| `short-form-carries-it` | 5/5 | 5/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+| **all three copies** | **5/5** | **5/5** |
+
+Every rep then rewrote the short form's own bullet - "The note you leave
+when work changes hands carries ..." - to carry the rollback, three of them
+at the end of its list and two right after its first item; none cut it to
+a pointer, and the short-form grader's named blind spot (a
+bullet referring back to the note without naming it) did not arise. Runner
+and hand agree on all forty cells of both arms. Rep 2 also wrote a note into
+the harness's own memory directory, which no grader reads.
+
+**Reading, by the bar fixed before any draw: this arm clears it, five of
+five against four on a 0/5 baseline**, as the first case's does, so the
+round lands. Against this record's earlier arm the move is from 1/5 to 5/5
+with no skill or brief text changed: the search the restated step did not
+bind, run by the hook instead, reached the copy only the old items' words
+reach.
+The cost of the round is in the first case's record.

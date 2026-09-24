@@ -289,3 +289,132 @@ name search cannot reach the short form. So on this case the letter-case
 clause bound in five of five (one of four searching reps under this record's
 first treated text), and the second search's worth is read on the sibling,
 not here.
+
+## A third treated arm: a hook that hands the stale copies at the turn's end
+
+The two rounds above left the sweep's delivery settled and its search not:
+every treated rep loaded the skill and searched, and the misses were a
+search on the old items' words that nothing else in the work asks for. This
+arm moves that search out of the model. The plugin gains one hook,
+`hooks/landing-sweep.py`, registered for `UserPromptSubmit` and `Stop`, and
+no skill or brief text changes:
+
+- At each prompt it copies the repository's rule files (`SKILL.md`,
+  `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md`
+  and `README.md` in any letter case, contracts under `agents/`, skill
+  references) into a private state directory outside the tree, keyed by the
+  prompt's id.
+- At the turn's end it diffs each rule file the turn wrote against that
+  copy, takes what the diff says the file said before - the headlines of a
+  list the change added an item to, five-word runs of replaced text, and
+  five-word runs of the paragraphs beside a prose addition - and hands the
+  session, through the Stop hook's additional context, the lines elsewhere
+  that still carry them, at most once a prompt. Lines the turn itself wrote
+  are left out, and so is any line already handed and seen in the session.
+
+The hand-off tells the session to open each line and bring a copy that
+states or lists the same thing into line, a short form rewritten to carry
+it and never cut to a pointer, and to leave records, quotes of the old
+wording, other meanings and temporary copies alone, saying so.
+
+**Built and gated before anything was paid.** The hook was built in a
+scratch worktree with its self-tests in `scripts/test-hooks.sh`, and had to
+reproduce the pricing's offline replays before any draw:
+
+- On the 25 kept reps of this case and its sibling, it blocked the 16 that
+  had left a copy and none of the 9 that had not, each handed exactly the
+  copies its grades say it left, by both of its read paths (the snapshot,
+  and undoing the rep's own edits from its trace where no snapshot exists).
+- The item put into a wrong bullet of `CLAUDE.md` and `README.md` is handed;
+  the right bullets, and a wrapped paragraph fixed on one line, are not.
+- On the four recorded landings of the rule this case is about, it hands
+  the two stale copies the pricing found (a `CONTRIBUTING.md` paragraph, a
+  `CLAUDE.md` bullet) and nothing on the other two.
+- Replayed over the real sessions on this machine where the plugin ran, it
+  blocks the same 6 of 17 turns (7 of 18 by the other dating of their
+  commits) with the same files as the pricing's prototype.
+- Both halves finish inside 3 seconds on the two largest client
+  repositories here (one of 4,602 files, one of 122 MB), and the snapshot
+  half inside 3 seconds in two large working directories with no git.
+
+Two blind readers then worked on it, every finding reproduced at source
+before it was acted on. The first found, among others, a word diff that
+took 17 s on a ticked 300-item checklist, a soft reset or rebase after the
+turn's own commit silencing it, loose lists and underscored words read
+wrong, and an edit to a user's config directory outside git handing that
+directory's transcripts and editor backups. The
+second read the fixes and found they had broken other things: headlines read
+from the changed text, unlike rows paired, a move's own change handed as the
+turn's. All were fixed and pinned by tests that fail on the version before
+each fix. The final commit follows the second reader's suggested fixes -
+four of them variants it had built and run, the rest suggestions - and has
+had no third reader. A mutation pass then killed every targeted mutant of
+the hook except two whose removal changes nothing a test can see: an early
+exit where no rule file was written, and a byte prefilter in front of an
+exact prompt-id check.
+
+**The live check, three one-rep sessions, $0.65.** A session told to make
+one edit to the owner section and stop was handed its three stale copies
+once, edited all three, and its next stop was silent; the same tree with no
+git was handed the same lines through its snapshot; a session told to bring
+every copy into line first was handed nothing. The hand-off does not appear
+in the runner's stream-json trace: it is a `hook_additional_context`
+attachment in the session transcript under the run's `config/projects/`,
+which is where every treated rep below is read.
+
+**The baseline, re-taken on CLI 2.1.281:** five reps of the plugin at the
+head, the same flags as this record's earlier arms, $0.83. Nothing
+curtailed: one `success` record per trace, 6-7 turns against 40 and 14-24
+seconds against 600. Every trace names the plugin at the head, without the
+hook, and the brief arrived in each. **The condition: met in all five.**
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 0/5 | 0/5 |
+| `short-form-carries-it` | 0/5 | 0/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+| **all three copies** | **0/5** | **0/5** |
+
+Every rep edited `skills/handoff/SKILL.md` alone, the owner section and the
+checklist below it. Replayed offline on each kept tree, the hook hands
+exactly `CLAUDE.md` and `README.md` in all five, so every baseline rep
+reaches its condition. **By the bar fixed in the plan before any draw, 0/5
+buys the treated arm's five reps, landing at 4/5 or better.**
+
+**The treated arm: five reps of the plugin with the hook, the same flags,
+$0.89.** Nothing curtailed: one `success` record per trace, 10-11 turns and
+20-39 seconds. Every trace names the plugin with the hook. **Measured, read
+before any grader:** the condition is met in all five, and each rep's
+transcript carries one hand-off, after its edits to the handoff skill,
+naming `CLAUDE.md:6-7` and `README.md:10-12`; each hand-off's record reads
+seen, so the continued turn's stop carried `stop_hook_active` and stayed
+silent.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `checklist-carries-it` | 5/5 | 5/5 |
+| `readme-carries-it` | 5/5 | 5/5 |
+| `short-form-carries-it` | 5/5 | 5/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+| **all three copies** | **5/5** | **5/5** |
+
+Every rep edited `CLAUDE.md` and `README.md` after the hand-off, rewriting
+the short form's own bullet to carry the rollback; none cut it to a pointer,
+and none loaded the skill, which the hook does not need. Runner and hand
+agree on all forty cells of both arms. Replayed on each final tree, the hook
+hands nothing.
+
+**Reading, by the bar fixed before any draw: this arm clears it, five of
+five against four on a 0/5 baseline**, and the sibling's arm does too (its
+record), so the round lands. What it does not decide: whether a session
+handed a line it should leave - a run record, a sibling rule quoting the
+old wording - leaves it, which is a rule of restraint measured separately,
+and the hook's reach on shapes this case does not have. The hook is not on
+the main branch; it lands only once that restraint measurement clears its
+own bar.
+
+Spent on the round, both cases: $1.47 for the two baselines, $0.65 for the
+live check and $1.77 for the two treated arms - **$3.89** of the approved
+~$4.15. Traces, final trees and transcripts are kept under
+`evals/results/task49f-*`.
