@@ -1054,7 +1054,7 @@ contains "sweep's prefilter finds a copy whose words carry underscores" "$(hande
 R="$WORK/sw-rows"; sweep_repo "$R"
 "$PY" - "$R" <<'EOF'
 import sys
-rows = "".join("| `/v1/items/%d` | GET | returns the item list for the account %d | yes |\n" % (i, i) for i in range(400))
+rows = "".join("| `/v1/items/%d` | GET | returns the item list for the account %d | yes |\n" % (i, i) for i in range(3000))
 open(sys.argv[1] + "/README.md", "a").write("\n| Endpoint | Method | What it does | Auth |\n|---|---|---|---|\n" + rows)
 open(sys.argv[1] + "/docs/api.md", "w").write("It returns the item list for the account 7 on request.\n")
 EOF
@@ -1122,6 +1122,174 @@ out=$(sweep_submit "$R" s40 p1)
 check "sweep's snapshot passes a rule file that is a device or a pipe" 0 $?
 mode=$("$PY" -c 'import os, stat, sys; print(oct(stat.S_IMODE(os.stat(sys.argv[1]).st_mode)))' "$SW/delivery-skills-landing-sweep-$(id -u)/s40")
 check "sweep keeps its state private" "0o700" "$mode"
+
+# The list's headlines are what it said before the turn, whichever change of
+# the turn rewrote an item.
+R="$WORK/sw-count"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Parts\n\n## What ships\n\n- **Eighteen skills** - each owns a rule.\n- **Three agent types** - each owns a pass.\n- **Four hooks** - each owns a moment.\n' > "$R/skills/handoff/references/parts.md"
+printf 'Eighteen skills, three agent types and four hooks.\n' > "$R/docs/stale.md"
+printf 'Nineteen skills, three agent types and four hooks.\n' > "$R/docs/current.md"
+(cd "$R" && git add -A && git commit -qm parts)
+sweep_submit "$R" s43 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/parts.md" '**Eighteen skills**' '**Nineteen skills**'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/parts.md" 'owns a moment.\n' 'owns a moment.\n- **One sweep** - at the stop.\n'
+text=$(context "$(sweep_stop "$R" s43 p1)")
+contains "sweep searches a list's headlines as they stood before the turn" "$text" '"Eighteen skills"'
+lacks "sweep never searches a headline's new wording" "$text" '"Nineteen skills"'
+
+# A long bullet merged into its neighbour keeps its replaced runs; rows of
+# unlike text are never paired because their count held.
+R="$WORK/sw-long"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+r = sys.argv[1]
+a = " ".join("alpha%03d" % i for i in range(320))
+b = " ".join("beta%03d" % i for i in range(320))
+with open(r + "/CLAUDE.md", "a") as fh:
+    fh.write("- " + a + "\n- " + b + "\n")
+open(r + "/docs/alpha.md", "w").write(" ".join("alpha%03d" % i for i in range(100, 112)) + "\n")
+open(r + "/docs/beta.md", "w").write(" ".join("beta%03d" % i for i in range(200, 212)) + "\n")
+EOF
+(cd "$R" && git commit -qam long)
+sweep_submit "$R" s44 p1 >/dev/null
+"$PY" - "$R/CLAUDE.md" <<'EOF'
+import sys
+p = sys.argv[1]
+text = open(p).read()
+a = " ".join("alpha%03d" % i for i in range(320))
+b = " ".join("beta%03d" % i for i in range(320))
+new_b = b.replace("beta205 beta206", "gamma205 gamma206")
+open(p, "w").write(text.replace("- " + a + "\n- " + b + "\n", "- " + new_b + "\n- " + " ".join("delta%03d" % i for i in range(320)) + "\n"))
+EOF
+got=$(handed "$(sweep_stop "$R" s44 p1)")
+contains "sweep reads the runs a deleted long bullet lost" "$got" "docs/alpha.md:1"
+contains "sweep reads the runs a long bullet's rewording lost" "$got" "docs/beta.md:1"
+
+# A blank line joins two items of one list, never a numbered list to a
+# bulleted one.
+R="$WORK/sw-kinds"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Kinds\n\n1. **First numbered step** - one.\n2. **Second numbered step** - two.\n\n- **Loose bullet one** - a.\n- **Loose bullet two** - b.\n' > "$R/skills/handoff/references/kinds.md"
+printf 'First numbered step, then the second numbered step.\n' > "$R/docs/numbered.md"
+(cd "$R" && git add -A && git commit -qm kinds)
+sweep_submit "$R" s45 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/kinds.md" '- b.\n' '- b.\n- **Loose bullet three** - c.\n'
+lacks "sweep never joins a bulleted list to the numbered one above it" "$(handed "$(sweep_stop "$R" s45 p1)")" "docs/numbered.md"
+
+# A move's own change is never handed as the turn's: a pull before the
+# turn's edit, and a pull that is the turn's only act on a file already dirty.
+R="$WORK/sw-pulled"; sweep_repo "$R"
+U="$WORK/sw-pulled-up"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com \
+  && sed 's/^The next person has the note/The next reader has the note/' skills/handoff/SKILL.md > s.tmp \
+  && cat s.tmp > skills/handoff/SKILL.md && git commit -qm upstream skills/handoff/SKILL.md)
+sweep_submit "$R" s46 p1 >/dev/null
+(cd "$R" && git -c pull.ff=only pull -q "$U" main)
+add_item "$R" "$WORK/t-pulled.jsonl" p1
+got=$(handed "$(sweep_stop "$R" s46 p1 false "$WORK/t-pulled.jsonl")")
+contains "sweep hands the turn's own change after a pull" "$got" "CLAUDE.md:3-4"
+lacks "sweep never hands a pulled change as the turn's" "$got" "docs/onboarding.md"
+R="$WORK/sw-dirty"; sweep_repo "$R"
+U="$WORK/sw-dirty-up"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com \
+  && sed 's/^The next person has the note/The next reader has the note/' skills/handoff/SKILL.md > s.tmp \
+  && cat s.tmp > skills/handoff/SKILL.md && git commit -qm upstream skills/handoff/SKILL.md)
+add_item "$R"
+sweep_submit "$R" s47 p1 >/dev/null
+(cd "$R" && git -c merge.autoStash=true -c pull.ff=only pull -q "$U" main >/dev/null 2>&1)
+empty "sweep leaves a file dirty before the prompt that only a pull moved" "$(sweep_stop "$R" s47 p1)"
+
+# The first move of a turn, not its last, is the one a commit before it
+# counts from; a deleted item of the list is what it said before; the
+# list's heading is read where it stood before lines above it moved.
+R="$WORK/sw-twomoves"; sweep_repo "$R"
+sweep_submit "$R" s51 p1 >/dev/null
+add_item "$R"
+(cd "$R" && git commit -qam land && git reset -q --soft HEAD~1 && git stash -q && git checkout -q -b other \
+  && git stash pop -q && printf 'more\n' >> docs/one.md && git commit -qm other docs/one.md)
+contains "sweep counts a commit from the turn's first move" "$(handed "$(sweep_stop "$R" s51 p1)")" "CLAUDE.md:3-4"
+R="$WORK/sw-twopulls"; sweep_repo "$R"
+U="$WORK/sw-twopulls-up"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com \
+  && sed 's/^The next person has the note/The next reader has the note/' skills/handoff/SKILL.md > s.tmp \
+  && cat s.tmp > skills/handoff/SKILL.md && git commit -qm upstream skills/handoff/SKILL.md)
+sweep_submit "$R" s55 p1 >/dev/null
+(cd "$R" && git -c pull.ff=only pull -q "$U" main && git checkout -q -b other)
+empty "sweep reads each move's own diff, not only the last move's" "$(sweep_stop "$R" s55 p1)"
+R="$WORK/sw-dropped"; sweep_repo "$R"
+sweep_submit "$R" s52 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '1. **What was done** - each change, and where it landed.\n' ''
+add_item "$R"
+contains "sweep reads an item the turn deleted as one the list held" "$(handed "$(sweep_stop "$R" s52 p1)")" "docs/guide.md:3"
+R="$WORK/sw-heading"; sweep_repo "$R"
+printf 'What a hand-over note carries: what was done first.\n' > "$R/docs/head.md"
+(cd "$R" && git add -A && git commit -qm head)
+sweep_submit "$R" s53 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' \
+  'went the way it did.\n\nOne.\n\nTwo.\n\nThree.\n\nFour.\n\nFive.\n\nSix.\n\nSeven.\n\nEight.\n\nNine.\n\nTen.\n'
+add_item "$R"
+contains "sweep reads the list's heading where it stood before the turn" "$(handed "$(sweep_stop "$R" s53 p1)")" "docs/head.md:1"
+
+# A long document whose every paragraph changed is diffed within the budget.
+R="$WORK/sw-paras"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+r = sys.argv[1]
+paras = ["Paragraph %d keeps the ledger sync notes for team %d in order." % (i, i) for i in range(1000)]
+open(r + "/README.md", "a").write("\n" + "\n\n".join(paras) + "\n")
+open(r + "/docs/para.md", "w").write("It keeps the ledger sync notes for team 500 in order.\n")
+EOF
+(cd "$R" && git commit -qam paras)
+sweep_submit "$R" s54 p1 >/dev/null
+"$PY" - "$R/README.md" <<'EOF'
+import sys
+p = sys.argv[1]
+text = open(p).read()
+open(p, "w").write(text.replace("keeps the ledger sync notes", "holds the ledger notes"))
+EOF
+contains "sweep diffs a document whose every paragraph changed within its budget" "$(handed "$(sweep_stop "$R" s54 p1)")" "docs/para.md:1"
+
+# A state directory that is open to others or a link is never used.
+R="$WORK/sw-open"; sweep_repo "$R"
+mkdir -p "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)" "$WORK/link-tmp" "$WORK/link-target"
+chmod 777 "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)"
+chmod 700 "$WORK/link-target"
+ln -s "$WORK/link-target" "$WORK/link-tmp/delivery-skills-landing-sweep-$(id -u)"
+printf '{"hook_event_name":"UserPromptSubmit","session_id":"s48","prompt_id":"p1","cwd":"%s"}' "$R" | TMPDIR="$WORK/open-tmp" "$PY" "$SWEEP_HOOK"
+empty "sweep writes nothing into a state directory others can open" "$(ls -A "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)")"
+printf '{"hook_event_name":"UserPromptSubmit","session_id":"s48","prompt_id":"p1","cwd":"%s"}' "$R" | TMPDIR="$WORK/link-tmp" "$PY" "$SWEEP_HOOK"
+empty "sweep writes nothing through a state directory that is a link" "$(ls -A "$WORK/link-target")"
+
+# A line found only beside an addition is marked, and keeps one of the eight
+# places when other lines fill the rest.
+R="$WORK/sw-slot"; sweep_repo "$R"
+for n in 1 2 3 4 5 6 7 8 9; do cp "$R/CLAUDE.md" "$R/docs/copy$n.md"; done
+sweep_submit "$R" s49 p1 >/dev/null
+add_item "$R"
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' 'went the way it did.\n\nWrite it the day you hand over.\n'
+text=$(context "$(sweep_stop "$R" s49 p1)")
+contains "sweep marks a line found beside the addition" "$text" "\`docs/onboarding.md:1\` - beside: "
+contains "sweep keeps one of eight places for a line found beside the addition" "$(printf '%s\n' "$text" | grep -c '^- `')" "8"
+
+# The hand-off leaves with 0 even when its reader has gone.
+R="$WORK/sw-pipe"; sweep_repo "$R"
+sweep_submit "$R" s50 p1 >/dev/null
+add_item "$R"
+rc=$("$PY" - "$SWEEP_HOOK" "$R" "$SW" <<'EOF'
+import json, os, subprocess, sys
+r, w = os.pipe()
+os.close(r)
+payload = {"hook_event_name": "Stop", "session_id": "s50", "prompt_id": "p1", "cwd": sys.argv[2], "stop_hook_active": False}
+p = subprocess.run([sys.executable, sys.argv[1]], input=json.dumps(payload).encode(), stdout=w,
+                   stderr=subprocess.DEVNULL, env=dict(os.environ, TMPDIR=sys.argv[3]))
+print(p.returncode)
+EOF
+)
+check "sweep exits 0 when the reader of its hand-off has gone" 0 "$rc"
 
 # Eight lines at most, the rest counted.
 R="$WORK/sw-many"; sweep_repo "$R"
