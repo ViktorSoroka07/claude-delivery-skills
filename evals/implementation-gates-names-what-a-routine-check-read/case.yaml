@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: implementation-gates-names-what-a-routine-check-read
+context:
+  scaffold_script: fixture.sh
