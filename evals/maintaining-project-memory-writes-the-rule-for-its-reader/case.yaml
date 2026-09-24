@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: maintaining-project-memory-writes-the-rule-for-its-reader
+context:
+  scaffold_script: fixture.sh
