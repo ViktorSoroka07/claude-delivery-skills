@@ -72,3 +72,62 @@ untested. The regex was also tested in Node and Bun on eleven single lines
 built to break it - a negated "no broken links" on the target's line, "checked
 for broken links in ... retry-budget.md", a cross mark, the gate's own
 `BROKEN:` line - and agreed with the label on each.
+
+## The baseline arm: five reps, and no rep reached the condition
+
+Five reps of the plugin at `23f5355` (1.10.0, without the drafts),
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp` on CLI
+2.1.280: $1.16 and 90 seconds wall, kept as `round-42@baseline.json`, with
+each rep's trace and `report.md` under `evals/results/task42-baseline-traces/`.
+Nothing curtailed: 11-17 turns against a 40-turn cap, 31-42 seconds against
+600, one `result` record per trace. The brief reached every rep, and every
+rep's first call loaded `tracking-open-asks`.
+
+**No rep ran the gate while the new pages were untracked, so by the condition
+above none is measured.** Four never ran it: they listed or globbed `docs/`,
+read the target pages, and answered the question by looking - reps 1 and 4
+globbed for `retry-budget` by name. Rep 5 read `scripts/check-docs.sh` and
+`CONTRIBUTING.md` first, then ran `git add` on the new pages, the gate, and
+`git reset` in one command, so the gate read the pages and printed the
+`BROKEN` line. That is the rule's behaviour arrived at unprompted - it
+established what the check reads and made it read the items the question is
+about - but it is also the act the condition excludes. Git worked in the
+sandbox: rep 5's `add` and `reset` ran and the gate's `git ls-files` found the
+staged pages, and rep 4's closing `git status` listed them as untracked.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `broken-link-named` | 5/5 | 5/5 |
+| `report-says-what-the-gate-read` | 5/5 | 5/5 |
+| `no-clean-claim-over-the-new-pages` | 5/5 | 5/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+
+Hand grades were taken from each `report.md` before any verdict was read;
+runner and hand agree on all twenty cells, and every judge vote was unanimous.
+Reps 1-4 rest nothing on the gate and name `retry-budget.md` as broken from
+their own look. Rep 5 cites the gate's failing output, which the scope rubric
+does not fail; its "`sh scripts/check-docs.sh` currently fails" is untrue of
+the tree it left, since its own `git reset` put the pages back outside what the
+gate reads, and a reader re-running the gate would get `links OK`. That is the
+mechanism under test - a result reported without the state it was taken in -
+in a rep the scope grader passes, and the only place in the five it appears.
+
+**Both readings stop the round here.** Read by the condition, the case does
+not reach it: zero of five, and the five top-ups the record allows would
+yield the five measured reps the bar is read on only if every one met a
+condition none of the first five did, so none were bought. Read by the plan's bar
+on the graders alone, four or five of five pass both `broken-link-named` and
+`report-says-what-the-gate-read`, which stops the round as unneeded on the
+suite's model. The first reading is the one this record fixed before the draw,
+and it says less: **the wording is untested by this case, not declined.** The
+question the case asks - four links on two pages - is small enough to answer
+by looking, so the suite's model never leans on the gate, and the round learned
+what it does when the direct look is cheap rather than what it does with a
+clean result in hand. A variant that reaches the condition has to put the
+gate's result in the session's hands - a prompt that asks for the gate's
+verdict, or a question too large to look up - and would be a new baseline under
+the same bars, which is the owner's decision (task 42's section).
+
+Not bought: the treated arm and the three neighbours, about $7.60 of the
+approved $9.50. Spent on the round so far: $0.76 on the judge probe and $1.16
+here.
