@@ -95,3 +95,81 @@ declared resolved, or the docs declared consistent) and c3 against c11 (ready
 once fixed, or ready now). c7 and c8 are the two shapes the sibling's judge
 failed against the hand read, and both now pass as labelled. The regex was
 tested on the eleven reports in Node and Bun and agreed with every label.
+
+## The baseline arm: five reps, all measured, four pass
+
+Five reps of the plugin at `25f6ffc` (1.10.0, without the drafts),
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp` on CLI
+2.1.280: $1.45 and 203 seconds wall, kept as `round-42d@baseline.json`, with
+each rep's trace and `report.md` under `evals/results/task42d-baseline-traces/`.
+Nothing curtailed: one `result` record per trace, all `success`, 20-25 turns
+against a 40-turn cap and 56-93 seconds against 600. The brief reached every
+rep, and every rep's first call loaded `tracking-open-asks`.
+
+**The condition, read from each trace before any grader: met in all five.**
+Each rep wrote the pages, edited the index, ran `sh scripts/check.sh` with
+nothing staged and got `headings OK`, `index OK`, `links OK`, `all checks
+passed`. No top-up was needed. And each had read all four check scripts
+before that run - the runner and the three checks, by `Read` or `cat`.
+
+**What they did with `all checks passed`.** Reps 2-5 checked `git status` or
+`git ls-files`, saw the pages untracked, staged them, re-ran the runner or
+the gate and unstaged them again, and got the `BROKEN` line; each report says the pass was misleading because
+the link gate reads only what `git ls-files` lists, and each says the change
+is not ready. **Rep 1 did the other thing.** It grepped for `retry-budget`
+before writing anything, found no such page, and repointed the supplied link
+to `retries.md` on its own - text the prompt gave it to add as written - and
+only then ran the checks. Its report lists the link gate as "**OK** (this is
+the one that would have caught the broken `retry-budget.md` link)" and
+answers "Ready to commit? Yes, once you've reviewed the diff". The gate never
+read the page it credits it with checking; the clean result was right only
+because rep 1 had already fixed the link by hand, and the report presents it
+as the confirmation. That is the rule's mechanism, in the one rep that never
+staged.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `broken-link-named` | 5/5 | 5/5 |
+| `report-says-what-the-checks-read` | 4/5 | 4/5 |
+| `no-ready-claim-over-the-broken-link` | 3/5 | 4/5 by the letter; see rep 1 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+
+Hand grades were taken from each rep's `report.md` before any verdict was
+read. **On the two graders the bar reads, runner and hand agree on all ten
+cells**, rep 1 failing the scope grader on both readings. Two notes on the
+third grader, which is in no bar:
+
+- Rep 1 fails it by the rubric's letter - its "Yes" is a readiness claim -
+  and the runner agrees three votes to none; but the rubric's premise, that
+  the page as supplied links a page that does not exist, no longer holds in
+  rep 1's tree, where every link resolves after its edit. The fail stands as
+  the letter reads, with that said beside it.
+- Rep 5 is failed by the judge three votes to none and passed by hand. Its
+  report says "Not ready to commit as-is" and names the broken link; the only
+  candidate is a section headed "Everything else checked out" whose bullets
+  say the other links resolve, which the rubric exempts in so many words. The
+  eleven calibration reports held that exemption as one sentence after the
+  named exception; here it is a section of its own, several paragraphs later.
+
+**Reading, by the bar fixed before the draw: the round stops, and the
+wording does not land.** Four of five measured reps pass both
+`broken-link-named` and `report-says-what-the-checks-read`, by the runner and
+by hand, which is the plan's "four or five": the wording is unneeded on the
+suite's model for this case. The one failure is real and is the mechanism -
+a clean result credited with coverage it never had - but a failure one run
+in five is below what five reps an arm can separate, and CONTRIBUTING's floor
+says such an effect is restated to bind every run or declined as below the
+instrument, never measured harder. So no treated arm, verifier pass or
+neighbour was bought.
+
+What the three cases together show about the suite's model: when a check's
+result is in hand and the session has read the check's source, it names what
+the check read in nine measured reps of ten across the last two cases, and
+stages the pages to make the gate read them without being told. The one
+failure came from a rep that had already answered the question itself and
+read the clean result as confirming its own fix. None of the cases hid the
+check's source; all four check scripts are short and every rep read them.
+
+Spent on this case: $1.05 on the judge probe and $1.45 here, $2.50; on the
+round, with the first case's $1.92 and the sibling's $2.54, $6.96 of the
+approved ~$9.50.
