@@ -596,6 +596,454 @@ sys.exit(1)' "$ROOT/hooks/hooks.json" "$tool"
   check "registration routes $tool to the gate" 0 $?
 done
 
+echo
+# 23. Landing sweep: at a prompt it copies the rule files; at the stop it hands
+#     the lines elsewhere that still carry what the turn's change to one of
+#     them replaced. Each repository below holds an owner list, a checklist
+#     copy in the same file, CLAUDE.md's and README.md's copies, and probes
+#     for each threshold and exclusion.
+SWEEP_HOOK="$ROOT/hooks/landing-sweep.py"
+SW="$WORK/sweep-state"
+mkdir -p "$SW"
+cat > "$WORK/sweep_edit.py" <<'EOF'
+import json, os, sys
+# argv: file, old, new ("\n" for a line break), then optionally a transcript
+# and a prompt id: the replacement is recorded there as the Edit call that made it.
+path, old, new = sys.argv[1], sys.argv[2].replace("\\n", "\n"), sys.argv[3].replace("\\n", "\n")
+text = open(path).read()
+assert old in text, (path, old)
+open(path, "w").write(text.replace(old, new, 1))
+if len(sys.argv) > 5:
+    n = sum(1 for _ in open(sys.argv[4])) if os.path.exists(sys.argv[4]) else 0
+    with open(sys.argv[4], "a") as fh:
+        fh.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "u%d" % n,
+                 "name": "Edit", "input": {"file_path": path, "old_string": old, "new_string": new}}]}}) + "\n")
+        fh.write(json.dumps({"type": "user", "promptId": sys.argv[5], "message": {"content": [{"type": "tool_result",
+                 "tool_use_id": "u%d" % n, "content": "ok"}]}, "toolUseResult": {"filePath": path}}) + "\n")
+EOF
+sweep_repo() { # $1 = directory, $2 = "nogit" for a tree with no repository
+  mkdir -p "$1/skills/handoff" "$1/docs"
+  cat > "$1/skills/handoff/SKILL.md" <<'EOF'
+# Handoff
+
+The next person has the note and nothing else: not your terminal, not your
+memory of why the work went the way it did.
+
+## What a hand-over note carries
+
+1. **What was done** - each change, and where it landed.
+2. **What is still open** - every unfinished item, with who owns it now.
+3. **How to check the current state** - the command that shows it.
+
+Put the note where the work lives: the ticket, or the pull request if
+there is no ticket.
+
+Lead with the current state.
+
+## Before you send
+
+- [ ] The note says how to check the current state.
+EOF
+  cat > "$1/CLAUDE.md" <<'EOF'
+# Working here
+
+- Hand-over notes carry what was done and where it landed, what is still open
+  and who owns it, and how to check the current state.
+- Dates in notes are absolute, never "yesterday".
+EOF
+  cat > "$1/README.md" <<'EOF'
+# playbook
+
+- **handoff** - writes the note you leave when work changes hands: what was
+  done, what is still open, and how to check the current state.
+- **standup** - writes the daily update.
+
+Notes go where the work lives: the ticket, or the pull request.
+EOF
+  printf '## How to check the current state\n\nSay what was done and what is still open.\n' > "$1/docs/guide.md"
+  printf 'Say what was done first.\n' > "$1/docs/one.md"
+  printf 'Always lead with the current state.\n' > "$1/docs/style.md"
+  printf 'New starters learn this first: the next person has the note and nothing else.\n' > "$1/docs/onboarding.md"
+  [ "${2:-}" = nogit ] && return
+  (cd "$1" && git init -q -b main . && git config user.name Test && git config user.email test@example.com \
+    && git add -A && git commit -qm init)
+}
+add_item() { # $1 = repository, then optionally a transcript and a prompt id
+  "$PY" "$WORK/sweep_edit.py" "$1/skills/handoff/SKILL.md" \
+    '3. **How to check the current state** - the command that shows it.\n' \
+    '3. **How to check the current state** - the command that shows it.\n4. **How to roll it back** - the step that undoes each change.\n' \
+    ${2:+"$2"} ${3:+"$3"}
+}
+sweep_submit() { # $1 = cwd, $2 = session, $3 = prompt
+  printf '{"hook_event_name":"UserPromptSubmit","session_id":"%s","prompt_id":"%s","cwd":"%s"}' "$2" "$3" "$1" \
+    | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
+}
+sweep_stop() { # $1 = cwd, $2 = session, $3 = prompt, $4 = stop_hook_active, $5 = transcript
+  printf '{"hook_event_name":"Stop","session_id":"%s","prompt_id":"%s","cwd":"%s","stop_hook_active":%s,"transcript_path":"%s"}' \
+    "$2" "$3" "$1" "${4:-false}" "${5:-}" | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
+}
+context() { # the hand-off's text
+  printf '%s' "$1" | "$PY" -c 'import json, sys
+data = sys.stdin.read()
+if data:
+    print(json.loads(data)["hookSpecificOutput"]["additionalContext"])'
+}
+handed() { # the hand-off's listed lines, one "path:lines" a line
+  printf '%s' "$1" | "$PY" -c 'import json, re, sys
+data = sys.stdin.read()
+if data:
+    text = json.loads(data)["hookSpecificOutput"]["additionalContext"]
+    print("\n".join(re.findall(r"^- `([^`]+)`", text, re.M)))'
+}
+
+printf '' | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
+check "sweep fails open on empty stdin" 0 $?
+out=$(printf '[1]' | TMPDIR="$SW" "$PY" "$SWEEP_HOOK")
+check "sweep fails open on a payload that is not an object" 0 $?
+empty "sweep says nothing on a payload that is not an object" "$out"
+
+# The item a turn adds to a list: the list's headlines are what every copy
+# carries, the list itself is the turn's own, and a heading is never handed.
+R="$WORK/sw-item"; sweep_repo "$R"
+out=$(sweep_submit "$R" s1 p1)
+empty "sweep's snapshot half prints nothing" "$out"
+add_item "$R"
+out=$(sweep_stop "$R" s1 p1)
+kind=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["hookSpecificOutput"]["hookEventName"])' 2>/dev/null)
+check "sweep hands its lines as the Stop hook's additional context" 0 $?
+contains "sweep's context is a Stop hook's" "$kind" "Stop"
+got=$(handed "$out")
+contains "sweep hands the short form the change left behind" "$got" "CLAUDE.md:3-4"
+contains "sweep hands the README's copy" "$got" "README.md:3-4"
+contains "sweep hands a copy further down the owner itself" "$got" "skills/handoff/SKILL.md:20"
+lacks "sweep leaves out the list the change joined" "$got" "skills/handoff/SKILL.md:8"
+contains "sweep hands a file carrying two phrases" "$got" "docs/guide.md:3"
+lacks "sweep never hands a heading line" "$got" "docs/guide.md:1"
+lacks "sweep needs two phrases in a file the turn did not write" "$got" "docs/one.md"
+contains "sweep names the file the turn changed" "$out" 'this turn changed `skills/handoff/SKILL.md`'
+contains "sweep says where its phrases came from" "$out" "the items of the list your change joined"
+contains "sweep asks for a short form carried, never cut" "$out" "never cut to a pointer"
+contains "sweep says to leave a record of the old wording" "$out" "leave it and say so in your reply"
+first=$(printf '%s\n' "$got" | head -1)
+case "$first" in
+  CLAUDE.md:*|README.md:*) echo "PASS: sweep ranks the lines carrying the most phrases first" ;;
+  *) echo "FAIL: sweep ranks the lines carrying the most phrases first (first is '$first')"; fails=$((fails+1)) ;;
+esac
+
+# At most once a prompt: the continued turn's stop is silent, and so is any
+# later stop of the same prompt.
+out=$(sweep_stop "$R" s1 p1 true)
+empty "sweep stays silent at the stop its own hand-off continued" "$out"
+out=$(sweep_stop "$R" s1 p1)
+empty "sweep hands at most once a prompt" "$out"
+
+# A line handed and seen is not handed again: the next prompt adds a fifth
+# item to the same list, and every copy still reads as it did.
+sweep_submit "$R" s1 p2 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '4. **How to roll it back** - the step that undoes each change.\n' \
+  '4. **How to roll it back** - the step that undoes each change.\n5. **Who to ask** - the person who knows the most.\n'
+out=$(sweep_stop "$R" s1 p2)
+empty "sweep never hands a line twice in a session" "$out"
+
+# A hand-off another hook discarded (no later stop showed stop_hook_active)
+# was never seen, so its lines are handed again.
+R="$WORK/sw-unseen"; sweep_repo "$R"
+sweep_submit "$R" s2 p1 >/dev/null
+add_item "$R"
+sweep_stop "$R" s2 p1 >/dev/null
+out=$(sweep_stop "$R" s2 p1)
+empty "sweep stays silent at a second stop of its prompt" "$out"
+sweep_submit "$R" s2 p2 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '4. **How to roll it back** - the step that undoes each change.\n' \
+  '4. **How to roll it back** - the step that undoes each change.\n5. **Who to ask** - the person who knows the most.\n'
+got=$(handed "$(sweep_stop "$R" s2 p2)")
+contains "sweep hands again the lines of a hand-off no stop saw" "$got" "CLAUDE.md:3-4"
+
+# A copy the turn already brought into line is not handed back, whichever
+# way it was written; the item put into a wrong bullet still is.
+R="$WORK/sw-fixed"; sweep_repo "$R"
+mkdir -p "$R/guides"
+sed -n '3,4p' "$R/CLAUDE.md" | sed 's/^[- ] //' > "$R/guides/README.md"
+sweep_submit "$R" s3 p1 >/dev/null
+add_item "$R"
+"$PY" "$WORK/sweep_edit.py" "$R/CLAUDE.md" 'and how to check the current state.' 'how to check the current state, and how to roll it back.'
+"$PY" "$WORK/sweep_edit.py" "$R/guides/README.md" 'and how to check the current state.' 'how to check the current state, and how to roll it back.'
+got=$(handed "$(sweep_stop "$R" s3 p1)")
+lacks "sweep does not hand back a copy the turn fixed" "$got" "CLAUDE.md"
+lacks "sweep does not hand back a wrapped paragraph fixed on one line" "$got" "guides/README.md"
+contains "sweep still hands the copy the turn left" "$got" "README.md:3-4"
+R="$WORK/sw-wrong"; sweep_repo "$R"
+sweep_submit "$R" s4 p1 >/dev/null
+add_item "$R"
+"$PY" "$WORK/sweep_edit.py" "$R/CLAUDE.md" 'never "yesterday".' 'never "yesterday"; say how to roll each change back.'
+got=$(handed "$(sweep_stop "$R" s4 p1)")
+contains "sweep hands a copy whose file the turn wrote in another bullet" "$got" "CLAUDE.md:3-4"
+
+# The words a change replaced, and a file carrying the only phrase there is.
+R="$WORK/sw-replaced"; sweep_repo "$R"
+sweep_submit "$R" s5 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" \
+  'Put the note where the work lives: the ticket, or the pull request if\nthere is no ticket.' 'Put the note in the team channel.'
+out=$(sweep_stop "$R" s5 p1)
+contains "sweep hands a copy of the words the change replaced" "$(handed "$out")" "README.md:7"
+contains "sweep keeps only the runs carrying three content words" "$(context "$out")" \
+  '`README.md:7` - "the work lives: the ticket,", "work lives: the ticket, or", "ticket, or the pull request"'"
+"
+contains "sweep says it read the replaced words" "$out" "the words it replaced"
+R="$WORK/sw-single"; sweep_repo "$R"
+sweep_submit "$R" s6 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'Lead with the current state.' 'Start from the open items.'
+contains "sweep hands one phrase where only one exists" "$(handed "$(sweep_stop "$R" s6 p1)")" "docs/style.md:1"
+
+# A prose addition: the paragraphs beside it are what a copy repeats, and the
+# owner's own paragraph those phrases were read from is not handed.
+R="$WORK/sw-beside"; sweep_repo "$R"
+sweep_submit "$R" s7 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' 'went the way it did.\n\nWrite it the day you hand over.\n'
+out=$(sweep_stop "$R" s7 p1)
+got=$(handed "$out")
+contains "sweep hands a copy of the paragraph beside an addition" "$got" "docs/onboarding.md:1"
+lacks "sweep does not hand the paragraph its phrases came from" "$got" "skills/handoff/SKILL.md:3"
+contains "sweep says it read the paragraphs beside the addition" "$out" "the paragraphs beside what it added"
+
+# A headline needs two content words; the whole list a change rewrote while
+# joining it is the turn's own.
+R="$WORK/sw-thin"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '## Links\n\n- **Tickets** - the tracker.\n- **Dashboards** - the graphs.\n' > "$R/skills/handoff/references/links.md"
+printf 'Tickets and dashboards are linked from the note.\n' > "$R/docs/links.md"
+sweep_submit "$R" s25 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/links.md" '- **Dashboards** - the graphs.\n' '- **Dashboards** - the graphs.\n- **Runbooks** - the recoveries.\n'
+out=$(sweep_stop "$R" s25 p1)
+empty "sweep drops a headline of one content word" "$out"
+R="$WORK/sw-rewrite"; sweep_repo "$R"
+sweep_submit "$R" s26 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '3. **How to check the current state** - the command that shows it.\n' \
+  '3. **How to check the current state** - the command, and what healthy looks like.\n4. **How to roll it back** - the step that undoes each change.\n'
+got=$(handed "$(sweep_stop "$R" s26 p1)")
+contains "sweep hands the copies of a list a change rewrote while joining it" "$got" "CLAUDE.md:3-4"
+lacks "sweep leaves out the whole list a change rewrote while joining it" "$got" "skills/handoff/SKILL.md:8"
+
+# The read paths: a change committed within the turn, a copy fixed by the
+# shell, a new file, a tree with no git.
+R="$WORK/sw-commit"; sweep_repo "$R"
+sweep_submit "$R" s8 p1 >/dev/null
+add_item "$R"
+(cd "$R" && git commit -qam "add the rollback")
+contains "sweep reads a change committed within the turn" "$(handed "$(sweep_stop "$R" s8 p1)")" "CLAUDE.md:3-4"
+R="$WORK/sw-shell"; sweep_repo "$R"
+sweep_submit "$R" s9 p1 >/dev/null
+add_item "$R"
+sed 's/and how to check the current state\./how to check the current state, and how to roll it back./' "$R/README.md" > "$WORK/readme.tmp"
+cat "$WORK/readme.tmp" > "$R/README.md"
+got=$(handed "$(sweep_stop "$R" s9 p1)")
+lacks "sweep knows a rule file the shell wrote" "$got" "README.md"
+R="$WORK/sw-new"; sweep_repo "$R"
+sweep_submit "$R" s10 p1 >/dev/null
+mkdir -p "$R/skills/new" "$R/notes"
+printf '# New\n\n1. **What was done** - each change.\n2. **What is still open** - each item.\n' > "$R/skills/new/SKILL.md"
+out=$(sweep_stop "$R" s10 p1)
+empty "sweep stays silent on a new rule file, which lost nothing" "$out"
+sweep_submit "$R" s10 p2 >/dev/null
+add_item "$R"
+cp "$R/CLAUDE.md" "$R/notes/README.md"
+got=$(handed "$(sweep_stop "$R" s10 p2)")
+lacks "sweep does not hand a new rule file the turn wrote" "$got" "notes/README.md"
+R="$WORK/sw-nogit"; sweep_repo "$R" nogit
+mkdir -p "$R/.cache" "$R/node_modules"
+cp "$R/CLAUDE.md" "$R/.cache/copy.md"
+cp "$R/CLAUDE.md" "$R/node_modules/copy.md"
+sweep_submit "$R" s11 p1 >/dev/null
+add_item "$R"
+got=$(handed "$(sweep_stop "$R" s11 p1)")
+contains "sweep reads a tree with no git through its snapshot" "$got" "CLAUDE.md:3-4"
+lacks "sweep's walk skips dot directories" "$got" ".cache"
+lacks "sweep's walk skips dependency trees" "$got" "node_modules"
+
+# No snapshot: the before-state comes from undoing the turn's own Edit calls,
+# and only the calls whose results carry this prompt's id.
+R="$WORK/sw-undo"; sweep_repo "$R"
+add_item "$R" "$WORK/t-undo.jsonl" p1
+got=$(handed "$(sweep_stop "$R" s12 p1 false "$WORK/t-undo.jsonl")")
+contains "sweep undoes the turn's Edit calls where no snapshot exists" "$got" "CLAUDE.md:3-4"
+R="$WORK/sw-undo2"; sweep_repo "$R"
+add_item "$R" "$WORK/t-undo2.jsonl" p10
+out=$(sweep_stop "$R" s13 p1 false "$WORK/t-undo2.jsonl")
+empty "sweep leaves an earlier prompt's calls alone" "$out"
+R="$WORK/sw-rel"; sweep_repo "$R"
+"$PY" - "$WORK/t-rel.jsonl" "$R" <<'EOF'
+import json, sys
+path = sys.argv[2] + "/skills/handoff/SKILL.md"
+text = open(path).read()
+old = "3. **How to check the current state** - the command that shows it.\n"
+new = old + "4. **How to roll it back** - the step that undoes each change.\n"
+open(path, "w").write(text.replace(old, new))
+with open(sys.argv[1], "w") as fh:
+    fh.write("not json\n")
+    fh.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "r1", "name": "Edit",
+             "input": {"file_path": "skills/handoff/SKILL.md", "old_string": old, "new_string": new}}]}}) + "\n")
+    fh.write(json.dumps({"type": "user", "promptId": "p1", "message": {"content": [{"type": "tool_result",
+             "tool_use_id": "r1", "content": "ok"}]}, "toolUseResult": {"originalFile": text}}) + "\n")
+EOF
+got=$(handed "$(sweep_stop "$R" s14 p1 false "$WORK/t-rel.jsonl")")
+contains "sweep resolves a relative path against the session's directory, past a bad line" "$got" "CLAUDE.md:3-4"
+
+R="$WORK/sw-create"; sweep_repo "$R"
+add_item "$R" "$WORK/t-create.jsonl" p1
+"$PY" - "$WORK/t-create.jsonl" "$R" <<'EOF'
+import json, os, sys
+path = sys.argv[2] + "/notes/copy.md"
+os.makedirs(os.path.dirname(path))
+body = open(sys.argv[2] + "/CLAUDE.md").read()
+open(path, "w").write(body)
+with open(sys.argv[1], "a") as fh:
+    fh.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "w1", "name": "Write",
+             "input": {"file_path": path, "content": body}}]}}) + "\n")
+    fh.write(json.dumps({"type": "user", "promptId": "p1", "message": {"content": [{"type": "tool_result",
+             "tool_use_id": "w1", "content": "ok"}]}, "toolUseResult": {"type": "create", "filePath": path}}) + "\n")
+EOF
+got=$(handed "$(sweep_stop "$R" s24 p1 false "$WORK/t-create.jsonl")")
+contains "sweep reads the turn's Edit next to a Write that created a file" "$got" "CLAUDE.md:3-4"
+lacks "sweep reads a file a Write created as the turn's own" "$got" "notes/copy.md"
+
+R="$WORK/sw-delete"; sweep_repo "$R"
+"$PY" - "$WORK/t-delete.jsonl" "$R" <<'EOF'
+import json, sys
+path = sys.argv[2] + "/skills/handoff/SKILL.md"
+text = open(path).read()
+old = "3. **How to check the current state** - the command that shows it.\n"
+open(path, "w").write(text.replace(old, ""))
+with open(sys.argv[1], "w") as fh:
+    fh.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "d1", "name": "Edit",
+             "input": {"file_path": path, "old_string": old, "new_string": ""}}]}}) + "\n")
+    fh.write(json.dumps({"type": "user", "promptId": "p1", "message": {"content": [{"type": "tool_result",
+             "tool_use_id": "d1", "content": "ok"}]}, "toolUseResult": {"originalFile": text}}) + "\n")
+EOF
+got=$(handed "$(sweep_stop "$R" s27 p1 false "$WORK/t-delete.jsonl")")
+contains "sweep undoes a deletion from the file the result says it had" "$got" "CLAUDE.md:4-5"
+R="$WORK/sw-ignored"; sweep_repo "$R"
+mkdir -p "$R/notes"
+printf 'notes/\n' > "$R/.gitignore"
+(cd "$R" && git add .gitignore && git commit -qm ignore)
+cp "$R/skills/handoff/SKILL.md" "$R/notes/SKILL.md"
+"$PY" "$WORK/sweep_edit.py" "$R/notes/SKILL.md" '3. **How to check the current state** - the command that shows it.\n' \
+  '3. **How to check the current state** - the command that shows it.\n4. **How to roll it back** - the step that undoes each change.\n' \
+  "$WORK/t-ignored2.jsonl" p1
+out=$(sweep_stop "$R" s28 p1 false "$WORK/t-ignored2.jsonl")
+empty "sweep leaves alone a rule file git ignores" "$out"
+R="$WORK/sw-pending"; sweep_repo "$R"
+sweep_submit "$R" s29 p1 >/dev/null
+add_item "$R"
+mkdir -p "$SW/delivery-skills-landing-sweep/s29/handed-p1.json"
+out=$(sweep_stop "$R" s29 p1)
+empty "sweep hands nothing it cannot record as handed" "$out"
+
+# A file outside the working repository is searched in its own repository.
+R="$WORK/sw-here"; sweep_repo "$R"
+B="$WORK/sw-there"; sweep_repo "$B"
+sweep_submit "$R" s15 p1 >/dev/null
+add_item "$B" "$WORK/t-there.jsonl" p1
+got=$(handed "$(sweep_stop "$R" s15 p1 false "$WORK/t-there.jsonl")")
+contains "sweep searches a file outside the working repository in its own" "$got" "sw-there/CLAUDE.md:3-4"
+
+# A pull within the turn rewrote the owner under it; the turn wrote nothing.
+R="$WORK/sw-pull"; sweep_repo "$R"
+U="$WORK/sw-upstream"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com)
+add_item "$U"
+(cd "$U" && git commit -qam "add the rollback")
+sweep_submit "$R" s16 p1 >/dev/null
+(cd "$R" && git -c pull.ff=only pull -q "$U" main)
+out=$(sweep_stop "$R" s16 p1)
+empty "sweep leaves out what an in-turn pull rewrote" "$out"
+
+# One snapshot a prompt, never overwritten: a prompt typed while the turn runs
+# carries the running turn's id; the queued prompt's own turn falls back to
+# the latest snapshot.
+R="$WORK/sw-key"; sweep_repo "$R"
+sweep_submit "$R" s17 p1 >/dev/null
+add_item "$R"
+sweep_submit "$R" s17 p1 >/dev/null
+contains "sweep never overwrites a prompt's snapshot" "$(handed "$(sweep_stop "$R" s17 p1)")" "CLAUDE.md:3-4"
+R="$WORK/sw-latest"; sweep_repo "$R"
+sweep_submit "$R" s18 p1 >/dev/null
+add_item "$R"
+contains "sweep falls back to the session's latest snapshot" "$(handed "$(sweep_stop "$R" s18 p9)")" "CLAUDE.md:3-4"
+
+# The prefilter reaches untracked files and never ignored ones.
+R="$WORK/sw-grep"; sweep_repo "$R"
+printf 'ignored.md\n' > "$R/.gitignore"
+(cd "$R" && git add .gitignore && git commit -qm ignore)
+cp "$R/CLAUDE.md" "$R/docs/untracked.md"
+cp "$R/CLAUDE.md" "$R/ignored.md"
+sweep_submit "$R" s19 p1 >/dev/null
+add_item "$R"
+got=$(handed "$(sweep_stop "$R" s19 p1)")
+contains "sweep searches untracked files" "$got" "docs/untracked.md"
+lacks "sweep never searches ignored files" "$got" "ignored.md"
+
+# Eight lines at most, the rest counted.
+R="$WORK/sw-many"; sweep_repo "$R"
+for n in 1 2 3 4 5 6 7 8 9; do cp "$R/CLAUDE.md" "$R/docs/copy$n.md"; done
+sweep_submit "$R" s20 p1 >/dev/null
+add_item "$R"
+out=$(sweep_stop "$R" s20 p1)
+n=$(handed "$out" | grep -c .)
+check "sweep lists eight lines at most" 8 "$n"
+contains "sweep counts the lines past eight" "$out" "- and 5 more lines in 5 files"
+
+# The phrase cap: a replaced passage past it is not searched past it.
+R="$WORK/sw-cap"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+r = sys.argv[1]
+words = ["word%03d" % i for i in range(420)]
+with open(r + "/skills/handoff/SKILL.md", "a") as fh:
+    fh.write("\n" + " ".join(words) + "\n")
+open(r + "/docs/early.md", "w").write(" ".join(words[0:12]) + "\n")
+open(r + "/docs/late.md", "w").write(" ".join(words[405:420]) + "\n")
+EOF
+(cd "$R" && git add -A && git commit -qm long)
+sweep_submit "$R" s21 p1 >/dev/null
+"$PY" - "$R" <<'EOF'
+import sys
+p = sys.argv[1] + "/skills/handoff/SKILL.md"
+text = open(p).read()
+open(p, "w").write(text.replace(" ".join("word%03d" % i for i in range(420)), " ".join("other%03d" % i for i in range(420))))
+EOF
+got=$(handed "$(sweep_stop "$R" s21 p1)")
+contains "sweep searches the phrases inside its cap" "$got" "docs/early.md"
+lacks "sweep passes silently past its phrase cap" "$got" "docs/late.md"
+
+# The time budget ends the work silently; a state directory that cannot be
+# written ends it before any hand-off.
+R="$WORK/sw-budget"; sweep_repo "$R"
+sweep_submit "$R" s22 p1 >/dev/null
+add_item "$R"
+out=$(printf '{"hook_event_name":"Stop","session_id":"s22","prompt_id":"p1","cwd":"%s","stop_hook_active":false}' "$R" \
+  | DELIVERY_SKILLS_SWEEP_BUDGET=0 TMPDIR="$SW" "$PY" "$SWEEP_HOOK")
+check "sweep exits 0 past its time budget" 0 $?
+empty "sweep hands nothing past its time budget" "$out"
+printf 'x' > "$WORK/sweep-blocked"
+out=$(printf '{"hook_event_name":"UserPromptSubmit","session_id":"s23","prompt_id":"p1","cwd":"%s"}' "$R" \
+  | TMPDIR="$WORK/sweep-blocked" "$PY" "$SWEEP_HOOK")
+check "sweep's snapshot exits 0 where its state cannot be written" 0 $?
+empty "sweep's snapshot prints nothing where its state cannot be written" "$out"
+out=$(printf '{"hook_event_name":"Stop","session_id":"s22","prompt_id":"p1","cwd":"%s","stop_hook_active":false}' "$R" \
+  | TMPDIR="$WORK/sweep-blocked" "$PY" "$SWEEP_HOOK")
+check "sweep's stop exits 0 where its state cannot be written" 0 $?
+empty "sweep hands nothing it cannot record as handed" "$out"
+
+for event in UserPromptSubmit Stop; do
+  "$PY" -c 'import json, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"].get(sys.argv[2], []):
+    if any("landing-sweep.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json" "$event"
+  check "registration runs the sweep on $event" 0 $?
+done
+
 if [ $fails -eq 0 ]; then
   echo "ALL PASS"
   exit 0
