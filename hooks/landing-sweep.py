@@ -28,16 +28,19 @@ work with whatever it had found.
 """
 import bisect
 import difflib
+import functools
 import hashlib
 import itertools
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
 import tempfile
 import time
 
+TEXT_DOC = re.compile(r"\.(?:md|mdx|markdown|txt|rst|adoc)$", re.I)
 RULE_FILE = re.compile(
     r"(?:^|/)(?:SKILL|CLAUDE|CLAUDE\.local|AGENTS|GEMINI|CONTRIBUTING|README)\.md$"
     r"|(?:^|/)agents/[^/]+\.md$"
@@ -48,6 +51,8 @@ LISTED = 8
 SHOWN_PHRASES = 3
 MAX_PHRASES = 400
 MAX_BYTES = 1 << 20
+WORD_DIFF = 250000
+BIG_FILE = 3000
 WALK_ENTRIES = 20000
 SKIP_DIRS = {"node_modules", "__pycache__"}
 BUDGET = {"UserPromptSubmit": 2.0, "Stop": 2.5}
@@ -58,20 +63,27 @@ these those what which who how when where not no nor but if then than so do does
 cant can't each every any all one two three note notes""".split())
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$")
 HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.*)$")
-BOLD = re.compile(r"\*\*(.+?)\*\*|__(.+?)__")
+BOLD_LEAD = re.compile(r"\s*(?:\*\*(.+?)\*\*|__(.+?)__)")
 PREFILTER_WORD = re.compile(r"^[a-z0-9]+$")
 TOKEN_DROP = re.compile(r"[*_`]")
 TOKEN_BREAK = re.compile(r"[^\w'\-\s]+")
 
 HAND_OFF = (
-    "Landing sweep - this turn changed %s, and these lines still carry what the "
-    "changed text said before (read from the diff: %s; matched in any letter case, "
-    "across line breaks; lines this turn wrote are left out):\n%s\n\n"
+    "Landing sweep - this turn changed %s, and these lines still carry %s (read from the "
+    "diff: %s; matched in any letter case, across line breaks; lines this turn wrote in a "
+    "rule file or with Edit or Write are left out%s):\n%s\n\n"
     "Open each. Where it states or lists the same thing, bring it into line with your "
     "change - a short form its readers use without opening the owner is rewritten to "
-    "carry it, never cut to a pointer. Where it records or quotes the old wording (a "
-    "log, a run record, a changelog), means something else, or is a temporary copy, "
-    "leave it and say so in your reply.")
+    "carry it, never cut to a pointer.%s Where it records or quotes the old wording (a "
+    "log, a run record, a changelog, a test fixture or its expected output), means "
+    "something else, or is a temporary copy, leave it and say so in your reply. If your "
+    "change is itself temporary - a trial wording you will revert - leave every line and "
+    "say so.")
+SAID_BEFORE = "what the changed text said before"
+SAID_BESIDE = "what the changed text said before, or what the paragraphs beside your addition say"
+BESIDE_ONLY = (" A line found only through the paragraphs beside your addition repeats that "
+               "neighbouring text, and needs your change only where it covers the same ground.")
+CUT_SHORT = "; the search stopped at its time limit, so there may be more"
 SOURCES = (
     ("item", "the items of the list your change joined"),
     ("replaced", "the words it replaced"),
@@ -115,19 +127,27 @@ def key(s):
 
 
 def state_dir(session_id):
+    """Per user and private: the state holds copies of the repository's rule
+    files, and a shared temp directory is other users' too."""
     k = key(session_id)
-    return os.path.join(tempfile.gettempdir(), "delivery-skills-landing-sweep", k) if k else None
+    top = "delivery-skills-landing-sweep-%s" % getattr(os, "getuid", lambda: "u")()
+    return os.path.join(tempfile.gettempdir(), top, k) if k else None
+
+
+def private_dir(path):
+    os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+    os.makedirs(path, mode=0o700, exist_ok=True)
 
 
 def read_bytes(path):
     try:
-        if os.path.getsize(path) > MAX_BYTES:
+        if not stat.S_ISREG(os.stat(path).st_mode):
             return None
         with open(path, "rb") as fh:
-            data = fh.read()
+            data = fh.read(MAX_BYTES + 1)
     except Exception:
         return None
-    return None if b"\0" in data[:8192] else data
+    return None if len(data) > MAX_BYTES or b"\0" in data[:8192] else data
 
 
 def read_text(path):
@@ -138,25 +158,19 @@ def read_text(path):
 def write_new(path, body):
     """Writes `path` only where it does not exist yet; False where it did or the
     write failed."""
-    tmp = "%s.%d.tmp" % (path, os.getpid())
     try:
-        with open(tmp, "w", encoding="utf-8") as fh:
-            fh.write(body)
-        os.link(tmp, path)
-        return True
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     except Exception:
         return False
-    finally:
-        try:
-            os.unlink(tmp)
-        except Exception:
-            pass
+    with os.fdopen(fd, "wb") as fh:
+        fh.write(body if isinstance(body, bytes) else body.encode("utf-8"))
+    return True
 
 
 def write_over(path, body):
     tmp = "%s.%d.tmp" % (path, os.getpid())
-    with open(tmp, "w", encoding="utf-8") as fh:
-        fh.write(body)
+    with os.fdopen(os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "wb") as fh:
+        fh.write(body if isinstance(body, bytes) else body.encode("utf-8"))
     os.replace(tmp, path)
 
 
@@ -214,8 +228,9 @@ def snapshot(payload, budget):
     root = root or cwd
     names, complete = rule_files(root, in_git, budget)
     head = (git(root, ["rev-parse", "HEAD"], budget) or "").strip() if in_git else ""
+    private_dir(sd)
     blobs = os.path.join(sd, "blobs")
-    os.makedirs(blobs, exist_ok=True)
+    os.makedirs(blobs, mode=0o700, exist_ok=True)
     files = {}
     for rel in names:
         if budget.spent():
@@ -227,9 +242,7 @@ def snapshot(payload, budget):
         digest = hashlib.sha1(data).hexdigest()
         blob = os.path.join(blobs, digest)
         if not os.path.exists(blob):
-            with open(blob + ".tmp", "wb") as fh:
-                fh.write(data)
-            os.replace(blob + ".tmp", blob)
+            write_over(blob, data)
         files[rel] = digest
     write_new(path, json.dumps({"root": root, "git": in_git, "head": head, "time": started,
                                 "complete": complete, "files": files}))
@@ -263,11 +276,11 @@ def blob_text(sd, digest):
 
 
 def moved_by_git(root, snap, budget):
-    """Files an in-turn pull, rebase, checkout, reset or merge rewrote: their
-    content changed under the turn without the turn writing them."""
+    """{file: the commit HEAD moved from first} for each file an in-turn pull,
+    rebase, checkout, reset or merge rewrote."""
     head = (git(root, ["rev-parse", "HEAD"], budget) or "").strip()
     if not head or head == snap.get("head"):
-        return set()
+        return {}
     out = git(root, ["reflog", "show", "--date=unix", "--format=%H%x09%gd%x09%gs", "-n", "500", "HEAD"], budget)
     entries = []
     for line in (out or "").splitlines():
@@ -275,14 +288,24 @@ def moved_by_git(root, snap, budget):
         m = re.search(r"@\{(\d+)\}", parts[1]) if len(parts) == 3 else None
         if m:
             entries.append((parts[0], int(m.group(1)), parts[2]))
-    moved = set()
+    moved = {}
     for i, (sha, when, subject) in enumerate(entries):
         if when < int(snap.get("time", 0)):
             break
         if MOVES.match(subject) and i + 1 < len(entries):
             names = git(root, ["diff", "--name-only", "-z", entries[i + 1][0], sha], budget) or ""
-            moved.update(n for n in names.split("\0") if n)
+            for name in names.split("\0"):
+                if name:
+                    moved[name] = entries[i + 1][0]
     return moved
+
+
+def moved_under(root, rel, commit, before, budget):
+    """True where a move, not the turn, changed the file: it stood as the
+    snapshot has it at the commit HEAD moved from. A turn that committed its
+    own change before a rebase or a soft reset left the file different there."""
+    at = git(root, ["show", "%s:%s" % (commit, rel)], budget)
+    return (at if at is not None else "") == before
 
 
 def entry_of(line):
@@ -358,9 +381,10 @@ def turn_writes(sd, snap, calls, budget):
     """{real path: before-state} of every file the turn wrote: a rule file the
     snapshot covers by its copy there, any other by undoing the turn's calls."""
     written, covered = {}, set()
+    named = {call[0] for call in calls}
     if snap:
         root = snap.get("root") or ""
-        moved = moved_by_git(root, snap, budget) if snap.get("git") else set()
+        moved = moved_by_git(root, snap, budget) if snap.get("git") else {}
         names = set(snap.get("files") or {})
         if snap.get("complete"):
             names |= set(rule_files(root, snap.get("git"), budget)[0])
@@ -371,7 +395,7 @@ def turn_writes(sd, snap, calls, budget):
             if before is None:
                 continue
             covered.add(path)
-            if rel in moved:
+            if rel in moved and path not in named and moved_under(root, rel, moved[rel], before, budget):
                 continue
             now = read_text(path)
             if now is not None and now != before:
@@ -400,10 +424,9 @@ def content_words(words):
 
 
 def headline(item):
-    m = BOLD.search(item)
-    if m:
-        return m.group(1) or m.group(2)
-    return " ".join(re.split(r"\s[-–—]\s|:\s|\.\s|\.$|;", item, maxsplit=1)[0].split()[:6])
+    m = BOLD_LEAD.match(item)
+    text = (m.group(1) or m.group(2)) if m else re.split(r"\s[-–—]\s|:\s|\.\s|\.$|;", item, maxsplit=1)[0]
+    return " ".join(text.split()[:6])
 
 
 def is_item(lines, i):
@@ -414,26 +437,43 @@ def is_cont(lines, i):
     return 0 <= i < len(lines) and lines[i].startswith((" ", "\t")) and lines[i].strip()
 
 
-def list_block(lines, at):
-    """The items of the list touching line index `at`, and its [start, end)."""
+def blank_run(lines, i, step):
+    while 0 <= i < len(lines) and not lines[i].strip():
+        i += step
+    return i
+
+
+def list_block(lines, at, loose=False):
+    """[(line index, text)] of the items of the list touching line index `at`,
+    and its [start, end); with `loose`, blank lines between two items stay
+    inside the list."""
+    def part(i):
+        return is_item(lines, i) or is_cont(lines, i)
+
     i = at - 1
-    while i >= 0 and (is_item(lines, i) or is_cont(lines, i)):
-        i -= 1
-    start, j = i + 1, at
-    while j < len(lines) and (is_item(lines, j) or is_cont(lines, j)):
-        j += 1
-    items, cur = [], None
-    for k in range(start, j):
+    while i >= 0:
+        if part(i):
+            i -= 1
+        elif loose and is_item(lines, i + 1) and part(blank_run(lines, i, -1)):
+            i = blank_run(lines, i, -1)
+        else:
+            break
+    j = at
+    while j < len(lines):
+        if part(j):
+            j += 1
+        elif loose and j > at and is_item(lines, blank_run(lines, j, 1)):
+            j = blank_run(lines, j, 1)
+        else:
+            break
+    items = []
+    for k in range(i + 1, j):
         m = LIST_ITEM.match(lines[k])
         if m:
-            if cur is not None:
-                items.append(cur)
-            cur = m.group(1)
-        elif cur is not None:
-            cur += " " + lines[k].strip()
-    if cur is not None:
-        items.append(cur)
-    return items, start, j
+            items.append([k, m.group(1)])
+        elif items and lines[k].strip():
+            items[-1][1] += " " + lines[k].strip()
+    return [tuple(it) for it in items], i + 1, j
 
 
 def paragraph_above(lines, at):
@@ -466,36 +506,71 @@ def heading_above(lines, at):
     return None
 
 
+@functools.lru_cache(maxsize=64)
 def opcodes(before, after):
     b, a = before.splitlines(), after.splitlines()
-    return b, a, [op for op in difflib.SequenceMatcher(None, b, a, autojunk=False).get_opcodes()
+    junk = max(len(a), len(b)) > BIG_FILE
+    return b, a, [op for op in difflib.SequenceMatcher(None, b, a, autojunk=junk).get_opcodes()
                   if op[0] != "equal"]
 
 
-def phrases_of(before, after):
-    """What the owning file said before the change, as (source, words, shown):
-    the headlines of a list the change added an item to and that list's
+def lost_runs(old_lines, new_lines, budget):
+    """The five-word runs of the old lines that overlap the words the change
+    lost. A block too large to diff word by word as a whole is diffed line by
+    line where its line count held, and skipped where it did not."""
+    whole = (" ".join(old_lines).split(), " ".join(new_lines).split())
+    if len(whole[0]) * len(whole[1]) <= WORD_DIFF:
+        pairs = [whole]
+    elif len(old_lines) == len(new_lines):
+        pairs = [(o.split(), n.split()) for o, n in zip(old_lines, new_lines)]
+    else:
+        pairs = []
+    for old, new in pairs:
+        if budget.spent() or len(old) * len(new) > WORD_DIFF:
+            continue
+        words = difflib.SequenceMatcher(None, [norm(t) for t in old], [norm(t) for t in new], autojunk=False)
+        for wt, x1, x2, _, _ in words.get_opcodes():
+            if wt in ("replace", "delete"):
+                for st in range(max(0, x1 - RUN + 1), min(len(old) - RUN, x2 - 1) + 1):
+                    yield " ".join(old[st:st + RUN])
+
+
+def key_word(words, shown):
+    """Index of the word a phrase is found by: its longest word that the raw
+    text holds verbatim, so a search on the raw file for it cannot miss the
+    phrase - `session_id` normalizes to `sessionid`, which no raw file holds.
+    None where no word qualifies."""
+    low = shown.lower()
+    verbatim = [i for i, w in enumerate(words) if w in low]
+    plain = [i for i in verbatim if PREFILTER_WORD.match(words[i])] or verbatim
+    return max(plain, key=lambda i: len(words[i])) if plain else None
+
+
+def phrases_of(before, after, budget):
+    """What the owning file said before the change, as (source, words, shown,
+    key): the headlines of a list the change added an item to and that list's
     heading; every five-word run of replaced or deleted text overlapping the
     words it lost; and the five-word runs of the paragraphs on either side of a
     prose addition."""
     b, a, ops = opcodes(before, after)
     raw = []
     for tag, i1, i2, j1, j2 in ops:
+        if budget.spent():
+            break
         if tag in ("replace", "delete"):
-            old, new = " ".join(b[i1:i2]).split(), " ".join(a[j1:j2]).split()
-            words = difflib.SequenceMatcher(None, [norm(t) for t in old], [norm(t) for t in new], autojunk=False)
-            for wt, x1, x2, _, _ in words.get_opcodes():
-                if wt in ("replace", "delete"):
-                    for st in range(max(0, x1 - RUN + 1), min(len(old) - RUN, x2 - 1) + 1):
-                        raw.append(("replaced", " ".join(old[st:st + RUN])))
+            raw.extend(("replaced", run) for run in lost_runs(b[i1:i2], a[j1:j2], budget))
         joined = sum(1 for x in a[j1:j2] if LIST_ITEM.match(x)) - sum(1 for x in b[i1:i2] if LIST_ITEM.match(x))
-        items, start, _ = list_block(b, i1 if tag == "insert" else i2)
-        if joined > 0 and len(items) >= 2:
-            raw.extend(("item", headline(it)) for it in items)
-            heading = heading_above(b, start)
-            if heading:
-                raw.append(("item", heading))
-        elif tag == "insert" and joined <= 0 and len(items) < 2:
+        if joined > 0:
+            first = next(j for j in range(j1, j2) if LIST_ITEM.match(a[j]))
+            members, start, _ = list_block(a, first, loose=True)
+            items = [text for k, text in members if not j1 <= k < j2]
+            items += [LIST_ITEM.match(x).group(1) for x in b[i1:i2] if LIST_ITEM.match(x)]
+            if len(items) >= 2:
+                raw.extend(("item", headline(it)) for it in items)
+                heading = heading_above(a, start)
+                if heading:
+                    raw.append(("item", heading))
+        elif tag == "insert" and len(list_block(b, i1)[0]) < 2:
             for para in (paragraph_above(b, i1), paragraph_below(b, i1)):
                 toks = " ".join(b[k] for k in para).split()
                 for st in range(0, max(0, len(toks) - RUN) + 1):
@@ -503,10 +578,14 @@ def phrases_of(before, after):
     seen, out = set(), []
     for source, text in sorted(raw, key=lambda r: ("item", "replaced", "beside").index(r[0])):
         words = tuple(norm(text).split())
+        shown = " ".join(re.sub(r"[*`]", "", text).split())
         if len(content_words(words)) < (2 if source == "item" else 3) or words in seen:
             continue
+        k = key_word(words, shown)
+        if k is None:
+            continue
         seen.add(words)
-        out.append((source, words, " ".join(re.sub(r"[*`]", "", text).split())))
+        out.append((source, words, shown, k))
     return out[:MAX_PHRASES]
 
 
@@ -518,7 +597,7 @@ def changed_lines(before, after, whole_list):
     out = set()
     for _, _, _, j1, j2 in ops:
         if whole_list:
-            _, s, e = list_block(a, j1)
+            _, s, e = list_block(a, j1, loose=True)
             lo, hi = min(j1, s), max(j2, e)
         else:
             lo, hi = j1, max(j2, j1 + 1)
@@ -561,13 +640,6 @@ def source_lines(before, after):
     return out
 
 
-def anchor(words):
-    """Index of the word a phrase is looked up by: its longest plain word, the
-    one a raw file holds verbatim whatever markup surrounds it."""
-    plain = [i for i, w in enumerate(words) if PREFILTER_WORD.match(w)] or range(len(words))
-    return max(plain, key=lambda i: len(words[i]))
-
-
 class Text:
     def __init__(self, text, anchors):
         self.lines = text.splitlines()
@@ -583,10 +655,9 @@ class Text:
     def line_of(self, i):
         return bisect.bisect_right(self.ends, i) + 1
 
-    def find(self, words):
+    def find(self, words, k):
         """(first line, last line) of each place the words run in order,
-        across line breaks."""
-        k = anchor(words)
+        across line breaks, looked up by the word at index k."""
         spans = []
         for p in self.where.get(words[k], ()):
             s = p - k
@@ -596,13 +667,14 @@ class Text:
 
 
 def prefilter_words(phrases):
-    return sorted({words[anchor(words)] for _, words, _ in phrases})
+    return sorted({words[k] for _, words, _, k in phrases})
 
 
 def candidates(root, in_git, words, budget):
     """Files under `root` holding any of `words` in any letter case: git grep
-    over tracked and untracked files where there is git, a bounded walk
-    where there is none."""
+    over tracked and untracked files where there is git, and where there is
+    none a bounded walk over text documents only - a tree outside git holds
+    transcripts, editor backups and caches that quote any file."""
     if in_git:
         args = ["grep", "-l", "-z", "-I", "-i", "-F", "--untracked"]
         for w in words:
@@ -614,6 +686,8 @@ def candidates(root, in_git, words, budget):
     for rel in names:
         if budget.spent():
             break
+        if not TEXT_DOC.search(rel):
+            continue
         text = read_text(os.path.join(root, rel))
         if text is not None:
             low = text.lower()
@@ -639,29 +713,41 @@ def reading_order(rel, written):
 
 
 def sweep(written, cwd, budget):
-    """[(owner, path, Text, {phrase: [(first, last)]})] for every file handed,
-    each written file searched in the repository it sits in."""
+    """[(owner, path, Text, {phrase: [(first, last)]})] for every file handed.
+    A written file is searched in the repository it sits in; one in no
+    repository through the working directory where it sits under it, and
+    alone where it does not."""
     groups = {}
+    cwd_git = toplevel(cwd, budget) is not None
     for path in written:
         d = os.path.dirname(path)
         root = toplevel(d, budget)
-        groups.setdefault((root or (cwd if path.startswith(cwd + os.sep) else d), root is not None), []).append(path)
+        if root:
+            scope = (root, "git")
+        elif path.startswith(cwd + os.sep) and not cwd_git:
+            scope = (cwd, "walk")
+        else:
+            scope = (d, "alone")
+        groups.setdefault(scope, []).append(path)
     hits = []
-    for (root, in_git), paths in sorted(groups.items()):
+    for (root, how), paths in sorted(groups.items()):
         rels = {p: os.path.relpath(p, root) for p in paths}
-        if in_git:
+        if how == "git":
             skip = ignored(root, sorted(rels.values()), budget)
             rels = {p: r for p, r in rels.items() if r not in skip}
         befores = {r: written[p] for p, r in rels.items()}
         afters = {r: read_text(p) or "" for p, r in rels.items()}
-        owners = sorted(r for r in befores if RULE_FILE.search(r.replace(os.sep, "/")))
-        per_owner = [(o, phrases_of(befores[o], afters[o]), source_lines(befores[o], afters[o])) for o in owners]
+        owners = sorted(r for p, r in rels.items() if RULE_FILE.search((r if how == "git" else p).replace(os.sep, "/")))
+        per_owner = [(o, phrases_of(befores[o], afters[o], budget), source_lines(befores[o], afters[o]))
+                     for o in owners]
         per_owner = [po for po in per_owner if po[1]]
         if not per_owner:
             continue
-        every = [p for _, ps, _ in per_owner for p in ps]
-        anchors = {words[anchor(words)] for _, words, _ in every}
-        found_in = set(candidates(root, in_git, prefilter_words(every), budget)) | set(befores)
+        every = [ph for _, phrases, _ in per_owner for ph in phrases]
+        anchors = {ph[1][ph[3]] for ph in every}
+        found_in = set(befores)
+        if how != "alone":
+            found_in |= set(candidates(root, how == "git", prefilter_words(every), budget))
         for rel in sorted(found_in, key=lambda r: reading_order(r, befores)):
             if budget.spent():
                 return hits
@@ -677,7 +763,7 @@ def sweep(written, cwd, budget):
                         skip |= source
                 found = {}
                 for ph in phrases:
-                    spans = [(s, e) for s, e in tx.find(ph[1])
+                    spans = [(s, e) for s, e in tx.find(ph[1], ph[3])
                              if s not in skip and not HEADING.match(tx.lines[s - 1])]
                     if spans:
                         found[ph] = spans
@@ -714,7 +800,8 @@ def entries_of(hits, handed):
             if ph not in cur["phrases"]:
                 cur["phrases"].append(ph)
             cur["owners"].add(owner)
-    entries.sort(key=lambda en: (-len(en["phrases"]), en["path"], en["first"]))
+    entries.sort(key=lambda en: (-sum(ph[0] != "beside" for ph in en["phrases"]),
+                                 -sum(ph[0] == "beside" for ph in en["phrases"]), en["path"], en["first"]))
     return entries
 
 
@@ -722,7 +809,7 @@ def shown(path, cwd):
     return os.path.relpath(path, cwd) if path.startswith(cwd + os.sep) else path
 
 
-def hand_off(entries, cwd):
+def hand_off(entries, cwd, cut_short):
     listed, rest = entries[:LISTED], entries[LISTED:]
     lines = []
     for en in listed:
@@ -740,8 +827,11 @@ def hand_off(entries, cwd):
     said = [label for source, label in SOURCES if source in sources]
     return HAND_OFF % (
         and_list(["`%s`" % shown(o, cwd) for o in owners]),
+        SAID_BESIDE if "beside" in sources else SAID_BEFORE,
         and_list(said),
-        "\n".join(lines))
+        CUT_SHORT if cut_short else "",
+        "\n".join(lines),
+        BESIDE_ONLY if "beside" in sources else "")
 
 
 def and_list(items):
@@ -771,6 +861,7 @@ def stop(payload, budget):
         return
     handed = set(load_json(os.path.join(sd, "handed.json"), []))
     entries = entries_of(sweep(written, cwd, budget), handed)
+    cut_short = budget.spent()
     if not entries:
         return
     lines = sorted({line_key(en["path"], en["tx"].lines[n - 1])
@@ -778,7 +869,7 @@ def stop(payload, budget):
     if not write_new(pending, json.dumps({"lines": lines, "seen": False})):
         return
     sys.stdout.write(json.dumps({"hookSpecificOutput": {
-        "hookEventName": "Stop", "additionalContext": hand_off(entries, cwd)}}))
+        "hookEventName": "Stop", "additionalContext": hand_off(entries, cwd, cut_short)}}))
 
 
 def main():
@@ -789,7 +880,7 @@ def main():
     elif event == "Stop":
         sd = state_dir(payload.get("session_id"))
         if sd:
-            os.makedirs(sd, exist_ok=True)
+            private_dir(sd)
         stop(payload, budget_for(event))
 
 

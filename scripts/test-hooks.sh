@@ -693,7 +693,7 @@ handed() { # the hand-off's listed lines, one "path:lines" a line
 data = sys.stdin.read()
 if data:
     text = json.loads(data)["hookSpecificOutput"]["additionalContext"]
-    print("\n".join(re.findall(r"^- `([^`]+)`", text, re.M)))'
+    print("\n".join(re.findall(r"^- \x60([^\x60]+)\x60", text, re.M)))'
 }
 
 printf '' | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
@@ -720,7 +720,7 @@ lacks "sweep leaves out the list the change joined" "$got" "skills/handoff/SKILL
 contains "sweep hands a file carrying two phrases" "$got" "docs/guide.md:3"
 lacks "sweep never hands a heading line" "$got" "docs/guide.md:1"
 lacks "sweep needs two phrases in a file the turn did not write" "$got" "docs/one.md"
-contains "sweep names the file the turn changed" "$out" 'this turn changed `skills/handoff/SKILL.md`'
+contains "sweep names the file the turn changed" "$out" "this turn changed \`skills/handoff/SKILL.md\`"
 contains "sweep says where its phrases came from" "$out" "the items of the list your change joined"
 contains "sweep asks for a short form carried, never cut" "$out" "never cut to a pointer"
 contains "sweep says to leave a record of the old wording" "$out" "leave it and say so in your reply"
@@ -787,7 +787,7 @@ sweep_submit "$R" s5 p1 >/dev/null
 out=$(sweep_stop "$R" s5 p1)
 contains "sweep hands a copy of the words the change replaced" "$(handed "$out")" "README.md:7"
 contains "sweep keeps only the runs carrying three content words" "$(context "$out")" \
-  '`README.md:7` - "the work lives: the ticket,", "work lives: the ticket, or", "ticket, or the pull request"'"
+  "\`README.md:7\` - \"the work lives: the ticket,\", \"work lives: the ticket, or\", \"ticket, or the pull request\"
 "
 contains "sweep says it read the replaced words" "$out" "the words it replaced"
 R="$WORK/sw-single"; sweep_repo "$R"
@@ -934,7 +934,7 @@ empty "sweep leaves alone a rule file git ignores" "$out"
 R="$WORK/sw-pending"; sweep_repo "$R"
 sweep_submit "$R" s29 p1 >/dev/null
 add_item "$R"
-mkdir -p "$SW/delivery-skills-landing-sweep/s29/handed-p1.json"
+mkdir -p "$SW/delivery-skills-landing-sweep-$(id -u)/s29/handed-p1.json"
 out=$(sweep_stop "$R" s29 p1)
 empty "sweep hands nothing it cannot record as handed" "$out"
 
@@ -982,6 +982,146 @@ add_item "$R"
 got=$(handed "$(sweep_stop "$R" s19 p1)")
 contains "sweep searches untracked files" "$got" "docs/untracked.md"
 lacks "sweep never searches ignored files" "$got" "ignored.md"
+
+# A soft reset or a rebase after the turn committed its change keeps the
+# change the turn's own.
+R="$WORK/sw-squash"; sweep_repo "$R"
+sweep_submit "$R" s30 p1 >/dev/null
+add_item "$R"
+(cd "$R" && git commit -qam land && git reset -q --soft HEAD~1 && git commit -qm land2)
+contains "sweep keeps a change squashed by a soft reset within the turn" "$(handed "$(sweep_stop "$R" s30 p1)")" "CLAUDE.md:3-4"
+R="$WORK/sw-rebase"; sweep_repo "$R"
+U="$WORK/sw-rebase-up"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com \
+  && printf 'more\n' >> docs/one.md && git commit -qam upstream)
+sweep_submit "$R" s31 p1 >/dev/null
+add_item "$R"
+(cd "$R" && git commit -qam land && git -c pull.rebase=true pull -q "$U" main)
+contains "sweep keeps a change the turn committed before a rebase" "$(handed "$(sweep_stop "$R" s31 p1)")" "CLAUDE.md:3-4"
+
+R="$WORK/sw-autostash"; sweep_repo "$R"
+U="$WORK/sw-autostash-up"
+git clone -q "$R" "$U"
+(cd "$U" && git config user.name Test && git config user.email test@example.com \
+  && sed 's/^The next person has the note/The next reader has the note/' skills/handoff/SKILL.md > s.tmp \
+  && cat s.tmp > skills/handoff/SKILL.md && git commit -qm upstream skills/handoff/SKILL.md)
+sweep_submit "$R" s41 p1 >/dev/null
+add_item "$R" "$WORK/t-autostash.jsonl" p1
+(cd "$R" && git -c merge.autoStash=true -c pull.ff=only pull -q "$U" main >/dev/null 2>&1)
+contains "sweep keeps a file the turn edited though a pull rewrote it too" \
+  "$(handed "$(sweep_stop "$R" s41 p1 false "$WORK/t-autostash.jsonl")")" "CLAUDE.md:3-4"
+
+# A headline is the item's bold lead, at most six words, else its first
+# clause; a list with blank lines between its items is still a list.
+R="$WORK/sw-lead"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Rules\n\n- Commit each entry **as soon as it is written** in its own commit.\n- Push the branch **before handing over a push** to anyone.\n- **Search before you write a new entry anywhere in the queue** - every file.\n' > "$R/skills/handoff/references/rules.md"
+printf 'Commit each entry as soon as it lands, and push the branch before handing over.\n' > "$R/docs/rules.md"
+printf 'Search before you write a new line, and commit each entry as soon as it lands.\n' > "$R/docs/cap.md"
+printf 'Keep drafts as soon as it is written, and before handing over a push.\n' > "$R/docs/drafts.md"
+sweep_submit "$R" s32 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/rules.md" 'every file.\n' 'every file.\n- **Name the owner** - who decides.\n'
+got=$(handed "$(sweep_stop "$R" s32 p1)")
+contains "sweep reads a headline as the item's first clause" "$got" "docs/rules.md:1"
+contains "sweep caps a bold lead at six words" "$got" "docs/cap.md:1"
+lacks "sweep never reads a bold span inside an item as its headline" "$got" "docs/drafts.md"
+R="$WORK/sw-loose"; sweep_repo "$R"
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" \
+  '1. **What was done** - each change, and where it landed.\n2. **What is still open**' \
+  '1. **What was done** - each change, and where it landed.\n\n2. **What is still open**'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'with who owns it now.\n3.' 'with who owns it now.\n\n3.'
+(cd "$R" && git commit -qam loose)
+sweep_submit "$R" s33 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'the command that shows it.\n' 'the command that shows it.\n\n4. **How to roll it back** - the step that undoes each change.\n'
+contains "sweep reads a list whose items blank lines separate" "$(handed "$(sweep_stop "$R" s33 p1)")" "CLAUDE.md:3-4"
+sweep_submit "$R" s33 p2 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '1. **What was done**' '0. **Who to ask** - the person who knows.\n\n1. **What was done**'
+contains "sweep reads the items below a new first item of a loose list" "$(handed "$(sweep_stop "$R" s33 p2)")" "CLAUDE.md:3-4"
+
+# A word the normalizing drops a character from is not what the prefilter
+# searches the raw files for.
+R="$WORK/sw-ident"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Hook\n\n## Inputs\n\n1. **Check session_id presence** - first.\n2. **Read transcript_path lines** - then.\n' > "$R/skills/handoff/references/inputs.md"
+printf 'The hook will check session_id presence, then read transcript_path lines.\n' > "$R/docs/inputs.md"
+sweep_submit "$R" s34 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/inputs.md" '- then.\n' '- then.\n3. **Write the marker** - last.\n'
+contains "sweep's prefilter finds a copy whose words carry underscores" "$(handed "$(sweep_stop "$R" s34 p1)")" "docs/inputs.md:1"
+
+# A block too large to diff word by word as a whole is diffed line by line
+# where its line count held.
+R="$WORK/sw-rows"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+rows = "".join("| `/v1/items/%d` | GET | returns the item list for the account %d | yes |\n" % (i, i) for i in range(400))
+open(sys.argv[1] + "/README.md", "a").write("\n| Endpoint | Method | What it does | Auth |\n|---|---|---|---|\n" + rows)
+open(sys.argv[1] + "/docs/api.md", "w").write("It returns the item list for the account 7 on request.\n")
+EOF
+(cd "$R" && git commit -qam rows)
+sweep_submit "$R" s35 p1 >/dev/null
+"$PY" - "$R/README.md" <<'EOF'
+import sys
+p = sys.argv[1]
+text = open(p).read()
+open(p, "w").write(text.replace("returns the item list for", "lists the items of"))
+EOF
+got=$(handed "$(sweep_stop "$R" s35 p1)")
+contains "sweep diffs a large block line by line" "$got" "docs/api.md:1"
+lacks "sweep reads only the rows a large block changed" "$got" "CLAUDE.md"
+
+# Outside git: a rule file under a working directory with no repository is
+# searched through that directory's text documents only, and one outside the
+# working directory alone.
+R="$WORK/sw-nogit-docs"; sweep_repo "$R" nogit
+cp "$R/CLAUDE.md" "$R/docs/session.jsonl"
+mkdir -p "$R/agents"
+printf '# Reviewer\n\n## Checks\n\n1. **Read the whole diff** - first.\n2. **Name every finding** - then.\n' > "$R/agents/reviewer.md"
+printf 'The reviewer will read the whole diff and name every finding.\n' > "$R/docs/reviewer.md"
+sweep_submit "$R" s36 p1 >/dev/null
+add_item "$R"
+"$PY" "$WORK/sweep_edit.py" "$R/agents/reviewer.md" '- then.\n' '- then.\n3. **Rank them** - last.\n'
+got=$(handed "$(sweep_stop "$R" s36 p1)")
+lacks "sweep's walk outside git reads text documents only" "$got" "session.jsonl"
+contains "sweep arms on an agent contract outside git" "$got" "docs/reviewer.md:1"
+H="$WORK/sw-home"; mkdir -p "$H/.claude/projects"
+printf '# Global\n\n## Rules\n\n1. **Never add attribution to commits** - ever.\n2. **Commit in its own call** - then push.\n' > "$H/.claude/CLAUDE.md"
+printf '{"text": "Never add attribution to commits. Commit in its own call."}\n' > "$H/.claude/projects/t.jsonl"
+printf 'Never add attribution to commits. Commit in its own call.\n' > "$H/.claude/projects/notes.md"
+R="$WORK/sw-work"; sweep_repo "$R"
+"$PY" "$WORK/sweep_edit.py" "$H/.claude/CLAUDE.md" '- then push.\n' '- then push.\n3. **Sign nothing** - never.\n' "$WORK/t-home.jsonl" p1
+out=$(sweep_stop "$R" s37 p1 false "$WORK/t-home.jsonl")
+empty "sweep searches a file in no repository outside the working directory alone" "$out"
+A="$WORK/sw-contracts/agents"; mkdir -p "$A"
+printf '# Reviewer\n\n## Checks\n\n1. **Read the whole diff** - first.\n2. **Name every finding** - then.\n\n## Before you reply\n\n- Read the whole diff and name every finding.\n' > "$A/reviewer.md"
+"$PY" "$WORK/sweep_edit.py" "$A/reviewer.md" '- then.\n' '- then.\n3. **Rank them** - last.\n' "$WORK/t-contract.jsonl" p1
+contains "sweep arms on an agent contract it searches alone" \
+  "$(handed "$(sweep_stop "$R" s42 p1 false "$WORK/t-contract.jsonl")")" "sw-contracts/agents/reviewer.md:11"
+
+# The hand-off: lines carrying what the change replaced rank above lines
+# found only beside it; a change that is itself temporary is left alone.
+R="$WORK/sw-rank"; sweep_repo "$R"
+sweep_submit "$R" s38 p1 >/dev/null
+add_item "$R"
+text=$(context "$(sweep_stop "$R" s38 p1)")
+contains "sweep says to leave every line of a trial wording" "$text" "If your change is itself temporary"
+contains "sweep counts a test fixture among the records to leave" "$text" "a test fixture or its expected output"
+lacks "sweep says nothing of neighbouring text where it read none" "$text" "beside your addition"
+R="$WORK/sw-beside2"; sweep_repo "$R"
+sweep_submit "$R" s39 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' 'went the way it did.\n\nWrite it the day you hand over.\n'
+text=$(context "$(sweep_stop "$R" s39 p1)")
+contains "sweep says a line found beside the addition may need nothing" "$text" "needs your change only where it covers the same ground"
+contains "sweep's lead names the neighbouring paragraphs it read" "$text" "what the paragraphs beside your addition say"
+
+# A file that is not a regular file is never read, and the state is private.
+R="$WORK/sw-dev"; sweep_repo "$R" nogit
+ln -s /dev/zero "$R/docs/README.md"
+mkfifo "$R/skills/README.md"
+out=$(sweep_submit "$R" s40 p1)
+check "sweep's snapshot passes a rule file that is a device or a pipe" 0 $?
+mode=$("$PY" -c 'import os, stat, sys; print(oct(stat.S_IMODE(os.stat(sys.argv[1]).st_mode)))' "$SW/delivery-skills-landing-sweep-$(id -u)/s40")
+check "sweep keeps its state private" "0o700" "$mode"
 
 # Eight lines at most, the rest counted.
 R="$WORK/sw-many"; sweep_repo "$R"
