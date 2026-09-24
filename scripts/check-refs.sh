@@ -35,10 +35,12 @@ for c in $(grep -o '{CLAUDE_PLUGIN_ROOT}[^"\\ ]*' "$ROOT/hooks/hooks.json" | sed
 done
 
 # 4. Relative links in tracked markdown resolve. docs/ is excluded (plan
-#    documents carry fenced example links that resolve nowhere), and the
-#    target charset admits only path-like tokens, so prose and inline code
-#    around a "](" never produce a match.
-for m in $(cd "$ROOT" && git ls-files '*.md' ':!docs/*'); do
+#    documents carry fenced example links that resolve nowhere), and so is
+#    each eval case's prompt.md, whose links name files in the fixture the
+#    run is handed rather than in this tree. The target charset admits only
+#    path-like tokens, so prose and inline code around a "](" never produce
+#    a match.
+for m in $(cd "$ROOT" && git ls-files '*.md' ':!docs/*' ':!evals/*/prompt.md'); do
   dir=$(dirname "$ROOT/$m")
   for t in $(grep -o ']([A-Za-z0-9._/#:-]*)' "$ROOT/$m" | sed 's/^](//;s/)$//'); do
     case "$t" in

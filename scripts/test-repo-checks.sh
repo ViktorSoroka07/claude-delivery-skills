@@ -77,6 +77,19 @@ printf 'A plan. [dead](skills/gone/SKILL.md) and prose with `](` then capture to
 sh "$CHECK" "$WORK/t5b" >/dev/null 2>&1
 check "committed plan doc with example links passes" 0 $?
 
+# 5c. An eval case's prompt links files of the fixture its run is handed, so
+#     its links pass; the same dead link in the case's own record still fails.
+mkplugin t5c
+mkdir -p "$WORK/t5c/evals/demo-case/results"
+printf 'Add this page:\n\n```markdown\nSee [Retries](retries.md).\n```\n' > "$WORK/t5c/evals/demo-case/prompt.md"
+( cd "$WORK/t5c" && git add -A && git commit -qm x )
+sh "$CHECK" "$WORK/t5c" >/dev/null 2>&1
+check "eval case prompt with fixture-relative links passes" 0 $?
+printf 'The run linked [Retries](retries.md).\n' > "$WORK/t5c/evals/demo-case/results/manual-run.md"
+( cd "$WORK/t5c" && git add -A && git commit -qm y )
+sh "$CHECK" "$WORK/t5c" >/dev/null 2>&1
+check "dead link in an eval case record is still caught" 1 $?
+
 GEN="$ROOT/scripts/generate-inventory.sh"
 
 # 6. The generator rewrites a stale count from the tree, and the result is
