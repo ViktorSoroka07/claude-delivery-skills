@@ -260,3 +260,103 @@ source first.
 **Not bought, and why:** a baseline on the strongest model, since none of the
 three is a restraint rule; a second fixture in another domain, which is the
 landing's question if the three clear here.
+
+## The baseline arm: five reps, all measured
+
+Five reps of the plugin at the case's commit, `--ablation none --model sonnet
+--judge-model sonnet -j 3 --keep-temp` on CLI 2.1.281: $1.10, kept as
+`round-49e@baseline.json`, each rep's trace and tree under
+`evals/results/task49e-baseline-traces/` with the hand grades written before
+the runner's verdicts were read. Nothing curtailed: one `result` record per
+trace, all `success`, 8-12 turns against 40 and 17-35 seconds against 600.
+Every start hook carries the head's brief phrase. No rep ran `make e2e` or
+bound a port, so the sandbox's refusal never came into play; every rep read
+`scripts/e2e.sh`, four of them after searching for `8080` or `e2e`, to check
+what the port claim rested on. No rep loaded `maintaining-project-memory`.
+
+**The condition: met in all five.** Each rep added a "Before calling a change
+done" section to the testing skill carrying both halves of the rule, and
+changed nothing else; `CLAUDE.md` is untouched in all five.
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `trigger-names-what-the-change-shows` | 0/5 | 0/5 |
+| `forbidden-act-says-why-replacement-needs-none` | 5/5 | 5/5 |
+| `imperative-in-the-file-every-session-loads` | 0/5 | 0/5 |
+| `skill-was-invoked` | 0/5 | 0/5 |
+
+Runner and hand agree on all twenty cells. Every trigger is the requester's
+category - "anything a shopper sees", once "or can do", once followed by
+"browsing, cart, checkout, or any page or API a storefront request can reach"
+- and none names `web/`; no rep opened the README. Every prohibition carries
+the reason with it, in the words of the script it read: "the suite starts its
+own server on its own free port" (four reps), "on a free port the OS picks"
+(one).
+
+**By the bars fixed before the draw:** the trigger and placement rows at 0/5
+buy the treated arm, each clearing at 4/5; the prohibition row at 5/5 is not
+needed on the suite's model where the reason sits in a file the writer opens
+anyway, and is read in the treated arm as a neighbour.
+
+## The treated arm: five reps, all measured, neither row clears
+
+Five reps of the treated text from the worktree pinned at `f72b8e1`, the same
+flags: $0.95, kept as `round-49e@treated.json`, traces, trees and hand grades
+under `evals/results/task49e-treated-traces/`. Nothing curtailed: one `result`
+record per trace, all `success`, 7-11 turns and 21-39 seconds. Every start
+hook carries the treated phrase. No rep ran `make e2e`.
+
+**The condition: met in all five**, and `CLAUDE.md` untouched in all five.
+Three reps loaded the skill - reps 1 and 4 before reading anything, rep 2
+after reading the script and before its one edit - and each of those traces
+carries the section's treated bullets in the loaded text; reps 3 and 5 had
+the brief's clause alone.
+
+| Rep | Skill loaded | Trigger as written | trigger | prohibition | `CLAUDE.md` |
+|---|---|---|---|---|---|
+| 1 | first call after the brief's | "anything a shopper sees or does - browsing, the cart, checkout" | fail | pass | fail |
+| 2 | before its edit | "a path a shopper takes - browsing, cart, checkout" | fail | pass | fail |
+| 3 | no | "anything a shopper sees" | fail | pass | fail |
+| 4 | first call after the brief's | "a shopper-facing path - browsing, cart, checkout" | fail | fail | fail |
+| 5 | no | "anything a shopper sees - a page, an API response shape, checkout, pricing" | fail | pass | fail |
+
+| Grader | Runner | Hand |
+|---|---|---|
+| `trigger-names-what-the-change-shows` | 0/5 | 0/5 |
+| `forbidden-act-says-why-replacement-needs-none` | 4/5 | 4/5 |
+| `imperative-in-the-file-every-session-loads` | 0/5 | 0/5 |
+| `skill-was-invoked` | 3/5 | 3/5 |
+
+Runner and hand agree on all twenty cells, every judged one by three votes to
+none. Three graders were read and none crossed its bar.
+
+**Reading, by the bars fixed before any draw: neither test lands.**
+
+- **The trigger: 0/5 against a bar of 4/5, on a 0/5 baseline.** The reps
+  moved the trigger toward the concrete - three listed the shopper's journeys
+  ("browsing, the cart, checkout"), and reps 1 and 2 wrote the rule's
+  exclusion out ("a change confined to code a shopper's path never reaches
+  doesn't need it") - but in the category's own terms: a journey is still a
+  category the reader judges a change into, and no rep looked for what in the
+  repository marks it. None opened the README or listed the tree.
+- **The placement: 0/5 against 4/5, on a 0/5 baseline.** No rep touched
+  `CLAUDE.md`. The requester named the rule's home, and every rep wrote it
+  there and nowhere else; rep 5, which had the brief's clause alone, is the
+  one rep that acted on the rule's reach, widening the testing skill's own
+  `description:` to fire "before calling any change that touches what a
+  shopper sees done" - inside the file it was told to use, and a trigger for a
+  skill the repository's sessions never load as one.
+- **Having the section's bullets loaded decided nothing.** The three reps that
+  loaded the skill before writing missed both rows exactly as the two that had
+  the brief's clause alone did - so a stop that delivers the skill at the write
+  would not be expected to move either row on this case.
+- **The prohibition, read as a neighbour: 4/5 against the baseline's 5/5**,
+  not a cost by the bar. The miss is rep 4, which loaded the skill first,
+  never opened the Makefile or the script, and wrote the harm and then an
+  instruction the script contradicts ("run the suite against it as it stands,
+  or use a different port") in seven turns, the fewest of either arm.
+
+The ablation arm was fixed to be bought only where a row cleared, and the
+extension only for a row at 2-3/5 on the baseline; neither was bought. Spent
+on the round: $1.17 for the judge probe, $1.10 for the baseline, $0.95 for
+the treated arm - **$3.22** of the approved ~$4-5.
