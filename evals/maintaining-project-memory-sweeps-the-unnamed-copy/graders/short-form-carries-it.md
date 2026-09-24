@@ -1,0 +1,13 @@
+---
+type: regex
+target:
+  source: file
+  path: "CLAUDE.md"
+pattern: "^[-*][ \\t]+(?:(?!\\n[ \\t]*\\n|\\n[-*][ \\t]|\\n#)[\\s\\S])*?(?:hand-?(?:over|off)|\\bchang(?:e|es|ed|ing)\\s+hands\\b)(?:(?!\\n[ \\t]*\\n|\\n[-*][ \\t]|\\n#)[\\s\\S])*?(?:\\broll(?:s|ed|ing)?(?:-|\\s*)backs?\\b|\\broll(?:s|ed|ing)?(?:\\s+\\w+){1,3}\\s+back\\b|\\brevert|\\bundo|revers(?:e|es|ed|ing|al|ible)\\b|\\bback(?:s|ed|ing)?(?:-|\\s+)out\\b|\\bback(?:\\s+\\w+){1,3}\\s+out\\b)|^[-*][ \\t]+(?:(?!\\n[ \\t]*\\n|\\n[-*][ \\t]|\\n#)[\\s\\S])*?(?:\\broll(?:s|ed|ing)?(?:-|\\s*)backs?\\b|\\broll(?:s|ed|ing)?(?:\\s+\\w+){1,3}\\s+back\\b|\\brevert|\\bundo|revers(?:e|es|ed|ing|al|ible)\\b|\\bback(?:s|ed|ing)?(?:-|\\s+)out\\b|\\bback(?:\\s+\\w+){1,3}\\s+out\\b)(?:(?!\\n[ \\t]*\\n|\\n[-*][ \\t]|\\n#)[\\s\\S])*?(?:hand-?(?:over|off)|\\bchang(?:e|es|ed|ing)\\s+hands\\b)"
+match: contains
+flags: mi
+---
+
+The fixture's `CLAUDE.md`, the file every session in the repository loads first, carries a one-bullet short form of what a hand-over note carries - and names its subject only as "the note you leave when work changes hands", with no "hand-over", no "handoff" and no path to the skill, so a search for the subject's name in any spelling or letter case misses it and only a search for the old items' own words (landed, owns, current state) reaches it. The prompt adds a fourth item and names only the skill's owner section, so a short form left alone is the copy a reader relies on without opening the owner, reading as complete while wrong. This passes only where one bullet names both the subject - hand-over, handoff, or work changing hands - and the new item - a word for undoing a change (roll back, rollback, revert, undo, reverse, back out) - in either order, its wrapped lines and an indented sub-bullet included, and a phrase broken across a line still read. A short form cut to a pointer at the skill fails: its readers do not open the owner, which is why it is a short form.
+
+The window ends at the next top-level bullet, blank line or heading, so the item added to another bullet (the dates rule, the skills rule, a new bullet about shipping behind flags) does not count. It was tested on fourteen hand-written trees from both sides of that line, in Node and in Bun, and agreed with the hand label on thirteen: the fourteenth, a new top-level bullet that refers back to the note without naming it ("That note also says how to roll back ..."), carries the item to a reader and fails here, so a failing rep's tree is read by hand before its fail is counted. The condition that the owner section carries the item is read per rep from the tree before this grader, and a rep that does not meet it is unmeasured, not failed.

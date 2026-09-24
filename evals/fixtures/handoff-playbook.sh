@@ -12,10 +12,19 @@
 # undo, back out): the case's fourth item is the rollback, and its graders
 # read those words as the item landed.
 # $1 = target directory (created; must not exist or be empty).
+# $2 = variant, optional: "unnamed" writes CLAUDE.md's short form naming the
+#      subject only as the note you leave when work changes hands, with no
+#      "hand-over", no "handoff" and no path, so a search for the subject's
+#      name misses it and only one for the old items' own words reaches it.
 #
 # Invented content throughout - a team and a service that never existed.
 set -e
 T=${1:?target directory}
+V=${2:-}
+case "$V" in
+  ''|unnamed) ;;
+  *) echo "handoff-playbook.sh: unknown variant '$V'" >&2; exit 1 ;;
+esac
 if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
   echo "handoff-playbook.sh: $T is not empty; refusing to build a fixture over existing files" >&2
   exit 1
@@ -50,6 +59,19 @@ conventions every contributor follows.
 Open a pull request against `main`; one reviewer from the team approves it.
 EOF
 
+if [ "$V" = unnamed ]; then
+cat > CLAUDE.md <<'EOF'
+# Working in team-playbook
+
+- Skills live under `skills/<name>/SKILL.md`; each owns its own rule, and a
+  change to a rule is made there first.
+- Keep every skill under 150 lines; a skill that grows past that is split.
+- The note you leave when work changes hands carries what was done and where
+  it landed, what is still open and who owns it, and how to check the current
+  state.
+- Dates in notes are absolute - the day, month and year - never "yesterday".
+EOF
+else
 cat > CLAUDE.md <<'EOF'
 # Working in team-playbook
 
@@ -61,6 +83,7 @@ cat > CLAUDE.md <<'EOF'
   `skills/handoff/SKILL.md`).
 - Dates in notes are absolute - the day, month and year - never "yesterday".
 EOF
+fi
 
 cat > skills/handoff/SKILL.md <<'EOF'
 ---
