@@ -331,7 +331,8 @@ instructions alone cannot:
     lines that carry a phrase are left out as well, among them: the lines the turn
     itself wrote in a rule file or with `Edit` or `Write`, with the rest of their
     paragraph or list item in another file and, in the rule file a phrase came from,
-    their whole list and the paragraphs beside an addition; a line in a file the turn
+    their whole list and, for a phrase read from the paragraphs beside a prose
+    addition, those paragraphs; a line in a file the turn
     did not write that way, where that file holds only one of a changed rule file's
     phrases and the rule file yields several; a match starting on a Markdown heading,
     a line opening with `#` and a space outside a code block; and every file git

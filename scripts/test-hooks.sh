@@ -824,6 +824,26 @@ sweep_submit "$R" s69 p1 >/dev/null
 "$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/release.md" 'before merge.\n\n' 'before merge.\n\n- Link the ticket\n- Name the reviewer\n\n'
 contains "sweep reads the paragraphs beside a list it started" "$(handed "$(sweep_stop "$R" s69 p1)")" "docs/release.md:1"
 
+# In the owning file, the paragraphs a beside phrase was read from are left
+# out for that phrase alone: a restatement below a list the turn appended to
+# still carries the words the turn replaced above it.
+R="$WORK/sw-ownbeside"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Checks\n\nAlways run the full browser suite before calling a storefront change finished today.\n\n- Keep the dev server up\n- Use a free port\n\nIn short: always run the full browser suite before calling a storefront change finished.\n' > "$R/skills/handoff/references/checks.md"
+(cd "$R" && git add -A && git commit -qm checks)
+sweep_submit "$R" s71 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/checks.md" 'Always run the full browser suite' 'Run the smoke suite'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/checks.md" '- Use a free port\n' '- Use a free port\n- Log the port\n'
+contains "sweep hands a restatement in the owner beside a list the turn appended to" \
+  "$(handed "$(sweep_stop "$R" s71 p1)")" "skills/handoff/references/checks.md:9"
+printf '# Notes\n\nThe release notes are drafted by the author of the change before merge.\n\nThe tag is cut on Thursday.\n\n- Keep the dev server up\n- Use a free port\n\nRemember: the release notes are drafted by the author of the change before merge.\n' > "$R/skills/handoff/references/notes.md"
+(cd "$R" && git add -A && git commit -qm notes)
+sweep_submit "$R" s72 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/notes.md" 'before merge.\n\nThe tag' 'before merge.\n\nAnnounce it in the channel.\n\nThe tag'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/notes.md" '- Use a free port\n' '- Use a free port\n- Log the port\n'
+contains "sweep reads the owner's beside lines from its prose additions alone" \
+  "$(handed "$(sweep_stop "$R" s72 p1)")" "skills/handoff/references/notes.md:13"
+
 # A headline needs two content words; the whole list a change rewrote while
 # joining it is the turn's own.
 R="$WORK/sw-thin"; sweep_repo "$R"

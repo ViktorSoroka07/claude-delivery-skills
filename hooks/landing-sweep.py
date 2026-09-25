@@ -671,9 +671,10 @@ def phrases_of(before, after, budget):
     item to, and that list's heading; every five-word run of replaced or
     deleted text overlapping the words it lost; and the five-word runs of the
     paragraphs on either side of a prose addition - an item added to a list of
-    one, or a list started, included, since no copy enumerates such a list."""
+    one, or a list started, included, since no copy enumerates such a list.
+    Returned with the 1-based lines of `after` those paragraphs stand on."""
     b, a, ops = opcodes(before, after)
-    raw = []
+    raw, beside_lines = [], set()
     for tag, i1, i2, j1, j2 in ops:
         if budget.spent():
             break
@@ -692,6 +693,7 @@ def phrases_of(before, after, budget):
                 if heading:
                     raw.append(("item", heading))
         if tag == "insert" and not listed and len(list_block(b, i1)[0]) < 2:
+            beside_lines.update(k + 1 for k in paragraph_above(a, j1) + paragraph_below(a, j2))
             for para in (paragraph_above(b, i1), paragraph_below(b, i1)):
                 toks = " ".join(b[k] for k in para).split()
                 for st in range(0, max(0, len(toks) - RUN) + 1):
@@ -707,7 +709,7 @@ def phrases_of(before, after, budget):
             continue
         seen.add(words)
         out.append((source, words, shown, k))
-    return out[:MAX_PHRASES]
+    return out[:MAX_PHRASES], beside_lines
 
 
 def changed_lines(before, after, whole_list):
@@ -751,16 +753,6 @@ def item_span(lines, at):
     while e < len(lines) and lines[e].strip() and not HEADING.match(lines[e]) and not LIST_ITEM.match(lines[e]):
         e += 1
     return s, e
-
-
-def source_lines(before, after):
-    """1-based lines of `after` the 'beside' phrases were read from."""
-    _, a, ops = opcodes(before, after)
-    out = set()
-    for tag, _, _, j1, j2 in ops:
-        if tag == "insert":
-            out.update(k + 1 for k in paragraph_above(a, j1) + paragraph_below(a, j2))
-    return out
 
 
 def heading_lines(lines):
@@ -884,8 +876,7 @@ def sweep(written, cwd, budget):
         befores = {r: written[p] for p, r in rels.items()}
         afters = {r: read_text(p) or "" for p, r in rels.items()}
         owners = sorted(r for p, r in rels.items() if (is_rule(r, root) if how == "git" else is_rule(p)))
-        per_owner = [(o, phrases_of(befores[o], afters[o], budget), source_lines(befores[o], afters[o]))
-                     for o in owners]
+        per_owner = [(o,) + phrases_of(befores[o], afters[o], budget) for o in owners]
         per_owner = [po for po in per_owner if po[1]]
         if not per_owner:
             continue
@@ -901,16 +892,13 @@ def sweep(written, cwd, budget):
             if text is None:
                 continue
             tx = Text(text, anchors, MARKDOWN.search(rel))
-            for owner, phrases, source in per_owner:
-                skip = set()
-                if rel in befores:
-                    skip = changed_lines(befores[rel], afters[rel], rel == owner)
-                    if rel == owner:
-                        skip |= source
+            for owner, phrases, beside_lines in per_owner:
+                skip = changed_lines(befores[rel], afters[rel], rel == owner) if rel in befores else set()
+                read_from = skip | beside_lines if rel == owner else skip
                 found = {}
                 for ph in phrases:
                     spans = [(s, e) for s, e in tx.find(ph[1], ph[3])
-                             if s not in skip and s not in tx.headings]
+                             if s not in (read_from if ph[0] == "beside" else skip) and s not in tx.headings]
                     if spans:
                         found[ph] = spans
                 if found and len(found) >= (1 if rel in befores else min(2, len(phrases))):
