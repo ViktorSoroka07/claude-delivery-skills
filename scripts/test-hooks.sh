@@ -979,10 +979,12 @@ sweep_submit "$R" s18 p1 >/dev/null
 add_item "$R"
 contains "sweep falls back to the session's latest snapshot" "$(handed "$(sweep_stop "$R" s18 p9)")" "CLAUDE.md:3-4"
 
-# The prefilter reaches untracked files and never ignored ones.
+# The prefilter reaches untracked files and never ignored ones, but every
+# tracked file, one the ignore rules match included.
 R="$WORK/sw-grep"; sweep_repo "$R"
-printf 'ignored.md\n' > "$R/.gitignore"
-(cd "$R" && git add .gitignore && git commit -qm ignore)
+printf 'ignored.md\ndocs/forced.md\n' > "$R/.gitignore"
+cp "$R/CLAUDE.md" "$R/docs/forced.md"
+(cd "$R" && git add .gitignore && git add -f docs/forced.md && git commit -qm ignore)
 cp "$R/CLAUDE.md" "$R/docs/untracked.md"
 cp "$R/CLAUDE.md" "$R/ignored.md"
 sweep_submit "$R" s19 p1 >/dev/null
@@ -990,6 +992,7 @@ add_item "$R"
 got=$(handed "$(sweep_stop "$R" s19 p1)")
 contains "sweep searches untracked files" "$got" "docs/untracked.md"
 lacks "sweep never searches ignored files" "$got" "ignored.md"
+contains "sweep searches a tracked file the ignore rules match" "$got" "docs/forced.md"
 
 # A soft reset or a rebase after the turn committed its change keeps the
 # change the turn's own.

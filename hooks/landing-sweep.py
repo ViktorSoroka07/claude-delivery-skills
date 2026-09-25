@@ -767,15 +767,20 @@ def prefilter_words(phrases):
 
 def candidates(root, in_git, words, budget):
     """Files under `root` holding any of `words` in any letter case: git grep
-    over tracked and untracked files where there is git, and where there is
-    none a bounded walk over text documents only - a tree outside git holds
-    transcripts, editor backups and caches that quote any file."""
+    over tracked and unignored untracked files where there is git, and where
+    there is none a bounded walk over text documents only - a tree outside git
+    holds transcripts, editor backups and caches that quote any file. The
+    tracked files get a grep of their own: `--untracked` applies the ignore
+    rules to them too, and a tracked file those rules match is still read."""
     if in_git:
-        args = ["grep", "-l", "-z", "-I", "-i", "-F", "--untracked"]
-        for w in words:
-            args += ["-e", w]
-        out = git(root, args, budget, ok=(0, 1))
-        return [] if out is None else [n for n in out.split("\0") if n]
+        found = set()
+        for untracked in ([], ["--untracked"]):
+            args = ["grep", "-l", "-z", "-I", "-i", "-F"] + untracked
+            for w in words:
+                args += ["-e", w]
+            out = git(root, args, budget, ok=(0, 1))
+            found.update(n for n in (out or "").split("\0") if n)
+        return sorted(found)
     names, _ = walk(root, budget)
     found = []
     for rel in names:
