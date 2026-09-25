@@ -1069,6 +1069,24 @@ EOF
 got=$(handed "$(sweep_stop "$R" s35 p1)")
 contains "sweep diffs a large block line by line" "$got" "docs/api.md:1"
 lacks "sweep reads only the rows a large block changed" "$got" "CLAUDE.md"
+R="$WORK/sw-rows-unlike"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+rows = "".join("| `/v1/items/%d` | GET | returns the item list for the account %d | yes |\n" % (i, i) for i in range(500))
+open(sys.argv[1] + "/README.md", "a").write("\n| Endpoint | Method | What it does | Auth |\n|---|---|---|---|\n" + rows)
+open(sys.argv[1] + "/docs/api.md", "w").write("It returns the item list for the account 207 | yes on request.\n")
+EOF
+(cd "$R" && git add -A && git commit -qm rows)
+sweep_submit "$R" s60 p1 >/dev/null
+"$PY" - "$R/README.md" <<'EOF'
+import sys
+p = sys.argv[1]
+text = open(p).read().replace(" | yes |", " | no |")
+text = text.replace("| `/v1/items/5` | GET | returns the item list for the account 5 | no |",
+                    "| `/v2/ledger` | POST | posts a ledger entry for the whole organisation at once | admin only |")
+open(p, "w").write(text)
+EOF
+contains "sweep pairs a large table's like rows where one row is unlike" "$(handed "$(sweep_stop "$R" s60 p1)")" "docs/api.md:1"
 
 # Outside git: a rule file under a working directory with no repository is
 # searched through that directory's text documents only, and one outside the

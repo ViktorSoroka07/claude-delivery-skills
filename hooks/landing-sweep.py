@@ -567,13 +567,17 @@ def lost_runs(old_lines, new_lines, budget):
     lost. A block too large to diff word by word exactly is diffed row by row
     where it kept its line count and every row pair is alike, as a table's
     rows are; otherwise as a whole with the popular words junked, and past a
-    ceiling not at all."""
+    ceiling only in the row pairs that are alike."""
     whole = (" ".join(old_lines).split(), " ".join(new_lines).split())
     pairs = [whole]
-    rows = [(o.split(), n.split()) for o, n in zip(old_lines, new_lines)]
-    if len(whole[0]) * len(whole[1]) > WORD_DIFF and len(old_lines) == len(new_lines) and all(
-            difflib.SequenceMatcher(None, o, n).quick_ratio() >= 0.5 for o, n in rows):
-        pairs = rows
+    size = len(whole[0]) * len(whole[1])
+    if size > WORD_DIFF and len(old_lines) == len(new_lines):
+        rows = [(o.split(), n.split()) for o, n in zip(old_lines, new_lines)]
+        alike = [difflib.SequenceMatcher(None, o, n).quick_ratio() >= 0.5 for o, n in rows]
+        if all(alike):
+            pairs = rows
+        elif size > WORD_DIFF_JUNK:
+            pairs = [row for row, like in zip(rows, alike) if like]
     for old, new in pairs:
         size = len(old) * len(new)
         if budget.spent() or size > WORD_DIFF_JUNK:
