@@ -130,3 +130,46 @@ sentence (read delivery from what arrived) stays out: nothing here reads it.
   --allow-tools Bash Write Edit Agent -j 3 --keep-temp`, the runs copied in as
   `round-E@baseline.json` and `round-E@<wording>.json`. Ceiling: each arm
   about $2.50, set above that.
+
+## The baseline: two of four measured reps keep the file off the read-only role
+
+Five reps from a detached worktree at `eb25595`, the invocation above, CLI
+2.1.281: $1.44, kept as `round-E@baseline.json` with each trace under
+`evals/results/rowE-traces/`. Nothing curtailed: 11-17 turns and 25-78
+seconds in each first `result` record, two reps writing further records after
+background agents reported. Every rep read `CLAUDE.md`, and every rep sent all
+three logs to `log-summariser` in one message: the gate stopped the first and
+the two siblings ran on briefs written before `delegating-to-subagents`
+loaded - the batch the verifier predicted, in five reps of five.
+
+| Rep | Briefs before the load (siblings ran) | Brief after the load | Act |
+|---|---|---|---|
+| 1 | "Write the summary to `summaries/nightly-01.md`" | none - it dispatched nothing after the load | unmeasured |
+| 2 | "Return the summary as text ... (do not write any file)" | "You do not have a Write tool, so return the complete summary as plain text in your final reply (not a file) - keep it concise (under 200 words) since it must fit whole" | pass |
+| 3 | "Write the summary to `.../summaries/nightly-01.md`" | the same, plus "That file is the deliverable. Reply with just the path you wrote" | fail |
+| 4 | "do not write any file yourself - you don't have write access" | "You have no Write tool, so return the full summary as plain text ... keep it concise ... since it will arrive alongside two sibling reports" | pass |
+| 5 | "Write the summary to `summaries/nightly-01.md`" | the same, plus "Report back by writing the full summary content ... to `summaries/.nightly-01.report.txt`, then reply with just that file path" | fail |
+
+**The act: 2/4 measured**, the fifth measured rep unable to move the tier
+(2/5 or 3/5), so no replacement was bought. The screen failed reps 1, 3 and
+5 - rep 1 on its pre-load briefs alone, the false fail the record names - and
+passed 2 and 4. `names-each-failure` and the three summary-file rows read 5/5:
+the coordinator wrote every file itself from the replies, which is the
+fallback the entry describes and not a cost to the asked work.
+
+**What the reps show about the skill's own text.** Once loaded, it moved
+briefs both ways: reps 2 and 4 read the role's tool list and kept the file off
+it, rep 4 adding the sibling budget the skill's paragraph gives as its reason;
+reps 3 and 5 applied "name the path the agent writes its full report to, and
+ask for a reply of that path alone" to a role with no write tool, rep 5
+adding a second file for the report on top of the summary file. Before the
+load, the unaided briefs split the same way, two of five keeping the file off.
+
+**By the bars fixed before the draw: 2-3/5 buys no treated arm inside batch
+1.** Its extension - both arms to ten measured reps, the row clearing at 9/10
+or better and five above the baseline's ten - is priced at the stop: five
+more baseline reps and ten treated, about $4.50 with replacements, on the
+revised treated text above. A clear there would still be tested on one
+domain.
+
+**Spent on this round**: the probe $0.15 and the baseline $1.44 - **$1.59**.
