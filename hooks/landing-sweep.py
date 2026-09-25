@@ -882,12 +882,18 @@ def beside_only(entry):
     return all(ph[0] == "beside" for ph in entry["phrases"])
 
 
-def hand_off(entries, cwd, cut_short):
+def chosen(entries):
+    """The entries a hand-off lists, and the rest: where none of the first
+    places holds a line found only beside the addition, the last one does."""
     listed, rest = entries[:LISTED], entries[LISTED:]
     if rest and not any(beside_only(en) for en in listed) and any(beside_only(en) for en in rest):
         spare = next(en for en in rest if beside_only(en))
         rest = [listed[-1]] + [en for en in rest if en is not spare]
         listed = listed[:-1] + [spare]
+    return listed, rest
+
+
+def hand_off(listed, rest, cwd, cut_short):
     lines = []
     for en in listed:
         at = "%d" % en["first"] if en["first"] == en["last"] else "%d-%d" % (en["first"], en["last"])
@@ -941,12 +947,13 @@ def stop(payload, budget):
     cut_short = budget.spent()
     if not entries:
         return
+    listed, rest = chosen(entries)
     lines = sorted({line_key(en["path"], en["tx"].lines[n - 1])
-                    for en in entries[:LISTED] for n in range(en["first"], en["last"] + 1)})
+                    for en in listed for n in range(en["first"], en["last"] + 1)})
     if not write_new(pending, json.dumps({"lines": lines, "seen": False})):
         return
     sys.stdout.write(json.dumps({"hookSpecificOutput": {
-        "hookEventName": "Stop", "additionalContext": hand_off(entries, cwd, cut_short)}}))
+        "hookEventName": "Stop", "additionalContext": hand_off(listed, rest, cwd, cut_short)}}))
 
 
 def main():

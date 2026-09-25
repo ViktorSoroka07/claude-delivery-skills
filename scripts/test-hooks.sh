@@ -1274,6 +1274,15 @@ add_item "$R"
 text=$(context "$(sweep_stop "$R" s49 p1)")
 contains "sweep marks a line found beside the addition" "$text" "\`docs/onboarding.md:1\` - beside: "
 contains "sweep keeps one of eight places for a line found beside the addition" "$(printf '%s\n' "$text" | grep -c '^- `')" "8"
+sweep_stop "$R" s49 p1 true >/dev/null
+(cd "$R" && git add -A && git commit -qm t1)
+sweep_submit "$R" s49 p2 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '4. **How to roll it back** - the step that undoes each change.\n' \
+  '4. **How to roll it back** - the step that undoes each change.\n5. **Who to ask** - the owner of each open item.\n'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' 'went the way it did.\n\nSend it before you log off.\n'
+got=$(handed "$(sweep_stop "$R" s49 p2)")
+lacks "sweep records the beside line it listed in place of the eighth" "$got" "docs/onboarding.md"
+contains "sweep hands later the line the beside line kept out of the list" "$got" "docs/copy6.md"
 
 # The hand-off leaves with 0 even when its reader has gone.
 R="$WORK/sw-pipe"; sweep_repo "$R"
