@@ -375,6 +375,58 @@ evidence, and the five rules are not interchangeable:
   before designing a round on any case whose reps write a rule file, and where
   it speaks, read the hand-off from the transcript before reading a grader.
 
+**A grader file's frontmatter ends at the first `---` after its opening line,
+wherever that `---` sits, and so does a `prompt.md`'s.** The runner reads both
+the same way, and a mock responder file too: it drops a leading byte-order
+mark, matches `/^---\s*\n([\s\S]*?)---\s*\n?/`, and parses as YAML only the
+text between a first line of `---` and the next three dashes - mid-line, inside
+a quoted value or in a comment as readily as on a line of their own. Dashes
+inside the frontmatter therefore cut it short. Where the cut leaves invalid
+YAML, a quote left open say, or YAML that is not a mapping, or drops a key the
+body cannot stand in for, such as `type` or a `tool_used` grader's `tool`, the
+case is refused at load and costs nothing. Any other cut loads without a
+warning. The value is shortened at the dashes, so an unquoted `^---$` becomes
+`^`, and every key after the cut falls to its default. In every regex grader
+here `match` and `flags` follow `pattern`, and in every `tool_used` grader
+`min`, `max` and `arm` follow `input_match`, so those are the likely losses: a
+lost `match` reads `contains`, so a pattern cut to a bare anchor - `^`, or the
+lookbehind a whole-file pattern opens with - passes on every target whatever
+mode the grader declared, and a `not_contains` grader whose pattern survived
+the cut passes exactly where the text it forbids is present; a lost `min` and
+`max` turn a `max: 0` grader into one that requires the call it forbids. A lost
+`target` or `focus` sends the grader back to the final message. A regex, `llm`
+or `baseline` grader whose `pattern` or `criteria` was among the lost takes the
+rest of the file - the rest of the cut line, the lost keys, the closing fence
+and the body - as its pattern or rubric, and a `prompt.md` cut that loads puts
+that text at the head of its prompt. A whole-file pattern over a file with
+frontmatter fences of its own is where the dashes arrive unnoticed: the landing
+sweep's restraint case was refused on its first launch for one. Spell three
+dashes in a pattern `-{3}` and keep the value quoted, as every pattern and
+`input_match` here is, so a run the spelling missed leaves the quote open and
+the case refused rather than loaded. Or put the pattern alone in the body: a
+regex grader whose frontmatter names no pattern takes its whole body, trimmed,
+as the pattern, so that body carries no rationale beside it; the body may hold
+`---` freely, and it is read raw rather than as YAML, so a pattern moved there
+from a double-quoted value loses one level of backslashes - `\n`, not `\\n`.
+
+**A file whose first line is not `---` has no frontmatter at all.** A grader
+file with a blank line above its fence is left out of the case without a
+warning - or, where it was the case's only grader, the case is refused as an
+`invalid case.yaml` with `graders: Required`, which blames `case.yaml` whether
+or not the case has one and names no grader file - and a `prompt.md` hands its whole
+frontmatter to the model as part of the prompt and runs on the defaults for
+every key it held, turns, timeout, tools, runs and tags alike. Each file is
+free to check before a launch - that expression and a YAML parse in Bun, whose
+parser the runner calls, show what the runner will read - and every grader file
+and `prompt.md` in the suite read as its author wrote it when this was written.
+The match is then `new RegExp(pattern, flags)` over the target, a leading
+byte-order mark dropped first from a file target: the runner applies no flag
+the grader does not declare, bar the `g` a `count:N` match adds to count, and
+`flags` defaults to empty, so `^` and `$` anchor the whole target rather than
+its lines, and `$` its very end, never before a final newline. The
+`input_match` of a `tool_used` or `tool_order` grader is compiled with no flags
+at all.
+
 **A new grader is mechanical unless its condition is irreducibly semantic.**
 `regex`, `file_exists` and `tool_used` cost nothing per rep, return the same
 verdict every time, and can be tried against an artifact that already exists
