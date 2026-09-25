@@ -514,6 +514,22 @@ when it was generated. `make-history.py` beside it reads `hooks/session-brief.md
 at build time and is deterministic, so regenerating it and finding no diff is
 the staleness check - run it after any change to the brief.
 
+**Which brief each kept run resumed.** Until the fixture was regenerated after
+`59bde35`, it carried the brief as it stood at `0c7898c`, without the
+first-tool-call paragraph, and every kept run of this case resumed that brief,
+bare or with one wording added. `round-41@baseline.json` and
+`round-44@baseline.json` ran from `main` on it as committed: all twenty reps
+branch off the seeded turn of the continuation transcript beside the case,
+whose every seeded attachment equals the committed one, and the probe above ran
+a byte-identical copy. `round-41a@rebuilt-list.json`,
+`round-41b@exit-clause.json` and `round-41b@exit-clause-draw2.json` resumed it
+with their own bullet wording, each regenerated in its own worktree;
+`round-48@moment-line.json` with the end-of-turn line; and
+`round-48@first-tool-call.json` with a two-skill paragraph whose
+`tracking-open-asks` clause is the landed one's word for word, followed by a
+conditional clause for `writing-for-audiences`. The regenerated fixture carries
+the brief at `59bde35`, and no kept run has resumed it.
+
 ## Not tested here
 
 That an item left on a default is said to have been; that the numbers stay the
@@ -524,12 +540,13 @@ either arm has yet passed.
 
 ## The first-tool-call line on a resumed conversation (task 48)
 
-Task 48's probe ran this case under the brief line later landed at `59bde35` -
-make a conversation's first tool call the Skill tool with
-`tracking-open-asks` - five reps, `--ablation none --model sonnet
---judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280, in
+Task 48's probe ran this case under an earlier wording of the brief line later
+landed at `59bde35`, carrying its first-call clause - make a conversation's
+first tool call the Skill tool with `tracking-open-asks` - and a conditional
+clause for `writing-for-audiences` after it: five reps, `--ablation none
+--model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.280, in
 `round-48@first-tool-call.json`, with `history.jsonl` regenerated in the
-treated worktree so the seeded brief carried the line. **`skill-was-invoked`
+treated worktree so the seeded brief carried that wording. **`skill-was-invoked`
 read 0/5**, confirmed from the traces: the conversation this case resumes
 already holds a finished turn, so "your first tool call in a conversation"
 reads as spent though that turn made no call. The same wording loaded the skill
