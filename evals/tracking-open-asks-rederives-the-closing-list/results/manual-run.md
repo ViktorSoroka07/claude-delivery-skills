@@ -406,9 +406,10 @@ cannot tell that an item is not theirs and answers from what they do know.
 Every other case in this suite is a single prompt, so no rep reaches a second
 closing round and both arms would score alike for a reason having nothing to do
 with the wording. This case seeds the first round instead of hoping for it.
-`context.history_file` is `--resume <path>`: the three lines in
-`history.jsonl` - the plugin's session brief as the attachment a recorded
-session writes, one user turn, one assistant turn - reach the run as its own
+`context.history_file` is `--resume <path>`: the lines in `history.jsonl` -
+the plugin's session brief as the attachment a recorded session writes, one
+user turn, the skill load that turn's first tool call makes (since row 6's F2,
+below; three lines before it), one assistant turn - reach the run as its own
 earlier turns. The seeded assistant turn closes with a table of three items
 said to wait on the requester, and the prompt asks for a second closing list.
 The condition is staged by construction, so every rep starts from it.
@@ -556,3 +557,27 @@ as the first call in five of five on the fresh sibling case. The other graders
 sat inside this case's baseline range and were read by the judge only; no
 decision rests on them. A rule in the skill's body therefore still does not
 reach a resumed conversation, and the brief remains this case's only carrier.
+
+## The seeded skill load (row 6's F2)
+
+From the commit that seeds it, the generator seeds the load a
+fresh conversation's first turn makes under the brief's first-tool-call line:
+the Skill `tool_use`, its `tool_result`, and the skill's body as the `isMeta`
+message the harness injects, read from `skills/tracking-open-asks/SKILL.md` at
+build time, so a skill change the fixture was not regenerated for fails the
+reference gate as a brief change does. A one-rep probe on a seeded file
+carrying the same load quoted a sentence only the skill's body holds, word for
+word, with no Skill call of its own; its case and run are kept under
+`evals/results/row6-probes/`.
+
+So the sentences above that say the skill's text reaches no rep of this case,
+that the brief is its only carrier, and that the indicator reads the trigger
+and nothing else, describe the fixture before the load: **every kept rate in
+this record was taken on that fixture**, none on the regenerated one, and a
+next run here needs its own baseline arm. The indicator now reads a second
+load by the rep, not arrival. And the continuation transcript beside the case
+still holds the old seed's rows, and the seeded assistant turn keeps its uuid
+with a new parent: a hand read walking a new rep's chain through that file
+would reach the old rows, which carry no load, so the file is moved aside
+before the next run, as it was between earlier draws.
+

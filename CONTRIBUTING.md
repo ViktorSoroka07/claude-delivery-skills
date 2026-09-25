@@ -343,8 +343,11 @@ it:
   deny rule covers the path, and grades the stop and the load rather than a
   written file. A rule in the body
   of a standing-rule skill that neither moment reaches on the case, or of
-  `tracking-open-asks` in a resumed conversation, still cannot be moved by
-  any round the runner can buy, the reps never having read it.
+  `tracking-open-asks` in a resumed conversation whose seeded turns never
+  loaded it, still cannot be moved by any round the runner can buy, the reps
+  never having read it. A replay fixture can seed that load itself, as the
+  first turn of a fresh conversation writes it, and a resume passes the seeded
+  body to the model (the replay paragraph below).
   Check the indicator before designing the arms, not after: the round is
   either restated to land where every rep does read, or it is not a runner
   round at all. And on a case either moment reaches, read a lit indicator as
@@ -745,13 +748,19 @@ Rules that held in practice, each answering a failure seen here:
   fixture was generated, so a wording that changes the brief does not reach a
   rep on the fixture alone; the answer written here was that a replay round
   therefore tests a wording landing in the skill's own text, which the run
-  loads live. The first replay run falsified that: the reps never called the
-  Skill tool, so the skill's text is not live to them either, and neither
-  carrier reaches a rep by default. **A replay round tests a brief wording, and
-  regenerates the fixture once per arm so each arm's seeded copy carries its
-  own text** - by a generator that reads the brief rather than holding a copy,
-  and deterministically, so that regenerating it and finding no diff is the
-  staleness check against the live file. Should a later run report both arms,
+  loads live. The first replay run falsified that: its seeded turn made no
+  tool call, so the reps read the brief's first-tool-call line as spent, never
+  called the Skill tool, and the skill's text reached none of them. The
+  generator now seeds the load a fresh conversation's first turn makes - the
+  Skill call, its result and the skill's body as the harness injects it - and
+  a one-rep probe on the seeded file quoted a sentence only that body holds,
+  word for word, with no Skill call of its own. So the skill's text is frozen
+  in the seed too, and **a replay round tests whichever text the seed carries,
+  the brief's or the skill's, and regenerates the fixture once per arm so each
+  arm's seeded copy carries its own text** - by a generator that reads both
+  rather than holding a copy, and deterministically, so that regenerating it
+  and finding no diff is the staleness check against the live files. Every
+  kept rate from before the seeded load is a rate on the fixture without it. Should a later run report both arms,
   the seeded brief reaches the arm meant to be without the plugin, and that
   row understates it.
 - **A capability rule is measured on the weakest model the plugin supports.**

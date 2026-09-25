@@ -54,7 +54,8 @@ for m in $(cd "$ROOT" && git ls-files '*.md' ':!docs/*' ':!evals/*/prompt.md'); 
 done
 
 # 5. Each replay case's history.jsonl is byte-identical to what its
-#    make-history.py builds from the tree now, the brief it seeds included.
+#    make-history.py builds from the tree now, the brief and the skill it
+#    seeds included.
 BUILT=$(mktemp)
 trap 'rm -f "$BUILT"' EXIT
 for g in "$ROOT"/evals/*/make-history.py; do

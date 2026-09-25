@@ -105,12 +105,13 @@ sh "$CHECK" "$WORK/t5c" >/dev/null 2>&1
 check "dead link in an eval case record is still caught" 1 $?
 
 # 5d. A replay case's history is rebuilt from the tree into a temporary file:
-#     a brief line the fixture was not regenerated for fails, and the
-#     committed fixture is left as it was.
+#     a brief line or a skill line the fixture was not regenerated for fails,
+#     and the committed fixture is left as it was.
 mkplugin t5d
-mkdir -p "$WORK/t5d/evals/replay"
+mkdir -p "$WORK/t5d/evals/replay" "$WORK/t5d/skills/tracking-open-asks"
 cp "$ROOT/evals/tracking-open-asks-rederives-the-closing-list/make-history.py" "$WORK/t5d/evals/replay/"
 printf 'The brief.\n' > "$WORK/t5d/hooks/session-brief.md"
+printf -- '---\nname: tracking-open-asks\ndescription: d\n---\n\nThe skill.\n' > "$WORK/t5d/skills/tracking-open-asks/SKILL.md"
 python3 "$WORK/t5d/evals/replay/make-history.py" >/dev/null
 ( cd "$WORK/t5d" && git add -A && git commit -qm x )
 sh "$CHECK" "$WORK/t5d" >/dev/null 2>&1
@@ -121,6 +122,11 @@ sh "$CHECK" "$WORK/t5d" >/dev/null 2>&1
 check "a replay fixture older than the brief is caught" 1 $?
 ( cd "$WORK/t5d" && git diff --quiet )
 check "the check leaves the committed fixture as it was" 0 $?
+python3 "$WORK/t5d/evals/replay/make-history.py" >/dev/null
+printf 'A skill line added since.\n' >> "$WORK/t5d/skills/tracking-open-asks/SKILL.md"
+( cd "$WORK/t5d" && git add -A && git commit -qm z )
+sh "$CHECK" "$WORK/t5d" >/dev/null 2>&1
+check "a replay fixture older than the skill it seeds is caught" 1 $?
 
 GEN="$ROOT/scripts/generate-inventory.sh"
 
