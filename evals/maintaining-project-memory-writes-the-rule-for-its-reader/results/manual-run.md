@@ -360,3 +360,94 @@ The ablation arm was fixed to be bought only where a row cleared, and the
 extension only for a row at 2-3/5 on the baseline; neither was bought. Spent
 on the round: $1.17 for the judge probe, $1.10 for the baseline, $0.95 for
 the treated arm - **$3.22** of the approved ~$4-5.
+
+## The restated round (row 6's D): the writer asked to say what it cannot settle
+
+The round above moved no writer on the trigger or the placement: every rep
+kept the requester's category and wrote the rule only where the requester said
+it belongs, three of them with the section loaded. A test asking the writer to
+override what the requester said loses to the requester. The restated text
+asks instead for acts the writer can take while doing what it was asked:
+
+- **the trigger**: keep the requester's category and define it by a mark the
+  change will carry, where the repository names one - or ask the requester in
+  the same reply which mark defines it;
+- **the placement**: write the rule where the requester said, and where that
+  home loads only when its own work is named, say in the same reply that it
+  will be read only then, and offer the always-loaded line that would carry
+  its imperative.
+
+**The treated text** is two bullets in the promotion section, after the
+qualifier bullets, their example taken from another domain (a schema change
+under `migrations/`) so a rep that loads the skill is not handed this
+fixture's answer; and, on the brief's bullet 3, the tier list naming chat
+written into a skill or an instruction file, plus one clause carrying both
+acts with the skill's condition and its gloss of a mark. At the head's brief
+the skill loaded in none of the five baseline reps and in three of five under
+49e's restated trigger, so **the brief clause is what reaches every rep**, and
+a row that clears with no rep loading the skill is the brief clause's alone,
+the skill's bullets landing untested. The treated start hook's phrase is
+"Where a rule's trigger is a category the reader must judge a change into".
+
+**Two new graders read the reply**, one condition each, over the final message
+the prompt asks to be two lines: `reply-names-the-trigger-a-judgement` (the
+requester asked which mark should define the trigger, or a mark proposed for
+them to accept or refuse) and `reply-says-where-the-rule-is-read` (the requester
+told that the rule, where it was put, will be read only when testing work is
+named). Each fails a report of the act already done - a trigger already scoped
+to a path, an imperative already written into `CLAUDE.md` - since the tree is
+read for that, and a rep cannot pass by saying it did what its tree does not
+show. **A rep passes a test's row where its tree grader or its reply grader
+passes**: the trigger by `trigger-names-what-the-change-shows` or the first,
+the placement by `imperative-in-the-file-every-session-loads` or the second.
+The placement row passed through the reply is **disclosure**, not placement -
+the writer telling the requester the rule will not reach its reader - and is
+reported as such; whether an offer came with the warning is read by hand.
+
+**Their calibration, before any draw.** Twenty-one final messages through the
+settled judge - the ten kept replies of the two arms above and eleven written
+across the lines - labelled first. The first rubrics asked for two things each
+(the trigger flagged as judged *and* a mark; the warning *and* an offer), and
+the judge passed three boundary messages the labels failed, three votes to none
+each: a table row proposing `web/` with no word that the trigger is judged, an
+offer to add the rule to `CLAUDE.md` with no reason, and a warning whose remedy
+was the skill's own description. The rubrics went to one condition each, the
+labels were rewritten from their text before the re-probe, and on the eleven
+boundary messages **the judge agreed on all twenty-two cells, three votes to
+none**; the ten kept replies fail both conditions under either version. $1.45
+in all.
+
+## The bars, fixed before any draw (row 6's D)
+
+- **The baseline is the arm above**, not a fresh one: `hooks/session-brief.md`,
+  the promotion section, `tracking-open-asks` and the skill gate are unchanged
+  since it ran, and what did change - the landing-sweep hook, landed after it -
+  handed nothing when replayed on its reps. Both rows sit at **0/5** on it: the
+  tree graders 0/5 by runner and hand, and all ten kept replies fail both reply
+  graders.
+- **0/5 on both rows: the treated arm's first five measured reps decide each
+  row; it clears at 4/5 or better.** The condition and arm membership are read
+  from each trace before any grader, as above; a rep missing the condition is
+  replaced, at most two, and past that the rows are read on the reps measured.
+- **What each outcome decides.** Both entries are Strong-tier, and this is
+  their one domain (CONTRIBUTING, the second-fixture rule), and the clause
+  sits in the brief every session reads, whose neighbours this case does not
+  measure: **no row lands from this round.** A row that clears is recorded as
+  tested on one domain - the entry keeps its tier, its next round a second
+  fixture and the brief's neighbours - with the placement row named as
+  disclosure where the reply carried it. A row below its bar is declined for
+  this wording, the entry saying whether the gap fell below the floor. One row
+  clearing and the other not lands nothing either way: the clause is one text.
+- **Neighbour**: the prohibition row, 5/5 on this baseline, is a cost at 1/5
+  or lower and watched above that.
+- **The landing sweep**: every treated rep's session transcript is read for a
+  `hook_additional_context` hand-off; where one spoke, both rows are graded on
+  the rep's state at its first stop - the tree its own `Edit` and `Write` calls
+  left, and the message that ended that stop.
+- **By hand, in both arms, beside the graders**, as 49e read them: whether the
+  rule applies to every change; which paths the trigger names, since `web/`
+  alone leaves out pricing under `api/` that a shopper sees; and whether a
+  `CLAUDE.md` line carries the rule's boundary.
+- **Every judged row is hand-graded before a decision rests on it.** Seven
+  graders feed the two rows and the neighbour; a crossing is reported with
+  that count. Ceiling: about $1.50 for the arm, set at $2.50.
