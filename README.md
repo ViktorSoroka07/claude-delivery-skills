@@ -308,7 +308,7 @@ instructions alone cannot:
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a skill's `references/`), hands
     the session the lines elsewhere in the repository that still carry what the change
-    replaced: the headlines of a list the change added to and the list's heading, and
+    replaced: the headlines of a list the change added to and the heading above it, and
     five-word runs of the text it replaced or of the paragraphs beside an addition. A
     rule landed in the file that owns it leaves every other copy - a checklist further
     down, a README's paraphrase, the short form in `CLAUDE.md` - reading as complete
@@ -323,11 +323,12 @@ instructions alone cannot:
     out the lines the turn itself wrote in a rule file or with `Edit` or `Write`, speaks
     at most once per prompt, and tells the session to leave a record, a quote or a test
     fixture of the old wording, and every line where the change is a trial it will
-    revert. It finds a copy only by those phrases, and in a file the turn did not write
-    only where two different ones occur, or the only one the change yields, so a copy
-    naming the subject alone, or a paraphrase elsewhere sharing fewer, is not handed;
-    outside a git repository it searches only the text documents under the working
-    directory.
+    revert. It finds a copy only by those phrases, and even then leaves some out: a line
+    in a file the turn did not write that way, where that file holds only one of a
+    changed rule file's phrases and the rule file yields several; a match starting on a
+    heading line; and the copies of a list that held a single item before the change
+    added another. So its silence does not prove every copy current. Outside a git
+    repository it searches only the text documents under the working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
