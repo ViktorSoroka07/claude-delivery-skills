@@ -62,10 +62,12 @@ WORD_DIFF = 250000
 WORD_DIFF_JUNK = 40 * 1000 * 1000
 LINE_DIFF_JUNK = 300000
 WALK_ENTRIES = 20000
-FORCED_ALL = 1000
+FORCED_ARGS = 16000
 SKIP_DIRS = {"node_modules", "__pycache__"}
 BUDGET = {"UserPromptSubmit": 2.0, "Stop": 2.5}
 MOVES = re.compile(r"(?:pull|rebase|checkout|reset|merge)\b|commit \(merge\)")
+GIT_ENV = {k: v for k, v in os.environ.items()
+           if k not in ("GIT_LITERAL_PATHSPECS", "GIT_GLOB_PATHSPECS", "GIT_NOGLOB_PATHSPECS", "GIT_ICASE_PATHSPECS")}
 
 STOP = set("""a an the and or of to in on at by for with from as is are be it its this that
 these those what which who how when where not no nor but if then than so do does did can
@@ -127,7 +129,7 @@ def git(root, args, budget, ok=(0,), stdin=None):
     if budget.spent():
         return None
     try:
-        r = subprocess.run(["git", "-C", root] + args, capture_output=True, input=stdin,
+        r = subprocess.run(["git", "-C", root] + args, capture_output=True, input=stdin, env=GIT_ENV,
                            timeout=max(0.05, budget.left()))
     except Exception:
         return None
@@ -817,7 +819,9 @@ def candidates(root, in_git, words, budget):
     holds transcripts, editor backups and caches that quote any file.
     `--untracked` applies the ignore rules to tracked files too, so the tracked
     files those rules match - usually none - get a grep of their own after it,
-    past FORCED_ALL of them a grep over every tracked file."""
+    by `:(literal)` pathspecs, which git's pathspec settings would reinterpret
+    and so are dropped from its environment; past FORCED_ARGS characters of
+    them, well inside a Windows command line, a grep over every tracked file."""
     if in_git:
         args = ["grep", "-l", "-z", "-I", "-i", "-F"]
         for w in words:
@@ -826,7 +830,8 @@ def candidates(root, in_git, words, budget):
         found = {n for n in (out or "").split("\0") if n}
         forced = [n for n in (git(root, ["ls-files", "-z", "-c", "-i", "--exclude-standard"], budget) or "").split("\0") if n]
         if forced:
-            paths = [] if len(forced) > FORCED_ALL else ["--"] + [":(literal)" + n for n in forced]
+            paths = ["--"] + [":(literal)" + n for n in forced]
+            paths = [] if sum(len(x) + 3 for x in paths) > FORCED_ARGS else paths
             out = git(root, args + paths, budget, ok=(0, 1))
             found.update(n for n in (out or "").split("\0") if n)
         return sorted(found)

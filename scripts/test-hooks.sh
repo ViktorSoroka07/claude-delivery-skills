@@ -1089,6 +1089,20 @@ got=$(handed "$(sweep_stop "$R" s19 p1)")
 contains "sweep searches untracked files" "$got" "docs/untracked.md"
 lacks "sweep never searches ignored files" "$got" "ignored.md"
 contains "sweep searches a tracked file the ignore rules match" "$got" "docs/forced.md"
+for s in s79 s80; do
+  R="$WORK/sw-forced-$s"; sweep_repo "$R"
+  printf 'gen/\n:colon.md\n' > "$R/.gitignore"
+  mkdir -p "$R/gen"
+  cp "$R/CLAUDE.md" "$R/gen/copy.md"
+  cp "$R/CLAUDE.md" "$R/:colon.md"
+  (cd "$R" && git add .gitignore && git add -f gen/copy.md ./:colon.md && git commit -qm forced)
+  sweep_submit "$R" $s p1 >/dev/null
+  add_item "$R"
+done
+contains "sweep searches a tracked ignored file whose name opens with a colon" \
+  "$(handed "$(sweep_stop "$WORK/sw-forced-s79" s79 p1)")" ":colon.md"
+contains "sweep searches a tracked ignored file whatever the pathspec settings" \
+  "$(handed "$(export GIT_LITERAL_PATHSPECS=1; sweep_stop "$WORK/sw-forced-s80" s80 p1)")" "gen/copy.md"
 
 # A soft reset or a rebase after the turn committed its change keeps the
 # change the turn's own.
