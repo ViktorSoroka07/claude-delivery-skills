@@ -797,6 +797,46 @@ Rules that held in practice, each answering a failure seen here:
   the treated arm's own work brings it near the cap, raise `max_turns` and
   `timeout_seconds` in both arms and re-take, rather than comparing an arm that
   finished against one that was stopped.
+- **A condition that decides which reps count is one test in both arms, and a
+  replay that settles it for a rep is fed every input the live code reads, or
+  names the one it is not fed.** Where whether a rep counts rests on what a
+  component did at some moment - a hook's hand-off at a stop, say - the arm
+  without the component has nothing to read, and a replay stands in: the
+  component's code, as the treated arm ran it, run offline on a fresh build of
+  the fixture brought to the rep's state at that moment. A replay agrees with
+  the live run except where an input it was not given, or was given in a form
+  the live run did not see, matters, and those reps are not rare by chance,
+  since what a case exists to catch is often the behaviour that writes that
+  input. The landing-sweep hook leaves out the lines the turn wrote in a rule
+  file or with `Edit` or `Write`, and learns of a write outside its rule files
+  only from the turn's successful `Edit` and `Write` calls in the session
+  transcript. The landing sweep's restraint case first replayed it with no
+  transcript: on a turn that brought every copy into line before its first
+  stop, both false positives included, the hook fed that turn's transcript was
+  silent, while the replay handed the false positive that is not a rule file -
+  so the rule re-taking a silent treated rep as an instrument defect would have
+  dropped the double fail the case was built to catch. A blind verifier found
+  it before any draw, and it was reproduced. The replay now applies the rep's
+  own successful `Edit` and `Write` calls from before its first stop and hands
+  the hook a transcript of exactly those. So list what the live code reads
+  before a replay decides anything - for that hook, among others, the prompt id
+  and working directory the stop names, the rule files as they stood at the
+  prompt with the `HEAD` and time that snapshot recorded, the turn's calls in
+  the transcript, git's `HEAD`, reflog, index and ignore rules at the stop, the
+  lines it has already handed in the session, and the clock its search runs
+  against - and feed each one, or name the one left out and read by hand every
+  rep it could change; and read a replay's agreement with the live component on
+  the reps at hand as clearing it only for the shapes those reps took. The same
+  case's first draft filtered one arm alone - a treated rep counted only where
+  the hook handed both false positives or the rep had written one before its
+  first stop, every baseline rep that met the case's condition counted - and a
+  filter's drops are not a random draw: the reps it could drop were treated
+  reps that had written no false positive early, so the counted treated reps
+  would have leaned toward the early writers, each a fail by the case's own
+  rule, and the treated rate down with them wherever the dropped reps passed
+  more often than the counted ones. The condition is now one test in both arms,
+  read from the hand-off where the hook ran and from the replay where it did
+  not, and a rep either arm drops for it is replaced.
 - **Fresh sessions, the skill unnamed in the prompt.** Each rep must be an independent
   trial with no context carried from the last, and a skill that fires only
   when named has a trigger defect a named arm would hide.
