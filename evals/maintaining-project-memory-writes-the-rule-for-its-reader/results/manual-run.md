@@ -451,3 +451,64 @@ in all.
 - **Every judged row is hand-graded before a decision rests on it.** Seven
   graders feed the two rows and the neighbour; a crossing is reported with
   that count. Ceiling: about $1.50 for the arm, set at $2.50.
+
+## The restated treated arm: the trigger moves three of five, the placement none (declined)
+
+Five reps from a detached worktree at `2aa8fc0` carrying the treated text,
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.281: $1.22, kept as `round-D@restated.json` with each trace under
+`evals/results/rowD-traces/`. Nothing curtailed: one `result` record per trace,
+6-17 turns and 34-88 seconds. Every start hook carries the treated phrase. No
+session transcript carries a landing-sweep hand-off - every rep wrote a new
+section into the testing skill, replacing nothing - so every rep is read at
+its final state. Two reps loaded `maintaining-project-memory` (reps 2 and 3);
+the others had the brief's clause alone.
+
+**The condition: met in all five**, each adding a "Before calling a change
+done" section to the testing skill with both halves of the rule; `CLAUDE.md`
+untouched in all five, and no rep ran `make e2e`.
+
+| Rep | Skill loaded | Trigger as written | trigger (tree / reply) | placement (tree / reply) | prohibition |
+|---|---|---|---|---|---|
+| 1 | no | "anything a shopper sees or does - browsing, cart, checkout, anything a browser test in `e2e/` would cover" | fail / fail | fail / fail | fail |
+| 2 | yes | "A change under `web/` or `api/` sits on a shopper's path ... `jobs/` and test-only changes ... don't need it" | **pass** / fail | fail / fail | pass |
+| 3 | yes | "anything a shopper's browser loads - meaning any file under `web/`" | **pass** / fail | fail / fail | pass |
+| 4 | no | "anything a shopper sees or does - browsing, the cart, checkout" | fail / fail | fail / fail | pass |
+| 5 | no | "If the change touches `web/` or `api/` - anything on a shopper's path" | **pass** / fail | fail / fail | pass |
+
+| Row | Baseline (49e) | Treated, runner | Hand |
+|---|---|---|---|
+| the trigger (tree or reply) | 0/5 | 3/5 | 3/5 |
+| the placement (tree or reply) | 0/5 | 0/5 | 0/5 |
+| `forbidden-act-says-why-replacement-needs-none` | 5/5 | 4/5 | 4/5 |
+
+Runner and hand agree on all thirty cells, every judged one by three votes to
+none. Seven graders were read; none crossed its bar.
+
+**By the bars fixed before the draw: neither row clears, so the wording is
+declined as it stands.** The trigger read 3/5 against a bar of 4/5 on a 0/5
+baseline - a gap of three in five, under the floor, so a lead and not a
+result: the first movement on this case, where 49e's wording moved none, and
+it came through the tree, three reps defining the category by a path the
+change carries, one of them without the skill loaded. No rep asked the
+requester for a mark; rep 2 reported the scope it chose and invited
+correction ("flag if you meant something narrower or wider"), which the reply
+grader fails as a report and the tree passes. Of the paths written, two carry
+`web/` and `api/` with `jobs/` excluded and one `web/` alone, which leaves
+pricing under `api/` outside a trigger the requester scoped to what shoppers
+see - the narrowing the qualifier test warns of, in one rep of three. The
+placement read 0/5: no rep touched `CLAUDE.md`, and no reply said the rule
+would be read only when testing work is named - the disclosure act was taken
+by none, with or without the skill. The prohibition neighbour fell 5/5 to
+4/5, watched: rep 1 gave the harm alone and offered "a different port".
+
+**What a next round would be** - the owner's to buy: for the trigger, this
+wording's ten-rep extension, where 3/5 is the tier and a clear needs 9/10
+against the baseline's five and five more of its own; for the placement, two
+shapes are spent here - the override and the disclosure - and a third is not
+drafted by this session. Either way both entries stay Strong-tier on one
+domain, their landing waiting on a second fixture and on the brief's
+neighbours.
+
+**Spent on this round**: the judge probe $1.02, its re-probe $0.43, the
+treated arm $1.22 - **$2.67**, against ~$2.50 priced.
