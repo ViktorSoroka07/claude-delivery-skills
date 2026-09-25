@@ -11,10 +11,11 @@ asks for a search on those. So the hook runs it. At each prompt it copies the
 repository's rule files into a state directory outside the tree, keyed by the
 prompt and never overwritten. At the turn's end it diffs each rule file the
 turn wrote against that copy, takes what the diff says the file said before -
-the headlines of a list the change joined, the five-word runs of replaced text
-or of the paragraphs beside an addition - and lists the lines elsewhere that
-still carry them. The list reaches the model as additional context, at most
-once per prompt, and a line handed once is never handed again in the session.
+the headlines of a list of two or more items the change joined, the five-word
+runs of replaced text or of the paragraphs beside an addition - and lists the
+lines elsewhere that still carry them. The list reaches the model as additional
+context, at most once per prompt, and a line handed once is never handed again
+in the session.
 
 Rule files: SKILL.md, CLAUDE.md, CLAUDE.local.md, AGENTS.md, GEMINI.md,
 CONTRIBUTING.md and README.md in any letter case, a .md directly under an
@@ -237,7 +238,8 @@ def is_rule(path, base=""):
     """`path`, relative to `base` or absolute, is a rule file: RULE_FILE's, or
     a .md under a references/ directory whose parent holds a SKILL.md - a
     skill's own layout wherever it sits, a single-skill repository's root
-    included. A references/ with no SKILL.md beside it is any docs folder."""
+    included. Elsewhere a references/ with no SKILL.md beside it is any docs
+    folder; RULE_FILE's skills/<name>/references/ needs none."""
     posix = path.replace(os.sep, "/")
     if RULE_FILE.search(posix):
         return True
@@ -671,8 +673,9 @@ def phrases_of(before, after, budget):
     key): the headlines of a list of two or more items the change added an
     item to, and that list's heading; every five-word run of replaced or
     deleted text overlapping the words it lost; and the five-word runs of the
-    paragraphs on either side of a prose addition - an item added to a list of
-    one, or a list started, included, since no copy enumerates such a list.
+    paragraphs on either side of a prose insertion - an item inserted into a
+    list of one, or a list started, included, since no copy enumerates such a
+    list.
     Returned with the 1-based lines of `after` those paragraphs stand on."""
     b, a, ops = opcodes(before, after)
     raw, beside_lines = [], set()

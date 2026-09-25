@@ -307,11 +307,11 @@ instructions alone cannot:
   - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a `.md` under
-    `skills/<name>/references/` or under a `references/` beside a `SKILL.md`), hands
-    the session the lines elsewhere in the
-    repository that still carry what the change replaced: the headlines of a list the
-    change added to and the heading above it, and five-word runs of the text it replaced
-    or of the paragraphs beside an addition. A rule landed in the file that owns it
+    `skills/<name>/references/` or under a `references/` beside a `SKILL.md`), hands the
+    session the lines elsewhere in the repository that still carry what the change
+    replaced: the headlines of a list the change added to and the heading above it, and
+    five-word runs of the text it replaced or of the paragraphs beside an addition. A
+    rule landed in the file that owns it
     leaves every other copy - a checklist further down, a README's paraphrase, the short
     form in `CLAUDE.md` - reading as complete while wrong, and a session asked to find
     them searches for the subject's name, which a short form need not carry; what every
@@ -326,22 +326,22 @@ instructions alone cannot:
     speaks at most once per prompt, and tells the session to leave a record, a quote or
     a test fixture of the old wording, and every line where the change is a trial it
     will revert. It finds a copy only by those phrases, and some changes yield none, a
-    new or deleted file among them; an item added to a list of fewer than two items, or
-    a list started, is read as a prose addition, by the paragraphs beside it. Some
-    lines that carry a phrase are left out as well, among them: the lines the turn
+    new or deleted file among them; an item inserted into a list of fewer than two
+    items, or a list started, is read as a prose addition, by the paragraphs beside it -
+    where the same change rewrites a line beside it, by the words it replaced instead.
+    Some lines that carry a phrase are left out as well, among them: the lines the turn
     itself wrote in a rule file or with `Edit` or `Write`, with the rest of their
     paragraph or list item in another file and, in the rule file a phrase came from,
-    their whole list and, for a phrase read from the paragraphs beside a prose
-    addition, those paragraphs; a line in a file the turn
-    did not write that way, where that file holds only one of a changed rule file's
-    phrases and the rule file yields several; a match starting on a Markdown heading,
-    a line opening with `#` and a space outside a code block; and every file git
-    ignores, which is an untracked file its ignore rules match, while a change to such
-    a file is swept only where it is a `CLAUDE.local.md`, whose usual state is ignored -
-    inside an ignored directory, only where the turn used `Edit` or `Write`.
-    So its silence does not prove every copy current. Outside a git repository it
-    searches the text documents under the working directory, or, for a changed file
-    outside that directory, that file alone.
+    their whole list and, for a phrase read from the paragraphs beside a prose addition,
+    those paragraphs; a line in a file the turn did not write that way, where that file
+    holds only one of a changed rule file's phrases and the rule file yields several; a
+    match starting on a Markdown heading, a line opening with `#` and a space outside a
+    code block; and every file git ignores, which is an untracked file its ignore rules
+    match, but for a `CLAUDE.local.md`, whose usual state is ignored: a change to one is
+    swept and that file searched, though inside an ignored directory only where the turn
+    used `Edit` or `Write`. So its silence does not prove every copy current. Outside a
+    git repository it searches the text documents under the working directory, or, for a
+    changed file outside that directory, that file alone.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
