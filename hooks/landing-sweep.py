@@ -721,12 +721,9 @@ def phrases_of(before, after, budget):
 def changed_lines(before, after, whole_list):
     """1-based lines of `after` the change wrote, widened to the whole list it
     sits in (the owning file) or to its list item, else its paragraph (any
-    other file). An addition's phrases are the text around it - its list's
-    other items, the paragraphs beside it - so outside the owning file a copy
-    given the same addition is still handed back wherever that text lies
-    outside the item or paragraph written; a copy given the same rewrite or
-    deletion is not, each of that change's phrases holding a word it removed.
-    A deletion writes no line, so it widens to nothing - the paragraph or list
+    other file). Outside the owning file the rest of a list and the paragraphs
+    beside the lines written stay unwidened, so a copy given the same change
+    can still be handed back by them. A deletion writes no line, so it widens to nothing - the paragraph or list
     after it is not the turn's."""
     _, a, ops = opcodes(before, after)
     out = set()
