@@ -306,31 +306,32 @@ instructions alone cannot:
     repeating an instruction built on a number just shown to be wrong.
   - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
-    `README.md`, a contract directly under `agents/`, a skill's `references/`), hands
-    the session the lines elsewhere in the repository that still carry what the change
-    replaced: the headlines of a list the change added to and the heading above it, and
-    five-word runs of the text it replaced or of the paragraphs beside an addition. A
-    rule landed in the file that owns it leaves every other copy - a checklist further
-    down, a README's paraphrase, the short form in `CLAUDE.md` - reading as complete
-    while wrong, and a session asked to find them searches for the subject's name, which
-    a short form need not carry; what every copy does carry is the words the change
-    replaced, and nothing else in the work asks for a search on those. On two eval cases
-    where one item joins a list that three other places repeat, every session without it
-    left the copies in the other files stale and every session with it brought them into
-    line; handed a dated review quoting the old wording and a sibling document saying
-    the same things to another reader beside the real copies, every session left both,
-    as every session without it did. It snapshots the rule files at each prompt, leaves
-    out the lines the turn itself wrote in a rule file or with `Edit` or `Write` and
-    every line in the same paragraph or list item as one of them (in the file that owns
-    the change, the same list instead), speaks at most once per prompt, and tells the
-    session to leave a record, a quote or a test fixture of the old wording, and every
-    line where the change is a trial it will revert. It finds a copy only by those
-    phrases, and even then leaves some out: a line in a file the turn did not write that
-    way, where that file holds only one of a changed rule file's phrases and the rule
-    file yields several; a match starting on a heading line; and the copies of a list
-    that held a single item before the change added another. So its silence does not
-    prove every copy current. Outside a git repository it searches only the text
-    documents under the working directory.
+    `README.md`, a contract directly under `agents/`, a `.md` under
+    `skills/<name>/references/`), hands the session the lines elsewhere in the
+    repository that still carry what the change replaced: the headlines of a list the
+    change added to and the heading above it, and five-word runs of the text it replaced
+    or of the paragraphs beside an addition. A rule landed in the file that owns it
+    leaves every other copy - a checklist further down, a README's paraphrase, the short
+    form in `CLAUDE.md` - reading as complete while wrong, and a session asked to find
+    them searches for the subject's name, which a short form need not carry; what every
+    copy does carry is the words the change replaced, and nothing else in the work asks
+    for a search on those. On two eval cases where one item joins a list that three
+    other places repeat, every session without it left the copies in the other files
+    stale and every session with it brought them into line; handed a dated review
+    quoting the old wording and a sibling document saying the same things to another
+    reader beside the real copies, every session left both, as every session without it
+    did. It snapshots the rule files at each prompt, leaves out the lines the turn
+    itself wrote in a rule file or with `Edit` or `Write` and every line in the same
+    paragraph or list item as one of them (in the file that owns the change, the same
+    list instead), speaks at most once per prompt, and tells the session to leave a
+    record, a quote or a test fixture of the old wording, and every line where the
+    change is a trial it will revert. It finds a copy only by those phrases, and even
+    then leaves some out: a line in a file the turn did not write that way, where that
+    file holds only one of a changed rule file's phrases and the rule file yields
+    several; a match starting on a heading line; and the copies of a list that held a
+    single item before the change added another. So its silence does not prove every
+    copy current. Outside a git repository it searches only the text documents under the
+    working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step

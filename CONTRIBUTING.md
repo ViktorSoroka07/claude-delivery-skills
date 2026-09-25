@@ -353,16 +353,16 @@ evidence, and the five rules are not interchangeable:
 - **The landing sweep reaches every case whose rep changes a rule file.** In
   the arm carrying the plugin, a turn that wrote a `SKILL.md`, `CLAUDE.md`,
   `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
-  `README.md`, or a `.md` directly under `agents/` or under a skill's
-  `references/`, is handed at its stop the lines elsewhere that still carry
-  what its change replaced, where any do, and the rep acts on them before its
-  turn ends. The arm without the plugin has no such moment, so a grader on any
-  file the hand-off can name reads the hook's work beside the wording's. The
-  hook loads no skill, and none of the thirty-five eval reps it spoke to
-  loaded `maintaining-project-memory`, whose rule it carries, so that skill's
-  indicator does not show it firing. When this was written, the reps of five
-  cases in the kept runs wrote a rule file: the three sweep cases and the
-  writer case by design, and the tracking case, whose rename edits the
+  `README.md`, or a `.md` directly under `agents/` or under
+  `skills/<name>/references/`, is handed at its stop the lines elsewhere that
+  still carry what its change replaced, where any do, and the rep acts on them
+  before its turn ends. The arm without the plugin has no such moment, so a
+  grader on any file the hand-off can name reads the hook's work beside the
+  wording's. The hook loads no skill, and none of the thirty-five eval reps it
+  spoke to loaded `maintaining-project-memory`, whose rule it carries, so that
+  skill's indicator does not show it firing. When this was written, the reps
+  of five cases in the kept runs wrote a rule file: the three sweep cases and
+  the writer case by design, and the tracking case, whose rename edits the
   fixture's `README.md` in every rep. Fed each rep's own `Edit` and `Write`
   calls up to its first stop on a fresh build of the fixture, the hook handed
   lines on the sweep cases and nothing to any of the thirty-eight tracking and
