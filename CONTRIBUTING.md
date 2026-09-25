@@ -350,6 +350,30 @@ evidence, and the five rules are not interchangeable:
   the moment firing, not as the prompt reaching the trigger: a fresh case's
   reps load `tracking-open-asks` whatever they were asked, and a rep the gate
   stopped loads the owning skill because it was stopped.
+- **The landing sweep reaches every case whose rep changes a rule file.** In
+  the arm carrying the plugin, a turn that wrote a `SKILL.md`, `CLAUDE.md`,
+  `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
+  `README.md`, or a `.md` directly under `agents/` or under a skill's
+  `references/`, is handed at its stop the lines elsewhere that still carry
+  what its change replaced, where any do, and the rep acts on them before its
+  turn ends. The arm without the plugin has no such moment, so a grader on any
+  file the hand-off can name reads the hook's work beside the wording's. The
+  hook loads no skill, and none of the thirty-five eval reps it spoke to
+  loaded `maintaining-project-memory`, whose rule it carries, so that skill's
+  indicator does not show it firing. When this was written, the reps of five
+  cases in the kept runs wrote a rule file: the three sweep cases and the
+  writer case by design, and the tracking case, whose rename edits the
+  fixture's `README.md` in every rep. Fed each rep's own `Edit` and `Write`
+  calls up to its first stop on a fresh build of the fixture, the hook handed
+  lines on the sweep cases and nothing to any of the thirty-eight tracking and
+  writer reps, so those two cases' rates stay comparable across the landing
+  only while a replay of their reps stays silent. The hand-off is not in the
+  stream-json trace: it is a `hook_additional_context` attachment in the
+  session transcript under the run's `config/projects/`, which only
+  `--keep-temp` keeps, and the hook's state is under the run's `sealed/tmp/`.
+  So replay the hook on a case's reps before designing a round on any case
+  whose reps write a rule file, and where it speaks, read the hand-off from
+  the transcript before reading a grader.
 
 **A new grader is mechanical unless its condition is irreducibly semantic.**
 `regex`, `file_exists` and `tool_used` cost nothing per rep, return the same
