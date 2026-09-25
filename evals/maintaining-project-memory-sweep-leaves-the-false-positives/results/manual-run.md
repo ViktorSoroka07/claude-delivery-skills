@@ -388,23 +388,82 @@ Runner and hand agree on all 240 cells.
 - The skill loaded in two baseline reps and no treated one. Both of those
   baseline reps left the copies as the other eighteen did.
 
-## The strongest model: the first rep, and the price of the rest
+## The strongest model: five reps an arm, every rep leaves both decoys
 
-One treated rep on Fable (`claude-fable-5-1` in its `init` event and its
-usage), drawn alone after the Sonnet arms: **$0.62**, 12 turns, 52 s, one
-`success` record, kept under `evals/results/task49g-fable-treated-traces/`.
-Its condition holds, and its hand-off names the same four files after the
-same two owner-file edits. It read all four and edited `CLAUDE.md` and
-`README.md` alone. By hand it leaves both decoys and brings all three copies
-into line, wording the item as "how to undo it", and the runner agrees on
-all six cells. Its reply says it left the review "since it records what the
-skill asked at the time", and the status page "since its three items
-describe customer updates, not hand-over notes".
+Fable (`claude-fable-5-1` in every `init` event), the strongest model the
+owner runs, drawn from the same two worktrees with the same flags. **The
+first treated rep ran alone**, $0.62, and its cost priced the other nine at
+about $4.65: four more treated reps at its cost, and five baseline reps at
+the ratio of Sonnet's baseline to treated medians. **The owner approved
+that, and the nine came to $4.67**: $2.32 for the baseline ($0.44-0.53 a
+rep) and $2.35 for the four treated ($0.57-0.59). Traces, transcripts and
+trees are kept under `evals/results/task49g-fable-baseline-traces/` and
+`task49g-fable-treated-traces/`.
 
-**The price of the other nine, told to the owner before any is drawn.**
-The rep cost $0.62, 3.3 times a Sonnet treated rep's median of $0.19. The
-four more treated reps come to about $2.50. A Fable baseline rep, at the
-same ratio to Sonnet's $0.13 median, is about $0.43, so five come to about
-$2.15. That is **about $4.65 for the nine**, and at most about $7 with
-Sonnet's widest spread and one replacement rep. The Fable reading, and with
-it the landing, waits on that answer.
+**Read from each trace before any grader.** Nothing was curtailed: one
+`success` record per trace, 6-8 turns and 16-21 s in the baseline, 12 turns
+and 29-52 s in the treated arm. Every trace names its arm's worktree, and
+the condition holds in all ten, each rep appending the rollback as item 4.
+- *Baseline:* no transcript carries a hand-off. Each rep edited only
+  `skills/handoff/SKILL.md`, the owner item and a checklist line. Replayed
+  with its own calls, the hook hands `CLAUDE.md`, `README.md` and both
+  decoys at each first stop, and each rebuilt tree equals the kept one.
+  One rep loaded the skill.
+- *Treated:* every transcript carries one hand-off, after the two
+  owner-file edits, naming the same four files; every record is marked
+  seen. Every rep read all four and then edited `CLAUDE.md` and
+  `README.md` alone.
+- Neither arm wrote a decoy or ran a shell command.
+
+**Graded by hand from every kept tree:**
+
+| Grader | Baseline, runner | Baseline, hand | Treated, runner | Treated, hand |
+|---|---|---|---|---|
+| `record-left-as-it-was` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `status-page-left-as-it-was` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `checklist-carries-it` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `readme-carries-it` | 0/5 | 0/5 | 5/5 | 5/5 |
+| `short-form-carries-it` | 0/5 | 0/5 | 5/5 | 5/5 |
+| `skill-was-invoked` | 1/5 | 1/5 | 0/5 | 0/5 |
+| **leaves both** | | **5/5** | | **5/5** |
+| **brings the copies into line** | | **0/5** | | **5/5** |
+
+Runner and hand agree on all sixty cells.
+
+- **Baseline.** The strongest model misses the same two copies Sonnet
+  does. One rep also narrowed the item to changes already deployed, saying
+  that a change sitting in an unmerged pull request needs no rollback step.
+- **Treated.** Every rep rewrote the short form's own bullet to carry the
+  item, never cut to a pointer, and kept each README change inside the
+  `handoff` bullet.
+- **Replies.** Each treated reply names both decoys and why it left them:
+  the review "records what the skill asked at the time", and the status
+  page "describes customer updates, not hand-over notes".
+
+## The reading, against the bars fixed before any draw: the hook lands
+
+- **Restraint on Sonnet: 20/20 against 20/20, level.** No cost convicts.
+- **Restraint on Fable: 5/5 against 5/5, level.** No cost convicts. The
+  baseline left both decoys in every rep, so the reading is measurable (a
+  baseline of 3/5 or fewer would not have been).
+- **The copies on Sonnet: 20/20 against 0/20** (p ≈ 7×10⁻¹²), past the bar
+  of 5/20, with no dilution against the sweep case's 5/5 without decoys.
+  **On Fable: 5/5 against 0/5** (p ≈ 0.004), reported without a bar. The
+  strongest model needs the sweep as much as the instrument does.
+- **Every condition of the landing line holds**: neither restraint reading
+  convicts, neither is unmeasurable, and the Sonnet copies clear their bar.
+  **The hook lands.**
+
+What the round does not show, and why. The floor clears no restraint cost
+below about one session in four on Sonnet at twenty an arm, and none below
+four in five on Fable at five an arm; a rarer over-application stays open.
+The decoys here are two clear cases, a dated record and a sibling for a
+different reader, and every rep's first stop took the one shape 49f's
+reps took. Other kinds of false positive the real replays met stay
+unmeasured: a mention of a mode, a copy of an unchanged neighbour, a grader
+file. So do the first-stop shapes that hand only decoys or only one of them.
+
+**Spent on the round: $12.29.** That is $6.61 for the Sonnet arms and $5.29
+for Fable, of which the nine approved reps were $4.67 against a price of
+about $4.65. The other $0.39 was the one-word check that `--model fable`
+resolves, made before the case was built.
