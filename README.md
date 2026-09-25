@@ -311,37 +311,37 @@ instructions alone cannot:
     session the lines elsewhere in the repository that still carry what the change
     replaced: the headlines of a list the change added to and the heading above it, and
     five-word runs of the text it replaced or of the paragraphs beside an addition. A
-    rule landed in the file that owns it
-    leaves every other copy - a checklist further down, a README's paraphrase, the short
-    form in `CLAUDE.md` - reading as complete while wrong, and a session asked to find
-    them searches for the subject's name, which a short form need not carry; what every
-    copy does carry is the words the change replaced, and nothing else in the work asks
-    for a search on those. On two eval cases where one item joins a list that three
-    other places repeat, every session without it left the copies in the other files
-    stale and every session with it brought them into line; handed a dated review
-    quoting the old wording and a sibling document saying the same things to another
-    reader beside the real copies, every session left both, as every session without it
-    did. It snapshots the rule files at each prompt, sees a change to a rule file
-    outside the repository it works in only where the turn used `Edit` or `Write`,
-    speaks at most once per prompt, and tells the session to leave a record, a quote or
-    a test fixture of the old wording, and every line where the change is a trial it
-    will revert. It finds a copy only by those phrases, and some changes yield none, a
-    new or deleted file among them; an item inserted into a list of fewer than two
-    items, or a list started, is read as a prose addition, by the paragraphs beside it -
-    where the same change rewrites a line beside it, by the words it replaced instead.
-    Some lines that carry a phrase are left out as well, among them: the lines the turn
-    itself wrote in a rule file or with `Edit` or `Write`, with the rest of their
-    paragraph or list item in another file and, in the rule file a phrase came from,
-    their whole list and, for a phrase read from the paragraphs beside a prose addition,
-    those paragraphs; a line in a file the turn did not write that way, where that file
-    holds only one of a changed rule file's phrases and the rule file yields several; a
-    match starting on a Markdown heading, a line opening with `#` and a space outside a
-    code block; and every file git ignores, which is an untracked file its ignore rules
-    match, but for a `CLAUDE.local.md`, whose usual state is ignored: a change to one is
-    swept and that file searched, though inside an ignored directory only where the turn
-    used `Edit` or `Write`. So its silence does not prove every copy current. Outside a
-    git repository it searches the text documents under the working directory, or, for a
-    changed file outside that directory, that file alone.
+    rule landed in the file that owns it leaves every other copy - a checklist further
+    down, a README's paraphrase, the short form in `CLAUDE.md` - reading as complete
+    while wrong, and a session asked to find them searches for the subject's name, which
+    a short form need not carry; what every copy does carry is the words the change
+    replaced, and nothing else in the work asks for a search on those. On two eval cases
+    where one item joins a list that three other places repeat, every session without it
+    left the copies in the other files stale and every session with it brought them into
+    line; handed a dated review quoting the old wording and a sibling document saying
+    the same things to another reader beside the real copies, every session left both,
+    as every session without it did. It snapshots the rule files at each prompt, sees a
+    change to a rule file outside the repository it works in only where the turn used
+    `Edit` or `Write`, speaks at most once per prompt, and tells the session to leave a
+    record, a quote or a test fixture of the old wording, and every line where the
+    change is a trial it will revert. It finds a copy only by those phrases, and some
+    changes yield none, a new or deleted file among them; an item inserted into a list
+    of fewer than two items, or a list started, is read as a prose addition, by the
+    paragraphs beside it - where the same change rewrites a line beside it, by the words
+    it replaced instead. Some lines that carry a phrase are left out as well, among
+    them: the lines the turn itself wrote in a rule file or with `Edit` or `Write`, with
+    the rest of their paragraph or list item in another file and, in the rule file a
+    phrase came from, their whole list and, for a phrase read from the paragraphs beside
+    a prose addition, those paragraphs; a line in a file the turn did not write that
+    way, where that file holds only one of a changed rule file's phrases and the rule
+    file yields several; a match starting on a Markdown heading, a line opening with `#`
+    and a space outside a code block; and every file git ignores, which is an untracked
+    file its ignore rules match, but for a `CLAUDE.local.md`, whose usual state is
+    ignored: a change to one is swept and that file searched, though inside an ignored
+    directory only where the turn used `Edit` or `Write`. So its silence does not prove
+    every copy current. Outside a git repository it searches the text documents under
+    the working directory, or, for a changed file outside that directory, that file
+    alone.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
