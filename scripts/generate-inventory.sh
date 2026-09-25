@@ -31,8 +31,9 @@ agents = sorted(f for f in os.listdir(os.path.join(root, "agents"))
                 if f.endswith(".md"))
 with open(os.path.join(root, "hooks", "hooks.json")) as fh:
     hooks_cfg = json.load(fh)
-hooks = sum(len(m.get("hooks", []))
-            for ev in hooks_cfg.get("hooks", {}).values() for m in ev)
+hooks = len({h.get("command")
+             for ev in hooks_cfg.get("hooks", {}).values()
+             for m in ev for h in m.get("hooks", [])})
 
 def noun(n, singular):
     return "%s %s%s" % (word(n), singular, "" if n == 1 else "s")

@@ -108,6 +108,18 @@ check "README marker region regenerated with per-count plurals" 0 $?
 python3 -c "import json;json.load(open('$WORK/t6/.claude-plugin/plugin.json'));json.load(open('$WORK/t6/.claude-plugin/marketplace.json'))"
 check "surgered manifests still parse as JSON" 0 $?
 
+# 6a. A script registered on two events is one hook, not two.
+mkplugin t6a
+python3 - "$WORK/t6a/hooks/hooks.json" <<'PYEOF'
+import json, sys
+cfg = json.load(open(sys.argv[1]))
+cfg["hooks"]["Stop"] = [{"hooks": [dict(cfg["hooks"]["PostToolUse"][0]["hooks"][0])]}]
+json.dump(cfg, open(sys.argv[1], "w"))
+PYEOF
+sh "$GEN" "$WORK/t6a" >/dev/null 2>&1
+grep -q 'two hooks' "$WORK/t6a/.claude-plugin/plugin.json"
+check "a hook registered on two events is counted once" 0 $?
+
 # 6b. The trigger index is built from each skill's own description: the "Use
 #     when " opener is dropped so the table header completes the sentence, and
 #     a description that does not open that way is carried through whole.
