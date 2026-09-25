@@ -228,8 +228,9 @@ behaviour a case is named for stays unmarked, because the no-plugin arm
 failing it is the baseline; a case whose named behaviour is marked has no
 scored row that moves when the rule is deleted.
 
-What each grader type is allowed to see decides where a case can put the
-evidence, and the five rules are not interchangeable:
+What each grader type is allowed to see, and what besides the rule under test
+changes what it sees, decide where a case can put the evidence and how to read
+it:
 
 - **`focus` on an `llm` grader and `target` on a `regex` grader resolve one
   literal existing file** in the run's workspace. A glob throws "does not
