@@ -512,3 +512,36 @@ neighbours.
 
 **Spent on this round**: the judge probe $1.02, its re-probe $0.43, the
 treated arm $1.22 - **$2.67**, against ~$2.50 priced.
+
+## The trigger's re-check: five of ten, the gap left open
+
+Bought at the owner's word as a re-check of the 3/5 reading, and read without
+it (CONTRIBUTING's re-check rule): ten fresh reps from the same treated tree,
+the same flags, $2.19, kept as `round-D@recheck.json` with traces under
+`evals/results/rowD-traces/`. **The bar, fixed before the draw: 7/10 or
+better** against the 0/5 baseline (one-sided exact p ≈ 0.02; 6/10 is p ≈
+0.04). Nothing curtailed (7-16 turns, 19-64 seconds); every start hook carries
+the treated phrase; no hand-off; the condition met in all ten, and `CLAUDE.md`
+untouched in all ten.
+
+| | Path-defined trigger | Of which loaded the skill |
+|---|---|---|
+| reps 1, 4, 5, 7, 10 | pass (`web/` or `api/`, four; `web/` alone, one) | 1, 5, 10 |
+| reps 2, 3, 6, 8, 9 | fail (the requester's category, or its journeys) | none |
+
+**The trigger: 5/10 by hand, 4/10 by the judge** - the judge failed rep 5,
+one vote to two, whose rule opens "A change under `web/` or `api/` is
+shopper-facing", a condition the rubric passes; reps 1 and 7 passed two votes
+to one. **Below the bar: the re-check does not convict, which leaves the gap
+below its floor open, not cleared.** Pooled beside the bar, never instead of
+it: 8/15 against 0/5. No reply asked for a mark in either draw. The placement
+row read 0/10 and the prohibition neighbour 10/10. Seven graders were read.
+
+**Where the movement comes from.** Across both draws, every rep that loaded
+`maintaining-project-memory` wrote a path-defined trigger - five of five -
+against three of the ten that had the brief's clause alone. On this case the
+section's bullet binds once read, and what it lacks is reach: the skill loaded
+in five of fifteen treated reps, the brief being the only text that reaches
+every one. That is a finding about the carrier, from reps the arm split by a
+choice of their own rather than at random, so it is a lead for the next
+design rather than a measured effect.
