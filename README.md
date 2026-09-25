@@ -329,9 +329,10 @@ instructions alone cannot:
     then leaves some out: a line in a file the turn did not write that way, where that
     file holds only one of a changed rule file's phrases and the rule file yields
     several; a match starting on a heading line; and the copies of a list that held a
-    single item before the change added another. So its silence does not prove every
-    copy current. Outside a git repository it searches only the text documents under the
-    working directory.
+    single item before the change added another. A file git ignores is neither searched
+    nor, when the turn changes it, swept - a `CLAUDE.local.md` listed in `.gitignore`
+    included. So its silence does not prove every copy current. Outside a git repository
+    it searches only the text documents under the working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step

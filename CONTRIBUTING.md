@@ -350,14 +350,14 @@ evidence, and the five rules are not interchangeable:
   the moment firing, not as the prompt reaching the trigger: a fresh case's
   reps load `tracking-open-asks` whatever they were asked, and a rep the gate
   stopped loads the owning skill because it was stopped.
-- **The landing sweep reaches every case whose rep changes a rule file.** In
-  the arm carrying the plugin, a turn that wrote a `SKILL.md`, `CLAUDE.md`,
-  `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
-  `README.md`, or a `.md` directly under `agents/` or under
-  `skills/<name>/references/`, is handed at its stop the lines elsewhere that
-  still carry what its change replaced, where any do, and the rep acts on them
-  before its turn ends. The arm without the plugin has no such moment, so a
-  grader on any file the hand-off can name reads the hook's work beside the
+- **The landing sweep reaches every case whose rep changes a rule file git
+  does not ignore.** In the arm carrying the plugin, a turn that wrote a
+  `SKILL.md`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`,
+  `CONTRIBUTING.md` or `README.md`, or a `.md` directly under `agents/` or
+  under `skills/<name>/references/`, is handed at its stop the lines elsewhere
+  that still carry what its change replaced, where any do, and the rep acts on
+  them before its turn ends. The arm without the plugin has no such moment, so
+  a grader on any file the hand-off can name reads the hook's work beside the
   wording's. The hook loads no skill, and none of the thirty-five eval reps it
   spoke to loaded `maintaining-project-memory`, whose rule it carries, so that
   skill's indicator does not show it firing. When this was written, the reps
