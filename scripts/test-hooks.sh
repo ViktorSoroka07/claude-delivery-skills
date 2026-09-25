@@ -913,6 +913,12 @@ add_item "$R"
 got=$(handed "$(sweep_stop "$R" s77 p1)")
 lacks "sweep never reads a line opening with inline code as a code block" "$got" "docs/inline.md:3"
 contains "sweep hands a line below a line opening with inline code" "$got" "docs/inline.md:5"
+R="$WORK/sw-tabfence"; sweep_repo "$R"
+printf '1. Step:\n\n\t\140\140\140sh\n\t# say what was done and what is still open\n\t\140\140\140\n' > "$R/docs/tab.md"
+(cd "$R" && git add -A && git commit -qm tab)
+sweep_submit "$R" s78 p1 >/dev/null
+add_item "$R"
+contains "sweep hands a comment in a tab-indented code block inside a list item" "$(handed "$(sweep_stop "$R" s78 p1)")" "docs/tab.md:4"
 
 # The read paths: a change committed within the turn, a copy fixed by the
 # shell, a new file, a tree with no git.

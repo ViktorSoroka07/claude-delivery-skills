@@ -72,7 +72,7 @@ these those what which who how when where not no nor but if then than so do does
 cant can't each every any all one two three note notes""".split())
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$")
 HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.*)$")
-FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
 MARKDOWN = re.compile(r"\.(?:md|mdx|markdown)$", re.I)
 BOLD_LEAD = re.compile(r"\s*(?:\*\*(.+?)\*\*|__(.+?)__)")
 PREFILTER_WORD = re.compile(r"^[a-z0-9]+$")
