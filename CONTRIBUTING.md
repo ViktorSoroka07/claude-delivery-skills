@@ -1096,7 +1096,11 @@ reaches the remote is fixed only by rewriting history.
    catalog does not name fails the generator rather than landing at the end of
    the table.
 3. `sh scripts/check-refs.sh` - verifies the tree's internal references
-   resolve.
+   resolve, and that each replay case's `history.jsonl` is byte-identical to
+   what its `make-history.py` builds from the tree now. Any change that alters
+   what a generator builds - to the brief, to the skill a seed loads, or to the
+   generator itself - fails it until the fixture is regenerated, and the
+   failure names the command that regenerates it.
 
 A fourth check is not a script: **one doc-vs-code pass over the prose that loads
 into sessions**, each changed sentence read against the file it cites and its
