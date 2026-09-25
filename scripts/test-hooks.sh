@@ -844,6 +844,36 @@ sweep_submit "$R" s72 p1 >/dev/null
 contains "sweep reads the owner's beside lines from its prose additions alone" \
   "$(handed "$(sweep_stop "$R" s72 p1)")" "skills/handoff/references/notes.md:13"
 
+# A deletion writes no line: the paragraph or list after it is not the
+# turn's, in the owning file or in another file the turn wrote.
+R="$WORK/sw-deleted"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Gates\n\nRun the eight local gates at the head before handing over any push.\n\n## Checklist\n\nAn obsolete intro line.\n\n- Run the eight local gates at the head before handing over any push\n- Name the next reviewer for every pull request\n' > "$R/skills/handoff/references/gates.md"
+printf 'An obsolete note the turn deletes.\n\nAlways lead with the current state.\n' > "$R/docs/style.md"
+(cd "$R" && git add -A && git commit -qm gates)
+sweep_submit "$R" s74 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/gates.md" 'Run the eight local gates at the head before handing over any push.\n' \
+  'Run the nine local gates at the head before handing over any push.\n'
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/gates.md" 'An obsolete intro line.\n\n' ''
+contains "sweep hands a list after a deletion in the owner" "$(handed "$(sweep_stop "$R" s74 p1)")" "skills/handoff/references/gates.md:7"
+(cd "$R" && git commit -qam gates)
+sweep_submit "$R" s75 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'Lead with the current state.' 'Start from the open items.'
+"$PY" - "$WORK/t-deleted.jsonl" "$R/docs/style.md" <<'EOF'
+import json, sys
+path = sys.argv[2]
+text = open(path).read()
+old = "An obsolete note the turn deletes.\n\n"
+open(path, "w").write(text.replace(old, ""))
+with open(sys.argv[1], "w") as fh:
+    fh.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "x1", "name": "Edit",
+             "input": {"file_path": path, "old_string": old, "new_string": ""}}]}}) + "\n")
+    fh.write(json.dumps({"type": "user", "promptId": "p1", "message": {"content": [{"type": "tool_result",
+             "tool_use_id": "x1", "content": "ok"}]}, "toolUseResult": {"originalFile": text}}) + "\n")
+EOF
+contains "sweep hands a paragraph after a deletion in a file the turn wrote" \
+  "$(handed "$(sweep_stop "$R" s75 p1 false "$WORK/t-deleted.jsonl")")" "docs/style.md:1"
+
 # A headline needs two content words; the whole list a change rewrote while
 # joining it is the turn's own.
 R="$WORK/sw-thin"; sweep_repo "$R"

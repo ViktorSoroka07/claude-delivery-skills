@@ -715,20 +715,22 @@ def phrases_of(before, after, budget):
 def changed_lines(before, after, whole_list):
     """1-based lines of `after` the change wrote, widened to the whole list it
     sits in (the owning file) or to its list item, else its paragraph (any
-    other file): a copy the turn already brought into line is not handed back."""
+    other file): a copy the turn already brought into line is not handed back.
+    A deletion writes no line, so it widens to nothing - the paragraph or list
+    after it is not the turn's."""
     _, a, ops = opcodes(before, after)
     out = set()
     s, e = 0, 0
     for _, _, _, j1, j2 in ops:
+        if j1 == j2:
+            continue
         if whole_list:
             if not s <= j1 < e:
                 _, s, e = list_block(a, j1, loose=True)
             lo, hi = min(j1, s), max(j2, e)
         else:
-            lo, hi = j1, max(j2, j1 + 1)
-            for j in range(j1, max(j2, j1 + 1)):
-                if j >= len(a):
-                    continue
+            lo, hi = j1, j2
+            for j in range(j1, j2):
                 s, e = item_span(a, j)
                 lo, hi = min(lo, s), max(hi, e)
         out.update(range(lo + 1, hi + 1))
