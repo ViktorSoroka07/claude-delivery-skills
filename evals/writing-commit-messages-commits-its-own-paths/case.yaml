@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: writing-commit-messages-commits-its-own-paths
+context:
+  scaffold_script: fixture.sh
