@@ -905,6 +905,14 @@ got=$(handed "$(sweep_stop "$R" s70 p1)")
 contains "sweep hands a comment line inside a code block" "$got" "docs/code.md:2"
 contains "sweep hands a comment line in a file that is not Markdown" "$got" "scripts/notes.sh:2"
 lacks "sweep never hands a heading line after a closed code block" "$got" "docs/code.md:5"
+R="$WORK/sw-inline"; sweep_repo "$R"
+printf '\140\140\140git status\140\140\140 shows the state.\n\n## What was done, and what is still open\n\nSay what was done and what is still open.\n' > "$R/docs/inline.md"
+(cd "$R" && git add -A && git commit -qm inline)
+sweep_submit "$R" s77 p1 >/dev/null
+add_item "$R"
+got=$(handed "$(sweep_stop "$R" s77 p1)")
+lacks "sweep never reads a line opening with inline code as a code block" "$got" "docs/inline.md:3"
+contains "sweep hands a line below a line opening with inline code" "$got" "docs/inline.md:5"
 
 # The read paths: a change committed within the turn, a copy fixed by the
 # shell, a new file, a tree with no git.

@@ -70,7 +70,7 @@ these those what which who how when where not no nor but if then than so do does
 cant can't each every any all one two three note notes""".split())
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$")
 HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.*)$")
-FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 MARKDOWN = re.compile(r"\.(?:md|mdx|markdown)$", re.I)
 BOLD_LEAD = re.compile(r"\s*(?:\*\*(.+?)\*\*|__(.+?)__)")
 PREFILTER_WORD = re.compile(r"^[a-z0-9]+$")
@@ -760,14 +760,15 @@ def item_span(lines, at):
 def heading_lines(lines):
     """1-based numbers of the lines that are Markdown headings: a line opening
     with # and a space outside a fenced code block. Inside one, as in a file
-    that is not Markdown, such a line is a comment."""
+    that is not Markdown, such a line is a comment. A backtick run followed by
+    another backtick on its line opens nothing - it is inline code."""
     out, fence = set(), None
     for n, line in enumerate(lines, 1):
         m = FENCE.match(line)
         if fence:
             if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not line[m.end():].strip():
                 fence = None
-        elif m:
+        elif m and not (m.group(1)[0] == "`" and "`" in line[m.end():]):
             fence = m.group(1)
         elif HEADING.match(line):
             out.add(n)
