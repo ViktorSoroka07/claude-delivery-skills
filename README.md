@@ -320,15 +320,17 @@ instructions alone cannot:
     line; handed a dated review quoting the old wording and a sibling document saying
     the same things to another reader beside the real copies, every session left both,
     as every session without it did. It snapshots the rule files at each prompt, leaves
-    out the lines the turn itself wrote in a rule file or with `Edit` or `Write`, speaks
-    at most once per prompt, and tells the session to leave a record, a quote or a test
-    fixture of the old wording, and every line where the change is a trial it will
-    revert. It finds a copy only by those phrases, and even then leaves some out: a line
-    in a file the turn did not write that way, where that file holds only one of a
-    changed rule file's phrases and the rule file yields several; a match starting on a
-    heading line; and the copies of a list that held a single item before the change
-    added another. So its silence does not prove every copy current. Outside a git
-    repository it searches only the text documents under the working directory.
+    out the lines the turn itself wrote in a rule file or with `Edit` or `Write` and
+    every line in the same paragraph or list item as one of them (in the file that owns
+    the change, the same list instead), speaks at most once per prompt, and tells the
+    session to leave a record, a quote or a test fixture of the old wording, and every
+    line where the change is a trial it will revert. It finds a copy only by those
+    phrases, and even then leaves some out: a line in a file the turn did not write that
+    way, where that file holds only one of a changed rule file's phrases and the rule
+    file yields several; a match starting on a heading line; and the copies of a list
+    that held a single item before the change added another. So its silence does not
+    prove every copy current. Outside a git repository it searches only the text
+    documents under the working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
