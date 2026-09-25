@@ -55,6 +55,20 @@ printf 'Also `delivery-skills:ghost`.\n' >> "$WORK/t3/skills/demo/SKILL.md"
 sh "$CHECK" "$WORK/t3" >/dev/null 2>&1
 check "unresolvable delivery-skills name is caught" 1 $?
 
+# 3b. The session brief's pointers are read as well; a hook's bytecode cache,
+#     which holds the pattern's prefix, is not.
+mkplugin t3b
+printf 'Owned by `delivery-skills:demo`.\n' > "$WORK/t3b/hooks/session-brief.md"
+mkdir -p "$WORK/t3b/hooks/__pycache__"
+printf 'a\000`delivery-skills:z\n' > "$WORK/t3b/hooks/__pycache__/h.cpython-314.pyc"
+( cd "$WORK/t3b" && git add -A && git commit -qm x )
+sh "$CHECK" "$WORK/t3b" >/dev/null 2>&1
+check "live brief pointer and a cached binary under hooks/ pass" 0 $?
+printf 'And `delivery-skills:ghost`.\n' >> "$WORK/t3b/hooks/session-brief.md"
+( cd "$WORK/t3b" && git add -A && git commit -qm y )
+sh "$CHECK" "$WORK/t3b" >/dev/null 2>&1
+check "unresolvable delivery-skills name in the session brief is caught" 1 $?
+
 # 4. A hooks.json command pointing at a missing file fails.
 mkplugin t4
 rm "$WORK/t4/hooks/h.py"

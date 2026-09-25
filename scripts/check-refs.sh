@@ -25,7 +25,7 @@ for f in "$ROOT"/skills/*/SKILL.md; do
 done
 
 # 2. delivery-skills:<name> mentions resolve to a skill dir or an agent file.
-for n in $(grep -rho 'delivery-skills:[a-z][a-z-]*' "$ROOT/skills" "$ROOT/agents" "$ROOT/README.md" 2>/dev/null | sed 's/^delivery-skills://' | sort -u); do
+for n in $(grep -rhoI 'delivery-skills:[a-z][a-z-]*' "$ROOT/skills" "$ROOT/agents" "$ROOT/hooks" "$ROOT/README.md" 2>/dev/null | sed 's/^delivery-skills://' | sort -u); do
   [ -d "$ROOT/skills/$n" ] || [ -f "$ROOT/agents/$n.md" ] || broken "delivery-skills:$n resolves to nothing"
 done
 
