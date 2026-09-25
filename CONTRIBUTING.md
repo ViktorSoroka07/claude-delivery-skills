@@ -354,8 +354,9 @@ evidence, and the five rules are not interchangeable:
   does not ignore, or a `CLAUDE.local.md` whether git ignores it or not.** In
   the arm carrying the plugin, a turn that wrote a
   `SKILL.md`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`,
-  `CONTRIBUTING.md` or `README.md`, or a `.md` directly under `agents/` or
-  under `skills/<name>/references/`, is handed at its stop the lines elsewhere
+  `CONTRIBUTING.md` or `README.md`, or a `.md` directly under `agents/`,
+  under `skills/<name>/references/` or under a `references/` beside a
+  `SKILL.md`, is handed at its stop the lines elsewhere
   that still carry what its change replaced, where the hook finds any, and the
   rep acts on them before its turn ends. The arm without the plugin has no
   such moment, so a grader on any file the hand-off can name reads the hook's

@@ -18,7 +18,8 @@ once per prompt, and a line handed once is never handed again in the session.
 
 Rule files: SKILL.md, CLAUDE.md, CLAUDE.local.md, AGENTS.md, GEMINI.md,
 CONTRIBUTING.md and README.md in any letter case, a .md directly under an
-agents/ directory, and a .md under skills/<name>/references/. A rule file git
+agents/ directory, and a .md under skills/<name>/references/ or under a
+references/ directory whose parent holds a SKILL.md. A rule file git
 ignores is left out, but for a CLAUDE.local.md, which is ignored by design: the
 snapshot copies one outside an ignored directory. A file the turn wrote that no
 snapshot covers - outside the working repository, in an ignored directory, or
@@ -50,6 +51,7 @@ RULE_FILE = re.compile(
     r"|(?:^|/)skills/[^/]+/references/.+\.md$",
     re.I)
 LOCAL_RULE = re.compile(r"(?:^|/)CLAUDE\.local\.md$", re.I)
+REFERENCES = re.compile(r"(?:^|/)references/", re.I)
 RUN = 5
 LISTED = 8
 SHOWN_PHRASES = 3
@@ -220,6 +222,27 @@ def walk(root, budget):
     return out, True
 
 
+@functools.lru_cache(maxsize=256)
+def holds_skill(directory):
+    try:
+        return any(n.lower() == "skill.md" for n in os.listdir(directory))
+    except Exception:
+        return False
+
+
+def is_rule(path, base=""):
+    """`path`, relative to `base` or absolute, is a rule file: RULE_FILE's, or
+    a .md under a references/ directory whose parent holds a SKILL.md - a
+    skill's own layout wherever it sits, a single-skill repository's root
+    included. A references/ with no SKILL.md beside it is any docs folder."""
+    posix = path.replace(os.sep, "/")
+    if RULE_FILE.search(posix):
+        return True
+    return posix.lower().endswith(".md") and any(
+        holds_skill(os.path.join(base, posix[:m.start()]) if m.start() else (base or "."))
+        for m in REFERENCES.finditer(posix))
+
+
 def ignored_local(root, budget):
     """The CLAUDE.local.md files git ignores, which is that file's usual state.
     `--directory` keeps git out of ignored trees - a dependency tree's walk
@@ -238,7 +261,7 @@ def rule_files(root, in_git, budget):
     else:
         names, complete = walk(root, budget)
     full = (lambda n: n) if in_git else (lambda n: os.path.join(root, n))
-    return sorted({n for n in names if RULE_FILE.search(full(n).replace(os.sep, "/"))}), complete
+    return sorted({n for n in names if is_rule(full(n), root if in_git else "")}), complete
 
 
 def snapshot(payload, budget):
@@ -804,11 +827,11 @@ def ignored(root, rels, budget):
     return {n for n in (out or "").split("\0") if n}
 
 
-def reading_order(rel, written):
+def reading_order(rel, written, root):
     """The files the turn wrote first, then rule files, then other Markdown:
     the budget runs out on the files least likely to hold a copy."""
     posix = rel.replace(os.sep, "/")
-    return (0 if rel in written else 1 if RULE_FILE.search(posix) else 2 if posix.lower().endswith(".md") else 3,
+    return (0 if rel in written else 1 if is_rule(rel, root) else 2 if posix.lower().endswith(".md") else 3,
             posix)
 
 
@@ -837,7 +860,7 @@ def sweep(written, cwd, budget):
             rels = {p: r for p, r in rels.items() if r not in skip or LOCAL_RULE.search(r)}
         befores = {r: written[p] for p, r in rels.items()}
         afters = {r: read_text(p) or "" for p, r in rels.items()}
-        owners = sorted(r for p, r in rels.items() if RULE_FILE.search((r if how == "git" else p).replace(os.sep, "/")))
+        owners = sorted(r for p, r in rels.items() if (is_rule(r, root) if how == "git" else is_rule(p)))
         per_owner = [(o, phrases_of(befores[o], afters[o], budget), source_lines(befores[o], afters[o]))
                      for o in owners]
         per_owner = [po for po in per_owner if po[1]]
@@ -848,7 +871,7 @@ def sweep(written, cwd, budget):
         found_in = set(befores)
         if how != "alone":
             found_in |= set(candidates(root, how == "git", prefilter_words(every), budget))
-        for rel in sorted(found_in, key=lambda r: reading_order(r, befores)):
+        for rel in sorted(found_in, key=lambda r: reading_order(r, befores, root)):
             if budget.spent():
                 return hits
             text = afters[rel] if rel in afters else read_text(os.path.join(root, rel))
@@ -971,7 +994,7 @@ def stop(payload, budget):
     transcript = payload.get("transcript_path") or ""
     calls = turn_calls(transcript, payload.get("prompt_id"), cwd) if os.path.isfile(transcript) else []
     written = turn_writes(sd, snap, calls, budget)
-    if not any(RULE_FILE.search(p.replace(os.sep, "/")) for p in written):
+    if not any(is_rule(p) for p in written):
         return
     handed = set(load_json(os.path.join(sd, "handed.json"), []))
     entries = entries_of(sweep(written, cwd, budget), handed)

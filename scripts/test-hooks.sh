@@ -1050,6 +1050,25 @@ sweep_submit "$R" s33 p2 >/dev/null
 "$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '1. **What was done**' '0. **Who to ask** - the person who knows.\n\n1. **What was done**'
 contains "sweep reads the items below a new first item of a loose list" "$(handed "$(sweep_stop "$R" s33 p2)")" "CLAUDE.md:3-4"
 
+# A skill's references/ is a rule file wherever the skill sits - a
+# single-skill repository keeps both at its root - and a references/ with no
+# SKILL.md beside it is any docs folder.
+R="$WORK/sw-refs"; sweep_repo "$R"
+mkdir -p "$R/references" "$R/tool/references"
+printf '# Playbook\n\nThe notes are under references/.\n' > "$R/SKILL.md"
+sed -n '/^## What a hand-over/,/^3\./p' "$R/skills/handoff/SKILL.md" > "$R/references/notes.md"
+cp "$R/references/notes.md" "$R/tool/references/notes.md"
+(cd "$R" && git add -A && git commit -qm refs)
+sweep_submit "$R" s66 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/references/notes.md" '3. **How to check the current state** - the command that shows it.\n' \
+  '3. **How to check the current state** - the command that shows it.\n4. **How to roll it back** - the step that undoes each change.\n'
+contains "sweep arms on a references/ beside a SKILL.md" "$(handed "$(sweep_stop "$R" s66 p1)")" "CLAUDE.md:3-4"
+(cd "$R" && git commit -qam notes)
+sweep_submit "$R" s67 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/tool/references/notes.md" '3. **How to check the current state** - the command that shows it.\n' \
+  '3. **How to check the current state** - the command that shows it.\n4. **How to roll it back** - the step that undoes each change.\n'
+empty "sweep never arms on a references/ with no SKILL.md beside it" "$(sweep_stop "$R" s67 p1)"
+
 # A word the normalizing drops a character from is not what the prefilter
 # searches the raw files for.
 R="$WORK/sw-ident"; sweep_repo "$R"

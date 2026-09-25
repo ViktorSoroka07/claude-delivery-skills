@@ -307,7 +307,8 @@ instructions alone cannot:
   - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a `.md` under
-    `skills/<name>/references/`), hands the session the lines elsewhere in the
+    `skills/<name>/references/` or under a `references/` beside a `SKILL.md`), hands
+    the session the lines elsewhere in the
     repository that still carry what the change replaced: the headlines of a list the
     change added to and the heading above it, and five-word runs of the text it replaced
     or of the paragraphs beside an addition. A rule landed in the file that owns it
