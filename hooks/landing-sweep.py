@@ -61,6 +61,7 @@ WORD_DIFF = 250000
 WORD_DIFF_JUNK = 40 * 1000 * 1000
 LINE_DIFF_JUNK = 300000
 WALK_ENTRIES = 20000
+FORCED_ALL = 1000
 SKIP_DIRS = {"node_modules", "__pycache__"}
 BUDGET = {"UserPromptSubmit": 2.0, "Stop": 2.5}
 MOVES = re.compile(r"(?:pull|rebase|checkout|reset|merge)\b|commit \(merge\)")
@@ -810,16 +811,20 @@ def candidates(root, in_git, words, budget):
     """Files under `root` holding any of `words` in any letter case: git grep
     over tracked and unignored untracked files where there is git, and where
     there is none a bounded walk over text documents only - a tree outside git
-    holds transcripts, editor backups and caches that quote any file. The
-    tracked files get a grep of their own: `--untracked` applies the ignore
-    rules to them too, and a tracked file those rules match is still read."""
+    holds transcripts, editor backups and caches that quote any file.
+    `--untracked` applies the ignore rules to tracked files too, so the tracked
+    files those rules match - usually none - get a grep of their own after it,
+    past FORCED_ALL of them a grep over every tracked file."""
     if in_git:
-        found = set()
-        for untracked in ([], ["--untracked"]):
-            args = ["grep", "-l", "-z", "-I", "-i", "-F"] + untracked
-            for w in words:
-                args += ["-e", w]
-            out = git(root, args, budget, ok=(0, 1))
+        args = ["grep", "-l", "-z", "-I", "-i", "-F"]
+        for w in words:
+            args += ["-e", w]
+        out = git(root, args + ["--untracked"], budget, ok=(0, 1))
+        found = {n for n in (out or "").split("\0") if n}
+        forced = [n for n in (git(root, ["ls-files", "-z", "-c", "-i", "--exclude-standard"], budget) or "").split("\0") if n]
+        if forced:
+            paths = [] if len(forced) > FORCED_ALL else ["--"] + [":(literal)" + n for n in forced]
+            out = git(root, args + paths, budget, ok=(0, 1))
             found.update(n for n in (out or "").split("\0") if n)
         return sorted(found)
     names, _ = walk(root, budget)
