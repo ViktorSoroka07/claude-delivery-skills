@@ -13,8 +13,10 @@ Regenerate after editing the exchange below, and after any change to
     python3 evals/tracking-open-asks-rederives-the-closing-list/make-history.py
 
 The output is deterministic - fixed identifiers, one fixed timestamp - so a
-regeneration that changes nothing leaves the file byte-identical, and `git
-diff` after running it is the staleness check on the brief.
+regeneration that changes nothing leaves the file byte-identical. That is the
+staleness check on the brief, and `scripts/check-refs.sh` runs it: it builds
+into a temporary file, named as the one argument, and fails when that differs
+from the committed file.
 
 Two constraints the file's shape answers:
 
@@ -31,6 +33,7 @@ Two constraints the file's shape answers:
 """
 import json
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -146,13 +149,14 @@ def assistant_line(parent, text):
 
 
 def main():
+    out = sys.argv[1] if len(sys.argv) > 1 else OUT
     att = brief_lines()
     usr = user_line(att["uuid"], USER)
     asst = assistant_line(usr["uuid"], ASSISTANT)
-    with open(OUT, "w") as fh:
+    with open(out, "w") as fh:
         for line in (att, usr, asst):
             fh.write(json.dumps(line).replace(STAMP, ESCAPED_STAMP) + "\n")
-    print("wrote %s" % OUT)
+    print("wrote %s" % out)
 
 
 if __name__ == "__main__":

@@ -512,7 +512,9 @@ differ only in text the reps actually read.
 **What the fixture freezes.** `history.jsonl` carries the brief as it stood
 when it was generated. `make-history.py` beside it reads `hooks/session-brief.md`
 at build time and is deterministic, so regenerating it and finding no diff is
-the staleness check - run it after any change to the brief.
+the staleness check, and `scripts/check-refs.sh` runs it: it builds the file
+into a temporary path and fails on any difference from the committed one, so a
+brief change the fixture was not regenerated for fails the reference gate.
 
 **Which brief each kept run resumed.** Until the fixture was regenerated after
 `59bde35`, it carried the brief as it stood at `0c7898c`, without the
