@@ -1075,6 +1075,7 @@ import sys
 rows = "".join("| `/v1/items/%d` | GET | returns the item list for the account %d | yes |\n" % (i, i) for i in range(500))
 open(sys.argv[1] + "/README.md", "a").write("\n| Endpoint | Method | What it does | Auth |\n|---|---|---|---|\n" + rows)
 open(sys.argv[1] + "/docs/api.md", "w").write("It returns the item list for the account 207 | yes on request.\n")
+open(sys.argv[1] + "/docs/five.md", "w").write("See `/v1/items/5` | GET | returns the item list for the account 5 here.\n")
 EOF
 (cd "$R" && git add -A && git commit -qm rows)
 sweep_submit "$R" s60 p1 >/dev/null
@@ -1086,7 +1087,9 @@ text = text.replace("| `/v1/items/5` | GET | returns the item list for the accou
                     "| `/v2/ledger` | POST | posts a ledger entry for the whole organisation at once | admin only |")
 open(p, "w").write(text)
 EOF
-contains "sweep pairs a large table's like rows where one row is unlike" "$(handed "$(sweep_stop "$R" s60 p1)")" "docs/api.md:1"
+got=$(handed "$(sweep_stop "$R" s60 p1)")
+contains "sweep pairs a large table's like rows where one row is unlike" "$got" "docs/api.md:1"
+lacks "sweep never pairs a large table's unlike row" "$got" "docs/five.md"
 
 # Outside git: a rule file under a working directory with no repository is
 # searched through that directory's text documents only, and one outside the
@@ -1212,6 +1215,12 @@ contains "sweep joins a loose bulleted list across its items' nested steps" "$(h
 sweep_submit "$R" s58 p1 >/dev/null
 "$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/after.md" '- b.\n' '- b.\n- **Loose bullet three** - c.\n'
 lacks "sweep never joins a bulleted list to a numbered one ending in nested bullets" "$(handed "$(sweep_stop "$R" s58 p1)")" "docs/steps.md"
+(cd "$R" && git commit -qam after)
+printf '# Spaced\n\n1. **Prepare the release branch** - cut it.\n\n   - check the version file\n\n2. **Tag the build** - sign it.\n\n   - push the tag\n\n3. **Publish the notes** - post them.\n\n   - link the tag\n' > "$R/skills/handoff/references/spaced.md"
+(cd "$R" && git add -A && git commit -qm spaced)
+sweep_submit "$R" s64 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/spaced.md" '   - link the tag\n' '   - link the tag\n\n4. **Announce it** - in the channel.\n'
+contains "sweep joins an item to the nested bullets a blank line sets under it" "$(handed "$(sweep_stop "$R" s64 p1)")" "docs/steps.md"
 
 # A move's own change is never handed as the turn's: a pull before the
 # turn's edit, and a pull that is the turn's only act on a file already dirty.
@@ -1269,6 +1278,27 @@ sweep_submit "$R" s53 p1 >/dev/null
   'went the way it did.\n\nOne.\n\nTwo.\n\nThree.\n\nFour.\n\nFive.\n\nSix.\n\nSeven.\n\nEight.\n\nNine.\n\nTen.\n'
 add_item "$R"
 contains "sweep reads the list's heading where it stood before the turn" "$(handed "$(sweep_stop "$R" s53 p1)")" "docs/head.md:1"
+R="$WORK/sw-renamed"; sweep_repo "$R"
+printf 'What a hand-over note carries: what was done first.\n' > "$R/docs/head.md"
+printf 'What every handover message includes: what was done first.\n' > "$R/docs/newhead.md"
+(cd "$R" && git add -A && git commit -qm heads)
+sweep_submit "$R" s62 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" '## What a hand-over note carries' '## What every handover message includes'
+add_item "$R"
+got=$(handed "$(sweep_stop "$R" s62 p1)")
+contains "sweep searches a heading the turn renamed by its old wording" "$got" "docs/head.md:1"
+lacks "sweep never searches a renamed heading by its new wording" "$got" "docs/newhead.md"
+R="$WORK/sw-merge"; sweep_repo "$R"
+(cd "$R" && git checkout -q -b feature \
+  && sed 's/^The next person has the note/The next reader has the note/' skills/handoff/SKILL.md > s.tmp \
+  && cat s.tmp > skills/handoff/SKILL.md && rm s.tmp && printf 'Say what was done last.\n' > docs/one.md \
+  && git commit -qam feature && git checkout -q main && printf 'Say what was done second.\n' > docs/one.md \
+  && git commit -qam main1)
+"$PY" -c 'import time; time.sleep(1 - time.time() % 1)'
+sweep_submit "$R" s61 p1 >/dev/null
+(cd "$R" && { git merge -q feature >/dev/null 2>&1 || true; } && printf 'Say what was done.\n' > docs/one.md \
+  && git add -A && git commit -qm merged)
+empty "sweep never hands a merged branch's change as the turn's" "$(sweep_stop "$R" s61 p1)"
 
 # A long document whose every paragraph changed is diffed within the budget.
 R="$WORK/sw-paras"; sweep_repo "$R"
@@ -1332,7 +1362,7 @@ add_item "$R"
 "$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/SKILL.md" 'went the way it did.\n' 'went the way it did.\n\nWrite it the day you hand over.\n'
 text=$(context "$(sweep_stop "$R" s49 p1)")
 contains "sweep marks a line found beside the addition" "$text" "\`docs/onboarding.md:1\` - beside: "
-contains "sweep keeps one of eight places for a line found beside the addition" "$(printf '%s\n' "$text" | grep -c '^- `')" "8"
+contains "sweep keeps the eighth place for a line found beside the addition" "$(printf '%s\n' "$text" | grep '^- `' | sed -n 8p)" "docs/onboarding.md:1"
 sweep_stop "$R" s49 p1 true >/dev/null
 (cd "$R" && git add -A && git commit -qm t1)
 sweep_submit "$R" s49 p2 >/dev/null
