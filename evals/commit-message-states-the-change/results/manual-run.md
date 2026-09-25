@@ -302,3 +302,16 @@ The trailer rule held in none of the thirty commits, as before. One rep of
 draw 1 first committed both edits without the trailer, then re-made them with
 it - the skill's rule held at the first commit and the harness default at the
 second.
+
+## The trailer grader retired with the rule it read
+
+`no-default-trailer` is removed with the change to `writing-commit-messages`
+that stops the skill claiming the harness's attribution trailer. That trailer
+is an instruction in the session's system prompt, which a loaded skill does
+not outrank: every one of the 61 commits the kept Sonnet rounds above landed
+carried it with the skill loaded, and the one rep that first committed without
+it re-made both commits with it. The skill now leaves that trailer to the
+harness's attribution setting and the user's instruction files. On this
+fixture neither says anything, so a rep that adds it follows the skill, and
+the grader would fail it. Its rates above stay as the record of the
+measurement behind the change; the case keeps its other five graders.

@@ -189,8 +189,9 @@ edited in place, never a stack.
 Commit bodies are where release notes and PR descriptions get their "why", and where
 narration creeps in: who asked, what else got fixed on the way, a trailer some tool
 adds by default. Subject as the outcome, body as the mechanism, trailers only the
-repo's own history asks for, one commit per workstream — and history rewrites left
-to the author.
+repo's own history asks for (the harness's own attribution trailer excepted, which
+its setting and the user's instructions decide), one commit per workstream — and
+history rewrites left to the author.
 
 ### The session itself
 

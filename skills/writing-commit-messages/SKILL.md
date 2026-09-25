@@ -11,7 +11,7 @@ A commit message is read after the branch is gone: in blame, in generated releas
 
 1. **Subject: the outcome of applying the commit**, imperative, in the repo's own convention — read `git log --format=%s -20` before writing the first one. It states what is true after the commit, not the activity: "Address review comments", "Fix typo", "Update summary", "WIP" tell the reader nothing they can act on.
 2. **Body: the mechanism**, whenever the subject cannot carry it — what was wrong or missing, and why this shape of change. Present tense for what now holds. This is the "why" the PR description curates and the release notes print; if it is not here, it is nowhere.
-3. **Trailers: only the ones the repo's own history or contributing guide asks for** — an issue reference, a sign-off. A trailer a tool or harness offers by default is that tool's convention, not the repo's; the repo's log shows which trailers exist here.
+3. **Trailers: only the ones the repo's own history or contributing guide asks for** — an issue reference, a sign-off; the repo's log shows which exist here, and a trailer another tool offers by default is that tool's convention, not the repo's. The exception is the attribution trailer the harness itself instructs you to add: that instruction sits in the session's system context, which a loaded skill does not outrank, so the harness's own attribution setting and the user's instruction files decide it, not this skill. A repository that keeps attribution out says so in one of those, where the harness reads it.
 
 Example of the shape (invented):
 
@@ -47,7 +47,7 @@ When an agent produced the diff, the orchestrator commits it (`delegating-to-sub
 | "The reviewer asked for this — say so"         | The thread holds the request. The message holds the change        |
 | "It's tiny, 'fix typo' is enough"              | Say what is now correct. The subject is the outcome               |
 | "I'll mention the other thing I fixed"         | Two workstreams, two commits. Split first, then write             |
-| "The tool adds a trailer, leave it"            | The repo's log decides which trailers exist here                  |
+| "The tool adds a trailer, leave it"            | The repo's log decides, bar the harness's own attribution trailer, which its setting and the user's instructions decide |
 | "The agent's summary is the message"           | The report narrates; the message states the mechanism             |
 | "It's a fixup, I'll squash it now"              | History rewrites are the author's call. Mark it, say it is there  |
 | "The PR description will explain it"           | It curates from bodies. An empty body leaves it nothing to curate |
