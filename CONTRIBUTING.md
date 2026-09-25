@@ -748,21 +748,23 @@ Rules that held in practice, each answering a failure seen here:
   fixture was generated, so a wording that changes the brief does not reach a
   rep on the fixture alone; the answer written here was that a replay round
   therefore tests a wording landing in the skill's own text, which the run
-  loads live. The first replay run falsified that: its seeded turn made no
-  tool call, so the reps read the brief's first-tool-call line as spent, never
-  called the Skill tool, and the skill's text reached none of them. The
-  generator now seeds the load a fresh conversation's first turn makes - the
-  Skill call, its result and the skill's body as the harness injects it - and
-  a one-rep probe on the seeded file quoted a sentence only that body holds,
-  word for word, with no Skill call of its own. So the skill's text is frozen
-  in the seed too, and **a replay round tests whichever text the seed carries,
-  the brief's or the skill's, and regenerates the fixture once per arm so each
-  arm's seeded copy carries its own text** - by a generator that reads both
-  rather than holding a copy, and deterministically, so that regenerating it
-  and finding no diff is the staleness check against the live files. Every
-  kept rate from before the seeded load is a rate on the fixture without it. Should a later run report both arms,
-  the seeded brief reaches the arm meant to be without the plugin, and that
-  row understates it.
+  loads live. The first replay run falsified that: none of its ten reps called
+  the Skill tool, so the skill's text reached none of them - under a brief
+  that did not yet make that load a conversation's first tool call. Under a
+  brief that did, it loaded in none of five reps resuming the case either, the
+  seeded turn having ended with no call. The generator now seeds the load a
+  fresh conversation's first turn makes - the Skill call, its result and the
+  skill's body as the harness injects it - and a one-rep probe on a file
+  seeded that way quoted a sentence only that body holds, word for word, with
+  no Skill call of its own. So the skill's text is frozen in the seed too, and
+  **a replay round tests whichever text the seed carries, the brief's or the
+  skill's, and regenerates the fixture once per arm so each arm's seeded copy
+  carries its own text** - by a generator that reads both rather than holding
+  a copy, and deterministically, so that regenerating it and finding no diff
+  is the staleness check against the live files, which `scripts/check-refs.sh`
+  runs. Every kept rate from before the seeded load is a rate on the fixture
+  without it. Should a later run report both arms, the seeded text reaches the
+  arm meant to be without the plugin, and that row understates it.
 - **A capability rule is measured on the weakest model the plugin supports.**
   Where a rule exists because the model does not know to do the thing, that
   model is both where the gap is and the more sensitive instrument: a rule the
