@@ -896,7 +896,7 @@ lacks "sweep leaves out the whole list a change rewrote while joining it" "$got"
 # in a file that is not Markdown, is a comment, and is handed.
 R="$WORK/sw-comment"; sweep_repo "$R"
 mkdir -p "$R/scripts"
-printf '```sh\n# say what was done and what is still open\n```\n\n## What was done, and what is still open\n' > "$R/docs/code.md"
+printf '\140\140\140sh\n# say what was done and what is still open\n\140\140\140\n\n## What was done, and what is still open\n' > "$R/docs/code.md"
 printf '#!/bin/sh\n# say what was done and what is still open\necho ok\n' > "$R/scripts/notes.sh"
 (cd "$R" && git add -A && git commit -qm comments)
 sweep_submit "$R" s70 p1 >/dev/null
