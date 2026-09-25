@@ -325,9 +325,9 @@ instructions alone cannot:
     outside the repository it works in only where the turn used `Edit` or `Write`,
     speaks at most once per prompt, and tells the session to leave a record, a quote or
     a test fixture of the old wording, and every line where the change is a trial it
-    will revert. It finds a copy only by those phrases, and some changes yield none:
-    adding to a list that held fewer than two items, where that is all the change does
-    to it, or starting a list, whose neighbouring paragraphs are then not read. Some
+    will revert. It finds a copy only by those phrases, and some changes yield none, a
+    new or deleted file among them; an item added to a list of fewer than two items, or
+    a list started, is read as a prose addition, by the paragraphs beside it. Some
     lines that carry a phrase are left out as well, among them: the lines the turn
     itself wrote in a rule file or with `Edit` or `Write`, with the rest of their
     paragraph or list item in another file and, in the rule file a phrase came from,

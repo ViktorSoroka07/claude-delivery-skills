@@ -806,6 +806,24 @@ contains "sweep hands a copy of the paragraph beside an addition" "$got" "docs/o
 lacks "sweep does not hand the paragraph its phrases came from" "$got" "skills/handoff/SKILL.md:3"
 contains "sweep says it read the paragraphs beside the addition" "$out" "the paragraphs beside what it added"
 
+# A list of fewer than two items is no list a copy enumerates: an item added
+# to a list of one, or a list started between paragraphs, is a prose addition,
+# read by the paragraphs beside it.
+R="$WORK/sw-oneitem"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Leaving\n\n## Before you go\n\n- Record the open branches and who owns them\n' > "$R/skills/handoff/references/leaving.md"
+printf 'Before leaving, record the open branches and who owns them, then log off.\n' > "$R/docs/leaving.md"
+printf '# Release\n\nThe release notes are drafted by the author of the change before merge.\n\nThe tag is cut on Thursday.\n' > "$R/skills/handoff/references/release.md"
+printf 'Remember that the release notes are drafted by the author of the change before merge.\n' > "$R/docs/release.md"
+(cd "$R" && git add -A && git commit -qm short)
+sweep_submit "$R" s68 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/leaving.md" 'who owns them\n' 'who owns them\n- Hand over the deploy keys\n'
+contains "sweep reads the item a list of one held beside the item added to it" "$(handed "$(sweep_stop "$R" s68 p1)")" "docs/leaving.md:1"
+(cd "$R" && git commit -qam leaving)
+sweep_submit "$R" s69 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/release.md" 'before merge.\n\n' 'before merge.\n\n- Link the ticket\n- Name the reviewer\n\n'
+contains "sweep reads the paragraphs beside a list it started" "$(handed "$(sweep_stop "$R" s69 p1)")" "docs/release.md:1"
+
 # A headline needs two content words; the whole list a change rewrote while
 # joining it is the turn's own.
 R="$WORK/sw-thin"; sweep_repo "$R"

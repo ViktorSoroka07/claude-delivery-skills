@@ -665,10 +665,11 @@ def to_before(before, after, k):
 
 def phrases_of(before, after, budget):
     """What the owning file said before the change, as (source, words, shown,
-    key): the headlines of a list the change added an item to and that list's
-    heading; every five-word run of replaced or deleted text overlapping the
-    words it lost; and the five-word runs of the paragraphs on either side of a
-    prose addition."""
+    key): the headlines of a list of two or more items the change added an
+    item to, and that list's heading; every five-word run of replaced or
+    deleted text overlapping the words it lost; and the five-word runs of the
+    paragraphs on either side of a prose addition - an item added to a list of
+    one, or a list started, included, since no copy enumerates such a list."""
     b, a, ops = opcodes(before, after)
     raw = []
     for tag, i1, i2, j1, j2 in ops:
@@ -677,16 +678,18 @@ def phrases_of(before, after, budget):
         if tag in ("replace", "delete"):
             raw.extend(("replaced", run) for run in lost_runs(b[i1:i2], a[j1:j2], budget))
         joined = sum(1 for x in a[j1:j2] if LIST_ITEM.match(x)) - sum(1 for x in b[i1:i2] if LIST_ITEM.match(x))
+        listed = False
         if joined > 0:
             first = next(j for j in range(j1, j2) if LIST_ITEM.match(a[j]))
             members, start, end = list_block(a, first, loose=True)
             items = before_items(before, after, members, start, end)
-            if len(items) >= 2:
+            listed = len(items) >= 2
+            if listed:
                 raw.extend(("item", headline(it)) for it in items)
                 heading = heading_above(b, to_before(before, after, start))
                 if heading:
                     raw.append(("item", heading))
-        elif tag == "insert" and len(list_block(b, i1)[0]) < 2:
+        if tag == "insert" and not listed and len(list_block(b, i1)[0]) < 2:
             for para in (paragraph_above(b, i1), paragraph_below(b, i1)):
                 toks = " ".join(b[k] for k in para).split()
                 for st in range(0, max(0, len(toks) - RUN) + 1):
