@@ -1176,6 +1176,24 @@ printf 'First numbered step, then the second numbered step.\n' > "$R/docs/number
 sweep_submit "$R" s45 p1 >/dev/null
 "$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/kinds.md" '- b.\n' '- b.\n- **Loose bullet three** - c.\n'
 lacks "sweep never joins a bulleted list to the numbered one above it" "$(handed "$(sweep_stop "$R" s45 p1)")" "docs/numbered.md"
+R="$WORK/sw-nested"; sweep_repo "$R"
+mkdir -p "$R/skills/handoff/references"
+printf '# Release\n\n1. **Prepare the release branch** - cut it.\n   - check the version file\n\n2. **Tag the build** - sign it.\n   - push the tag\n\n3. **Publish the notes** - post them.\n   - link the tag\n' > "$R/skills/handoff/references/steps.md"
+printf '# Parts\n\n- **Prepare the release branch** - cut it.\n  1. check the version file\n\n- **Tag the build** - sign it.\n  1. push the tag\n\n- **Publish the notes** - post them.\n  1. link the tag\n' > "$R/skills/handoff/references/parts.md"
+printf '1. **Prepare the release branch** - cut it.\n2. **Tag the build** - sign it.\n   - push the tag\n\n- **Loose bullet one** - a.\n- **Loose bullet two** - b.\n' > "$R/skills/handoff/references/after.md"
+printf 'Prepare the release branch, then tag the build, then publish the notes.\n' > "$R/docs/steps.md"
+(cd "$R" && git add -A && git commit -qm nested)
+sweep_submit "$R" s56 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/steps.md" '   - link the tag\n' '   - link the tag\n\n4. **Announce it** - in the channel.\n'
+contains "sweep joins a loose numbered list across its items' nested bullets" "$(handed "$(sweep_stop "$R" s56 p1)")" "docs/steps.md"
+(cd "$R" && git commit -qam steps)
+sweep_submit "$R" s57 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/parts.md" '  1. link the tag\n' '  1. link the tag\n\n- **Announce it** - in the channel.\n'
+contains "sweep joins a loose bulleted list across its items' nested steps" "$(handed "$(sweep_stop "$R" s57 p1)")" "docs/steps.md"
+(cd "$R" && git commit -qam parts)
+sweep_submit "$R" s58 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/skills/handoff/references/after.md" '- b.\n' '- b.\n- **Loose bullet three** - c.\n'
+lacks "sweep never joins a bulleted list to a numbered one ending in nested bullets" "$(handed "$(sweep_stop "$R" s58 p1)")" "docs/steps.md"
 
 # A move's own change is never handed as the turn's: a pull before the
 # turn's edit, and a pull that is the turn's only act on a file already dirty.

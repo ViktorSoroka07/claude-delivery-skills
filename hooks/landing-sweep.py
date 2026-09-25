@@ -468,22 +468,31 @@ def blank_run(lines, i, step):
 
 def list_block(lines, at, loose=False):
     """[(line index, text)] of the items of the list touching line index `at`,
-    and its [start, end); with `loose`, blank lines between two items of the
-    same kind - both numbered or both bulleted - stay inside the list."""
+    and its [start, end); with `loose`, blank lines stay inside the list
+    before an item nested under the item above them, or of the same depth and
+    kind - both numbered or both bulleted - as the nearest item above them at
+    its depth."""
     def part(i):
         return is_item(lines, i) or is_cont(lines, i)
 
-    def kind(i):
-        while i >= 0 and not is_item(lines, i) and is_cont(lines, i):
-            i -= 1
-        return bool(ORDERED.match(lines[i])) if is_item(lines, i) else None
+    def depth(i):
+        return len(lines[i]) - len(lines[i].lstrip(" \t"))
+
+    def joins(above, below):
+        k = above
+        while k >= 0 and (part(k) or not lines[k].strip()):
+            if is_item(lines, k) and depth(k) <= depth(below):
+                return depth(k) < depth(below) or \
+                    bool(ORDERED.match(lines[k])) == bool(ORDERED.match(lines[below]))
+            k -= 1
+        return False
 
     i = at - 1
     while i >= 0:
         if part(i):
             i -= 1
         elif loose and is_item(lines, i + 1) and part(blank_run(lines, i, -1)) \
-                and kind(blank_run(lines, i, -1)) == kind(i + 1):
+                and joins(blank_run(lines, i, -1), i + 1):
             i = blank_run(lines, i, -1)
         else:
             break
@@ -492,7 +501,7 @@ def list_block(lines, at, loose=False):
         if part(j):
             j += 1
         elif loose and j > at and is_item(lines, blank_run(lines, j, 1)) \
-                and kind(blank_run(lines, j, 1)) == kind(j - 1):
+                and joins(j - 1, blank_run(lines, j, 1)):
             j = blank_run(lines, j, 1)
         else:
             break
