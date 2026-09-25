@@ -16,13 +16,19 @@
 #      subject only as the note you leave when work changes hands, with no
 #      "hand-over", no "handoff" and no path, so a search for the subject's
 #      name misses it and only one for the old items' own words reaches it.
+#      "decoys" adds two files that carry the three items' words without
+#      being copies of the list: a dated review record that quotes what the
+#      notes were read against that day, and a status-page skill whose
+#      customer update says the same three things to a different reader. A
+#      landing sweep that searches for the old items finds both; each must be
+#      left as it is.
 #
 # Invented content throughout - a team and a service that never existed.
 set -e
 T=${1:?target directory}
 V=${2:-}
 case "$V" in
-  ''|unnamed) ;;
+  ''|unnamed|decoys) ;;
   *) echo "handoff-playbook.sh: unknown variant '$V'" >&2; exit 1 ;;
 esac
 if [ -e "$T" ] && [ -n "$(ls -A "$T" 2>/dev/null)" ]; then
@@ -53,6 +59,15 @@ conventions every contributor follows.
 - **incident-notes** - keeps the running log during an incident and turns it
   into the summary afterwards. See
   [skills/incident-notes/SKILL.md](skills/incident-notes/SKILL.md).
+EOF
+if [ "$V" = decoys ]; then
+cat >> README.md <<'EOF'
+- **status-page** - writes the customer updates on the public status page
+  during and after an incident. See
+  [skills/status-page/SKILL.md](skills/status-page/SKILL.md).
+EOF
+fi
+cat >> README.md <<'EOF'
 
 ## Changing a skill
 
@@ -148,6 +163,46 @@ one line each, in the incident channel's pinned thread. Afterwards, turn the
 log into a summary: impact, timeline, cause, and the follow-up tickets.
 EOF
 
+if [ "$V" = decoys ]; then
+mkdir -p skills/status-page docs/reviews
+cat > skills/status-page/SKILL.md <<'EOF'
+---
+name: status-page
+description: Use when posting an update to the public status page during or after an incident.
+---
+
+# Status page
+
+Customers read the status page, not our channels. Every update tells them
+what was done, what is still open, and how to check the current state from
+their side - the status page itself or their own account, never one of our
+dashboards.
+
+- Write for someone who has never heard of ledger-sync.
+- No internal names: no people, no tickets, no hostnames.
+- Post at least every 30 minutes while an incident is open, even when
+  nothing has changed, and say that nothing has.
+EOF
+
+cat > docs/reviews/august-cutover-handover-review.md <<'EOF'
+# Hand-over note review - 21 August 2026
+
+Read by the two on-call leads, the week after the ledger-sync cutover.
+
+We read the nine hand-over notes left during the cutover against what the
+handoff skill asked a note to carry: what was done and where it landed, what
+is still open and who owns it, and how to check the current state.
+
+- Seven of the nine carried all three.
+- Two named every change but not where it landed; both authors added it the
+  same day.
+- None needed its author there to explain it.
+
+Next review: after the October cutover.
+EOF
+fi
+
 git add -A
-git commit -q -m "Start the team playbook with three skills"
+n=three; [ "$V" = decoys ] && n=four
+git commit -q -m "Start the team playbook with $n skills"
 echo "built handoff-playbook fixture in $T"
