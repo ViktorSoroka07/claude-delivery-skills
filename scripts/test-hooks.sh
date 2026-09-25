@@ -842,6 +842,20 @@ got=$(handed "$(sweep_stop "$R" s26 p1)")
 contains "sweep hands the copies of a list a change rewrote while joining it" "$got" "CLAUDE.md:3-4"
 lacks "sweep leaves out the whole list a change rewrote while joining it" "$got" "skills/handoff/SKILL.md:8"
 
+# A heading is a Markdown one: a line opening with # inside a code block, or
+# in a file that is not Markdown, is a comment, and is handed.
+R="$WORK/sw-comment"; sweep_repo "$R"
+mkdir -p "$R/scripts"
+printf '```sh\n# say what was done and what is still open\n```\n\n## What was done, and what is still open\n' > "$R/docs/code.md"
+printf '#!/bin/sh\n# say what was done and what is still open\necho ok\n' > "$R/scripts/notes.sh"
+(cd "$R" && git add -A && git commit -qm comments)
+sweep_submit "$R" s70 p1 >/dev/null
+add_item "$R"
+got=$(handed "$(sweep_stop "$R" s70 p1)")
+contains "sweep hands a comment line inside a code block" "$got" "docs/code.md:2"
+contains "sweep hands a comment line in a file that is not Markdown" "$got" "scripts/notes.sh:2"
+lacks "sweep never hands a heading line after a closed code block" "$got" "docs/code.md:5"
+
 # The read paths: a change committed within the turn, a copy fixed by the
 # shell, a new file, a tree with no git.
 R="$WORK/sw-commit"; sweep_repo "$R"

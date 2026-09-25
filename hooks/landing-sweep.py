@@ -70,6 +70,8 @@ these those what which who how when where not no nor but if then than so do does
 cant can't each every any all one two three note notes""".split())
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$")
 HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.*)$")
+FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+MARKDOWN = re.compile(r"\.(?:md|mdx|markdown)$", re.I)
 BOLD_LEAD = re.compile(r"\s*(?:\*\*(.+?)\*\*|__(.+?)__)")
 PREFILTER_WORD = re.compile(r"^[a-z0-9]+$")
 NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
@@ -761,9 +763,27 @@ def source_lines(before, after):
     return out
 
 
+def heading_lines(lines):
+    """1-based numbers of the lines that are Markdown headings: a line opening
+    with # and a space outside a fenced code block. Inside one, as in a file
+    that is not Markdown, such a line is a comment."""
+    out, fence = set(), None
+    for n, line in enumerate(lines, 1):
+        m = FENCE.match(line)
+        if fence:
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not line[m.end():].strip():
+                fence = None
+        elif m:
+            fence = m.group(1)
+        elif HEADING.match(line):
+            out.add(n)
+    return out
+
+
 class Text:
-    def __init__(self, text, anchors):
+    def __init__(self, text, anchors, markdown):
         self.lines = text.splitlines()
+        self.headings = heading_lines(self.lines) if markdown else set()
         low = TOKEN_BREAK.sub(" ", TOKEN_DROP.sub("", text.lower()))
         per_line = [line.split() for line in low.splitlines()]
         self.words = list(itertools.chain.from_iterable(per_line))
@@ -880,7 +900,7 @@ def sweep(written, cwd, budget):
             text = afters[rel] if rel in afters else read_text(os.path.join(root, rel))
             if text is None:
                 continue
-            tx = Text(text, anchors)
+            tx = Text(text, anchors, MARKDOWN.search(rel))
             for owner, phrases, source in per_owner:
                 skip = set()
                 if rel in befores:
@@ -890,7 +910,7 @@ def sweep(written, cwd, budget):
                 found = {}
                 for ph in phrases:
                     spans = [(s, e) for s, e in tx.find(ph[1], ph[3])
-                             if s not in skip and not HEADING.match(tx.lines[s - 1])]
+                             if s not in skip and s not in tx.headings]
                     if spans:
                         found[ph] = spans
                 if found and len(found) >= (1 if rel in befores else min(2, len(phrases))):

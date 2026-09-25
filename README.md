@@ -333,8 +333,8 @@ instructions alone cannot:
     paragraph or list item in another file and, in the rule file a phrase came from,
     their whole list and the paragraphs beside an addition; a line in a file the turn
     did not write that way, where that file holds only one of a changed rule file's
-    phrases and the rule file yields several; a match starting on a line that opens with
-    `#` and a space - a heading, or a comment in a code block; and every file git
+    phrases and the rule file yields several; a match starting on a Markdown heading,
+    a line opening with `#` and a space outside a code block; and every file git
     ignores, which is an untracked file its ignore rules match, while a change to such
     a file is swept only where it is a `CLAUDE.local.md`, whose usual state is ignored -
     inside an ignored directory, only where the turn used `Edit` or `Write`.
