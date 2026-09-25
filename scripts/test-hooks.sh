@@ -565,6 +565,27 @@ out=$(printf '{"session_id":"g18","transcript_path":"%s","tool_name":"Bash","too
 check "skill gate exits 0 where its stop cannot be recorded" 0 $?
 empty "skill gate does not stop an act whose stop it cannot record" "$out"
 
+# 21b. The gate formats its table's skill names into its stop at run time, so
+#      no reference check reads them; a name with no skill directory is caught
+#      here or nowhere.
+gate_skills() { # $1 = gate script; prints and fails on each ACTS skill with no directory
+  "$PY" -B - "$1" "$ROOT/skills" <<'EOF'
+import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location("gate", sys.argv[1])
+gate = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(gate)
+dead = [skill for skill, _ in gate.ACTS.values() if not os.path.isdir(os.path.join(sys.argv[2], skill))]
+print("\n".join("no skill directory: %s" % skill for skill in dead))
+sys.exit(1 if dead else 0)
+EOF
+}
+sed 's/"writing-commit-messages"/"renamed-away"/' "$GATE_HOOK" > "$WORK/dead-gate.py"
+out=$(gate_skills "$WORK/dead-gate.py")
+check "a dead skill name in a copy of the gate's table fails the check" 1 $?
+contains "the check names the dead skill" "$out" "renamed-away"
+out=$(gate_skills "$GATE_HOOK")
+check "every skill the gate's table names is a directory under skills/" 0 $?
+
 echo
 # 22. Registration: a checkout at a commit older than a hook lacks its script,
 #     and exit 2 from a PreToolUse, Stop or UserPromptSubmit hook is a block, so
