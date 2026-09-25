@@ -351,7 +351,8 @@ evidence, and the five rules are not interchangeable:
   reps load `tracking-open-asks` whatever they were asked, and a rep the gate
   stopped loads the owning skill because it was stopped.
 - **The landing sweep reaches every case whose rep changes a rule file git
-  does not ignore.** In the arm carrying the plugin, a turn that wrote a
+  does not ignore, or a `CLAUDE.local.md` whether git ignores it or not.** In
+  the arm carrying the plugin, a turn that wrote a
   `SKILL.md`, `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`,
   `CONTRIBUTING.md` or `README.md`, or a `.md` directly under `agents/` or
   under `skills/<name>/references/`, is handed at its stop the lines elsewhere

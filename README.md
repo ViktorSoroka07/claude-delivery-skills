@@ -335,7 +335,8 @@ instructions alone cannot:
     phrases and the rule file yields several; a match starting on a line that opens with
     `#` and a space - a heading, or a comment in a code block; and every file git's
     ignore rules match, even a tracked one, while a change to such a file is swept only
-    where git tracks it, so an ignored `CLAUDE.local.md` never committed hands nothing.
+    where git tracks it or the file is a `CLAUDE.local.md`, whose usual state is
+    ignored - inside an ignored directory, only where the turn used `Edit` or `Write`.
     So its silence does not prove every copy current. Outside a git repository it
     searches the text documents under the working directory, or, for a changed file
     outside that directory, that file alone.

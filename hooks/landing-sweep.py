@@ -18,10 +18,12 @@ once per prompt, and a line handed once is never handed again in the session.
 
 Rule files: SKILL.md, CLAUDE.md, CLAUDE.local.md, AGENTS.md, GEMINI.md,
 CONTRIBUTING.md and README.md in any letter case, a .md directly under an
-agents/ directory, and a .md under skills/<name>/references/. A file the turn
-wrote that no snapshot covers - outside the working repository, or in a turn
-whose prompt took none - gets its before-state by undoing the turn's own Edit
-and Write calls, read from the transcript.
+agents/ directory, and a .md under skills/<name>/references/. A rule file git
+ignores is left out, but for a CLAUDE.local.md, which is ignored by design: the
+snapshot copies one outside an ignored directory. A file the turn wrote that no
+snapshot covers - outside the working repository, in an ignored directory, or
+in a turn whose prompt took none - gets its before-state by undoing the turn's
+own Edit and Write calls, read from the transcript.
 
 Fails open: any error emits nothing, and a cap or the time budget ends the
 work with whatever it had found.
@@ -47,6 +49,7 @@ RULE_FILE = re.compile(
     r"|(?:^|/)agents/[^/]+\.md$"
     r"|(?:^|/)skills/[^/]+/references/.+\.md$",
     re.I)
+LOCAL_RULE = re.compile(r"(?:^|/)CLAUDE\.local\.md$", re.I)
 RUN = 5
 LISTED = 8
 SHOWN_PHRASES = 3
@@ -217,12 +220,20 @@ def walk(root, budget):
     return out, True
 
 
+def ignored_local(root, budget):
+    """The CLAUDE.local.md files git ignores, which is that file's usual state.
+    `--directory` keeps git out of ignored trees - a dependency tree's walk
+    costs seconds - so one inside an ignored directory is not listed."""
+    out = git(root, ["ls-files", "-z", "-o", "-i", "--exclude-standard", "--directory"], budget)
+    return [n for n in (out or "").split("\0") if LOCAL_RULE.search(n)]
+
+
 def rule_files(root, in_git, budget):
     if in_git:
         out = git(root, ["ls-files", "-z", "-c", "-o", "--exclude-standard"], budget)
         if out is None:
             return [], False
-        names = [n for n in out.split("\0") if n]
+        names = [n for n in out.split("\0") if n] + ignored_local(root, budget)
         complete = True
     else:
         names, complete = walk(root, budget)
@@ -818,7 +829,7 @@ def sweep(written, cwd, budget):
         rels = {p: os.path.relpath(p, root) for p in paths}
         if how == "git":
             skip = ignored(root, sorted(rels.values()), budget)
-            rels = {p: r for p, r in rels.items() if r not in skip}
+            rels = {p: r for p, r in rels.items() if r not in skip or LOCAL_RULE.search(r)}
         befores = {r: written[p] for p, r in rels.items()}
         afters = {r: read_text(p) or "" for p, r in rels.items()}
         owners = sorted(r for p, r in rels.items() if RULE_FILE.search((r if how == "git" else p).replace(os.sep, "/")))

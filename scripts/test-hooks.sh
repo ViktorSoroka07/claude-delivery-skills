@@ -931,6 +931,14 @@ cp "$R/skills/handoff/SKILL.md" "$R/notes/SKILL.md"
   "$WORK/t-ignored2.jsonl" p1
 out=$(sweep_stop "$R" s28 p1 false "$WORK/t-ignored2.jsonl")
 empty "sweep leaves alone a rule file git ignores" "$out"
+R="$WORK/sw-local"; sweep_repo "$R"
+printf 'CLAUDE.local.md\n' > "$R/.gitignore"
+(cd "$R" && git add .gitignore && git commit -qm ignore)
+sed -n '/^## What a hand-over/,/^3\./p' "$R/skills/handoff/SKILL.md" > "$R/CLAUDE.local.md"
+sweep_submit "$R" s65 p1 >/dev/null
+"$PY" "$WORK/sweep_edit.py" "$R/CLAUDE.local.md" '3. **How to check the current state** - the command that shows it.\n' \
+  '3. **How to check the current state** - the command that shows it.\n4. **How to roll it back** - the step that undoes each change.\n'
+contains "sweep reads a CLAUDE.local.md git ignores, whichever tool wrote it" "$(handed "$(sweep_stop "$R" s65 p1)")" "CLAUDE.md:3-4"
 R="$WORK/sw-pending"; sweep_repo "$R"
 sweep_submit "$R" s29 p1 >/dev/null
 add_item "$R"
