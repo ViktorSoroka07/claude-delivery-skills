@@ -899,7 +899,13 @@ than failed: a run that carries an error, such as one the turn cap or the
 timeout curtailed, lifted whole since some of its graders read output the run
 never reached and nothing in a verdict says which; and a grader skipped at a
 cost ceiling. If the runner's skip marker ever stops matching, it still counts
-those verdicts, and warns that they may not be real.
+those verdicts, and warns that they may not be real. The lift is the reading's
+repair, not the launch's, so set `--max-cost-usd` above a batch's expected
+spend: the runner checks the ceiling before each launch against what is
+already spent, never against the run about to start, so a run still launches
+below the ceiling and, once its cost reaches what is left, has every judged
+grader scored as a fail - and a ceiling set far below one run's cost is no
+preview of what a filter selects, since it buys the first run whole.
 
 **A round's arms are named in the file, never inferred from it.** The two arms
 of a wording round are two runs of one case at one release with different skill
