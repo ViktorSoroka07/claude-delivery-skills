@@ -721,8 +721,9 @@ def phrases_of(before, after, budget):
 def changed_lines(before, after, whole_list):
     """1-based lines of `after` the change wrote, widened to the whole list it
     sits in (the owning file) or to its list item, else its paragraph (any
-    other file): a copy the turn already brought into line is not handed back.
-    A deletion writes no line, so it widens to nothing - the paragraph or list
+    other file). Outside the owning file only the item is the turn's, so a
+    list the turn brought into line there still carries the owner's old items
+    and is handed back by them. A deletion writes no line, so it widens to nothing - the paragraph or list
     after it is not the turn's."""
     _, a, ops = opcodes(before, after)
     out = set()
