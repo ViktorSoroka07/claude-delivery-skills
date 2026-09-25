@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and seven hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and eight hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -242,14 +242,15 @@ instructions alone cannot:
   refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
   use them when present; dispatch prompts shrink to axis, worktree, SHA, scope, and
   the file the report goes to.
-- **Seven hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
+- **Eight hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
   the judgment, and none of the four blocks. The comment rules are the most-relapsed
   discipline in the corpus behind this repo, which is why two of the four watch them.
-  One stops an act once until the skill that owns it is loaded. The other two inject
-  what a session cannot see for itself: the standing rules at session start, and how
-  far into its context window it has run.
+  One stops an act once until the skill that owns it is loaded. The other three inject
+  what a session cannot see for itself: the standing rules at session start, how far
+  into its context window it has run, and, at the end of a turn that changed a rule
+  file, the lines elsewhere that still say what the change replaced.
   - **Write-time** — fires the moment an edit adds a narrative-comment tell
     ("Regression:", "used to", "harmless because"); backs `writing-code-comments`.
   - **Commit-time** — reads the staged diff when a commit is about to run, so the
@@ -303,13 +304,35 @@ instructions alone cannot:
     to run; once the session passes that window - the one fact that disproves the
     assumption - it reports the window as bigger than it assumes rather than
     repeating an instruction built on a number just shown to be wrong.
+  - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
+    `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
+    `README.md`, a contract directly under `agents/`, a skill's `references/`), hands
+    the session the lines elsewhere in the repository that still carry what the change
+    replaced: the headlines of a list the change added to, and five-word runs of the
+    text it replaced or of the paragraphs beside an addition. A rule landed in the file
+    that owns it leaves every other copy - a checklist further down, a README's
+    paraphrase, the short form in `CLAUDE.md` - reading as complete while wrong, and a
+    session asked to find them searches for the subject's name, which a short form need
+    not carry; what every copy does carry is the words the change replaced, and nothing
+    else in the work asks for a search on those. On two eval cases where one item joins
+    a list that three other places repeat, every session without it left the copies in
+    the other files stale and every session with it brought them into line; handed a
+    dated review quoting the old wording and a sibling document saying the same things
+    to another reader beside the real copies, every session left both, as every session
+    without it did. It snapshots the rule files at each prompt, leaves out the lines the
+    turn itself wrote, speaks at most once per prompt, and tells the session to leave a
+    record, a quote or a test fixture of the old wording, and every line where the
+    change is a trial it will revert. It finds a copy only by the words it shares with
+    what was replaced, so a copy naming the subject alone, or a paraphrase sharing with
+    it neither a list item's headline nor five words in a row, is not handed; outside a
+    git repository it searches only the text documents under the working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
     around. It speaks once per set of paths, because the end of every turn is the
     same moment as the end of the session.
 
-![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; seven hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and two inject what a session cannot see for itself (the standing rules at session start, and how far into its context window it has run)](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; eight hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and three inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, and the lines a turn's change to a rule file left stale elsewhere)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
