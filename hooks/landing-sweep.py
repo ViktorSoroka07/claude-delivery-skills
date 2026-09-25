@@ -677,9 +677,11 @@ def changed_lines(before, after, whole_list):
     other file): a copy the turn already brought into line is not handed back."""
     _, a, ops = opcodes(before, after)
     out = set()
+    s, e = 0, 0
     for _, _, _, j1, j2 in ops:
         if whole_list:
-            _, s, e = list_block(a, j1, loose=True)
+            if not s <= j1 < e:
+                _, s, e = list_block(a, j1, loose=True)
             lo, hi = min(j1, s), max(j2, e)
         else:
             lo, hi = j1, max(j2, j1 + 1)

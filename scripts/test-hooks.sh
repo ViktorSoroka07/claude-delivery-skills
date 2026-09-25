@@ -1288,6 +1288,29 @@ text = open(p).read()
 open(p, "w").write(text.replace("keeps the ledger sync notes", "holds the ledger notes"))
 EOF
 contains "sweep diffs a document whose every paragraph changed within its budget" "$(handed "$(sweep_stop "$R" s54 p1)")" "docs/para.md:1"
+R="$WORK/sw-longlist"; sweep_repo "$R"
+"$PY" - "$R" <<'EOF'
+import sys
+r = sys.argv[1]
+items = ["%d. **Step %d** keeps the ledger sync notes for team %d in order.\n   - checked by team %d" % (i + 1, i, i, i)
+         for i in range(2000)]
+open(r + "/README.md", "a").write("\n" + "\n\n".join(items) + "\n")
+open(r + "/docs/para.md", "w").write("It keeps the ledger sync notes for team 500 in order.\n")
+EOF
+(cd "$R" && git commit -qam steps)
+sweep_submit "$R" s63 p1 >/dev/null
+"$PY" - "$R/README.md" <<'EOF'
+import sys
+p = sys.argv[1]
+lines = open(p).read().split("\n")
+for n, line in enumerate(lines):
+    if "**Step " in line and int(line.split("**Step ")[1].split("**")[0]) % 2 == 0:
+        lines[n] = line.replace("keeps the ledger sync notes", "holds the ledger notes")
+open(p, "w").write("\n".join(lines))
+EOF
+text=$(context "$(sweep_stop "$R" s63 p1)")
+contains "sweep reads a long loose list whose items carry nested bullets within its budget" "$text" "docs/para.md:1"
+lacks "sweep finishes a long loose list's search before its time limit" "$text" "stopped at its time limit"
 
 # A state directory that is open to others or a link is never used.
 R="$WORK/sw-open"; sweep_repo "$R"
