@@ -23,7 +23,7 @@ agents/ directory, and a .md under skills/<name>/references/ or under a
 references/ directory whose parent holds a SKILL.md. A rule file git
 ignores is left out, but for a CLAUDE.local.md, which is ignored by design: the
 snapshot copies one outside an ignored directory. A file the turn wrote that no
-snapshot covers - outside the working repository, in an ignored directory, or
+snapshot covers - outside the working tree, in an ignored directory, or
 in a turn whose prompt took none - gets its before-state by undoing the turn's
 own Edit and Write calls, read from the transcript.
 

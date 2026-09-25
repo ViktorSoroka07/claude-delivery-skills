@@ -321,7 +321,7 @@ instructions alone cannot:
     line; handed a dated review quoting the old wording and a sibling document saying
     the same things to another reader beside the real copies, every session left both,
     as every session without it did. It snapshots the rule files at each prompt, sees a
-    change to a rule file outside the repository it works in only where the turn used
+    change to a rule file outside the working tree it works in only where the turn used
     `Edit` or `Write`, speaks at most once per prompt, and tells the session to leave a
     record, a quote or a test fixture of the old wording, and every line where the
     change is a trial it will revert. It finds a copy only by those phrases, and some
@@ -336,13 +336,13 @@ instructions alone cannot:
     way, where that file holds only one of a changed rule file's phrases and the rule
     file yields several; a match starting on a Markdown heading, a line opening with `#`
     and a space outside a code block; and every file git ignores, which is an untracked
-    file its own repository's ignore rules match - a change to one is not swept at all -
-    but for a `CLAUDE.local.md`, whose usual state is ignored: a change to one is swept
-    and that file itself searched, though inside an ignored directory only where the
-    turn used `Edit` or `Write`, while one the turn did not change is not searched. So
-    its silence does not prove every copy current. Outside a git repository it searches
-    the text documents under the working directory, or, for a changed file outside that
-    directory, that file alone.
+    file the ignore rules of its own working tree match - a change to one is not swept
+    at all - but for a `CLAUDE.local.md`, whose usual state is ignored: a change to one
+    is swept and that file itself searched, though inside an ignored directory only
+    where the turn used `Edit` or `Write`, while one the turn did not change is not
+    searched. So its silence does not prove every copy current. Outside a git repository
+    it searches the text documents under the working directory, or, for a changed file
+    outside that directory, that file alone.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
