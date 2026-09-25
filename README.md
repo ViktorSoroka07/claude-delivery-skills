@@ -308,24 +308,25 @@ instructions alone cannot:
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a skill's `references/`), hands
     the session the lines elsewhere in the repository that still carry what the change
-    replaced: the headlines of a list the change added to, and five-word runs of the
-    text it replaced or of the paragraphs beside an addition. A rule landed in the file
-    that owns it leaves every other copy - a checklist further down, a README's
-    paraphrase, the short form in `CLAUDE.md` - reading as complete while wrong, and a
-    session asked to find them searches for the subject's name, which a short form need
-    not carry; what every copy does carry is the words the change replaced, and nothing
-    else in the work asks for a search on those. On two eval cases where one item joins
-    a list that three other places repeat, every session without it left the copies in
-    the other files stale and every session with it brought them into line; handed a
-    dated review quoting the old wording and a sibling document saying the same things
-    to another reader beside the real copies, every session left both, as every session
-    without it did. It snapshots the rule files at each prompt, leaves out the lines the
-    turn itself wrote, speaks at most once per prompt, and tells the session to leave a
-    record, a quote or a test fixture of the old wording, and every line where the
-    change is a trial it will revert. It finds a copy only by the words it shares with
-    what was replaced, so a copy naming the subject alone, or a paraphrase sharing with
-    it neither a list item's headline nor five words in a row, is not handed; outside a
-    git repository it searches only the text documents under the working directory.
+    replaced: the headlines of a list the change added to and the list's heading, and
+    five-word runs of the text it replaced or of the paragraphs beside an addition. A
+    rule landed in the file that owns it leaves every other copy - a checklist further
+    down, a README's paraphrase, the short form in `CLAUDE.md` - reading as complete
+    while wrong, and a session asked to find them searches for the subject's name, which
+    a short form need not carry; what every copy does carry is the words the change
+    replaced, and nothing else in the work asks for a search on those. On two eval cases
+    where one item joins a list that three other places repeat, every session without it
+    left the copies in the other files stale and every session with it brought them into
+    line; handed a dated review quoting the old wording and a sibling document saying
+    the same things to another reader beside the real copies, every session left both,
+    as every session without it did. It snapshots the rule files at each prompt, leaves
+    out the lines the turn itself wrote, speaks at most once per prompt, and tells the
+    session to leave a record, a quote or a test fixture of the old wording, and every
+    line where the change is a trial it will revert. It finds a copy only by those
+    phrases, and in a file the turn did not write only where two different ones occur,
+    or the only one the change yields, so a copy naming the subject alone, or a
+    paraphrase elsewhere sharing fewer, is not handed; outside a git repository it
+    searches only the text documents under the working directory.
   - **Uncommitted changes** — at the end of a turn, names the tracked files left
     uncommitted, so a backlog entry lands in a commit of its own as soon as it is
     written and no stray change is left for a later session to explain or step
