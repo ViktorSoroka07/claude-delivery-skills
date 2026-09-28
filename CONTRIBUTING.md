@@ -168,17 +168,17 @@ its own definitions (the equivalence test included) inline and references no
 plugin file. Do not tidy that duplication into a cross-reference: a plan that
 points at a file its executor cannot read runs no gate.
 
-`hooks/session-brief.md` is the strictest case: it loads into every session,
-so each rule there is a pointer to the skill that owns it plus its core in a
-sentence or three, never the full statement. A change to a rule lands in its skill; the
-brief changes only when the pointer or the core does. The line between the
-opening paragraph and the rules is no rule: it makes a conversation's first
-tool call a load of `tracking-open-asks`, because how a message ends is work no
-request names, so a pointer to that skill is never followed. A moment that is a
-tool decision is the one form measured to load a skill no request names, and
-this one has bound only in fresh conversations: the probe of a line with the
-same imperative loaded the skill in none of five reps resuming a
-conversation, and after a compaction it is unmeasured.
+`hooks/session-brief.md` is the strictest case: it loads into every session, so
+each rule there is a pointer to the skill that owns it plus its core in a
+sentence or three, never the full statement. A change to a rule lands in its
+skill; the brief changes only when the pointer or the core does. The line
+between the opening paragraph and the rules is no rule: it makes a
+conversation's first tool call a load of `tracking-open-asks`, because how a
+message ends is work no request names, so a pointer to that skill is never
+followed. A moment that is a tool decision is the one form measured to load a
+skill no request names, and this one has bound only in fresh conversations: the
+probe of a line with the same imperative loaded the skill in none of five reps
+resuming a conversation, and after a compaction it is unmeasured.
 
 ## The README paraphrases; the skill files own
 
