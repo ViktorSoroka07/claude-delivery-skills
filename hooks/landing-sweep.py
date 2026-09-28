@@ -425,8 +425,9 @@ def turn_calls(transcript, prompt_id, cwd):
 
 def undo(text, calls):
     """The file as it stood before `calls`, or None where one cannot be undone.
-    An Edit's strings may carry bare newlines where the file keeps CRLF, so
-    they are matched in the file's own line endings."""
+    The Edit tool records its strings with bare newlines and writes the whole
+    file back in one line ending, so in a file holding any CRLF they are
+    matched in CRLF."""
     for _, name, inp, result in reversed(calls):
         original = result.get("originalFile")
         if isinstance(original, str):
