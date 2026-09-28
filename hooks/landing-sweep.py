@@ -213,6 +213,13 @@ def toplevel(directory, budget, cache={}):
     return cache[directory]
 
 
+def posix_rel(path, root):
+    """`path` relative to `root` in the slashes git prints: a file named with
+    the platform's separator here and git's there is read twice, once as a
+    file the turn never wrote, and its own new lines are handed back."""
+    return os.path.relpath(path, root).replace(os.sep, "/")
+
+
 def walk(root, budget):
     """Every file under `root` a walk reaches within its entry cap and the
     budget, dot directories and dependency trees left out; True as the second
@@ -224,7 +231,7 @@ def walk(root, budget):
             seen += 1
             if seen > WALK_ENTRIES or budget.spent():
                 return out, False
-            out.append(os.path.relpath(os.path.join(dirpath, name), root))
+            out.append(posix_rel(os.path.join(dirpath, name), root))
     return out, True
 
 
@@ -892,7 +899,7 @@ def sweep(written, cwd, budget):
         groups.setdefault(scope, []).append(path)
     hits = []
     for (root, how), paths in sorted(groups.items()):
-        rels = {p: os.path.relpath(p, root) for p in paths}
+        rels = {p: posix_rel(p, root) for p in paths}
         if how == "git":
             skip = ignored(root, sorted(rels.values()), budget)
             rels = {p: r for p, r in rels.items() if r not in skip or LOCAL_RULE.search(r)}
@@ -963,7 +970,7 @@ def entries_of(hits, handed):
 
 
 def shown(path, cwd):
-    return os.path.relpath(path, cwd) if path.startswith(cwd + os.sep) else path
+    return posix_rel(path, cwd) if path.startswith(cwd + os.sep) else path.replace(os.sep, "/")
 
 
 def beside_only(entry):
