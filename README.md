@@ -468,8 +468,8 @@ starts as `python3`, so that name has to resolve on the PATH they run with — o
 Windows, under the Git Bash that Git for Windows bundles, which carries no Python
 of its own. A machine whose Python answers only to `python` or `py` gets an
 error from every hook instead of its work, while the skills and agents still load.
-The guard scripts are POSIX sh, which Git Bash already provides. CI exercises all
-three.
+The guard scripts are POSIX sh, which Git Bash already provides, though most of
+them start Python as well. CI exercises all three.
 
 ## Opinionated defaults
 
