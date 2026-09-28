@@ -9,6 +9,10 @@ set -u
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
+# Payload paths travel inside JSON on stdin, which Git Bash never rewrites: a
+# native Windows Python reads mktemp's /tmp/... as a missing directory on the
+# current drive, and every hook falls silent. pwd -W gives the drive form.
+WORK=$(cd "$WORK" && { pwd -W 2>/dev/null || pwd; })
 PY=$(command -v python3 || command -v python)
 fails=0
 
@@ -395,7 +399,6 @@ empty "uncommitted hook stays silent outside a repository" "$out"
 
 echo
 GATE_HOOK="$ROOT/hooks/skill-gate.py"
-NW=$(cd "$WORK" && { pwd -W 2>/dev/null || pwd; })
 GSTATE="$WORK/gate-state"
 mkdir -p "$GSTATE"
 
@@ -403,7 +406,7 @@ mkdir -p "$GSTATE"
 # files it can reach, so each run starts from none of the operator's.
 gate_hook() { # $@ = NAME=value pairs added to the hook's environment
   env -u CLAUDE_CONFIG_DIR -u CLAUDE_CODE_REMOTE_MEMORY_DIR -u CLAUDE_COWORK_MEMORY_PATH_OVERRIDE \
-    -u CLAUDE_PROJECT_DIR HOME="$NW/home" USERPROFILE="$NW/home" TMPDIR="$GSTATE" "$@" "$PY" "$GATE_HOOK"
+    -u CLAUDE_PROJECT_DIR HOME="$WORK/home" USERPROFILE="$WORK/home" TMPDIR="$GSTATE" "$@" "$PY" "$GATE_HOOK"
 }
 
 gate_payload() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
@@ -468,25 +471,25 @@ contains "skill gate stops the first subagent dispatch" "$out" "delivery-skills:
 out=$(gate Task g24 '' "$WORK/t-none.jsonl" 'review the diff')
 contains "skill gate stops a dispatch under the tool's other name" "$out" "delivery-skills:delegating-to-subagents"
 
-CFG="$NW/cfg"
-mkdir -p "$CFG" "$NW/proj/.claude"
+CFG="$WORK/cfg"
+mkdir -p "$CFG" "$WORK/proj/.claude"
 out=$(gate_payload Write g25 '' "$WORK/t-none.jsonl" "$CFG/projects/-w/memory/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
 contains "skill gate stops a memory write under a moved config directory" "$out" "delivery-skills:maintaining-project-memory"
 out=$(gate Write g25 '' "$WORK/t-none.jsonl" "$CFG/projects/-w/memory/a.md")
 empty "skill gate takes a moved store from the environment, not from the path" "$out"
-out=$(gate_payload Write g26 '' "$WORK/t-none.jsonl" "$NW/remote/projects/-w/memory/a.md" | gate_hook CLAUDE_CODE_REMOTE_MEMORY_DIR="$NW/remote")
+out=$(gate_payload Write g26 '' "$WORK/t-none.jsonl" "$WORK/remote/projects/-w/memory/a.md" | gate_hook CLAUDE_CODE_REMOTE_MEMORY_DIR="$WORK/remote")
 contains "skill gate stops a memory write under a remote memory directory" "$out" "delivery-skills:maintaining-project-memory"
-out=$(gate_payload Bash g27 '' "$WORK/t-none.jsonl" "echo x > $NW/cowork/a.md" | gate_hook CLAUDE_COWORK_MEMORY_PATH_OVERRIDE="$NW/cowork")
+out=$(gate_payload Bash g27 '' "$WORK/t-none.jsonl" "echo x > $WORK/cowork/a.md" | gate_hook CLAUDE_COWORK_MEMORY_PATH_OVERRIDE="$WORK/cowork")
 contains "skill gate stops a write into an overridden memory directory" "$out" "delivery-skills:maintaining-project-memory"
-printf '{"autoMemoryDirectory": "%s"}\n' "$NW/notes" > "$CFG/settings.json"
-out=$(gate_payload Edit g28 '' "$WORK/t-none.jsonl" "$NW/notes/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
+printf '{"autoMemoryDirectory": "%s"}\n' "$WORK/notes" > "$CFG/settings.json"
+out=$(gate_payload Edit g28 '' "$WORK/t-none.jsonl" "$WORK/notes/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
 contains "skill gate stops an edit in the directory the user's settings name" "$out" "delivery-skills:maintaining-project-memory"
-out=$(gate_payload Write g29 '' "$WORK/t-none.jsonl" "$NW/notes-old/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
+out=$(gate_payload Write g29 '' "$WORK/t-none.jsonl" "$WORK/notes-old/a.md" | gate_hook CLAUDE_CONFIG_DIR="$CFG")
 empty "skill gate passes a sibling that shares the named directory's prefix" "$out"
-printf '{"autoMemoryDirectory": "~/proj-notes"}\n' > "$NW/proj/.claude/settings.local.json"
-out=$(gate_payload Write g30 '' "$WORK/t-none.jsonl" "$NW/home/proj-notes/a.md" | gate_hook CLAUDE_PROJECT_DIR="$NW/proj")
+printf '{"autoMemoryDirectory": "~/proj-notes"}\n' > "$WORK/proj/.claude/settings.local.json"
+out=$(gate_payload Write g30 '' "$WORK/t-none.jsonl" "$WORK/home/proj-notes/a.md" | gate_hook CLAUDE_PROJECT_DIR="$WORK/proj")
 contains "skill gate stops a write in the directory a project's local settings name" "$out" "delivery-skills:maintaining-project-memory"
-out=$(gate_payload Bash g31 '' "$WORK/t-none.jsonl" 'echo x >> ~/proj-notes/b.md' | gate_hook CLAUDE_PROJECT_DIR="$NW/proj")
+out=$(gate_payload Bash g31 '' "$WORK/t-none.jsonl" 'echo x >> ~/proj-notes/b.md' | gate_hook CLAUDE_PROJECT_DIR="$WORK/proj")
 contains "skill gate reads that directory written from the home prefix" "$out" "delivery-skills:maintaining-project-memory"
 out=$(gate Write g32 '' "$WORK/t-none.jsonl" 'C:\Users\x\.claude\projects\-w\memory\a.md')
 contains "skill gate stops a memory write whose path uses backslashes" "$out" "delivery-skills:maintaining-project-memory"
@@ -593,6 +596,7 @@ echo
 #     the script where it is present.
 OLD="$WORK/old-checkout"
 mkdir -p "$OLD/hooks" "$WORK/shim"
+SHIM=$(cygpath -u "$WORK/shim" 2>/dev/null || printf '%s' "$WORK/shim")
 if [ "$(basename "$PY")" != python3 ]; then
   { echo '#!/bin/sh'; echo "exec \"$PY\" \"\$@\""; } > "$WORK/shim/python3"
   chmod +x "$WORK/shim/python3"
@@ -604,11 +608,11 @@ for event in json.load(open(sys.argv[1]))["hooks"].values():
             print(hook["command"])' "$ROOT/hooks/hooks.json" > "$WORK/commands"
 while IFS= read -r cmd; do
   name=${cmd##*/hooks/}
-  printf '' | env PATH="$WORK/shim:$PATH" CLAUDE_PLUGIN_ROOT="$OLD" sh -c "$cmd" >/dev/null 2>&1
+  printf '' | env PATH="$SHIM:$PATH" CLAUDE_PLUGIN_ROOT="$OLD" sh -c "$cmd" >/dev/null 2>&1
   check "registration exits 0 without ${name%%.py*}.py" 0 $?
 done < "$WORK/commands"
 out=$(printf '{"session_id":"g19","transcript_path":"%s","tool_name":"Bash","tool_input":{"command":"git commit -m x"}}' "$WORK/t-none.jsonl" \
-  | env PATH="$WORK/shim:$PATH" TMPDIR="$GSTATE" CLAUDE_PLUGIN_ROOT="$ROOT" sh -c "$(grep skill-gate.py "$WORK/commands")")
+  | env PATH="$SHIM:$PATH" TMPDIR="$GSTATE" CLAUDE_PLUGIN_ROOT="$ROOT" sh -c "$(grep skill-gate.py "$WORK/commands")")
 contains "registration runs the gate where its script is present" "$out" "$DENY"
 for tool in Bash Write Edit Agent Task; do
   "$PY" -c 'import json, re, sys
