@@ -240,9 +240,11 @@ instructions alone cannot:
   [`mutation-tester`](agents/mutation-tester.md) carry the reviewer, skeptic, and mutation contracts that
   `review-pr`, `implementation-gates`, and `verifying-before-sending` otherwise restate in
   every dispatch prompt: the finding format, the name-the-pinned-SHA rule, the
-  refute-don't-confirm stance, the mutation protocol, read-only boundaries. The skills
-  use them when present; dispatch prompts shrink to axis, worktree, SHA, scope, and
-  the file the report goes to.
+  refute-don't-confirm stance, the mutation protocol, read-only boundaries, and a
+  report written whole to a file with only its path as the reply, since a report sent
+  as the reply is cut mid-finding with nothing to say so. The skills use them when
+  present; dispatch prompts shrink to axis, worktree, SHA, scope, and the file the
+  report goes to.
 - **Eight hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
