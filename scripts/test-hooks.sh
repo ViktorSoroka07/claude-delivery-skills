@@ -996,6 +996,7 @@ sweep_submit "$R" s11 p1 >/dev/null
 add_item "$R"
 got=$(handed "$(sweep_stop "$R" s11 p1)")
 contains "sweep reads a tree with no git through its snapshot" "$got" "CLAUDE.md:3-4"
+lacks "sweep leaves out the list the change joined outside git" "$got" "skills/handoff/SKILL.md:8"
 lacks "sweep's walk skips dot directories" "$got" ".cache"
 lacks "sweep's walk skips dependency trees" "$got" "node_modules"
 
