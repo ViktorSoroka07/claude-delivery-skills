@@ -347,7 +347,10 @@ it:
   loaded it, still cannot be moved by any round the runner can buy, the reps
   never having read it. A replay fixture can seed that load itself, as the
   first turn of a fresh conversation writes it, and a resume passes the seeded
-  body to the model (the replay paragraph below).
+  body to the model (the replay paragraph below). On such a fixture the
+  indicator no longer separates the two fails: it reads only a second load
+  by the rep, so its 0/N says nothing about arrival, and whether the seeded
+  body arrived is read from a probe rather than from it.
   Check the indicator before designing the arms, not after: the round is
   either restated to land where every rep does read, or it is not a runner
   round at all. And on a case either moment reaches, read a lit indicator as
