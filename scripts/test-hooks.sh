@@ -632,6 +632,12 @@ echo
 SWEEP_HOOK="$ROOT/hooks/landing-sweep.py"
 SW="$WORK/sweep-state"
 mkdir -p "$SW"
+# The hook's own name for its state directory, and whether its Python has the
+# uid and the modes a private one is checked by: native Windows Python has
+# neither, and its temp directory is the user's own.
+STATE_TOP=$(TMPDIR="$SW" "$PY" -c 'import os, runpy, sys
+print(os.path.basename(os.path.dirname(runpy.run_path(sys.argv[1])["state_dir"]("s"))))' "$SWEEP_HOOK")
+HAS_UID=$("$PY" -c 'import os; print(int(hasattr(os, "getuid")))')
 cat > "$WORK/sweep_edit.py" <<'EOF'
 import json, os, sys
 # argv: file, old, new ("\n" for a line break), then optionally a transcript
@@ -1065,7 +1071,7 @@ contains "sweep reads a CLAUDE.local.md git ignores, whichever tool wrote it" "$
 R="$WORK/sw-pending"; sweep_repo "$R"
 sweep_submit "$R" s29 p1 >/dev/null
 add_item "$R"
-mkdir -p "$SW/delivery-skills-landing-sweep-$(id -u)/s29/handed-p1.json"
+mkdir -p "$SW/$STATE_TOP/s29/handed-p1.json"
 out=$(sweep_stop "$R" s29 p1)
 empty "sweep hands nothing it cannot record as handed" "$out"
 
@@ -1308,8 +1314,12 @@ ln -s /dev/zero "$R/docs/README.md"
 mkfifo "$R/skills/README.md"
 out=$(sweep_submit "$R" s40 p1)
 check "sweep's snapshot passes a rule file that is a device or a pipe" 0 $?
-mode=$("$PY" -c 'import os, stat, sys; print(oct(stat.S_IMODE(os.stat(sys.argv[1]).st_mode)))' "$SW/delivery-skills-landing-sweep-$(id -u)/s40")
-check "sweep keeps its state private" "0o700" "$mode"
+if [ "$HAS_UID" = 1 ]; then
+  mode=$("$PY" -c 'import os, stat, sys; print(oct(stat.S_IMODE(os.stat(sys.argv[1]).st_mode)))' "$SW/$STATE_TOP/s40")
+  check "sweep keeps its state private" "0o700" "$mode"
+else
+  echo "SKIP: sweep keeps its state private (no POSIX modes here)"
+fi
 
 # The list's headlines are what it said before the turn, whichever change of
 # the turn rewrote an item.
@@ -1511,12 +1521,16 @@ lacks "sweep finishes a long loose list's search before its time limit" "$text" 
 
 # A state directory that is open to others or a link is never used.
 R="$WORK/sw-open"; sweep_repo "$R"
-mkdir -p "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)" "$WORK/link-tmp" "$WORK/link-target"
-chmod 777 "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)"
+mkdir -p "$WORK/open-tmp/$STATE_TOP" "$WORK/link-tmp" "$WORK/link-target"
+chmod 777 "$WORK/open-tmp/$STATE_TOP"
 chmod 700 "$WORK/link-target"
-ln -s "$WORK/link-target" "$WORK/link-tmp/delivery-skills-landing-sweep-$(id -u)"
-printf '{"hook_event_name":"UserPromptSubmit","session_id":"s48","prompt_id":"p1","cwd":"%s"}' "$R" | TMPDIR="$WORK/open-tmp" "$PY" "$SWEEP_HOOK"
-empty "sweep writes nothing into a state directory others can open" "$(ls -A "$WORK/open-tmp/delivery-skills-landing-sweep-$(id -u)")"
+ln -s "$WORK/link-target" "$WORK/link-tmp/$STATE_TOP"
+if [ "$HAS_UID" = 1 ]; then
+  printf '{"hook_event_name":"UserPromptSubmit","session_id":"s48","prompt_id":"p1","cwd":"%s"}' "$R" | TMPDIR="$WORK/open-tmp" "$PY" "$SWEEP_HOOK"
+  empty "sweep writes nothing into a state directory others can open" "$(ls -A "$WORK/open-tmp/$STATE_TOP")"
+else
+  echo "SKIP: sweep writes nothing into a state directory others can open (no POSIX modes here)"
+fi
 printf '{"hook_event_name":"UserPromptSubmit","session_id":"s48","prompt_id":"p1","cwd":"%s"}' "$R" | TMPDIR="$WORK/link-tmp" "$PY" "$SWEEP_HOOK"
 empty "sweep writes nothing through a state directory that is a link" "$(ls -A "$WORK/link-target")"
 
