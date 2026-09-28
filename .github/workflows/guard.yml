@@ -29,10 +29,10 @@ jobs:
       - name: Guard self-tests
         run: sh scripts/test-guard.sh
 
-      # Both comment-discipline hooks fail open by design, so a syntax error
-      # or broken import turns them silently inert in every session - these
-      # tests are the only place such a break is visible.
-      - name: Comment-hook self-tests
+      # Every hook fails open by design, so a syntax error or broken import
+      # turns it silently inert in every session - these tests are the only
+      # place such a break is visible.
+      - name: Hook self-tests
         run: sh scripts/test-hooks.sh
 
       # .leakwords.local never leaves the author's machine, so CI can check
