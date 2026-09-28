@@ -1126,18 +1126,24 @@ got=$(handed "$(sweep_stop "$R" s19 p1)")
 contains "sweep searches untracked files" "$got" "docs/untracked.md"
 lacks "sweep never searches ignored files" "$got" "ignored.md"
 contains "sweep searches a tracked file the ignore rules match" "$got" "docs/forced.md"
+# Windows reserves the colon in a file name, so no file there can open with one.
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) colon= ;; *) colon=:colon.md ;; esac
 for s in s79 s80; do
   R="$WORK/sw-forced-$s"; sweep_repo "$R"
-  printf 'gen/\n:colon.md\n' > "$R/.gitignore"
+  printf 'gen/\n%s\n' "$colon" > "$R/.gitignore"
   mkdir -p "$R/gen"
   cp "$R/CLAUDE.md" "$R/gen/copy.md"
-  cp "$R/CLAUDE.md" "$R/:colon.md"
-  (cd "$R" && git add .gitignore && git add -f gen/copy.md ./:colon.md && git commit -qm forced)
+  if [ -n "$colon" ]; then cp "$R/CLAUDE.md" "$R/$colon"; fi
+  (cd "$R" && git add .gitignore && git add -f gen/copy.md ${colon:+"./$colon"} && git commit -qm forced)
   sweep_submit "$R" $s p1 >/dev/null
   add_item "$R"
 done
-contains "sweep searches a tracked ignored file whose name opens with a colon" \
-  "$(handed "$(sweep_stop "$WORK/sw-forced-s79" s79 p1)")" ":colon.md"
+if [ -n "$colon" ]; then
+  contains "sweep searches a tracked ignored file whose name opens with a colon" \
+    "$(handed "$(sweep_stop "$WORK/sw-forced-s79" s79 p1)")" ":colon.md"
+else
+  echo "SKIP: sweep searches a tracked ignored file whose name opens with a colon (no such name on Windows)"
+fi
 contains "sweep searches a tracked ignored file whatever the pathspec settings" \
   "$(handed "$(export GIT_LITERAL_PATHSPECS=1; sweep_stop "$WORK/sw-forced-s80" s80 p1)")" "gen/copy.md"
 
