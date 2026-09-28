@@ -29,16 +29,20 @@ check() { # $1 = description, $2 = expected exit, $3 = actual exit
   fi
 }
 
+read_out() { # $1 = what a failed check read; a CI leg's log is all there is of it
+  if [ -n "$1" ]; then printf '%s\n' "$1" | head -n 20 | sed 's/^/    | /'; fi
+}
+
 contains() { # $1 = description, $2 = haystack, $3 = needle
   case "$2" in
     *"$3"*) echo "PASS: $1" ;;
-    *) echo "FAIL: $1 (output lacks '$3')"; fails=$((fails+1)) ;;
+    *) echo "FAIL: $1 (output lacks '$3')"; read_out "$2"; fails=$((fails+1)) ;;
   esac
 }
 
 lacks() { # $1 = description, $2 = haystack, $3 = needle
   case "$2" in
-    *"$3"*) echo "FAIL: $1 (output contains '$3')"; fails=$((fails+1)) ;;
+    *"$3"*) echo "FAIL: $1 (output contains '$3')"; read_out "$2"; fails=$((fails+1)) ;;
     *) echo "PASS: $1" ;;
   esac
 }
