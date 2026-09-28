@@ -215,8 +215,9 @@ def toplevel(directory, budget, cache={}):
 
 def posix_rel(path, root):
     """`path` relative to `root` in the slashes git prints: a file named with
-    the platform's separator here and git's there is read twice, once as a
-    file the turn never wrote, and its own new lines are handed back."""
+    the platform's separator here and git's there is read twice, the second
+    time as a file the turn never wrote, which hands back the list or the
+    paragraphs around the turn's own change as stale copies."""
     return os.path.relpath(path, root).replace(os.sep, "/")
 
 
