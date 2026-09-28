@@ -169,8 +169,8 @@ plugin file. Do not tidy that duplication into a cross-reference: a plan that
 points at a file its executor cannot read runs no gate.
 
 `hooks/session-brief.md` is the strictest case: it loads into every session,
-so each rule there is a pointer to the skill that owns it plus a one-sentence
-core, never the full statement. A change to a rule lands in its skill; the
+so each rule there is a pointer to the skill that owns it plus its core in a
+sentence or three, never the full statement. A change to a rule lands in its skill; the
 brief changes only when the pointer or the core does. The line between the
 opening paragraph and the rules is no rule: it makes a conversation's first
 tool call a load of `tracking-open-asks`, because how a message ends is work no
