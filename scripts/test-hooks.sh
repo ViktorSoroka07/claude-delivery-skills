@@ -721,14 +721,18 @@ sweep_stop() { # $1 = cwd, $2 = session, $3 = prompt, $4 = stop_hook_active, $5 
   printf '{"hook_event_name":"Stop","session_id":"%s","prompt_id":"%s","cwd":"%s","stop_hook_active":%s,"transcript_path":"%s"}' \
     "$2" "$3" "$1" "${4:-false}" "${5:-}" | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
 }
+# Python on Windows writes each newline to a pipe as CRLF, and a check whose
+# needle spans a line break then never matches; both helpers write bare ones.
 context() { # the hand-off's text
   printf '%s' "$1" | "$PY" -c 'import json, sys
+sys.stdout.reconfigure(newline="\n")
 data = sys.stdin.read()
 if data:
     print(json.loads(data)["hookSpecificOutput"]["additionalContext"])'
 }
 handed() { # the hand-off's listed lines, one "path:lines" a line
   printf '%s' "$1" | "$PY" -c 'import json, re, sys
+sys.stdout.reconfigure(newline="\n")
 data = sys.stdin.read()
 if data:
     text = json.loads(data)["hookSpecificOutput"]["additionalContext"]
