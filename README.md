@@ -461,9 +461,13 @@ Works best alongside:
   [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) hands off to humanizer as the final register pass on
   prose published under a person's name.
 
-Works on macOS, Linux, and Windows: the guard scripts are POSIX sh, which Git
-for Windows already provides — hooks run under its bundled Git Bash, no extra
-setup. CI exercises all three.
+Works on macOS, Linux, and Windows. The hooks are Python 3 scripts the harness
+starts as `python3`, so that name has to resolve on the PATH they run with — on
+Windows, under the Git Bash that Git for Windows bundles, which carries no Python
+of its own. A machine whose Python answers only to `python` or `py` gets an
+error from every hook instead of its work, while the skills and agents still load.
+The guard scripts are POSIX sh, which Git Bash already provides. CI exercises all
+three.
 
 ## Opinionated defaults
 
