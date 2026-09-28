@@ -646,10 +646,12 @@ cat > "$WORK/sweep_edit.py" <<'EOF'
 import json, os, sys
 # argv: file, old, new ("\n" for a line break), then optionally a transcript
 # and a prompt id: the replacement is recorded there as the Edit call that made it.
+# As the Edit tool does, it keeps the file's line endings and records bare newlines.
 path, old, new = sys.argv[1], sys.argv[2].replace("\\n", "\n"), sys.argv[3].replace("\\n", "\n")
-text = open(path).read()
-assert old in text, (path, old)
-open(path, "w").write(text.replace(old, new, 1))
+text = open(path, newline="").read()
+eol = "\r\n" if "\r\n" in text else "\n"
+assert old.replace("\n", eol) in text, (path, old)
+open(path, "w", newline="").write(text.replace(old.replace("\n", eol), new.replace("\n", eol), 1))
 if len(sys.argv) > 5:
     n = sum(1 for _ in open(sys.argv[4])) if os.path.exists(sys.argv[4]) else 0
     with open(sys.argv[4], "a") as fh:
