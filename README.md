@@ -435,7 +435,8 @@ As a plugin, from inside Claude Code:
     /plugin install delivery-skills@claude-delivery-skills
 
 Skills then invoke under the plugin namespace (`/delivery-skills:review-pr`), and the
-agents are available by bare name. Alternatively, clone the repo as a subdirectory of
+agents dispatch under it too (`delivery-skills:refute-verifier`) — a dispatch by bare
+name is refused as an unknown agent type. Alternatively, clone the repo as a subdirectory of
 your skills directory —
 
     git clone https://github.com/ViktorSoroka07/claude-delivery-skills ~/.claude/skills/claude-delivery-skills
