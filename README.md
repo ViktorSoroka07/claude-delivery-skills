@@ -290,8 +290,9 @@ instructions alone cannot:
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero
-    comments by default, every message ends with what waits on the requester. Each is a pointer to the skill that owns it plus a
-    one-sentence core, so a user's `CLAUDE.md` no longer needs a copy — they travel
+    comments by default, every message ends with what waits on the requester. Each
+    is a pointer to the skill that owns it plus its core in a sentence or three,
+    never the full rule, so a user's `CLAUDE.md` no longer needs a copy — they travel
     with the plugin. It also makes a fresh conversation's first tool call a load of
     `tracking-open-asks`, since how a message ends is work no request names. The
     text is [`hooks/session-brief.md`](hooks/session-brief.md).
