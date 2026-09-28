@@ -243,8 +243,9 @@ instructions alone cannot:
   refute-don't-confirm stance, the mutation protocol, read-only boundaries, and a
   report written whole to a file with only its path as the reply, since a report sent
   as the reply is cut mid-finding with nothing to say so. The skills use them when
-  present; dispatch prompts shrink to axis, worktree, SHA, scope, and the file the
-  report goes to.
+  present; dispatch prompts shrink to the task itself — an axis, the draft or claims
+  to refute, the test command — plus worktree, SHA, scope, and the file the report
+  goes to.
 - **Eight hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
@@ -353,7 +354,7 @@ instructions alone cannot:
     around. It speaks once per set of paths, because the end of every turn is the
     same moment as the end of the session.
 
-![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to scope; eight hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and three inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, and the lines a turn's change to a rule file left stale elsewhere)](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; eight hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and three inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, and the lines a turn's change to a rule file left stale elsewhere)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
