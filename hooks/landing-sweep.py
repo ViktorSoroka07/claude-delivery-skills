@@ -415,7 +415,9 @@ def turn_calls(transcript, prompt_id, cwd):
 
 
 def undo(text, calls):
-    """The file as it stood before `calls`, or None where one cannot be undone."""
+    """The file as it stood before `calls`, or None where one cannot be undone.
+    An Edit's strings may carry bare newlines where the file keeps CRLF, so
+    they are matched in the file's own line endings."""
     for _, name, inp, result in reversed(calls):
         original = result.get("originalFile")
         if isinstance(original, str):
@@ -424,7 +426,11 @@ def undo(text, calls):
             text = ""
         elif name == "Edit":
             new, old = inp.get("new_string"), inp.get("old_string")
-            if not isinstance(new, str) or not isinstance(old, str) or not new or new not in text:
+            if not isinstance(new, str) or not isinstance(old, str) or not new:
+                return None
+            eol = "\r\n" if "\r\n" in text else "\n"
+            new, old = (s.replace("\r\n", "\n").replace("\n", eol) for s in (new, old))
+            if new not in text:
                 return None
             text = text.replace(new, old) if inp.get("replace_all") else text.replace(new, old, 1)
         else:

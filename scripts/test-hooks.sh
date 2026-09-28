@@ -1001,6 +1001,13 @@ R="$WORK/sw-undo"; sweep_repo "$R"
 add_item "$R" "$WORK/t-undo.jsonl" p1
 got=$(handed "$(sweep_stop "$R" s12 p1 false "$WORK/t-undo.jsonl")")
 contains "sweep undoes the turn's Edit calls where no snapshot exists" "$got" "CLAUDE.md:3-4"
+R="$WORK/sw-crlf"; sweep_repo "$R"
+"$PY" -c 'import sys
+data = open(sys.argv[1], "rb").read().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+open(sys.argv[1], "wb").write(data)' "$R/skills/handoff/SKILL.md"
+add_item "$R" "$WORK/t-crlf.jsonl" p1
+got=$(handed "$(sweep_stop "$R" s81 p1 false "$WORK/t-crlf.jsonl")")
+contains "sweep undoes the turn's Edit calls in a file with CRLF endings" "$got" "CLAUDE.md:3-4"
 R="$WORK/sw-undo2"; sweep_repo "$R"
 add_item "$R" "$WORK/t-undo2.jsonl" p10
 out=$(sweep_stop "$R" s13 p1 false "$WORK/t-undo2.jsonl")
