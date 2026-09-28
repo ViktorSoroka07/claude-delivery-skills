@@ -1100,8 +1100,10 @@ reaches the remote is fixed only by rewriting history.
    resolve, and that each replay case's `history.jsonl` is byte-identical to
    what its `make-history.py` builds from the tree now. Any change that alters
    what a generator builds - to the brief, to the skill a seed loads, or to the
-   generator itself - fails it until the fixture is regenerated, and the
-   failure names the command that regenerates it.
+   generator itself - fails it as stale until the fixture is regenerated,
+   naming the command that regenerates it. A generator that cannot build at
+   all, broken or missing a file it reads, fails it as `fails to build`
+   instead, which names only the generator and discards its error output.
 
 A fourth check is not a script: **one doc-vs-code pass over the prose that loads
 into sessions**, each changed sentence read against the file it cites and its
