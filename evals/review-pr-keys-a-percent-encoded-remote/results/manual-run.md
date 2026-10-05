@@ -26,3 +26,15 @@ Model `claude-sonnet-5-5`, CLI 2.1.289, `main` at `cd48d76`; $1.17, 11-16 turns,
 | 5 | `acme/night shift/ticket-gateway/branch-feat-close-ticket/` | both pass |
 
 All five used the Azure DevOps form, so the decision reads: **3/5 decoded, 2/5 kept the encoding.** By the bar, a decoding clause is drafted and its round priced for the owner; nothing lands from this draw. No rep keyed the repository any other way, and the screens agreed with the kept homes on every rep.
+
+## The decoding round's bars, fixed before its first draw
+
+Bought by the owner. The draft is one clause in §5's `<repo>` bullet - the key is lowercased "and with any percent-encoding decoded (a project the remote spells `Night%20Shift` keys as `night shift`)" - on branch `71-decode-repo-key` at `e95b41a`. The baseline arm is the draw above (`main` at `cd48d76`, whose `skills/`, `hooks/` and `agents/` match the draft's parent byte for byte); the treated arm is five reps at `e95b41a`, kept as `evals/results/round-71a@decode.json`, same invocation, traces and homes copied out at once. Neighbour: `review-pr-keeps-the-findings-outside-the-clone`, five reps on each text, kept as `round-71a@baseline-storage.json` and `round-71a@decode-storage.json`.
+
+What the round can read, and what it cannot:
+
+- **The clause binds** when every treated rep that used the Azure DevOps form decodes the project - 5/5, nothing less. One treated rep keeping `%20` means the text did not reach it, and the clause is declined or restated; 4/5 against the baseline's 3/5 is indistinguishable from the baseline and says nothing either way.
+- **It costs no neighbour** when no storage-case bar (`findings-written-to-the-state-folder` with its companion, read by the kept home; `nothing-written-into-the-clone`; `reply-gives-the-absolute-path`) drops three or more of five against its baseline, and no treated drop's hand-read cause is the wording.
+- **What it cannot read** is a separated rate: five reps an arm separate only a four-in-five gap, and ten only a half, so 3/5 against 5/5 is below what any permitted spend separates. A landing rests on the baseline's measured failure - two reps in five would have started a second folder beside the one the earlier reviews sit in - together with a clause that bound in every treated rep and moved no neighbour. That reading, with this caveat, is put to the owner at the stop.
+
+The replacement rules above hold for both arms.
