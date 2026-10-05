@@ -10,7 +10,7 @@ from an unsettled judge. Read the rates from the JSON itself.
 
 ## Round 73: does a what-clause reach a capability-phrased ask
 
-| Grader | baseline (`c6dfe09`, the description as landed) | what-clause (`449f902`, branch deleted) | nouns of the ask (`cf1a589`, branch deleted) |
+| Grader | baseline (`31ece6f`, the description as landed) | what-clause (`449f902`, branch deleted) | nouns of the ask (`cf1a589`, branch deleted) |
 |---|---|---|---|
 | skill-was-invoked | 0/5 | 0/5 | 4/5 |
 
