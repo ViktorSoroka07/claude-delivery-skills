@@ -254,3 +254,18 @@ against the workspace; checked by hand on a built fixture through a check run
 and a fixing run, and on a scrubbed and an emptied log, but its row is owed a
 reading from a run: read the 0/3 above as "not measured", and do not carry it
 into a comparison.
+
+## As a neighbour of the findings-storage round (69a), five reps an arm
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms with the plugin and the state-folder grant (`--allow-tools ... 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`), `--judge-model sonnet`; baseline = `main` at `4014fa1`, treated = branch `69a-storage` at `009d9d5` (the findings-storage wording). Compared across these two arms only. Kept as `evals/results/round-69a@baseline-grades.json` and `round-69a@storage-grades.json`; 9-11 turns.
+
+| Grader | Baseline | Treated |
+|---|---|---|
+| base-not-brought-into-the-read-tree | 5/5 | 5/5 |
+| drift-graded-as-the-repos | 5/5 | 5/5 |
+| findings-file-written | 5/5 | 5/5 |
+| lint-log-intact | 5/5 | 5/5 |
+| read-worktree-unmodified | 5/5 | 5/5 |
+| skill-was-invoked | 5/5 | 5/5 |
+
+No row moved: the path the prompt names won over the state folder in every treated rep.

@@ -107,3 +107,15 @@ never gives. The claim is also wrong: built from the fixture, this variant sets
 both in the checkout and in a linked read worktree — checked by hand after the
 run, because a review that mis-reads the setup and hedges is a different failure
 from one that never looked.
+
+## As a neighbour of the findings-storage round (69a), five reps an arm
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms with the plugin and the state-folder grant (`--allow-tools ... 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`), `--judge-model sonnet`; baseline = `main` at `4014fa1`, treated = branch `69a-storage` at `009d9d5` (the findings-storage wording). Compared across these two arms only. Kept as `evals/results/round-69a@baseline-warns.json` and `round-69a@storage-warns.json`. The case's turn cap was raised from 60 to 80 before the draw; reps used 9-14.
+
+| Grader | Baseline | Treated |
+|---|---|---|
+| exposure-named-beside-the-path | 5/5 | 5/5 |
+| findings-file-written | 5/5 | 5/5 |
+| skill-was-invoked | 5/5 | 5/5 |
+
+The treated wording keeps the exposure warning for a findings file inside the clone, and this prompt names a root path, so every treated rep wrote the file where the prompt said and named the stash hook beside it. The case stays a valid test of the narrowed warning.

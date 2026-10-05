@@ -7,7 +7,7 @@ Review-pr's storage wording (backlog entry "keep review findings in one folder o
 ## The instrument, settled before the first draw
 
 - Every invocation grants `--allow-tools Bash Write Edit Agent 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`. Without the grant the runner refuses the Write tool outside the workspace and `$TMPDIR`, and its refusal invites "other tools", which pushes a treated rep toward the clone-root fallback for the instrument's reason (task 69's first probe); with it the Write tool reaches the state folder (the second probe). Both arms and all three neighbours run under the same grant.
-- A grader cannot read the state folder: `file_exists` reports files outside the workspace missing although they exist, and a `regex` target climbing out with `..` refuses the case at load (probes kept in `evals/results/task69-probe/`). So the write is graded from the Write call, and every rep's file is read by hand from the kept run's home.
+- A grader cannot read the state folder: `file_exists` reports files outside the workspace missing although they exist, and a `regex` file target is untested outside the workspace (probes kept in `evals/results/task69-probe/`). So the write is graded from the Write call, and every rep's file is read by hand from the kept run's home.
 - An SSH host alias cannot be staged: `ssh -G` reads the account's real home from the system, not `$HOME`, so the alias clause is not measured here (a named gap); the fixture's host is plain.
 
 ## Bars, fixed before the first draw
@@ -33,3 +33,20 @@ Reading rules, fixed now:
 - Neighbours are compared across this round's two arms only, never against earlier records (other model, no grant). Turns are read from each trace's `result` records; a rep curtailed at the cap is unmeasured and replaced.
 - `last_message` is the last assistant text of any thread; a reply grader fail is checked one text event earlier before it counts.
 - Arms are kept as `round-69a@baseline*.json` and `round-69a@storage*.json`, since both report plugin version 1.10.0.
+
+## Round 69a (the storage wording), five reps an arm
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms with the plugin, the grant above, `--judge-model sonnet`. Baseline = `main` at `4014fa1`; treated = branch `69a-storage` at `009d9d5`. Kept as `evals/results/round-69a@baseline.json` and `round-69a@storage.json`, traces in `evals/results/round69a-traces/`. $0.99 and $1.11: reps on this model run about 10 turns and $0.20, against about 24 turns and $0.55 for the previous Sonnet on the sibling cases.
+
+| Row | Baseline | Treated |
+|---|---|---|
+| findings written to the state folder (Write; settled by the kept home) | 0/5 | 5/5 (4 by Write, 1 by a shell heredoc into a variable path the screen cannot match) |
+| `nothing-written-into-the-clone` | 0/5 | 5/5 |
+| `reply-gives-the-absolute-path` | 0/5 | 5/5 |
+| `frontmatter-opens-the-file` (screen) | 0/5 | 4/5, 5/5 by the kept files |
+| one-time "reviews now live there" line with `DELIVERY_SKILLS_REVIEW_DIR` | - | 5/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+
+Every baseline rep wrote `review-findings-feat-close-ticket.md` into the clone's root (four with the Write tool, one with a shell heredoc that a Write-only grader would have scored clean). Every treated rep wrote `git.example.org/acme/ticket-gateway/branch-feat-close-ticket/r1-bd2f605.md` under the run's state folder - the host and path lowercased, the branch folder, round 1, the reviewed head's short SHA - and the hand read of each kept file found the frontmatter complete under the migrated tree's key names: `reviewed_sha` in full, `merge_base`, `round: 1`, `previous: null`, `kind: review`, `scope: full`, `findings` counts, `posted: null`. Two departures, both from text a rep cannot satisfy: `plugin` carries the plugin's name without its version (the wording asks for both, and nothing in a session states the version), and `reviewed_at` is a date, not a time. No rep wrote anything into the clone, and none took the fallback.
+
+The treated arm clears its bar (4/5 or better on all three rows) against a 0/5 baseline. The neighbours are read in their own records.
