@@ -39,3 +39,5 @@ Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms wi
 | skill-was-invoked | 5/5 | 4/6 |
 
 Every usable treated rep re-verified the head from this fixture's header-line findings file, which the wording's fallback for a file written before the frontmatter covers. Two of six treated reps never loaded review-pr - each read the findings file and the forge's usage and then posted all three findings, the open question included - against none of five on the current text. Both dark reps were read. The one part of the treated diff that can move a trigger is the description's later-asks list, which the wording extended with "or list and open earlier reviews". At 2/6 against 0/5 the gap is below what five reps can separate, so it stands as a watched cost of that one line rather than a measured regression; it is one indicator of this case's five graders.
+
+The storage wording landed without the description line (1.11.0, on the owner's ruling), so this case's indicator is the neighbour of that line's own round rather than a cost carried by the landed text.

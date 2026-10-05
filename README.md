@@ -372,9 +372,16 @@ logic changed and the PR carries a spec. Say the word to add or drop one.
 Pass 2 (fresh-eyes verifier, prompted to refute each finding):
 5 confirmed, 2 refuted, 1 adjusted, 1 added by the sweep.
 
-review-findings-214.md written — 3 medium, 4 minor. Nothing was posted;
-say "post" to publish the final findings to the PR as inline threads.
+Findings written to
+/home/you/.local/state/delivery-skills/review-pr/github.com/acme/shop/pr-214/r1-a1b2c3d.md
+— 3 medium, 4 minor. Nothing was posted; say "post" to publish the final
+findings to the PR as inline threads.
+Reviews now live in ~/.local/state/delivery-skills/review-pr/, outside your
+clones; set DELIVERY_SKILLS_REVIEW_DIR to move them.
 ```
+
+The findings file stays out of the clone, where it would sit in the author's
+change list, and every later round of the same request lands beside it.
 
 The mutation axis measures rather than reads — its evidence looks like:
 

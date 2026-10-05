@@ -29,7 +29,7 @@ Then verify the platform CLI is present and authenticated (`gh auth status`; `az
    2. **Sweep for tool exhaust:** bytes outside the stated scope. `git diff --word-diff-regex=.` catches single-character edits inside long opaque strings; decode every touched encoded payload rather than eyeballing it, since one flipped character inside one reads as unchanged. Artifacts the tool left riding the diff (telemetry files, run logs) are findings whose fix is removal; section 2's generated-artifact rule draws the line between exhaust and an artifact the PR deliberately carries.
    3. **Check in both directions.** Generated issues are not uniformly fabricated; one was verified real and fixed. Never trust, verify.
 5. **Dedupe against existing review surface first**: pull existing comment threads (platform reference has the mechanics) from all authors — humans and bots. Don't re-raise what's already raised; verify that "resolved" items are actually fixed in the current code — a resolved thread with the bug still present is a top finding.
-6. Create two detached worktrees at the head SHA in the session scratchpad: `review-<id>-read` for all reading agents, `review-<id>-mut` for the mutation agent (it edits files — it never shares a tree with readers). `<id>` = the PR id if one exists, otherwise the branch name with `/` replaced by `-`; the same `<id>` names the output MD later. Remove both worktrees (`git worktree remove --force`) when done.
+6. Create two detached worktrees at the head SHA in the session scratchpad: `review-<id>-read` for all reading agents, `review-<id>-mut` for the mutation agent (it edits files — it never shares a tree with readers). `<id>` = the PR id if one exists, otherwise the branch name with `/` replaced by `-`; the same `<id>` names the findings file where §5 falls back to the clone. Remove both worktrees (`git worktree remove --force`) when done.
 
 ## 2. Finding format (all passes)
 
@@ -132,17 +132,54 @@ Then merge in the main conversation (both modes):
 
 ## 5. Output — MD file, not chat
 
-Save `review-findings-<id>.md` in the repo root (untracked), using the `<id>` from section 1, and only once every dispatched axis agent has reported (`verifying-before-sending` owns that gate: a closing report that lands after the conclusion means the conclusion was premature). Header line first: PR id/URL, the reviewed head SHA, and the target branch — posting-time re-verification keys off that SHA. Sections:
+Write the findings file only once every dispatched axis agent has reported (`verifying-before-sending` owns that gate: a closing report that lands after the conclusion means the conclusion was premature).
+
+**The file goes to one folder outside every clone**, never into the clone: there it sits in the author's change list beside their own work, the clone's hooks and formatters reach it, and it goes when the clone goes, while a later session that wants it back (to post it, apply it, or review the request again) has no fixed place to look. The path is `<root>/<repo>/<request>/r<N>-<sha7>.md`:
+
+- `<root>` is `$DELIVERY_SKILLS_REVIEW_DIR` where that is set, otherwise `${XDG_STATE_HOME:-$HOME/.local/state}/delivery-skills/review-pr`.
+- `<repo>` is the `origin` remote's host and path, lowercased, with no scheme, user, port or `.git`: `git@github.com:Acme/Tickets.git` keys as `github.com/acme/tickets`. A host that is an SSH alias is resolved first (`ssh -G <alias> | awk '$1 == "hostname" { print $2 }'`), so a second clone of the repository, or a clone that moved, reaches the same folder. An Azure DevOps remote keys as `dev.azure.com/<org>/<project>/<repo>` whichever URL form it uses. With no remote, `local/<the clone's directory name>`.
+- `<request>` is `pr-<n>`, or `branch-<name>` with `/` replaced by `-` for a branch reviewed before any request exists.
+- `<N>` is one more than the highest round already in that folder, 1 for the first; `<sha7>` is the reviewed head's short SHA.
+
+A path the user names for the findings wins over all of this. Where the folder cannot be created or written, the file falls back to `review-findings-<id>.md` in the clone's root, untracked, and the hand-off says that it fell back and why.
+
+The file opens with frontmatter, then a title line linking the request (or naming the branch). The keys extend the ones the folder's earlier files carry, under the same names, so the next round and a later pass over many reviews read old files and new alike:
+
+```yaml
+---
+repo: github.com/acme/tickets      # the folder key above
+pr: 42                             # null for a branch review
+pr_url: https://github.com/acme/tickets/pull/42
+branch: feat/close-ticket          # the head branch
+base: main                         # the target branch
+title: Close a ticket from the queue
+author: mara-k
+reviewed_sha: <the full head SHA>  # posting-time re-verification keys off this
+merge_base: <the full SHA>
+round: 1
+previous: null                     # the earlier round's file name, e.g. r1-<sha7>.md
+kind: review
+scope: full                        # or the area the user named
+depth: default                     # or deep
+reviewed_at: <ISO 8601 time>
+plugin: <this plugin's name and version>
+model: <the model id>
+findings: { major: 0, medium: 3, minor: 4 }
+posted: null                       # the posting step rewrites it
+---
+```
+
+No key holds a local path: clones move, and the folder must read the same from any of them. Sections:
 
 1. **Pass 1 findings** — the draft list, graded.
 2. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
 3. **Final findings** — the merged list, organized by severity, then §2's compact packing table.
 
-In chat, report only the file path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), the thread count each way ("16 threads by default, 12 compact"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. An untracked file in the repo root is exposed to the repo's own automation: a pre-commit hook that stashes untracked files takes it out of the tree on the author's next commit, and the restore is the step that gets skipped — a check that fails between the stash and the pop aborts the commit with the file still in the stash, and a pop that conflicts leaves it there too — so a hook that stashes is never reported as safe because it also restores; and a formatting gate that runs over every file can block their next push on it. Check the repo's hooks and gates for either (the repo-conventions axis has read them), and where one exists say so beside the path in the hand-off, so the author moves or excludes the file before it costs them a commit. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
+In chat, report only the file's absolute path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), the thread count each way ("16 threads by default, 12 compact"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. When this write created the `<root>` folder, add one line saying that reviews now live there, outside the clone, and that `DELIVERY_SKILLS_REVIEW_DIR` moves them. A findings file inside the clone — the fallback, or a path the user named there — is exposed to the repo's own automation: a pre-commit hook that stashes untracked files takes it out of the tree on the author's next commit, and the restore is the step that gets skipped — a check that fails between the stash and the pop aborts the commit with the file still in the stash, and a pop that conflicts leaves it there too — so a hook that stashes is never reported as safe because it also restores; and a formatting gate that runs over every file can block their next push on it. Check the repo's hooks and gates for either (the repo-conventions axis has read them), and where one exists say so beside the path in the hand-off, so the author moves or excludes the file before it costs them a commit. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
 
 ## 6. Posting and applying (later asks only)
 
-Posting findings to the PR and applying them to the tree are separate user requests — never automatic after a review, and often made in a fresh session. When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; it carries the re-verification and staleness checks, the pending/staged mode, the thread and suggestion-block packaging rules, the reply-and-resolve discipline, and the apply-mode protocol (every new test must fail against pre-fix code first).
+Posting findings to the PR and applying them to the tree are separate user requests — never automatic after a review, and often made in a fresh session, which finds the review as the newest round in the request's folder (§5) unless the user names another file. When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; it carries the re-verification and staleness checks, the pending/staged mode, the thread and suggestion-block packaging rules, the reply-and-resolve discipline, and the apply-mode protocol (every new test must fail against pre-fix code first).
 
 ## 7. Modes — and telling the user they exist
 
@@ -158,5 +195,6 @@ Every mode below is off unless the user asks. The failure this section exists to
 | **Staged post** | "hold it", "I'll submit it myself" | Findings staged invisibly where the platform supports it; where it does not, say so plainly and post nothing |
 | **Apply** | "apply", "fix these" | Findings become edits on the branch, each new test failing against pre-fix code first (§6) |
 | **Disposition** | "resolve", "reply to the threads" | Reply-and-resolve against the findings file, verifying each fix actually landed (§6) |
+| **List reviews** | "list my reviews", "open the last review of PR 42" | Lists the repository's folder (§5), newest round first, with each file's request, round, reviewed commit, counts and whether it was posted — or opens the one named |
 
 **Name the applicable modes in the closing message, in one line** — not a menu, and only what the user could sensibly want next. After a review that is post, post compact, apply, or a deeper pass; after posting it is apply or disposition. When a mode the user asked for is unavailable on the platform, say which and why rather than silently doing something else.

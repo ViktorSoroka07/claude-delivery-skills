@@ -81,7 +81,7 @@ A pull request's builds run on its merge ref, not on the source branch: `GET ...
 
 ## No pending / draft comment mode
 
-ADO has no equivalent of GitHub's PENDING review: a thread is visible to everyone the moment the POST returns, comments cannot be staged or batched for a later one-shot submission, and the review model is immediate threads plus a vote (Approve / Approve with suggestions / Wait for author / Reject). ADO's "draft" is a PR-level state (the PR isn't ready for review), not a comment state. When the user asks to hold publication (submit later themselves, keep review activity invisible for now): post nothing, say explicitly that ADO cannot stage comments, and leave the findings in `review-findings-<id>.md` — the posting session, on the user's word, is the moment they become visible.
+ADO has no equivalent of GitHub's PENDING review: a thread is visible to everyone the moment the POST returns, comments cannot be staged or batched for a later one-shot submission, and the review model is immediate threads plus a vote (Approve / Approve with suggestions / Wait for author / Reject). ADO's "draft" is a PR-level state (the PR isn't ready for review), not a comment state. When the user asks to hold publication (submit later themselves, keep review activity invisible for now): post nothing, say explicitly that ADO cannot stage comments, and leave the findings unposted in the findings file (SKILL.md §5) — the posting session, on the user's word, is the moment they become visible.
 
 ## Reply & resolve (thread disposition, later)
 
