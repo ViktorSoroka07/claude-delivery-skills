@@ -65,3 +65,7 @@ Every treated rep keyed the Azure DevOps form and filed under the Azure DevOps h
 ## After the rename: bars, fixed before the draw
 
 The owner had the case's project renamed and paid for one redraw. One arm: review-pr on `main` with the decoding clause landed (`6187405`), the case at its renamed commit, five reps, `--model sonnet`, `--keep-temp`, the full grant `--allow-tools Bash Write Edit Agent 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`; kept as `evals/results/round-71a@landed-renamed.json`, traces and homes copied out at once. It is the case's reading on the shipped text and on a third project name - unlike both the clause's example and the name the earlier draws used. Every rep decoding the project (5/5) is the shipped clause reading as it did in its round; any rep keeping `%20` is recorded with its trace read and goes to the owner. The replacement rules above hold.
+
+## After the rename: the draw
+
+Model `claude-sonnet-5-5` in every `init` event, CLI 2.1.289, `main` at `b8c1bca` with the clause landed; $1.15, 11-14 turns, no rep replaced. Kept as `evals/results/round-71a@landed-renamed.json`, traces in `round71a-landed-renamed-traces/`, homes in `round71a-landed-renamed-files/`. Every rep filed under the Azure DevOps host's folder, then `acme/night shift/ticket-gateway/branch-feat-close-ticket/` - **5/5 decoded** on the shipped text, on a name unlike both the clause's example and the earlier draws' project, with both screens 5/5. The shipped clause reads as it did in its round.
