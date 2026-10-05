@@ -3,7 +3,10 @@
 Both arms by `claude plugin eval` on CLI 2.1.289, five reps each, `--ablation
 none`, `--model sonnet` (resolved to `claude-sonnet-5-5` in every rep's
 `init` event), from a worktree of the commit named, the run JSONs kept as
-`evals/results/round-73@baseline.json` and `round-73@what-clause.json`.
+`evals/results/round-73@baseline.json` and `round-73@what-clause.json`. The
+trend fold excludes both as "judged by the default judge": the case has no
+judged grader, so the run's judge field is unset and the fold cannot tell that
+from an unsettled judge. Read the rates from the JSON itself.
 
 ## Round 73: does a what-clause reach a capability-phrased ask
 
@@ -12,8 +15,12 @@ none`, `--model sonnet` (resolved to `claude-sonnet-5-5` in every rep's
 | skill-was-invoked | 0/5 | 0/5 |
 
 The wording under test opened the description with one sentence of what the
-skill does before its "Use when" clause. It moved nothing, and is declined for
-this skill on this ask.
+skill does before its "Use when" clause, verbatim (the branch SHA above is a
+pointer only; the branch is spent):
+
+> Checks every factual claim in outbound prose against its source before the person who will act on it reads it, through a fact table, a blind pass by a fresh reader and a delta check.
+
+It moved nothing, and is declined for this skill on this ask.
 
 The instrument is read from the traces, not assumed: every rep in both arms
 carried the plugin's eighteen skills in its `init` event, saw the brief, and
