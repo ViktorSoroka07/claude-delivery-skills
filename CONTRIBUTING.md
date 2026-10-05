@@ -964,6 +964,18 @@ and against no release. What a name cannot fix, the fold flags - a release row
 fed by two plugin checkouts is marked and warned about, because one version
 run from two working trees is two bodies of text it has no way to tell apart.
 
+**A record quotes the wording it measured; a commit on a round's branch is a
+pointer, not the record.** A wording under test lives on the branch its arm
+ran from, and a round's branches are deleted once the round is read - that is
+the normal end of a round, not an accident - so a record that cites only the
+branch's SHA names text no reader can open once the branch is gone, and the
+round's declined wording, the one thing a later round must not try again
+unchanged, is lost with it. Write the sentence under test into the case's
+`results/manual-run.md` verbatim, in both arms where both changed text, and
+keep the SHA beside it as the pointer it is. A wording that landed needs no
+quote - it is in the skill, on `main`, and the SHA resolves for as long as the
+history does.
+
 ## When a rule outlives the model that needed it
 
 A rule lands here because a model needed it, and it is paid for on every load
