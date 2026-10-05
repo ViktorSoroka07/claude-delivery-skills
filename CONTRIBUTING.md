@@ -631,8 +631,9 @@ never from the case file - nor from the call's presence in the trace, since
 the runner counts a refused call as a call (the `tool_used` rules above).
 **A rule whose act writes outside the workspace and the temp directory meets a
 refused `Write` or `Edit` at its own destination unless the invocation grants
-that path**, while the shell - which the sandbox lets write anywhere in the
-run's home - is not refused there. The refusal's message invites other tools,
+that path**, while the shell is not refused wherever the sandbox lets it
+write - under the run's home, outside the paths it protects there (`.claude`
+and the git and shell configuration files among them). The refusal's message invites other tools,
 so a rep that answers it by taking the rule's fallback rather than the shell
 has been moved by the instrument, not the wording: grant the destination on
 the invocation, in both arms alike, before the draw.
