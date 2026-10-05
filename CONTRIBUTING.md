@@ -595,7 +595,9 @@ from the shell the runner is invoked from, or from the scaffold.
 neither the tool set nor the grant.** The runner starts each run in `dontAsk`
 mode, where a call that would have to ask is refused, and passes it an allow
 list made of every tool the invocation's `--allow-tools` grants - the
-file-writing ones scoped to the workspace and the run's temp directory - plus
+file-writing ones scoped to the workspace and the run's temp directory, unless
+the invocation names a wider pattern such as `'Write(~/.local/state/**)'`,
+which let a run's `Write` land under its own state folder - plus
 the case list's entries from the runner's read-only set (`Read`, `Glob`,
 `Grep`, `Skill`, `Agent` and a few more). A tool the invocation grants is
 allowed whether the case lists it or not, and a gated tool the case lists
@@ -627,6 +629,13 @@ and no block of tool permissions. So read which tools a run had from its
 `init` event, and whether a call to one could run from that call's result,
 never from the case file - nor from the call's presence in the trace, since
 the runner counts a refused call as a call (the `tool_used` rules above).
+**A rule whose act writes outside the workspace and the temp directory meets a
+refused `Write` or `Edit` at its own destination unless the invocation grants
+that path**, while the shell - which the sandbox lets write anywhere in the
+run's home - is not refused there. The refusal's message invites other tools,
+so a rep that answers it by taking the rule's fallback rather than the shell
+has been moved by the instrument, not the wording: grant the destination on
+the invocation, in both arms alike, before the draw.
 
 The runner's two arms are the plugin and no plugin at all, which answers
 whether the plugin changes behaviour; whether one edited sentence does is a
