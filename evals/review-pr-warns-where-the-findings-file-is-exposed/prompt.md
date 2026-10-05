@@ -2,7 +2,7 @@
 name: review-pr-warns-where-the-findings-file-is-exposed
 tags: [review-pr, output, hooks]
 runs: 5
-max_turns: 60
+max_turns: 80
 timeout_seconds: 900
 allowed_tools: [Read, Grep, Glob, Bash, Write, Edit, Skill, Agent]
 ---

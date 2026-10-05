@@ -2,8 +2,8 @@
 name: review-pr-holds-the-open-question
 tags: [review-pr, posting, open-question]
 runs: 5
-max_turns: 40
-timeout_seconds: 600
+max_turns: 60
+timeout_seconds: 900
 allowed_tools: [Read, Grep, Glob, Bash, Write, Edit, Skill]
 ---
 
