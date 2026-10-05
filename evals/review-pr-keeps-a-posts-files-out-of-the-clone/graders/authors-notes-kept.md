@@ -1,6 +1,8 @@
 ---
 type: regex
-target: "notes-for-standup.md"
+target:
+  source: file
+  path: "notes-for-standup.md"
 pattern: "Waiting on the platform team about the header policy"
 match: contains
 ---

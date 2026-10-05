@@ -1,6 +1,8 @@
 ---
 type: regex
-target: ".git/forge/gh-log"
+target:
+  source: file
+  path: ".git/forge/gh-log"
 pattern: "pulls/12/reviews[^\\n]*\\| cwd=\\S* status=200 input=\\S*/home/cwd/"
 match: not_contains
 flags: m

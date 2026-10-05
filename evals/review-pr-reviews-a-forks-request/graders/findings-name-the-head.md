@@ -1,6 +1,8 @@
 ---
 type: regex
-target: "review-findings-12.md"
+target:
+  source: file
+  path: "review-findings-12.md"
 pattern: "bd2f605"
 match: contains
 ---
