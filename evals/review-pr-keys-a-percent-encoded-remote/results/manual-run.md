@@ -1,5 +1,8 @@
 # review-pr-keys-a-percent-encoded-remote
 
+
+The case's project was renamed after the draws below (the fixture now spells `Night%20Shift`); those draws used another two-word name, and their folder names are given here in the current spelling. The draw after the rename is the last section.
+
 The storage case's fixture under an Azure DevOps remote whose project name carries a space, which every remote form spells `%20`: `git@ssh.dev.azure.com:v3/acme/Night%20Shift/Ticket-Gateway`. review-pr's §5 keys the folder by the remote's host and path, lowercased, with an Azure DevOps remote as `dev.azure.com/<org>/<project>/<repo>`, and says nothing about the encoding. The migrated review tree keys such a project decoded (`night shift`), so a session that keeps the `%20` starts a second folder at round 1 and never reaches the earlier reviews. This is a baseline-first check of the landed text (plan task 71, item 1).
 
 ## Bars, fixed before the first draw
@@ -58,3 +61,7 @@ Model `claude-sonnet-5-5` in every `init` event of all three runs, CLI 2.1.289; 
 Every treated rep keyed the Azure DevOps form and filed under the Azure DevOps host's folder, then `acme/night shift/ticket-gateway/branch-feat-close-ticket/`, decoded and lowercased on an example naming another project; the screen expected to fail correct treated reps did not. The neighbour's Write screens read 2/5 in each arm, the other reps writing by shell, and the kept homes decided its rows. The `.claude` directory in every clone is the runner's own, present in every arm.
 
 **Verdict, as the bars allow:** the clause binds (5/5) and moves no neighbour. A separated rate is not shown - a clause that did nothing would still score 5/5 about one time in twelve at the baseline's point estimate - so a landing rests on the baseline's measured failure (two reps in five would have started a second folder), the clause binding on an example unlike its input, and the migrated tree already keyed the decoded way. That reading, with this caveat, is the owner's to land; the first version of these bars said so and the re-pin dropped the sentence, which this verdict restores.
+
+## After the rename: bars, fixed before the draw
+
+The owner had the case's project renamed and paid for one redraw. One arm: review-pr on `main` with the decoding clause landed (`6187405`), the case at its renamed commit, five reps, `--model sonnet`, `--keep-temp`, the full grant `--allow-tools Bash Write Edit Agent 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`; kept as `evals/results/round-71a@landed-renamed.json`, traces and homes copied out at once. It is the case's reading on the shipped text and on a third project name - unlike both the clause's example and the name the earlier draws used. Every rep decoding the project (5/5) is the shipped clause reading as it did in its round; any rep keeping `%20` is recorded with its trace read and goes to the owner. The replacement rules above hold.
