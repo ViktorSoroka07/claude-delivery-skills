@@ -284,7 +284,15 @@ it:
   through, read those rates across the arms rather than a run at a time, and
   hand-read the draw of every rep one of them fails - which needs `--keep-temp`
   on the invocation, since the runner deletes each run's workspace and a fail
-  whose trace is gone cannot be read at all. **And the runner counts a refused
+  whose trace is gone cannot be read at all. **A companion on a write's full
+  destination path misses the shell's way of writing it**: a rep that holds
+  the directory in a variable (`D=...; cat > "$D/r2-<sha7>.md"`) never spells
+  the path in one piece, and across three cases in two rounds fourteen shell
+  writes into a folder outside the workspace matched such a pattern none of
+  the times, while thirteen spelled the file name itself and one built that
+  from a variable too. Anchor the shell companion on the file name, and where
+  `file_exists` cannot see the destination, read the file from the run's kept
+  home as the decisive record. **And the runner counts a refused
   call as a call**: it keeps every `tool_use` in the trace and flags one that a
   hook or the run's permission settings refused, but reads that flag only for
   mock tallies, so a grader on an act either can stop reads the stopped attempt
