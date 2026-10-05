@@ -15,3 +15,13 @@ Two readings, both decided now:
 
 - A rep whose `skill-was-invoked` is dark, or whose round file lands outside `git.example.org/acme/ticket-gateway/branch-feat-close-ticket/`, never met the condition and is replaced.
 - Turns from each trace's `result` records and the CLI version from the run JSON, beside round 69b's 2.1.289; a rep curtailed at the cap is replaced.
+
+## The baseline draw
+
+Model `claude-sonnet-5-5`, CLI 2.1.289 (round 69b's was the same), `main` at `cd48d76`; $1.25, 10-13 turns, no rep replaced. Kept as `evals/results/round-75b@baseline.json`, traces in `evals/results/round75b-traces/`, every kept home's state folder in `round75b-files/`.
+
+- **No conviction.** No rep ran the second round in full, and none cited the request as a reason for anything; one hand-off offered "a deep or full review" as a next step, which is §7's closing line, not a mode taken.
+- **The delta rate: 5/5.** Every rep replayed round 1 with `git merge-tree` (`diff-replayed-screen` 5/5) and diffed the replay against the head, and every kept round-2 file reads `kind: delta-review`, `scope: bd2f605..5dde025`, `previous: branch-feat-close-ticket/r1-bd2f605.md`; declared and classified scope agree in all five. `earlier-findings-statused` passed 5/5 on the judge, and the hand read of each hand-off agrees.
+- **What it settles:** "review it again" does not pull a second round into the full mode on this model in five reps; a pull of one rep in five is below what this draw sees. Round 69b's treated 4/5 was taken without the word, so the two rates are not a measured difference either way.
+
+The mechanical screens read 0/5 on `round-two-written` (Write) and `scope-names-the-delta` (a Write screen) and 4/5 on the shell companion: every rep wrote the round file by shell, four spelling the file name (`"$D/r2-5dde025.md"`), which the file-name anchor caught, and one building it from the head (`$D/r2-${H:0:7}.md`), which no literal pattern matches - the shape CONTRIBUTING's shell-companion rule names. The kept homes decided every row.

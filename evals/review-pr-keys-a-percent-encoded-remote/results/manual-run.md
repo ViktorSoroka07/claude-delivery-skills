@@ -12,3 +12,17 @@ One arm: review-pr on `main` at the commit that adds these bars, the plugin load
 - **Screens:** `decoded-key-in-reply` and `encoded-key-not-in-reply` read the hand-off and can fail a correct rep - one that also mentions `Night%20Shift` in prose, a `file://` link (which encodes the space), a path quoting only the folder, or the folder and file name on separate lines - so every screen fail is read by hand against the kept home.
 - **Replacements:** a rep whose `skill-was-invoked` is dark, or that keyed `local/<directory>` (reading "the remote cannot be reached" as "no remote"), never met the condition and is replaced. The sandbox has no Azure DevOps login (`az` is not on the run's PATH and the PAT variable is denied), so review-pr's platform check meets "no login" in every rep: a rep that stops there writes no findings file and is replaced, but if three of the first five stop, topping up stops, and that is recorded as a finding about the platform check - a branch with no request gets no review without a login - and the case is re-staged.
 - Turns from each trace's `result` records; a rep curtailed at the cap is replaced.
+
+## The baseline draw
+
+Model `claude-sonnet-5-5`, CLI 2.1.289, `main` at `cd48d76`; $1.17, 11-16 turns, no rep stopped at the platform check and none was replaced. Kept as `evals/results/round-71a@baseline.json`, traces in `evals/results/round71a-traces/`, every kept home's state folder in `round71a-files/`.
+
+| Rep | Folder the findings file ended up in (under the Azure DevOps host's folder) | Screens |
+|---|---|---|
+| 1 | `acme/night%20shift/ticket-gateway/branch-feat-close-ticket/` | both fail |
+| 2 | `acme/night shift/ticket-gateway/branch-feat-close-ticket/` | both pass |
+| 3 | `acme/night shift/ticket-gateway/branch-feat-close-ticket/` | both pass |
+| 4 | `acme/night%20shift/ticket-gateway/branch-feat-close-ticket/` | both fail |
+| 5 | `acme/night shift/ticket-gateway/branch-feat-close-ticket/` | both pass |
+
+All five used the Azure DevOps form, so the decision reads: **3/5 decoded, 2/5 kept the encoding.** By the bar, a decoding clause is drafted and its round priced for the owner; nothing lands from this draw. No rep keyed the repository any other way, and the screens agreed with the kept homes on every rep.
