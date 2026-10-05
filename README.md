@@ -381,7 +381,9 @@ clones; set DELIVERY_SKILLS_REVIEW_DIR to move them.
 ```
 
 The findings file stays out of the clone, where it would sit in the author's
-change list, and every later round of the same request lands beside it.
+change list, and every later round of the same request lands beside it: it
+reviews only what changed since the round before - a merge of the base branch
+adds nothing to it - and gives each earlier finding a status.
 
 The mutation axis measures rather than reads — its evidence looks like:
 
@@ -396,6 +398,8 @@ That's the default path. [`review-pr`](skills/review-pr/SKILL.md) also carries, 
   fires when the repo's memory pins it
 - **scoped review** — name an area, file, or concern; honored on top of the
   axis triage
+- **full review** — a later round reviews the whole change again instead of
+  only what changed since the round before
 - **ungrouped** — disables the grouping default; every finding gets its own
   thread
 - **compact** — fewer threads: one defect class becomes one thread, across

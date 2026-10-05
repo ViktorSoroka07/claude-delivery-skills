@@ -24,12 +24,18 @@ Then verify the platform CLI is present and authenticated (`gh auth status`; `az
 1. **Check project memory first** for a `review-repo-nuances` entry — it records this repo's gate commands, mutation-axis test command, bot reviewers to dedupe against, PR conventions, any depth pins (e.g. deep-mode Pass 2, no small-diff shortcut), and — when `implement-plan` left one — the location of the branch's executed gates record (plan path, branch, the SHA the gates ran at). If it doesn't exist, discover those from the repo's CLAUDE.md / CI config during the review and **save such a memory** (+ MEMORY.md index line) before finishing.
 2. Never switch the user's branch. Identify the PR first via the platform reference — the user may give a branch, a PR number, or a URL — and record its head SHA and target branch. Then `git fetch origin <branch>` for the PR's head branch (works for branches never fetched). Every later step pins to the head SHA.
 3. Diff = `git diff $(git merge-base origin/<base> <head>)...<head>` where `<base>` is the PR's target branch (default branch if no PR exists). Read the PR body too: claims it makes about content ("includes X") are auditable and sometimes stale.
-4. **When the PR's author is a bot or AI pipeline** (a fix agent, a scan bot, a generated PR), the review gains three checks:
+4. **A later round reviews only what changed since the round before it.** Look for earlier rounds in the request's folder (§5) and, for a request, in the folder of the branch it was reviewed from before the request existed. Where one exists, the newest round's `reviewed_sha` is where this round starts, and by default it reviews only the delta from there:
+   1. Fetch the earlier commit if it is missing (`git cat-file -e <old>`). Then replay the change as it stood onto today's merge base and diff that against the head: `T=$(git merge-tree --write-tree --merge-base=$(git merge-base origin/<base> <old>) $(git merge-base origin/<base> <head>) <old>)`, and the delta is `git diff $T <head>`. Each side is taken from its own merge base, so a merge of the base branch into the request adds nothing to the delta, where a plain `git diff <old> <head>` would carry the whole merge in. Files the replay conflicts on are reviewed in full.
+   2. The readers still read the surrounding code and the whole change; what they grade is the delta. The mutation axis runs only where the delta changed tested logic.
+   3. Every finding of the earlier round, posted or not, gets a status at the new head: **fixed**, **still present**, or **gone with its code**. A posted thread marked resolved is checked against the code, never trusted (step 6's rule).
+   4. The round is written beside the earlier one as the next file, with `kind: delta-review`, `previous` naming the earlier file by its path under the repository's folder (`branch-feat-x/r3-<sha7>.md` when it sits in the branch's folder), `round` one more than that file's, and `scope` the range reviewed (`<old7>..<head7>`).
+   5. It runs in full instead, saying why in the hand-off, when the earlier round was scoped (its `scope` is not `full` or a range), when its commit can no longer be fetched, or when the user asks for a full review.
+5. **When the PR's author is a bot or AI pipeline** (a fix agent, a scan bot, a generated PR), the review gains three checks:
    1. **Verify the stated premise.** Check the issue's or body's cited location and quoted observation at the branch point (`git show $(git merge-base origin/<base> <head>):<file>`; the moving tip of base may have changed since the PR forked) before evaluating the fix. Real cited paths make a false observation read as plausible. A premise that fails verification is a major finding recommending the PR not merge as-is; skip fix-level review of that hunk, since the fix acts on content that is not there.
    2. **Sweep for tool exhaust:** bytes outside the stated scope. `git diff --word-diff-regex=.` catches single-character edits inside long opaque strings; decode every touched encoded payload rather than eyeballing it, since one flipped character inside one reads as unchanged. Artifacts the tool left riding the diff (telemetry files, run logs) are findings whose fix is removal; section 2's generated-artifact rule draws the line between exhaust and an artifact the PR deliberately carries.
    3. **Check in both directions.** Generated issues are not uniformly fabricated; one was verified real and fixed. Never trust, verify.
-5. **Dedupe against existing review surface first**: pull existing comment threads (platform reference has the mechanics) from all authors — humans and bots. Don't re-raise what's already raised; verify that "resolved" items are actually fixed in the current code — a resolved thread with the bug still present is a top finding.
-6. Create two detached worktrees at the head SHA in the session scratchpad: `review-<id>-read` for all reading agents, `review-<id>-mut` for the mutation agent (it edits files — it never shares a tree with readers). `<id>` = the PR id if one exists, otherwise the branch name with `/` replaced by `-`; the same `<id>` names the findings file where §5 falls back to the clone. Remove both worktrees (`git worktree remove --force`) when done.
+6. **Dedupe against existing review surface first**: pull existing comment threads (platform reference has the mechanics) from all authors — humans and bots. Don't re-raise what's already raised; verify that "resolved" items are actually fixed in the current code — a resolved thread with the bug still present is a top finding.
+7. Create two detached worktrees at the head SHA in the session scratchpad: `review-<id>-read` for all reading agents, `review-<id>-mut` for the mutation agent (it edits files — it never shares a tree with readers). `<id>` = the PR id if one exists, otherwise the branch name with `/` replaced by `-`; the same `<id>` names the findings file where §5 falls back to the clone. Remove both worktrees (`git worktree remove --force`) when done.
 
 ## 2. Finding format (all passes)
 
@@ -157,9 +163,9 @@ author: mara-k
 reviewed_sha: <the full head SHA>  # posting-time re-verification keys off this
 merge_base: <the full SHA>
 round: 1
-previous: null                     # the earlier round's file name, e.g. r1-<sha7>.md
-kind: review
-scope: full                        # or the area the user named
+previous: null                     # the round this one follows, by its path under <repo>, e.g. pr-42/r1-<sha7>.md
+kind: review                       # delta-review for a later round (§1)
+scope: full                        # the area the user named, or <old7>..<head7> for a later round
 depth: default                     # or deep
 reviewed_at: <ISO 8601 time>
 plugin: <this plugin's name and version>
@@ -171,11 +177,12 @@ posted: null                       # the posting step rewrites it
 
 No key holds a local path: clones move, and the folder must read the same from any of them. Sections:
 
-1. **Pass 1 findings** — the draft list, graded.
-2. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
-3. **Final findings** — the merged list, organized by severity, then §2's compact packing table.
+1. **Earlier findings** — a later round only: each finding of the round it follows, by its title and grade, with its status at this head and the evidence for it.
+2. **Pass 1 findings** — the draft list, graded.
+3. **Pass 2** — per draft finding: CONFIRMED / REFUTED / ADJUSTED with the verifier's reason; then the additions (from the sweep, or the blind re-review in deep mode) and whether each survived verification.
+4. **Final findings** — the merged list, organized by severity, then §2's compact packing table.
 
-In chat, report only the file's absolute path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), the thread count each way ("16 threads by default, 12 compact"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. When this write created the `<root>` folder, add one line saying that reviews now live there, outside the clone, and that `DELIVERY_SKILLS_REVIEW_DIR` moves them. A findings file inside the clone — the fallback, or a path the user named there — is exposed to the repo's own automation: a pre-commit hook that stashes untracked files takes it out of the tree on the author's next commit, and the restore is the step that gets skipped — a check that fails between the stash and the pop aborts the commit with the file still in the stash, and a pop that conflicts leaves it there too — so a hook that stashes is never reported as safe because it also restores; and a formatting gate that runs over every file can block their next push on it. Check the repo's hooks and gates for either (the repo-conventions axis has read them), and where one exists say so beside the path in the hand-off, so the author moves or excludes the file before it costs them a commit. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
+In chat, report only the file's absolute path and counts (e.g. "6 confirmed, 2 refuted, 1 adjusted, 1 added"), the thread count each way ("16 threads by default, 12 compact"), plus a one-line index of the grouped findings — title and grade only, no bodies, so the user can see the shape of the review and redirect it before anything is posted. A later round also names the range it reviewed and counts the earlier findings by status ("3 fixed, 1 still present, 1 gone with its code"), or says why it ran in full. When this write created the `<root>` folder, add one line saying that reviews now live there, outside the clone, and that `DELIVERY_SKILLS_REVIEW_DIR` moves them. A findings file inside the clone — the fallback, or a path the user named there — is exposed to the repo's own automation: a pre-commit hook that stashes untracked files takes it out of the tree on the author's next commit, and the restore is the step that gets skipped — a check that fails between the stash and the pop aborts the commit with the file still in the stash, and a pop that conflicts leaves it there too — so a hook that stashes is never reported as safe because it also restores; and a formatting gate that runs over every file can block their next push on it. Check the repo's hooks and gates for either (the repo-conventions axis has read them), and where one exists say so beside the path in the hand-off, so the author moves or excludes the file before it costs them a commit. **Do not restate the findings themselves in chat.** Finish with §7's one-line note of what the user can ask for next.
 
 ## 6. Posting and applying (later asks only)
 
@@ -189,6 +196,7 @@ Every mode below is off unless the user asks. The failure this section exists to
 |---|---|---|
 | **Deep review** | "deep", "thorough", "exhaustive", "paranoid" — or a repo-memory pin | Full axis set instead of triage (§3); Pass 2 becomes a blind re-review plus isolated skeptics per finding, locus-sharing per §4 |
 | **Scoped review** | names an area, file, or concern | That scope is honored *on top of* the triage, never in place of the mutation axis (§3) |
+| **Full review** | "review it all again", "full review" | A later round reviews the whole change instead of what changed since the round before it (§1) |
 | **Ungrouped** | "one thread per finding", "don't group" | Disables §2's grouping default |
 | **Compact** | "post compact", "compact", "fewer threads" | Posts from the MD's compact packing table: one defect class is one thread, across files; multi-member threads lose their one-click suggestions (posting reference) |
 | **Post** | "post" | Publishes the final findings (§6) |

@@ -33,3 +33,26 @@ Reading rules:
 - A treated rep that ran in full and cited a request for a full review fails `reviewed-the-delta`, its cause recorded as the prompt.
 - Turns are read from each trace's `result` records; a rep curtailed at the cap is unmeasured and replaced.
 - Compared across this round's two arms only.
+
+## Round 69b (the later-round wording), five reps an arm
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; baseline = `main` at `fdd56e7` (the landed storage text), treated = `69b-delta-on-a` at `ce780eb`. Kept as `evals/results/round-69b@baseline.json`, `round-69b@delta.json`, `round-69b@baseline-storage.json` and `round-69b@delta-storage.json`, traces in `evals/results/round69b-traces/`, every rep's state-folder files in `evals/results/round69b-files/`. $4.98 for the four runs; turns 10-12 baseline and 9-12 treated, no rep near the cap, no subagent dispatched.
+
+| Row | Baseline | Treated |
+|---|---|---|
+| **reviewed-the-delta** (bar; trace and kept file) | 0/5 | 4/5 |
+| **earlier-findings-statused-in-file** (bar; kept file) | 5/5 | 5/5 |
+| `earlier-findings-statused` (chat; judge and hand agree) | 5/5 | 5/5 |
+| `decoy-not-reported` (guard; judge and hand agree) | 4/5 | 5/5 |
+| `new-defect-found` (guard; judge and hand agree) | 5/5 | 5/5 |
+| `round-two-written` (guard; kept file) | 5/5 | 5/5 |
+| round 1's file byte-identical to the seed | 5/5 | 5/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+
+The classification, from each trace's git commands: every baseline rep reviewed the whole change (`main...HEAD`, or `da56eeb...HEAD`, which is the same range) and wrote `scope: full`; four treated reps replayed round 1 with `git merge-tree` and diffed the replay against the head, writing `kind: delta-review`, `scope: bd2f605..5dde025` and `previous: branch-feat-close-ticket/r1-bd2f605.md`; treated rep 2 declared the same range but reviewed `main...HEAD`, so its declared and classified scope disagree and it fails the bar - the disagreement the rule was fixed for. No rep in either arm reviewed a naive delta into the decoy. Baseline rep 1's decoy fail is a full review that found `src/audit.js` through `git log` on `main` and counted it as a medium finding "arrived from main"; the cause is not the wording, recorded and not a decline.
+
+The mechanical screens read 0/5 for `round-two-written`, its Bash companion and `scope-names-the-delta` in both arms because nine of ten reps wrote the round file through a shell heredoc into a variable path (`$D/r2-5dde025.md`), which no literal pattern matches; the kept files settled every one of those rows, as the reading rules provide. Every rep in both arms gave M-1 "still present" and M-2 and m-1 "fixed", correctly.
+
+Neighbour (`review-pr-keeps-the-findings-outside-the-clone`): every rep in both arms wrote round 1 under the state folder by the kept home, none into the clone, and gave the absolute path - 5/5 and 5/5 on all three bars; its Write screens read 3/5 in each arm for the same shell-write reason.
+
+**Verdict:** `reviewed-the-delta` clears its bar (4/5 against 0/5) and no guard or neighbour declines, so the wording lands as drawn. `earlier-findings-statused-in-file` passed 5/5 in the baseline, so that half is unneeded on this model; its clauses ride in the tested text unchanged rather than an edited text landing untested.
