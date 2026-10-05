@@ -48,6 +48,19 @@ rm "$WORK/t2/skills/demo/references/how.md"
 sh "$CHECK" "$WORK/t2" >/dev/null 2>&1
 check "missing references file is caught" 1 $?
 
+# 2b. A SKILL.md naming another skill's references file resolves beside that
+#     skill; the same name with the file missing fails.
+mkplugin t2b
+mkdir -p "$WORK/t2b/skills/other/references"
+printf 'theirs\n' > "$WORK/t2b/skills/other/references/theirs.md"
+printf 'Mechanics: `../other/references/theirs.md`.\n' >> "$WORK/t2b/skills/demo/SKILL.md"
+( cd "$WORK/t2b" && git add -A && git commit -qm x )
+sh "$CHECK" "$WORK/t2b" >/dev/null 2>&1
+check "another skill's references file resolves beside that skill" 0 $?
+rm "$WORK/t2b/skills/other/references/theirs.md"
+sh "$CHECK" "$WORK/t2b" >/dev/null 2>&1
+check "another skill's missing references file is caught" 1 $?
+
 # 3. A delivery-skills:<name> with no skill dir or agent file fails.
 mkplugin t3
 printf 'Also `delivery-skills:ghost`.\n' >> "$WORK/t3/skills/demo/SKILL.md"

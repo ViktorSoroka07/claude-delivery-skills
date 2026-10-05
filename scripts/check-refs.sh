@@ -1,6 +1,7 @@
 #!/bin/sh
 # Read-only reference-integrity gate. Verifies that the tree's internal
-# references resolve: references/*.md named by skills, delivery-skills:<name>
+# references resolve: references/*.md named by skills (their own or another
+# skill's, as ../<skill>/references/*.md), delivery-skills:<name>
 # mentions, hooks.json command paths, relative markdown links, and each replay
 # case's history.jsonl against what its generator builds from the tree. Exit 0
 # clean; exit 1 with one BROKEN line per failure. Optional $1 = tree root.
@@ -16,11 +17,12 @@ broken() {
   fails=$((fails+1))
 }
 
-# 1. references/*.md named by each SKILL.md exist beside it.
+# 1. references/*.md named by each SKILL.md exist beside it, or, named as
+#    ../<skill>/references/*.md, beside that other skill.
 for f in "$ROOT"/skills/*/SKILL.md; do
   [ -f "$f" ] || continue
   d=$(dirname "$f")
-  for r in $(grep -o 'references/[A-Za-z0-9._-]*\.md' "$f" | sort -u); do
+  for r in $(grep -oE '(\.\./[A-Za-z0-9._-]+/)?references/[A-Za-z0-9._-]+\.md' "$f" | sort -u); do
     [ -f "$d/$r" ] || broken "$f names $r"
   done
 done
