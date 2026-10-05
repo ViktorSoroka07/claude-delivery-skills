@@ -1,4 +1,4 @@
 schema_version: "1.1"
-name: commit-message-states-the-change
+name: writing-commit-messages-states-the-change
 context:
   scaffold_script: fixture.sh

@@ -304,6 +304,12 @@ files = {
     "c-elsewhere": run("sonnet", "1.1.0", [case("case-c",
         [rep([g("z", False)])], [rep([g("z", False)])])],
         path="/checkout/wt-elsewhere"),
+    # a case renamed between releases: the kept run carries the old name and
+    # folds into the current name's row
+    "renamed-before": run("sonnet", "1.0.0", [case("commit-message-states-the-change",
+        [rep([g("no-narration", True)])], [rep([g("no-narration", False)])])]),
+    "renamed-after": run("sonnet", "1.1.0", [case("writing-commit-messages-states-the-change",
+        [rep([g("no-narration", True)])], [rep([g("no-narration", False)])])]),
 }
 for name, data in files.items():
     with open(os.path.join(out, name + ".json"), "w") as fh:
@@ -317,6 +323,11 @@ check "eval-trend runs over a corpus" 0 $?
 
 grep -Eq '1\.1\.0 +1/3 +0/3 +\+33 +-67' "$WORK/t11/out.txt"
 check "a grader that slid between releases shows the drop" 0 $?
+
+grep -Eq 'writing-commit-messages-states-the-change +no-narration +1\.0\.0' "$WORK/t11/out.txt"
+check "a run kept under a case's old name folds into its current row" 0 $?
+grep -Eq '(^| )commit-message-states-the-change ' "$WORK/t11/out.txt"
+check "the old name opens no row of its own" 1 $?
 
 grep -q '2 unmeasured' "$WORK/t11/out.txt"
 check "a curtailed run and a ceiling-skipped grader are unmeasured, not failed" 0 $?

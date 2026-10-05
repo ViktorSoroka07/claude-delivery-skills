@@ -54,6 +54,12 @@ import sys
 SETTLED_JUDGE = "sonnet"  # CONTRIBUTING, "Testing a wording change"
 SKIPPED = re.compile(r"^\s*skipped\b", re.I)
 ARM_IN_NAME = re.compile(r"^(?P<round>[^@]+)@(?P<arm>[^@]+)\.json$")
+# A case renamed in the tree keeps the rows its kept runs wrote under the old
+# name: without the map, the rename reads as one row ending and another
+# starting at the release it happened.
+RENAMED = {
+    "commit-message-states-the-change": "writing-commit-messages-states-the-change",
+}
 
 
 def arm_of(name):
@@ -124,6 +130,7 @@ def collect(paths, judge, plugin_name):
             continue
         target = arms if arm_name else cells
         for case in run.get("cases") or []:
+            case_name = RENAMED.get(case.get("name"), case.get("name"))
             for arm, runs in (case.get("arms") or {}).items():
                 for rep in runs:
                     curtailed = bool(rep.get("error"))
@@ -132,9 +139,9 @@ def collect(paths, judge, plugin_name):
                     for grader in rep.get("graders") or []:
                         if not grader.get("scored", True):
                             continue  # an arm-only indicator scores in neither arm
-                        key = ((round_name, case.get("name"),
+                        key = ((round_name, case_name,
                                 grader.get("name"), arm_name) if arm_name else
-                               (case.get("name"), grader.get("name"), release))
+                               (case_name, grader.get("name"), release))
                         cell = target.setdefault(
                             key,
                             {"with": [0, 0], "without": [0, 0], "unmeasured": 0,
@@ -158,7 +165,7 @@ def collect(paths, judge, plugin_name):
                         notes.append(
                             "%s: %s/%s reports skipped paid graders, but no grader "
                             "carries the skip marker - those verdicts are counted as "
-                            "real and may not be" % (name, case.get("name"), arm))
+                            "real and may not be" % (name, case_name, arm))
     notes.extend(mixed_checkout_notes(cells, provenance))
     return cells, arms, excluded, notes
 

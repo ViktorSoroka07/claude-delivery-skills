@@ -1,5 +1,5 @@
 ---
-name: commit-message-states-the-change
+name: writing-commit-messages-states-the-change
 tags: [writing-commit-messages, git]
 runs: 5
 max_turns: 30
