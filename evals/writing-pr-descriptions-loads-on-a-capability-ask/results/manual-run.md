@@ -10,9 +10,9 @@ from an unsettled judge. Read the rates from the JSON itself.
 
 ## Round 73: does a what-clause reach a capability-phrased ask
 
-| Grader | baseline (`c6dfe09`, the description as landed) | what-clause (`449f902` on `73-what-clause`) |
-|---|---|---|
-| skill-was-invoked | 0/5 | 0/5 |
+| Grader | baseline (`c6dfe09`, the description as landed) | what-clause (`449f902`, branch deleted) | nouns of the ask (`cf1a589`, branch deleted) |
+|---|---|---|---|
+| skill-was-invoked | 0/5 | 0/5 | 5/5 |
 
 The wording under test opened the description with one sentence of what the
 skill does before its "Use when" clause, verbatim (the branch SHA above is a
@@ -35,9 +35,23 @@ explanation" a person will read) rather than the task that produces it. That is
 a capability match on a neighbour's description, caught in the act, and the
 one lead the round leaves.
 
+### The second wording: the nouns of the ask
+
+The owner bought a second wording on the lead above. It rewrote the "Use when"
+clause to name the nouns a capability-phrased ask carries, verbatim:
+
+> Use when a branch is ready for the team and reviewers need to know what to read first - a pull request, its title and description, review notes or a reviewer-facing summary for a branch - when creating a pull request, writing or editing a PR title or description, when commits have landed on a branch whose PR description may no longer match - including "sync the PR description" and "update the PR body" asks - and when maintaining a living status comment on a PR or issue. GitHub and Azure DevOps.
+
+Four reps of the batch loaded the skill with their second call and none loaded `writing-for-audiences`; the batch's fifth rep was curtailed at its scaffold (the worktree was being removed under it, so `stage-git.sh` was gone) and is unmeasured, replaced by a one-rep re-take from a fresh worktree at the same commit (`round-73@nouns-retake.json`), which loaded the skill too. Instrument as before: eighteen plugin skills in every `init`,
+`tracking-open-asks` loaded first in every rep, the new clause present in a
+treated rep's session transcript (`round-73@nouns.json`).
+
+This wording moved the indicator from 0/5 to 5/5 and is the candidate to
+land. It has not landed: the skill's named-trigger cases are its neighbours and
+have not been run under it on this model, and CLAUDE.md declines a wording
+that costs one.
+
 ## Not tested
 
-Whether a description that names the ask's own nouns - the artefact asked for,
-the outcome wanted - reaches it, which the writing-for-audiences loads in the
-round suggest is what the model matches on. One wording was bought; a second is
-the owner's call.
+The neighbours above, and whether the same clause shape reaches the other
+thirteen named-task skills, whose descriptions this round did not touch.
