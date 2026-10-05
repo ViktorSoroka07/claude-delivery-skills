@@ -244,7 +244,14 @@ it:
   nothing else.** A rubric about a document the run wrote is then a vote on
   the summary of it, which is the one text that cannot hold the evidence.
 - **A `file_exists` grader reads the run's own file changes, not the
-  workspace tree.** A file the scaffold wrote and the run left alone reports
+  workspace tree:** the paths a listing of the workspace holds after the run
+  and did not hold after the scaffold, so a file any tool or subagent
+  created there counts and nothing outside the workspace is ever
+  seen - a file a rule sends into the run's home reports missing however it
+  was written. Its `path` is matched as a glob against that list
+  (`review-findings*.md` caught every root file one round's baseline wrote),
+  and a `regex` grader's `target: files` reads the same list, one path per
+  line. A file the scaffold wrote and the run left alone reports
   missing, and `exists: false` passes whether the run deleted the path or
   never touched it - so no grader proves a deletion, and a case whose
   behaviour is a deletion is hand-graded against the tree. Where a
