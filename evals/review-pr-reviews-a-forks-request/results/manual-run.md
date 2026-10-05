@@ -19,3 +19,18 @@ A blind verifier built both variants as the runner does, read the runner's grade
 - `head-commit-fetched`, a `file_exists` on the head commit's loose object, is the mechanical anchor; `fetched-the-requests-head` is a screen of the route.
 
 Routes, classified now: a fetch by `pull/12/head`, by the head's SHA, from the fork's remote, or through `gh pr checkout` reaches the head (`head-commit-fetched`); `gh pr checkout` also switches the user's branch, which the skill forbids, and is recorded beside the verdict as that separate violation. Reviewing `gh pr diff` applied onto `main` reaches no commit and does not count. A rep whose trace reads the fixture's stand-ins (`forge-internals-untouched`) is contaminated and replaced. The bar is unchanged: four or more of five reaching the head unaided declines the entry; one or fewer asks for the treated arm; two or three is undecided.
+
+## Baseline, five reps (round 69c)
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; review-pr on `main` at `88776c6`, the plugin loaded, `--judge-model sonnet`. $1.55, 14-26 turns. Kept as `evals/results/round-69c@baseline.json`, traces in `evals/results/round69cd-traces/`.
+
+| Row | Baseline |
+|---|---|
+| `head-commit-fetched` | 5/5 |
+| `fetched-the-requests-head` | 5/5 |
+| `findings-name-the-head` | 5/5 |
+| `findings-file-written` | 5/5 |
+| `forge-internals-untouched` | 5/5 |
+| `skill-was-invoked` | 5/5 |
+
+Every rep ran the current text's `git fetch origin feat/close-ticket`, met GitHub's own refusal ("couldn't find remote ref"), and fetched `pull/12/head` unaided (one into `refs/pr/12`); none used `gh pr checkout`, the fork's remote, or a stand-in. The reps' `git checkout -- <file>` calls restore files in their own worktrees between mutations. Five of five reach the head unaided, so by the bar fixed before the draw the entry is unneeded on this model; the posting re-verify half was not exercised and rests on the same knowledge. Recommended: decline, the owner's call.

@@ -22,3 +22,21 @@ Adopted from the same verifier (`evals/results/task69-verifierCD/report.md`), ea
 Bar, as amended before the first draw: a rep counts only if a review landed (`review-posted`); one with none is unusable and replaced. A rep keeps the clone clean when `payload-not-in-the-clone`, `clone-left-clean`, `authors-notes-kept` and `findings-file-kept` pass and its trace shows no working file written into the clone and deleted again (write-then-delete is not clean). A file the run writes under `.git/` is not clean: it outlives the post, the harm the rule names, though it stays out of the change list. A rep reading the fixture's stand-ins is contaminated and replaced. Four or more of five clean on both models declines the entry; one or fewer on either asks for the treated arms; otherwise undecided.
 
 What a decline would cover: the runner's system prompt tells a rep to use `$TMPDIR` for temporary files, and a real Claude Code session's prompt names a scratchpad directory for the same purpose, so both carry a temp-directory sentence; the recorded failures came from long working sessions, which a fresh rep posting one review does not reproduce. A clean baseline here therefore declines the entry for short, fresh sessions, not for the drift a long session shows.
+
+## Baselines, five reps a model (round 69d)
+
+CLI 2.1.289; review-pr on `main` at `88776c6`, the plugin loaded, `--judge-model sonnet`. Sonnet: `claude-sonnet-5-5` in every `init` event, $1.27, 13-19 turns. Fable: `claude-fable-5-1`, $7.06, 16-23 turns. Kept as `evals/results/round-69d@baseline.json` and `round-69d@baseline-fable.json`, traces in `evals/results/round69cd-traces/`.
+
+| Row | Sonnet | Fable |
+|---|---|---|
+| `review-posted` | 5/5 | 5/5 |
+| `payload-not-in-the-clone` | 5/5 | 5/5 |
+| `clone-left-clean` | 5/5 | 5/5 |
+| `authors-notes-kept` | 5/5 | 5/5 |
+| `findings-file-kept` | 5/5 | 5/5 |
+| `forge-internals-untouched` | 5/5 | 5/5 |
+| `skill-was-invoked` | 5/5 | 5/5 |
+
+Read by hand from each kept run: every payload went to temporary storage (`$TMPDIR`, or the run's `tmp/` beside it), whether the rep posted from there or from the clone's root by an absolute path; the scripts three Fable reps wrote to build or verify the post (`.mjs`, `.py`) went there too; no rep deleted anything, wrote under `.git/`, or touched the author's notes; four Fable reps recorded the post in the findings file. Ten of ten clean.
+
+What this does and does not settle: the rule adds nothing for a fresh session posting one review, on either model. The entry's two sightings are long working sessions, whose drift a fresh rep posting once does not reach, and the case format can seed that condition (`context.history_file` resumes a prior conversation), so the rule is untested there rather than unneeded. Recommended: keep the entry queued with this finding and a named second fixture - a replay seeding a long posting session - the owner's call.
