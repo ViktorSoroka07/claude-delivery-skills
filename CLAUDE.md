@@ -24,7 +24,7 @@ Most changes here are verified by something stronger than a reading before they 
 
 **The range is the watermark, not the last push:** `git diff prose-passed..HEAD -- hooks skills agents CLAUDE.md CONTRIBUTING.md README.md`, where `prose-passed` is a lightweight local tag marking the commit through which this prose has actually been read. The pass is its own unit of work, never started inside a task; it is due at about 150 changed lines, at a push whatever the size, or after two task units that changed a path in that range or one of the backlog's three headers; and it closes by moving that tag to the head it read, which is its only durable output (CONTRIBUTING, "Before pushing", has the mechanics and why a push is the wrong anchor).
 
-Findings files (`review-findings-*.md`) are point-in-time and git-ignored; delete one once everything in it is closed or carried into the plan.
+Review findings are point-in-time, and review-pr keeps them in its folder outside the clone (its §5), where a later round and any pass over many reviews read them - so none is deleted there. A `review-findings-*.md` in this repo's root is that skill's fallback, git-ignored: once the folder can be written, move it into its request's folder as the next round.
 
 ## Gates
 
