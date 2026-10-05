@@ -16,6 +16,9 @@ SEP=$'\037'
 # ---------------------------------------------------------------- options ----
 
 TARGET=""
+# Below OpenSSH's default MaxStartups of 10: past that many unauthenticated
+# connections at once, sshd drops new ones at random, and a dropped fetch
+# reads as a failed repo rather than a throttled one.
 JOBS=8
 ASK=0
 NO_WRITE=0
@@ -32,7 +35,8 @@ usage: git-sync.sh [DIR] [options]
                       direct children, no recursion). Defaults to \$PWD.
 
 options:
-  -j, --jobs N        parallel fetches (default $JOBS)
+  -j, --jobs N        parallel fetches (default $JOBS, under sshd's default
+                      limit of 10 unauthenticated connections to one host)
       --ask           ask before fast-forwarding any repo with local changes,
                       not only the ones git refuses on its own
       --fetch-only    fetch and prune, leave every local branch alone
