@@ -1,7 +1,7 @@
 ---
 name: addressing-review-feedback
 description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked to, re-checking threads already marked resolved — "check the resolved threads too", "re-check the resolved ones before we merge".
-compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Platform mechanics (reading threads, replying, resolving) are review-pr's references; this skill owns the author's seat.
+compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Platform mechanics (reading threads, replying, resolving) are review-pr's references, at `../review-pr/references/<platform>.md` from this skill's directory; this skill owns the author's seat.
 ---
 
 # Addressing Review Feedback
@@ -11,6 +11,8 @@ Review feedback on your own change arrives from three kinds of author on three k
 **Inventory → verify → apply → reply and resolve.** The order matters because each step's output is the next step's checklist, and the inventory is what the closing gate is measured against.
 
 ## 1. Inventory: every surface, every author, before anything else
+
+The mechanics of every read, reply and resolve below are in review-pr's platform reference, which sits beside this skill rather than in it: from the base directory the loader printed, `../review-pr/references/github.md`, `../review-pr/references/ado.md` or `../review-pr/references/gitlab.md`, chosen from `git remote get-url origin` the way review-pr's section 0 chooses it. Read it before the first call.
 
 Pull every surface before forming a single verdict — every *surface*, which is not every thread. The default inventory is four reads, each made once: the request, the thread listing in its default form, the review submission bodies, and the request-level comments; the resolved-thread count comes from what the default thread listing reports, never from a second call. A forge splits feedback across places that do not link to each other, and a bot's own summary line ("N actionable comments") counts only what it chose to post inline:
 
@@ -67,7 +69,7 @@ Every row gets a reply, in the author's own voice, stating the disposition and i
 **When a reply may post is decided by where the commit is, not by whether it exists:**
 
 - **Rejections, answers, and out-of-scope verdicts post immediately.** They depend on no commit, and posting early lets the reviewer push back before more work stacks on top.
-- **A fix reply posts only once its commit is on the remote** — the check is that the remote branch contains the SHA (`git branch -r --contains <sha>`), not that `git log` shows it. A "fixed in <sha>" citing a local commit points at nothing the reviewer can open; if the push is waiting on someone's OK, the fix reply waits with it. Cite SHAs the way the platform links them (review-pr's platform reference: bare on GitHub, never in code formatting).
+- **A fix reply posts only once its commit is on the remote** — the check is that the remote branch contains the SHA (`git branch -r --contains <sha>`), not that `git log` shows it. A "fixed in <sha>" citing a local commit points at nothing the reviewer can open; if the push is waiting on someone's OK, the fix reply waits with it. Cite SHAs the way the platform links them (the platform reference read at the inventory: bare on GitHub, never in code formatting).
 
 **Resolve every thread you dispositioned**, rejections and deferrals included — a thread left open as a reminder reads as unaddressed to every other reviewer and can gate the merge. A thread re-read — in the re-check mode, or because a repeat round found a newer comment on it — and found resolved over unchanged code stays resolved once the fix lands; it gets a reply naming the commit so the state and the code agree again. Request-level comments have no resolve state; the reply is the whole disposition.
 
