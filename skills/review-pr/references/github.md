@@ -4,7 +4,7 @@
 
 - From a branch: `gh pr list --head <branch> --json number,title,baseRefName,headRefOid,body`. From a PR number or URL: `gh pr view <n> --json number,title,headRefName,baseRefName,headRefOid,body` (`headRefName` is the branch to fetch). Record `headRefOid` — every step pins to it. `baseRefName` is the diff base.
 - If no PR exists for the branch, say so in chat and review against the default branch; re-run discovery at posting time — a PR may have been opened since.
-- At posting time, re-resolve the PR and confirm its current `headRefOid` still equals the head SHA recorded in the findings MD.
+- At posting time, re-resolve the PR and confirm its current `headRefOid` still equals the head SHA recorded in the findings file.
 
 ## Dedupe source
 
@@ -12,7 +12,7 @@ Pull existing threads via GraphQL `reviewThreads` (with author + path + isResolv
 
 ## Anchor validation (required before output)
 
-Every inline comment must land on an added/changed diff line or GitHub **422s the whole submission**. New files are safe; for modified files parse `git diff -U0 <base>...<head>` hunks and confirm each line. A finding on an unchanged line → anchor to the nearest changed line in the same file, stating the true `file:line` in the comment body and marking the finding **relocated** in the findings MD (a relocated anchor can never carry a suggestion block — see Suggestion blocks); only when the file has no changed lines at all does the finding go in the review body instead.
+Every inline comment must land on an added/changed diff line or GitHub **422s the whole submission**. New files are safe; for modified files parse `git diff -U0 <base>...<head>` hunks and confirm each line. A finding on an unchanged line → anchor to the nearest changed line in the same file, stating the true `file:line` in the comment body and marking the finding **relocated** in the findings file (a relocated anchor can never carry a suggestion block — see Suggestion blocks); only when the file has no changed lines at all does the finding go in the review body instead.
 
 ## Posting
 
@@ -29,7 +29,7 @@ Every inline comment must land on an added/changed diff line or GitHub **422s th
 - Anchor rules unchanged: an inline comment on a non-diff line still 422s the whole creation, pending or not.
 - **Verify by `position`, not `line`:** `GET .../reviews/{id}/comments` never resolves anchors — on a pending review it returns `line`/`side` as null, and on a submitted one it omits them entirely, carrying only `position`. That is not an error, and it is not a symptom of staging; the endpoint is position-only in both states (for a submitted review, resolve anchors through the PR-level endpoint instead — see Posting). The proof the anchor took is `position`/`original_position` (line offset within the file's unified diff: the line under the first `@@` header is position 1, and each later `@@` header counts one line) plus `commit_id` equal to the staged head.
 - The staged review stays pinned to its `commit_id`. If the author pushes before the user submits, the comments keep pointing at the staged head and may render outdated — tell the user to have the anchors re-checked (or the review re-staged) before submitting in that case.
-- The posting reference's placement-and-content rule adapts to staging: confirm `state: PENDING` plus the comment positions, and diff each body returned by `GET .../reviews/{id}/comments` against the payload file — a mangled body sits invisible in the pending review until the user submits it publicly. Then record the review id, its `html_url` (both in the creation response), and the staged head SHA in the findings MD, stating that submission is the user's action.
+- The posting reference's placement-and-content rule adapts to staging: confirm `state: PENDING` plus the comment positions, and diff each body returned by `GET .../reviews/{id}/comments` against the payload file — a mangled body sits invisible in the pending review until the user submits it publicly. Then record the review id, its `html_url` (both in the creation response), and the staged head SHA in the findings file, stating that submission is the user's action.
 
 ## Suggestion blocks (one-click appliable fixes)
 
