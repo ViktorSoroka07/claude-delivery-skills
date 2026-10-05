@@ -18,7 +18,7 @@ Two readings, both decided now:
 
 ## The baseline draw
 
-Model `claude-sonnet-5-5`, CLI 2.1.289 (round 69b's was the same), `main` at `cd48d76`; $1.25, 10-13 turns, no rep replaced. Kept as `evals/results/round-75b@baseline.json`, traces in `evals/results/round75b-traces/`, every kept home's state folder in `round75b-files/`.
+Model `claude-sonnet-5-5`, CLI 2.1.289 (round 69b's was the same), `main` at `92b7475`; $1.25, 10-13 turns, no rep replaced. Kept as `evals/results/round-75b@baseline.json`, traces in `evals/results/round75b-traces/`, every kept home's state folder in `round75b-files/`.
 
 - **No conviction.** No rep ran the second round in full, and none cited the request as a reason for anything; one hand-off offered "a deep or full review" as a next step, which is §7's closing line, not a mode taken.
 - **The delta rate: 5/5.** Every rep replayed round 1 with `git merge-tree` (`diff-replayed-screen` 5/5) and diffed the replay against the head, and every kept round-2 file reads `kind: delta-review`, `scope: bd2f605..5dde025`, `previous: branch-feat-close-ticket/r1-bd2f605.md`; declared and classified scope agree in all five. `earlier-findings-statused` passed 5/5 on the judge, and the hand read of each hand-off agrees.

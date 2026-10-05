@@ -18,7 +18,7 @@ One arm: review-pr on `main` at the commit that adds these bars, the plugin load
 
 ## The baseline draw
 
-Model `claude-sonnet-5-5`, CLI 2.1.289, `main` at `cd48d76`; $1.17, 11-16 turns, no rep stopped at the platform check and none was replaced. Kept as `evals/results/round-71a@baseline.json`, traces in `evals/results/round71a-traces/`, every kept home's state folder in `round71a-files/`.
+Model `claude-sonnet-5-5`, CLI 2.1.289, `main` at `92b7475`; $1.17, 11-16 turns, no rep stopped at the platform check and none was replaced. Kept as `evals/results/round-71a@baseline.json`, traces in `evals/results/round71a-traces/`, every kept home's state folder in `round71a-files/`.
 
 | Rep | Folder the findings file ended up in (under the Azure DevOps host's folder) | Screens |
 |---|---|---|
@@ -32,7 +32,7 @@ All five used the Azure DevOps form, so the decision reads: **3/5 decoded, 2/5 k
 
 ## The decoding round's bars, fixed before its first draw
 
-Bought by the owner. The draft is one clause in §5's `<repo>` bullet - the key is the remote's host and path "percent-decoded and then lowercased (a project the remote spells `Field%20Ops` keys as `field ops`)" - on branch `71-decode-repo-key` at `d3f27c3`. Its first version (`e95b41a`) used this case's own remote as the example, which would have let a rep copy the worked answer; a blind verifier caught it before any draw (`evals/results/task71-verifier/report.md`), and the example now names a project unlike the case's. The baseline arm is the draw above (`main` at `cd48d76`, whose `skills/`, `hooks/` and `agents/` match the draft's parent byte for byte); the treated arm is five reps at `d3f27c3`, kept as `evals/results/round-71a@decode.json`, same invocation, traces and homes copied out at once. Neighbour: `review-pr-keeps-the-findings-outside-the-clone`, five reps on each text, kept as `round-71a@baseline-storage.json` and `round-71a@decode-storage.json` - its remote carries no encoding, so the clause cannot change its key, and the draw checks for side effects only.
+Bought by the owner. The draft is one clause in §5's `<repo>` bullet - the key is the remote's host and path "percent-decoded and then lowercased (a project the remote spells `Field%20Ops` keys as `field ops`)" - on branch `71-decode-repo-key` at `d3f27c3`. Its first version (`e95b41a`) used this case's own remote as the example, which would have let a rep copy the worked answer; a blind verifier caught it before any draw (`evals/results/task71-verifier/report.md`), and the example now names a project unlike the case's. The baseline arm is the draw above (`main` at `92b7475`, whose `skills/`, `hooks/` and `agents/` match the draft's parent byte for byte); the treated arm is five reps at `d3f27c3`, kept as `evals/results/round-71a@decode.json`, same invocation, traces and homes copied out at once. Neighbour: `review-pr-keeps-the-findings-outside-the-clone`, five reps on each text, kept as `round-71a@baseline-storage.json` and `round-71a@decode-storage.json` - its remote carries no encoding, so the clause cannot change its key, and the draw checks for side effects only.
 
 What the round can read, and what it cannot:
 
@@ -47,7 +47,7 @@ The replacement rules above hold for both arms.
 
 ## The decoding round's draw
 
-Model `claude-sonnet-5-5` in every `init` event of all three runs, CLI 2.1.289; treated at `d3f27c3`, the neighbour's baseline at `20bf8e1` (same `skills/` as `cd48d76`); $3.27 for the three runs, 9-14 turns, no rep replaced and no write split at the space. Kept as `evals/results/round-71a@decode.json`, `round-71a@baseline-storage.json`, `round-71a@decode-storage.json`, traces in `round71a-decode-traces/` and beside, every kept home's state folder in `round71a-decode-files/` and beside.
+Model `claude-sonnet-5-5` in every `init` event of all three runs, CLI 2.1.289; treated at `d3f27c3`, the neighbour's baseline at `4ab344c` (same `skills/` as `92b7475`); $3.27 for the three runs, 9-14 turns, no rep replaced and no write split at the space. Kept as `evals/results/round-71a@decode.json`, `round-71a@baseline-storage.json`, `round-71a@decode-storage.json`, traces in `round71a-decode-traces/` and beside, every kept home's state folder in `round71a-decode-files/` and beside.
 
 | Row | Baseline | Treated |
 |---|---|---|
@@ -64,8 +64,8 @@ Every treated rep keyed the Azure DevOps form and filed under the Azure DevOps h
 
 ## After the rename: bars, fixed before the draw
 
-The owner had the case's project renamed and paid for one redraw. One arm: review-pr on `main` with the decoding clause landed (`6187405`), the case at its renamed commit, five reps, `--model sonnet`, `--keep-temp`, the full grant `--allow-tools Bash Write Edit Agent 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`; kept as `evals/results/round-71a@landed-renamed.json`, traces and homes copied out at once. It is the case's reading on the shipped text and on a third project name - unlike both the clause's example and the name the earlier draws used. Every rep decoding the project (5/5) is the shipped clause reading as it did in its round; any rep keeping `%20` is recorded with its trace read and goes to the owner. The replacement rules above hold.
+The owner had the case's project renamed and paid for one redraw. One arm: review-pr on `main` with the decoding clause landed (`d45d009`), the case at its renamed commit, five reps, `--model sonnet`, `--keep-temp`, the full grant `--allow-tools Bash Write Edit Agent 'Write(~/.local/state/**)' 'Edit(~/.local/state/**)'`; kept as `evals/results/round-71a@landed-renamed.json`, traces and homes copied out at once. It is the case's reading on the shipped text and on a third project name - unlike both the clause's example and the name the earlier draws used. Every rep decoding the project (5/5) is the shipped clause reading as it did in its round; any rep keeping `%20` is recorded with its trace read and goes to the owner. The replacement rules above hold.
 
 ## After the rename: the draw
 
-Model `claude-sonnet-5-5` in every `init` event, CLI 2.1.289, `main` at `b8c1bca` with the clause landed; $1.15, 11-14 turns, no rep replaced. Kept as `evals/results/round-71a@landed-renamed.json`, traces in `round71a-landed-renamed-traces/`, homes in `round71a-landed-renamed-files/`. Every rep filed under the Azure DevOps host's folder, then `acme/night shift/ticket-gateway/branch-feat-close-ticket/` - **5/5 decoded** on the shipped text, on a name unlike both the clause's example and the earlier draws' project, with both screens 5/5. The shipped clause reads as it did in its round.
+Model `claude-sonnet-5-5` in every `init` event, CLI 2.1.289, `main` at `ae89ab0` with the clause landed; $1.15, 11-14 turns, no rep replaced. Kept as `evals/results/round-71a@landed-renamed.json`, traces in `round71a-landed-renamed-traces/`, homes in `round71a-landed-renamed-files/`. Every rep filed under the Azure DevOps host's folder, then `acme/night shift/ticket-gateway/branch-feat-close-ticket/` - **5/5 decoded** on the shipped text, on a name unlike both the clause's example and the earlier draws' project, with both screens 5/5. The shipped clause reads as it did in its round.
