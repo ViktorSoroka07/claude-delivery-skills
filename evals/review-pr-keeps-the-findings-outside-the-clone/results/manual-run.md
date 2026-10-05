@@ -54,3 +54,5 @@ The treated arm clears its bar (4/5 or better on all three rows) against a 0/5 b
 ## Landed, without the description line
 
 Landed in 1.11.0 on the owner's ruling as tested, bar one line: the description's later-asks list keeps the current text, so "or list and open earlier reviews" did not ship. That line is the one part of the diff that can move a trigger, and the holds neighbour's two dark treated reps are its watched cost; the list-on-request ask is queued as its own round in `BACKLOG.md`, with that neighbour's `skill-was-invoked` row beside it. The folder, the frontmatter, the fallback, the narrowed exposure warning, §6's newest-round lookup and §7's List reviews row landed as drawn.
+
+A correction to the round's record, from the sixteenth prose pass's verifier: the version is within a session's reach after all. The skill's base directory is announced at every load - 39 times in this round's kept traces - and `.claude-plugin/plugin.json` sits two levels above it in a marketplace install and in a clone; the wording names no source, which is the gap (plan task 71).
