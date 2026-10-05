@@ -41,3 +41,20 @@ What the round can read, and what it cannot:
 - Decoding puts a space in the path: before replacing a treated rep for "no findings file in the state folder", its workspace is checked for a write split at the space.
 
 The replacement rules above hold for both arms.
+
+## The decoding round's draw
+
+Model `claude-sonnet-5-5` in every `init` event of all three runs, CLI 2.1.289; treated at `d3f27c3`, the neighbour's baseline at `20bf8e1` (same `skills/` as `cd48d76`); $3.27 for the three runs, 9-14 turns, no rep replaced and no write split at the space. Kept as `evals/results/round-71a@decode.json`, `round-71a@baseline-storage.json`, `round-71a@decode-storage.json`, traces in `round71a-decode-traces/` and beside, every kept home's state folder in `round71a-decode-files/` and beside.
+
+| Row | Baseline | Treated |
+|---|---|---|
+| project decoded in the folder the findings file ended up in (kept home) | 3/5 | 5/5 |
+| `decoded-key-in-reply` (screen) | 3/5 | 5/5 |
+| `encoded-key-not-in-reply` (screen) | 3/5 | 5/5 |
+| storage neighbour: written to the state folder (kept home) | 5/5 | 5/5 |
+| storage neighbour: `nothing-written-into-the-clone` | 5/5 | 5/5 |
+| storage neighbour: `reply-gives-the-absolute-path` | 5/5 | 5/5 |
+
+Every treated rep keyed the Azure DevOps form and filed under the Azure DevOps host's folder, then `acme/night shift/ticket-gateway/branch-feat-close-ticket/`, decoded and lowercased on an example naming another project; the screen expected to fail correct treated reps did not. The neighbour's Write screens read 2/5 in each arm, the other reps writing by shell, and the kept homes decided its rows. The `.claude` directory in every clone is the runner's own, present in every arm.
+
+**Verdict, as the bars allow:** the clause binds (5/5) and moves no neighbour. A separated rate is not shown - a clause that did nothing would still score 5/5 about one time in twelve at the baseline's point estimate - so a landing rests on the baseline's measured failure (two reps in five would have started a second folder), the clause binding on an example unlike its input, and the migrated tree already keyed the decoded way. That reading, with this caveat, is the owner's to land; the first version of these bars said so and the re-pin dropped the sentence, which this verdict restores.
