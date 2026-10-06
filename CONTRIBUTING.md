@@ -287,10 +287,10 @@ it:
   whose trace is gone cannot be read at all. **A companion on a write's full
   destination path misses the shell's way of writing it**: a rep that holds
   the directory in a variable (`D=...; cat > "$D/r2-<sha7>.md"`) never spells
-  the path in one piece, and across three cases in two rounds fourteen shell
-  writes into a folder outside the workspace matched such a pattern none of
-  the times, while thirteen spelled the file name itself and one built that
-  from a variable too. Anchor the shell companion on the file name, and where
+  the path in one piece, and across two cases in two rounds fourteen shell
+  writes of a round's findings file into a folder outside the workspace
+  matched such a pattern none of the times, while thirteen spelled the file
+  name itself and one built that from a variable too. Anchor the shell companion on the file name, and where
   `file_exists` cannot see the destination, read the file from the run's kept
   home as the decisive record. **And the runner counts a refused
   call as a call**: it keeps every `tool_use` in the trace and flags one that a
