@@ -1,6 +1,6 @@
 ---
 name: verifying-before-sending
-description: Use when factual text is about to leave the workspace for someone else's surface — a message a teammate will act on, a comment on another person's PR or work item, instructions another engineer will build against, skill or agent-instruction text a future session will obey, spec or wiki content other teams read — and earlier, before drafting such text at all.
+description: Use when a runbook, hand-off, message, comment, instruction or spec that someone else will act on is about to reach them or already waits for them - the on-call engineer who works from a document tonight, a teammate who acts on a message, a reviewer reading a comment on their PR or work item, another engineer building against instructions, a future session obeying skill or agent text, another team reading a spec or wiki - and the question is whether anything in it is wrong or would trip its reader; and earlier, before drafting such text at all.
 ---
 
 # Verifying Before Sending
