@@ -484,10 +484,11 @@ them start Python as well. CI exercises all three.
 
 ## Opinionated defaults
 
-Plans live in `docs/plans/`; review findings go to an untracked MD in the repo
-root, never into chat; repo-specific facts (gate commands, test commands, bot
-reviewers) live in a project memory entry named `review-repo-nuances` that the
-skills read and maintain. Adjust to taste — the skills state their mechanisms, so
+Plans live in `docs/plans/`; review findings go to a findings file in one folder
+outside every clone (`DELIVERY_SKILLS_REVIEW_DIR` moves it), never into chat;
+repo-specific facts (gate commands, test commands, bot reviewers) live in a
+project memory entry named `review-repo-nuances` that the skills read and
+maintain. Adjust to taste — the skills state their mechanisms, so
 the seams are visible.
 
 ## Beyond Claude Code
