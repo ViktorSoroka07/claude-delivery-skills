@@ -47,11 +47,12 @@ Four reps of the batch loaded the skill with their second call and none loaded `
 treated rep's session transcript (`round-73@nouns.json`).
 
 This wording moved the indicator from 0/5 to 5/5 and is the candidate to
-land. It has not landed: the skill's named-trigger cases are its neighbours and
-have not been run under it on this model, and CLAUDE.md declines a wording
-that costs one.
+land. It landed at `532c7fe` (riding the unreleased 1.11.0)
+with no neighbour read: the skill has no named-trigger case, so nothing in the
+suite measures what the new clause could cost an ask that names the task.
 
 ## Not tested
 
-The neighbours above, and whether the same clause shape reaches the other
+A named-trigger case for this skill, which would read what the clause costs an
+ask that names the task; and whether the same clause shape reaches the other
 thirteen named-task skills, whose descriptions this round did not touch.

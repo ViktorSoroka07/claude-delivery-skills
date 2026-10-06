@@ -46,11 +46,13 @@ Four reps loaded the skill with their second call; the fifth read the runbook an
 treated rep's session transcript (`round-73@nouns.json`).
 
 This wording moved the indicator from 0/5 to 4/5 and is the candidate to
-land. It has not landed: the skill's named-trigger cases are its neighbours and
-have not been run under it on this model, and CLAUDE.md declines a wording
-that costs one.
+land. It landed at `532c7fe` (riding the unreleased 1.11.0),
+after the skill's named-trigger case `verifying-before-sending-walks-the-procedure`
+ran under it as a neighbour on this model: its behaviour grader held 5/5 in
+both arms and its own indicator rose from 2/5 to 5/5; its record carries the
+table.
 
 ## Not tested
 
-The neighbours above, and whether the same clause shape reaches the other
-thirteen named-task skills, whose descriptions this round did not touch.
+Whether the same clause shape reaches the other thirteen named-task skills,
+whose descriptions this round did not touch.

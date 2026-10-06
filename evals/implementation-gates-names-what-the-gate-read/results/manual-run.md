@@ -131,3 +131,24 @@ the same bars, which is the owner's decision (task 42's section).
 Not bought: the treated arm and the three neighbours, about $7.60 of the
 approved $9.50. Spent on the round so far: $0.76 on the judge probe and $1.16
 here.
+
+## Neighbour check for task 73's noun wording
+
+Task 73 rewrote `implementation-gates`'s description to name the nouns a capability-phrased ask carries; the clause is quoted verbatim in `implementation-gates-loads-on-a-capability-ask`'s record, and it landed at `532c7fe`. A description moves the trigger for every case of its skill, so this case ran as a neighbour, with the bar fixed before the draw: a grader down by the floor's gap, four reps in five, declines the wording for this skill alone.
+
+Five reps an arm on `claude-sonnet-5-5` (CLI 2.1.289), `--ablation none`, `--judge-model sonnet`, `--keep-temp`. Base at `31ece6f`, the descriptions as they stood; treated at `31ece6f` with `cf1a589`'s three description lines applied uncommitted, so the arms differ in those lines alone (the branch `73-nouns` that holds `cf1a589` sits on a base the history rewrite replaced). The base arm ran in an earlier batch that was stopped at a usage limit after this invocation had finished; its fifteen reps across the three implementation-gates cases are complete and are read here, and the treated arm ran 78 minutes later on the same model and CLI version. Every rep's `init` carries the eighteen plugin skills and every rep loaded `tracking-open-asks` first (40/40 across the four cases). Turns: base [7, 12, 8, 7, 10], treated [7, 7, 10, 7, 8]; no rep was curtailed.
+
+| Grader | Type | Base | Nouns |
+|---|---|---|---|
+| `broken-link-named` | mechanical | 5/5 | 5/5 |
+| `no-clean-claim-over-the-new-pages` | judge | 4/5 | 4/5 |
+| `report-says-what-the-gate-read` | judge | 5/5 | 5/5 |
+| `skill-was-invoked` | mechanical | 0/5 | 0/5 |
+
+The indicator reads 0/5 in both arms, as this case's prompt was built to leave it: the prompt neither names the skill nor asks for work the skill names (the indicator grader's own note), so the noun wording had no ask here to reach, and the case reads only what it might cost.
+
+Judged rows, hand-graded in both arms from the run JSONs' `evidence`:
+- `no-clean-claim-over-the-new-pages`: 5/5 base, 5/5 treated by hand - the judge failed one rep in each arm, 2-1 both times, on "Every other link on the two new pages resolves" (base) and "The other links on both pages resolve" (treated), each beside the named broken link; neither says every link resolves, which is the condition.
+- `report-says-what-the-gate-read`: the judge passed every rep in both arms, and a hand screen of each reply for a clean, ready or gate-result sentence found none that the rubric fails.
+
+No grader moved by more than one rep, by the judge or by hand, so the wording does not cost this case and landed for `implementation-gates`. Run JSONs: `evals/results/round-73n@base-gates.json` and `round-73n@nouns-gates.json`; traces in `evals/results/round73n-traces/`.

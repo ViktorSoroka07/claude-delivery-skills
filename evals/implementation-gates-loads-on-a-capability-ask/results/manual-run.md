@@ -45,11 +45,12 @@ Every rep loaded the skill with its second call, before touching the repo, then 
 treated rep's session transcript (`round-73@nouns.json`).
 
 This wording moved the indicator from 0/5 to 5/5 and is the candidate to
-land. It has not landed: the skill's named-trigger cases are its neighbours and
-have not been run under it on this model, and CLAUDE.md declines a wording
-that costs one.
+land. It landed at `532c7fe` (riding the unreleased 1.11.0),
+after the skill's three named-trigger cases ran under it as neighbours on this
+model and no grader moved by more than one rep in five; their records carry
+the tables.
 
 ## Not tested
 
-The neighbours above, and whether the same clause shape reaches the other
-thirteen named-task skills, whose descriptions this round did not touch.
+Whether the same clause shape reaches the other thirteen named-task skills,
+whose descriptions this round did not touch.
