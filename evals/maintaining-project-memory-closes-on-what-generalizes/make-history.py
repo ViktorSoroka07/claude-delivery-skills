@@ -8,7 +8,10 @@ could offer for promotion, and gave them very different weight:
 
 - three long turns on why a carrier's parcel quotes were too high - the zone
   map the repo pins had been renumbered by the carrier - whose cause is that
-  one party's data and holds in no sentence without its name;
+  one party's data, though a general lesson can be drawn from it (a pinned
+  copy of published data drifts when the party publishes a new version), so
+  this seed measures the capability half of the closing list, not its
+  restraint half;
 - one parenthetical inside a sentence of the first turn, on a test run
   filtered by a name that matched no test, which the runner still reported as
   a passing file with exit 0 - true of any repository whose runner treats an
