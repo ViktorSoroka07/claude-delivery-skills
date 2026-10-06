@@ -176,9 +176,11 @@ between the opening paragraph and the rules is no rule: it makes a
 conversation's first tool call a load of `tracking-open-asks`, because how a
 message ends is work no request names, so a pointer to that skill is never
 followed. A moment that is a tool decision is the one form measured to load a
-skill no request names, and this one has bound only in fresh conversations: the
-probe of a line with the same imperative loaded the skill in none of five reps
-resuming a conversation, and after a compaction it is unmeasured.
+skill no request names. It binds in fresh conversations, and the landed line
+loaded the skill first in five of five reps resuming a seeded conversation
+whose turns held no tool call, where the probe of an earlier line with the same
+imperative had loaded it in none of five resumed reps of another seed; after a
+compaction it is unmeasured.
 
 ## The README paraphrases; the skill files own
 
@@ -336,8 +338,9 @@ it:
   first tool call a load of `tracking-open-asks`, which put it first in every
   fresh rep measured, all on the suite's model - five of five under an
   earlier wording with the same imperative, twenty-three of twenty-three
-  under the landed one - and loaded it in none of five reps resuming a
-  conversation under that earlier wording; and the skill gate stops a commit,
+  under the landed one - and, in a resumed conversation, in none of five reps
+  under that earlier wording and five of five under the landed one, on two
+  seeds whose turns held no tool call; and the skill gate stops a commit,
   a pull request create, a memory write and a subagent dispatch once each
   until the skill owning the act is loaded. In every kept rep it stopped - a
   commit on a smaller model, a dispatch on the suite's - the first call it
@@ -361,9 +364,9 @@ it:
   deny rule covers the path, and grades the stop and the load rather than a
   written file. A rule in the body
   of a standing-rule skill that neither moment reaches on the case, or of
-  `tracking-open-asks` in a resumed conversation whose seeded turns never
-  loaded it, still cannot be moved by any round the runner can buy, the reps
-  never having read it. A replay fixture can seed that load itself, as the
+  `tracking-open-asks` in a resumed conversation where neither the seed nor
+  the rep loaded it, still cannot be moved by any round the runner can buy,
+  the reps never having read it. A replay fixture can seed that load itself, as the
   first turn of a fresh conversation writes it, and a resume passes the seeded
   body to the model (the replay paragraph below). On such a fixture the
   indicator's 0/N no longer separates the two fails: it reads only the
