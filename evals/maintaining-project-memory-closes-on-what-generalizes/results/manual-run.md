@@ -91,6 +91,23 @@ No row fell by the floor's gap. The two that moved by two reps were read by hand
 
 Where lists appeared: none in any tracking closing in either arm; `prunes-the-store` closings carried one in 5 of 5 treated reps against 2 of 5 baseline, and two `plan-feature` hand-offs carried one under the treated text against none, one of them saying no mechanism generalized beyond what the skills state. No graded row of either case moved. Whether the strong model over-applies the sentence is unmeasured.
 
+## The Fable read, owner-bought after the landing
+
+Both arms on `--model fable` (`claude-fable-5-1` in every `init`), five reps, from the same two worktrees as the Sonnet round, the case's stale continuation transcripts moved aside first; this case and the two neighbours whose closings gained lists on Sonnet. Readings fixed before the draw (`docs/plans/task72-wording.md`): a row down by the floor's gap, or treated closings carrying local candidates in four or more reps more than the baseline, would narrow the landed sentence. Run JSONs `evals/results/round-72f@*.json`, traces `round72f-traces/`; $22.23.
+
+| Case and row | Baseline | Treated |
+|---|---|---|
+| this case, `offers-a-candidate` | 5/5 | 5/5 |
+| this case, `offers-the-quiet-mechanism` | 5/5 | 5/5 |
+| this case, `leaves-the-incident-unnamed` (hand) | 4/5 | 5/5 |
+| `maintaining-project-memory-prunes-the-store`, all four rows | 5/5 | 5/5 |
+| `plan-feature-commits-on-the-branch-it-is-on`, `hand-off-names-the-branch` (hand) | 5/5 | 5/5 |
+| `plan-feature-commits-on-the-branch-it-is-on`, `no-second-branch` | 5/5 | 5/5 |
+
+The judge failed one treated cell of each of the two hand-graded rows that a hand read passes: a treated closing whose carrier note is framed for this project ("so you can carry it yourself"), beside two general skill candidates; and a treated hand-off that names `feature/request-list` as the plan's branch and gives the `implement-plan` continuation. Its fail on baseline rep 1 stands: that closing offered the carrier note, `config/zones.json` and all, as a skill candidate. `nothing-pushed` read 0/5 in both arms, the grader defect of plan task 76.
+
+Every candidate offered beyond the repository was classified by hand. Fable has no failure here to fix: on the baseline brief it offered the quiet mechanism in five of five closings, where Sonnet did in one of five. Under the landed sentence its lists grew longer - two or three candidates per closing of this case against one or two, and `prunes-the-store` and `plan-feature` closings offering one or two where a baseline closing sometimes said none surfaced - and every added candidate is general: the pinned-data lesson restated, a "pin needs an owner who watches the changelog" question for planning, an absence claim re-checked at each pruning pass, a skill named in a plan step treated as a reference. No treated closing carried a local candidate; the one local candidate in either arm was a baseline closing's. So by the bars fixed before the draw the strong model does not over-apply the sentence, and the sentence stands; it is a fix the suite's model needs and the strong model does not.
+
 ## Not tested
 
-The restraint half as the entry describes it - dropping a vivid candidate whose cause is local - needs a seed whose vivid incident has no mechanism behind it (V1); the owner chose not yet. Over-application on Fable. A long or compacted session, where asides are summarised away. The skill's full statement, held for task 67.
+The restraint half as the entry describes it - dropping a vivid candidate whose cause is local - needs a seed whose vivid incident has no mechanism behind it (V1); the owner chose not yet. A long or compacted session, where asides are summarised away. The skill's full statement, held for task 67.
