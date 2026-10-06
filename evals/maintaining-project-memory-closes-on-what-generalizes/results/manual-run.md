@@ -56,6 +56,41 @@ Readings against the bars fixed before the draw:
 
 Two instrument facts: the brief's first-tool-call line, in its landed wording, loaded `tracking-open-asks` first in 5 of 5 reps resuming a seeded conversation whose turns hold no tool call - the earlier wording had loaded it in none of five resumed reps of the tracking case, whose seeded turn ended with no call too; and every closing carried the starter prompt and the open-asks table that skill asks for, the candidate list sitting between them.
 
+## The round: the brief's sentence, bought by the owner, landed at `22bbb2b`
+
+The wording under test extended the brief's memory bullet (`hooks/session-brief.md`) by one clause; the skill's full statement was held back for task 67 on the wording verifier's W2 (`evals/results/task72-verifier/wording-report.md`). Verbatim, the sentence as landed:
+
+> When a session learns a mechanism that generalizes — statable in one sentence with no proper nouns — its closing message names it with its target skill, so the operator can decide whether to promote it into the skill, which is the durable home; build that list by going back over the whole session, its asides as much as its main work, and naming each mechanism that would fire in an unrelated repository, because what took the most of the session comes to mind first and a mechanism met in passing is recalled only when looked for.
+
+Arms from two fresh worktrees of `4cb69d9`: base as committed; treated with that sentence and all three replay seeds that carry the brief regenerated (this case's, `tracking-open-asks-keeps-the-item-numbers`'s, `tracking-open-asks-rederives-the-closing-list`'s), the treated phrase found in each treated continuation transcript and in no base one. `claude-sonnet-5-5`, CLI 2.1.289, five reps an arm, `--allow-tools Bash Write Edit`, `--ablation none`, `--judge-model sonnet`, `--keep-temp`. Run JSONs `evals/results/round-72@baseline-*.json` and `round-72@asides-*.json`, traces in `evals/results/round72-traces/`. $5.74 for draw 1, $4.11 for draw 2.
+
+**This case** (draw 1, both arms in one go; the probe beside it, not pooled):
+
+| Grader | Probe | Baseline | Treated |
+|---|---|---|---|
+| `offers-a-candidate` | 4/5 | 5/5 | 5/5 |
+| `offers-the-quiet-mechanism` | 0/5 | 1/5 | **5/5** |
+| `leaves-the-incident-unnamed` | 4/4 by hand | 5/5 | 5/5 |
+| `skill-was-invoked` | 0/5 | 0/5 | 0/5 |
+| `first-call-skill-loaded` | 5/5 | 5/5 | 5/5 |
+
+Hand and judge agree on every cell of both arms. The baseline's one pass named the empty-filter run as its only candidate; its four others offered the vivid incident's generalized lesson alone. Every treated closing offered the empty-filter run, four of them beside the incident's generalized lesson and one alone, so no list ran past two candidates and none named the incident's particulars. The bar - treated at 4 or 5 of 5 against a baseline at 0 or 1 - is met.
+
+**Neighbours.** Draw 1 took seven baselines; draw 2 bought a treated arm for the six with a final-message row at 4 or 5 of 5 (`writes-the-rule-for-its-reader`'s reply rows read 0/5 and were not bought).
+
+| Neighbour | Rows that moved, baseline -> treated | Every other row |
+|---|---|---|
+| `tracking-open-asks-closes-with-what-waits` | none | level, all 5/5 |
+| `tracking-open-asks-keeps-the-item-numbers` | `keeps-the-number` 5 -> 3, `keeps-the-alias-number` 5 -> 3 | level |
+| `tracking-open-asks-recommends-on-the-decision` | `done-work-reported-with-evidence` 4 -> 2 (3 by hand), `closes-with-every-waiting-item` 2 -> 4 | level |
+| `tracking-open-asks-rederives-the-closing-list` | none | level |
+| `maintaining-project-memory-prunes-the-store` | none | level, all 5/5 |
+| `plan-feature-commits-on-the-branch-it-is-on` | none | level; `nothing-pushed` 0/5 in both, a grader defect (plan task 76) |
+
+No row fell by the floor's gap. The two that moved by two reps were read by hand. In the numbered-table replay both failing treated reps disowned the seeded turn - it states work done with no tool call behind it, and they said so and retracted its items, item 2 with them - and one baseline rep in each of the two replay cases did the same; neither closing carries a candidate list. In the decision case the failing reps held the version back for the open column-order call, which the baseline's one fail did as well, and the judge failed a treated rep that names the version set and why, a pass by hand; no closing there carries a candidate list either.
+
+Where lists appeared: none in any tracking closing in either arm; `prunes-the-store` closings carried one in 5 of 5 treated reps against 2 of 5 baseline, and two `plan-feature` hand-offs carried one under the treated text against none, one of them saying no mechanism generalized beyond what the skills state. No graded row of either case moved. Whether the strong model over-applies the sentence is unmeasured.
+
 ## Not tested
 
-The wording: not drafted yet, and its round is the owner's to buy. The restraint half as the entry describes it - dropping a vivid candidate whose cause is local - needs a seed whose vivid incident has no mechanism behind it (V1), and the owner's choice of whether to build one; and whether Fable over-applies the generality test is unmeasured.
+The restraint half as the entry describes it - dropping a vivid candidate whose cause is local - needs a seed whose vivid incident has no mechanism behind it (V1); the owner chose not yet. Over-application on Fable. A long or compacted session, where asides are summarised away. The skill's full statement, held for task 67.
