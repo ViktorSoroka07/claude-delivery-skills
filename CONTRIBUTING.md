@@ -290,13 +290,16 @@ it:
   the path in one piece, and across two cases in two rounds fourteen shell
   writes of a round's findings file into a folder outside the workspace
   matched such a pattern none of the times, while thirteen spelled the file
-  name itself and one built that from a variable too. Anchor the shell companion on the file name, and where
-  `file_exists` cannot see the destination, read the file from the run's kept
-  home as the decisive record. **And the runner counts a refused
-  call as a call**: it keeps every `tool_use` in the trace and flags one that a
-  hook or the run's permission settings refused, but reads that flag only for
-  mock tallies, so a grader on an act either can stop reads the stopped attempt
-  as the act. The settings refuse calls with no hook involved: the trace copies
+  name itself and one built that from a variable too. Anchor the shell
+  companion on the file name, and where `file_exists` cannot see the
+  destination, read the file from the run's kept home as the decisive record -
+  `<run root>/sealed/home/`, opened with `chmod 700` on the root and on
+  `sealed`, as the runner's own warning at the end of a kept run says. **And
+  the runner counts a refused call as a call**: it keeps every `tool_use` in
+  the trace and flags one that a hook or the run's permission settings
+  refused, but reads that flag only for mock tallies, so a grader on an act
+  either can stop reads the stopped attempt as the act. The settings refuse
+  calls with no hook involved: the trace copies
   kept under `evals/results/` from before the gate hold 35 such refusals, and in
   three reps `reapplied-the-contradicted-row` counted a refused source mutation,
   each beside one that ran, so no verdict moved. The plugin's own skill
