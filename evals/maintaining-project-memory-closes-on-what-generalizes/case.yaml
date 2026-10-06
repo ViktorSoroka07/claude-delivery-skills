@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: maintaining-project-memory-closes-on-what-generalizes
+context:
+  scaffold_script: fixture.sh
+  history_file: history.jsonl
