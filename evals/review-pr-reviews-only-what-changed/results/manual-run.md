@@ -36,7 +36,7 @@ Reading rules:
 
 ## Round 69b (the later-round wording), five reps an arm
 
-Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; baseline = `main` at `fdd56e7` (the landed storage text), treated = `69b-delta-on-a` at `ce780eb`. Kept as `evals/results/round-69b@baseline.json`, `round-69b@delta.json`, `round-69b@baseline-storage.json` and `round-69b@delta-storage.json`, traces in `evals/results/round69b-traces/`, every rep's state-folder files in `evals/results/round69b-files/`. $4.98 for the four runs; turns 10-12 baseline and 9-12 treated, no rep near the cap, no subagent dispatched.
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; baseline = `main` at `fdd56e7` (the landed storage text), treated = `69b-delta-on-a` at `ce780eb`, a branch commit on no branch since; the wording landed on `main` as `9d1f3cd`, which holds the text this round measured (step 4.1's command was rewritten after it, at `17b7a12`). Kept as `evals/results/round-69b@baseline.json`, `round-69b@delta.json`, `round-69b@baseline-storage.json` and `round-69b@delta-storage.json`, traces in `evals/results/round69b-traces/`, every rep's state-folder files in `evals/results/round69b-files/`. $4.98 for the four runs; turns 10-12 baseline and 9-12 treated, no rep near the cap, no subagent dispatched.
 
 | Row | Baseline | Treated |
 |---|---|---|
