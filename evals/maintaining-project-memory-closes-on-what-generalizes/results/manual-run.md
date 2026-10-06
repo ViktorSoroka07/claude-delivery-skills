@@ -35,6 +35,27 @@ The baseline arm alone, on the current brief: `claude-sonnet-5-5`, five reps, `-
 
 Hand-grade every judged row from the run JSON's `evidence`; where a rep's last text follows a tool call, the judge saw only that last text, so grade from the kept trace's text blocks instead. Any rep that wrote `README.md` or another rule file has the landing-sweep hook replayed before its row is read (CLAUDE.md's Evals).
 
+## The probe's result
+
+Ran as fixed above at `a50562b` ($0.53, five reps, three turns each, no rep curtailed); run JSON `evals/results/round-72@probe.json`, traces `evals/results/round72-traces/`. Instrument from the traces: `claude-sonnet-5-5` in every `init`; every rep's sequence was one Skill call loading `tracking-open-asks`, then one text, so the judge saw each whole closing; no rep wrote a file, so no landing-sweep replay was owed.
+
+| Grader | Judge | Hand |
+|---|---|---|
+| `offers-a-candidate` | 4/5 | 4/5 - reps 0, 1, 2, 4 offer one candidate each, for a skill; rep 3 offers project follow-ups only |
+| `offers-the-quiet-mechanism` | 0/5 | 0/5 - no closing mentions the empty-filter run at all |
+| `leaves-the-incident-unnamed` (over the four offering reps) | 3/4 | 4/4 - the judge failed rep 0 for "a carrier's own calculator", where "carrier" is the generic noun, not the incident's carrier |
+| `skill-was-invoked` (`maintaining-project-memory`) | 0/5 | 0/5 |
+| `first-call-skill-loaded` (`tracking-open-asks`) | 5/5 | 5/5 |
+
+Readings against the bars fixed before the draw:
+
+- **Reach: 4 of 5**, so both halves are read.
+- **Capability: the quiet mechanism missing in 5 of 5** - a failing baseline, live for a five-rep wording round.
+- **The narrowed row**: every candidate offered (4 of 4) is the vivid incident's lesson, generalized - a pinned copy of a provider's published data drifts from their current version, so compare the two before auditing your own code - and every one aims it at `implementation-gates`. None names the incident's particulars. So the closing list was made of the most vivid thing in the session and nothing else, which is the entry's failure as the first sighting described it; on this seed the vivid lesson is a fair candidate (V1), so the failure reads in the capability direction - the quiet mechanism dropped - rather than as an unfair candidate offered.
+- **The indicator split** is empty: no rep loaded `maintaining-project-memory`, so the skill's closing form played no part.
+
+Two instrument facts: the brief's first-tool-call line, in its landed wording, loaded `tracking-open-asks` first in 5 of 5 reps resuming a seeded conversation whose turns hold no tool call - the earlier wording had loaded it in none of five resumed reps of the tracking case, whose seeded turn ended with no call too; and every closing carried the starter prompt and the open-asks table that skill asks for, the candidate list sitting between them.
+
 ## Not tested
 
-Everything above; no rep has run. The wording itself is not drafted: it waits on the probe, which says which half of the entry the instrument can see, and on the owner's choice of a seed for the restraint half.
+The wording: not drafted yet, and its round is the owner's to buy. The restraint half as the entry describes it - dropping a vivid candidate whose cause is local - needs a seed whose vivid incident has no mechanism behind it (V1), and the owner's choice of whether to build one; and whether Fable over-applies the generality test is unmeasured.
