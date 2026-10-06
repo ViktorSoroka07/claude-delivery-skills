@@ -973,8 +973,10 @@ round's declined wording, the one thing a later round must not try again
 unchanged, is lost with it. Write the sentence under test into the case's
 `results/manual-run.md` verbatim, in both arms where both changed text, and
 keep the SHA beside it as the pointer it is. A wording that landed needs no
-quote - it is in the skill, on `main`, and the SHA resolves for as long as the
-history does.
+quote once the record names the commit on `main` that landed it: a landing
+here is a new commit, not the branch's, so the branch's SHA goes with the
+branch, and the skill's text moves on after the landing while that commit
+keeps the text the round measured.
 
 ## When a rule outlives the model that needed it
 
