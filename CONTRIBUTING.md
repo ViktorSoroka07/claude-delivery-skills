@@ -788,8 +788,10 @@ Rules that held in practice, each answering a failure seen here:
   loads live. The first replay baseline falsified that: none of its ten reps
   called the Skill tool, so the skill's text reached none of them - under a
   brief that did not yet make that load a conversation's first tool call.
-  Under a brief that did, it loaded in none of five reps resuming the case
-  either, the seeded turn having ended with no call. The generator now seeds
+  Under the earlier wording of a brief that did, it loaded in none of five
+  reps resuming the case either, the seeded turn having ended with no call
+  (the landed wording has since loaded it in five of five reps resuming
+  another seed). The generator now seeds
   the load a fresh conversation's first turn makes - the Skill call, its
   result and the skill's body as the harness injects it - and a one-rep probe
   on a file seeded that way quoted a sentence only that body holds, word for
