@@ -94,6 +94,19 @@ it is written: the commit body carries the observation behind the sentence,
 which the entry cannot, and an uncommitted entry is a stray change every
 later session has to explain or step around.
 
+**What is worth queuing is what the session missed, not what it knew.** A
+session's closing list of mechanisms is written from salience, and salience
+favours what took the most time - including insights the session reached
+unaided and applied correctly. Those are not lessons: the next session reaches
+them the same way, and queuing them spends a round on a rule that changes
+nothing. A mechanism is queued when the session failed, or nearly failed,
+because it did not hold it - a wrong claim reached a reader, a reply missed its
+first point, a question went out that its reader could not act on - and the
+cost of that miss is what the entry's parenthetical names. The test, applied
+to each candidate before the list is written: would a session that had never
+met this mechanism have done the same work correctly on its own? If yes, drop
+it; if it is only vivid, the generality test above already drops it.
+
 **Queuing starts with a search, not with a line.** Nobody re-reads a
 backlog, and the one moment anyone has a mechanism in hand with the file
 open is when they are about to queue it - so that is where recurrence gets
