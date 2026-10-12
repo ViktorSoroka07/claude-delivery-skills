@@ -68,13 +68,19 @@ jobs:
       # The Agent Skills reference validator (PyPI: skills-ref; the installed
       # command is `agentskills`) - frontmatter validity, name/directory
       # agreement, and the spec's length limits, for every skill.
+      # It refuses every key the spec does not define, so it reads a copy
+      # without `argument-hint`, Claude Code's slash-command hint, which the
+      # spec has no key for; any other unknown key still fails the step.
       # pipx rather than pip: newer runner images mark the system python
       # externally managed, and a PEP 668 refusal would fail the job.
       - name: Validate every skill against the Agent Skills spec
         run: |
           pipx install skills-ref
           for d in skills/*/SKILL.md; do
-            agentskills validate "$(dirname "$d")"
+            n=$(basename "$(dirname "$d")")
+            mkdir -p "$RUNNER_TEMP/spec/$n"
+            sed '1,/^---$/{/^argument-hint:/d;}' "$d" > "$RUNNER_TEMP/spec/$n/SKILL.md"
+            agentskills validate "$RUNNER_TEMP/spec/$n"
           done
 
       # The spec validator above reads SKILL.md alone; this is what Claude
