@@ -2,6 +2,7 @@
 name: implementation-gates
 description: Use when a change is about to be merged, called done or complete, or handed over on a green suite - a branch ready for its target, passing tests, a written record of what was verified, the question of what is left before a merge - after the repo's own gates have passed; and while writing a plan or spec, to settle its claims about outside systems (APIs, data, libraries) against evidence before they become design decisions.
 argument-hint: "[branch | plan or spec to ground-truth]"
+license: MIT
 ---
 
 # Implementation Gates

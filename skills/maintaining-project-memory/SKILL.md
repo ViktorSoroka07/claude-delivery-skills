@@ -2,6 +2,7 @@
 name: maintaining-project-memory
 description: Use when writing, pruning, or restructuring project memory entries, when a merge or shipped milestone leaves memory describing finished work, when ending a session whose work continues in a later one — and whenever a statement is about to be copied from chat, a memory, or one document into another.
 argument-hint: "[prune | what to remember | close session]"
+license: MIT
 compatibility: Claude Code-native — assumes a per-project memory directory (entries plus a MEMORY.md index) that later sessions load.
 ---
 

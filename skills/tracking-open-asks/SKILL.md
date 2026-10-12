@@ -1,6 +1,7 @@
 ---
 name: tracking-open-asks
 description: Use when a request contains more than one ask, when new asks arrive while work is already running, at any checkpoint or session end where status gets reported, and whenever a question, decision or action is handed to the requester.
+license: MIT
 ---
 
 # Tracking Open Asks

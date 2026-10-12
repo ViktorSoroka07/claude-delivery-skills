@@ -2,6 +2,7 @@
 name: writing-for-audiences
 description: Use when writing prose a specific person or audience will read, act on, or hear — a report, a deck or speech, teaching material, an explanation, a message — and when a reader signals they did not understand ("what is this number of?", "explain it in simpler terms", "I don't get what you mean").
 argument-hint: "[draft or topic] [reader]"
+license: MIT
 ---
 
 # Writing for Audiences

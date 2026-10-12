@@ -2,6 +2,7 @@
 name: addressing-review-feedback
 description: Use when review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked to, re-checking threads already marked resolved — "check the resolved threads too", "re-check the resolved ones before we merge".
 argument-hint: "[PR number | URL] [re-check resolved]"
+license: MIT
 compatibility: Requires git and an authenticated platform CLI - gh (GitHub), az / a PAT in AZURE_DEVOPS_EXT_PAT (Azure DevOps), or glab (GitLab). Platform mechanics (reading threads, replying, resolving) are review-pr's references, at `../review-pr/references/<platform>.md` from this skill's directory; this skill owns the author's seat.
 ---
 

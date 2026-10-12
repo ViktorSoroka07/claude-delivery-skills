@@ -2,6 +2,7 @@
 name: plan-feature
 description: Use when starting new work from an idea rather than from an existing plan — "I want to build X", "let's add Y", "can we change how Z works", "plan this feature". Ends at a plan; implementation is a separate skill (implement-plan).
 argument-hint: "[what to build or change]"
+license: MIT
 compatibility: Delegates to the superpowers skill set (brainstorming, writing-plans) or a repo's own forks of them - install one or the chain has nothing to call.
 ---
 

@@ -2,6 +2,7 @@
 name: writing-pr-descriptions
 description: Use when a branch is ready for the team and reviewers need to know what to read first - a pull request, its title and description, review notes or a reviewer-facing summary for a branch - when creating a pull request, writing or editing a PR title or description, when commits have landed on a branch whose PR description may no longer match - including "sync the PR description" and "update the PR body" asks - and when maintaining a living status comment on a PR or issue. GitHub and Azure DevOps.
 argument-hint: "[PR number | branch] [sync]"
+license: MIT
 ---
 
 # Writing PR Descriptions

@@ -2,6 +2,7 @@
 name: git-sync
 description: Use when asked to fetch, sync, refresh or update the git repos in a folder rather than one at a time — "sync all my repos", "fetch everything under this directory", "which of these clones are behind", "bring my checkouts up to date" — and when surveying what has moved across many clones before starting work. Runs a bundled script; the judgement is in reading its output, not in doing the git work by hand.
 argument-hint: "[folder | repo] [--dry-run] [--fetch-only] [--ask]"
+license: MIT
 ---
 
 # git-sync

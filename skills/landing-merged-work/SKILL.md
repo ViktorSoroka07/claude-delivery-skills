@@ -2,6 +2,7 @@
 name: landing-merged-work
 description: Use when work has landed on its target branch — a merged PR or MR, a completed local merge — and the branch, worktree, memory entries and tracker item it leaves behind need closing out; and, as a separate ask, when deciding which existing local branches and worktrees are safe to delete.
 argument-hint: "[merged PR number | branch] | [all branches and worktrees]"
+license: MIT
 compatibility: Requires git; the tracker step requires an authenticated platform CLI. The forward path of integrating a branch you just finished belongs to the superpowers skill set (finishing-a-development-branch) or a repo's own fork — this skill owns the moment after that one ends.
 ---
 

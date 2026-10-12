@@ -1,6 +1,7 @@
 ---
 name: delegating-to-subagents
 description: Use when handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted.
+license: MIT
 compatibility: Claude Code-native — assumes the Agent tool and subagent machinery. The decision to fan out belongs to the superpowers dispatch skills or a repo's own; this skill owns collision-safe partitioning and everything around and after the dispatch.
 ---
 
