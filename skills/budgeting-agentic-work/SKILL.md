@@ -1,6 +1,7 @@
 ---
 name: budgeting-agentic-work
 description: Use when launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared.
+argument-hint: "[work to price]"
 ---
 
 # Budgeting Agentic Work

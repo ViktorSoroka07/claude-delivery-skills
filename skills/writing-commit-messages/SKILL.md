@@ -1,6 +1,7 @@
 ---
 name: writing-commit-messages
 description: Use when a commit is about to be made — "commit this", staged changes waiting, a fix-up after review, a delegated diff the orchestrator is committing — and when a commit message is being edited or squashed before a push.
+argument-hint: "[commit or range to reword]"
 ---
 
 # Writing Commit Messages

@@ -1,6 +1,7 @@
 ---
 name: writing-code-comments
 description: Use when writing or editing code and a comment is about to be added — new modules, bug-fix rounds, review-fix rounds, test files — and when auditing a diff's comments (your own or a delegate's) before commit.
+argument-hint: "[file or diff range to audit]"
 ---
 
 # Writing Code Comments

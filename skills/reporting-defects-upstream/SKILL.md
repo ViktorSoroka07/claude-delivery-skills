@@ -1,6 +1,7 @@
 ---
 name: reporting-defects-upstream
 description: Use when filing a defect, a data point or an improvement request into a system another team owns — a shared pipeline, a platform, an internal tool, a library — that they did not ask you to review; and when reviewing such a report before it is sent.
+argument-hint: "[defect to report | draft report to review]"
 ---
 
 # Reporting Defects Upstream

@@ -1,6 +1,7 @@
 ---
 name: writing-plan-docs
 description: Use when creating, rewriting, or syncing a document a reader will later consult for current state, whether a plan or spec (docs/plans or equivalent), a findings or analysis report, or a research write-up. Triggers at feature start, when implementation ships, after a merge with the target branch, after review fixes land, and whenever a later finding overturns a conclusion the same document already states.
+argument-hint: "[plan, spec or report path]"
 ---
 
 # Writing plan docs
