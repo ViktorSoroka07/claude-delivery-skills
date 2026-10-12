@@ -15,6 +15,9 @@ conversation, with a reason naming the skill, so the session loads it and runs
 the act again, rewritten where the skill changes it. A session that declines
 the skill loses one turn.
 
+Claude Code shows every stop to the person watching as a red "hook error", so
+the stop carries a second line addressed to them, which the model never sees.
+
 A subagent's hook input carries its parent's session and transcript plus its
 own agent_id. Its own transcript sits beside the parent's, and its state is
 keyed apart, so a skill the parent loaded does not count for a subagent that
@@ -237,11 +240,18 @@ def main():
                "loaded it. Call the Skill tool with `delivery-skills:%s`, follow it, then run the "
                "act again - rewritten where the skill changes it." % (what, skill, skill))
     else:
+        what = "this command"
         owners = " and ".join("`delivery-skills:%s` owns %s" % ACTS[a] for a in stops)
         why = ("this command once, because %s, and this conversation has loaded none of them. "
                "Call the Skill tool with each, follow them, then run the command again - "
                "rewritten where the skills change it." % owners)
+    skills = " and ".join("`%s`" % ACTS[a][0] for a in stops)
     sys.stdout.write(json.dumps({
+        "systemMessage": (
+            "delivery-skills paused %s so the session can load %s first and run it again. "
+            "Claude Code labels every hook stop a \"hook error\"; nothing failed, and this act "
+            "is not paused again in this conversation." % (what, skills)
+        ),
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",

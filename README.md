@@ -277,7 +277,9 @@ instructions alone cannot:
     warning reaches the session beside the call's result, one act too late for a
     commit whose message is already in the command. Each act is stopped once per
     conversation, so a session that declines the skill loses one turn, and a
-    subagent's acts are keyed apart from its parent's. It finds the memory directory
+    subagent's acts are keyed apart from its parent's. Claude Code shows every
+    hook stop as a red "hook error", so the stop also prints a line telling the
+    person watching that nothing failed. It finds the memory directory
     where Claude Code keeps it - under the `projects/` of the config directory,
     `~/.claude` or the one `CLAUDE_CONFIG_DIR` names, or of the directory
     `CLAUDE_CODE_REMOTE_MEMORY_DIR` names, or at the path

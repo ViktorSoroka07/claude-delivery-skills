@@ -448,6 +448,7 @@ check "skill gate exits 0 when it stops" 0 $?
 contains "skill gate stops a commit with no load in the transcript" "$out" "$DENY"
 contains "skill gate names the commit's skill" "$out" "delivery-skills:writing-commit-messages"
 contains "skill gate's reason opens by saying it is no error" "$out" "Not an error"
+contains "skill gate tells the person watching that its stop is a pause" "$out" "\"systemMessage\": \"delivery-skills paused this commit so the session can load \`writing-commit-messages\` first"
 out=$(gate Bash g1 '' "$WORK/t-none.jsonl" 'git commit -m x')
 empty "skill gate stands aside on the retry of a stopped act" "$out"
 
@@ -542,6 +543,7 @@ contains "skill gate stops a tee into memory fed by a heredoc" "$out" "delivery-
 out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
 contains "skill gate names every unloaded act of a command in one stop" "$out" "writing-pr-descriptions"
 contains "skill gate's combined stop names the commit's skill too" "$out" "writing-commit-messages"
+contains "skill gate's combined stop tells the person watching both skills" "$out" "paused this command so the session can load \`writing-commit-messages\` and \`writing-pr-descriptions\` first"
 out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
 empty "skill gate stands aside on the combined command's retry" "$out"
 
