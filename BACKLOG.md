@@ -66,9 +66,20 @@ untested and short a sighting. `backlog/declined.md`'s preamble names the
 grounds a decline can rest on; CONTRIBUTING's "Where a lesson waits" has the
 reasoning.
 
-Nothing here is pre-approved; the tiers are the maintainer's current read of
-what a rule would be worth, and the sighting count is what says it is ready to
-test.
+**The order within a tier is the order a round takes entries up**, so where a
+line is placed decides when it runs, and a line appended at the end runs last
+whatever it is worth. A new entry, or one moving back from parked, is placed
+where its value sits among its neighbours, with two things in view: how often
+the mechanism costs the operator and what each occurrence costs - a rule that
+saves a turn in every message sits above one that saves a review round, which
+sits above one that saves a planning session's quota, which sits above one
+that corrects the eval instrument - and whether its failure landed or was
+measured, which sits above a near miss. The commit that adds it says which
+entry it was placed above and why, and the session's closing message says
+where it landed, so the operator reads when it will run instead of asking.
+The tiers themselves are the maintainer's read of what a rule would be worth,
+and the sighting count is what says it is ready to test; nothing here is
+pre-approved.
 
 ## Strong — prevents a real failure, general
 

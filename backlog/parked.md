@@ -10,9 +10,10 @@ Each of these was met once and has not come back. Parking is a finding about
 the mechanism, not a judgement on the sentence: nothing here was tested, and
 what it lacks is a second occurrence rather than a better wording. Each keeps
 its sentence so that search matches it, and ends with the circumstance that
-would make it two. A session that hits one moves it back to its tier in
-[`BACKLOG.md`](../BACKLOG.md) with its own circumstance added, already
-carrying two sightings, which makes it eligible at once.
+would make it two. A session that hits one moves it back into its tier in
+[`BACKLOG.md`](../BACKLOG.md), placed where its value sits among its
+neighbours as that file's header says, with its own circumstance added,
+already carrying two sightings, which makes it eligible at once.
 
 - A committed credential is a "rotate" finding, never a "remove" one — history keeps the value reachable on every branch that contains the commit. → review-pr (Parked until a review files a committed secret with removal alone as its fix; a round starts by checking the baseline, which a model that already knows history keeps the value reachable will pass)
 - A finding graded down because another layer already guards the behaviour is regraded when a second finding in the same review rewrites that guard, since an author applying both is left with neither; before a grade rests on a guard, check whether any other finding in the same list changes it. → review-pr, the Pass 2 merge (untested; parked until a second review has one finding rewrite the guard another finding's grade rests on)

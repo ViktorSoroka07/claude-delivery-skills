@@ -130,6 +130,19 @@ sentence; [`BACKLOG.md`](BACKLOG.md)'s header shows the shape. An entry
 carrying no count stands at the one sighting that queued it, so the first
 sighting added to it makes two.
 
+**Placement is the schedule.** Within a tier, a round takes entries up in the
+order they stand, so the line's position is the decision about when it runs,
+and a session that appends at the end has scheduled its entry last without
+noticing it has decided anything - the maintainer then either reorders the
+file by hand or never learns that something worth more sits at the bottom.
+So a new entry, and a parked one moving back, is placed where its value sits
+among its neighbours: the operator's cost per occurrence times how often the
+mechanism occurs, then whether its failure landed or was measured.
+[`BACKLOG.md`](BACKLOG.md)'s header carries the ordering a session applies;
+the commit body says which entry the line was placed above and why, and the
+closing message says where it landed, which is what lets the maintainer read
+the schedule off the file instead of asking for it.
+
 **Recurrence is the promotion filter.** A mechanism met once is a hypothesis
 about how things fail; one that bites twice is a rule, and the second
 sighting is the evidence the first one lacked - so an entry is worth a
