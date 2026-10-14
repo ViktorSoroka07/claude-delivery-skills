@@ -6,6 +6,8 @@
 
 The order of work lives outside the tree: the maintainer keeps a plan under `docs/plans/` (git-ignored) and a memory note that holds the current ordered steps. Read those before choosing a task; do not infer the order from the git log. A session covers the tasks its plan assigns and stops at the boundary the plan names, even with context to spare; at the stop it commits, rewrites the memory note's current steps in place, hands over any push, and says whether a fresh session can continue from the files alone.
 
+A session that finds something worth doing beyond its assigned tasks does not drop it, and does it beside those tasks, never instead of them. What is plainly right, within this repository's purpose and undone by one commit if wrong - a sentence a change made stale, a copy that disagrees with its source, a sighting the queue lacks, a check that would have caught a defect met here - is done in its own commit and reported in a line, after a word with the advisor where one is configured. What needs a round, a spend or a change to the order is appended to the plan's task list with a line in the memory note and named in the closing. What the session declines is named with its reason. Nothing found leaves the session unmentioned.
+
 ## Commits
 
 - One workstream per commit; a change that would be reverted separately is a separate commit. Subject is the outcome, body is the mechanism; no session narration, no attribution trailers.
