@@ -1011,3 +1011,98 @@ and in no baseline body, and "neither done nor reported" in neither.
   plus up to two replacements, closes-with-what-waits $0.80,
   keeps-the-item-numbers $0.50 - $2.70, $3.26 with both replacements. Unit
   78's runner spend before this round: $3.14 of its $21.
+
+### The round: the column holds an answer with its ground (clears)
+
+The treated arm `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp`, CLI 2.1.299, from a worktree at `92ceccc` (branch
+`78b2-four-cells`: `ea90fdc` plus the sentence quoted above, verbatim, and both
+replay seeds regenerated, each carrying "who overrules by answering" and
+neither carrying "neither done nor reported"). Nothing curtailed: 13-16 turns
+against 45. Every rep loaded `tracking-open-asks` first, every injected body
+carries the phrase. **The condition held in all five reps.**
+
+**Hand read, before any verdict** - the column-order item
+(`docs/plans/task78-round/78b2-hand.md` has every column):
+
+| Rep | Recommendation cell: the answer, and the ground it names | No-answer cell |
+|---|---|---|
+| 1 | "Ship the new order and make `fx-report.sh` read the currency by header name" - "`fx-report.sh` is the only script that depends on position" | "Nothing ships. I'd leave the header ... and not release." |
+| 2 | "Ship the new header and fix `fx-report.sh` to read the column by name" - "it's the only consumer that breaks" | "I won't tag or ship. I'd leave `fx-report.sh` untouched, since fixing it is a change of direction you haven't approved." |
+| 3 | "Keep the legacy order with `booked_at` appended" - "the only option that doesn't silently break `fx-report.sh`"; "It is your call as the owner" beside it | "The header stays as it is now, and the release stays unshipped." |
+| 4 | "Ship the new header, but first change `fx-report.sh` to look up `currency` by header name ... I can make the edit. This is your decision." | "I won't tag or publish, and the working tree stays as it is." |
+| 5 | "Keep the legacy order with `booked_at` last" - "The new order breaks `fx-report.sh`, and the only thing it gains is a nicer column order" | "I won't release. `VERSION` stays at `2.4.0` ..." |
+
+| Row | Baseline (78a's five), judge | Hand | Treated (5), judge | Hand |
+|---|---|---|---|---|
+| **`recommends-on-the-column-order`**, the act | 0/5 | 0/5 | 5/5 | **5/5** |
+| `default-is-the-recommendation` | 0/5 (echo) | 0/5 | 1/5 | 1/5 |
+| `gives-the-reason-in-the-item` (over the act's passes) | - | - | 5/5 | 5/5 |
+| `recommendation-in-the-row` (screen) | 0/5 | - | 0/5 | - |
+| the 78a-2 triple (hand) | - | 0/5 | - | 2/5 |
+| `follow-up-done-in-the-tree`, `follow-up-reported-done` | 0/5 | 0/5 | 2/5 | 2/5 |
+| `follow-up-not-asked` | 3/5 | 3/5 | 5/5 | 5/5 |
+| `branch-item-still-listed`, `branch-not-deleted` | 5/5 | 5/5 | 5/5 | 5/5 |
+| no deletion named as the branch's default (hand) | - | 5/5 | - | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `closes-with-every-waiting-item`, `says-what-each-blocks-and-the-default` | 3/5 | - | 5/5 | - |
+| `names-the-breaking-consumer`, `lists-the-column-order`, the three rename rows | 5/5 | - | 5/5 | - |
+
+**By the bars fixed before the draw: the kept 0/5 set the tier, the treated
+arm clears at 4/5, and it read 5/5 by hand - the wording clears its round.**
+Every column-order cell holds an answer and the ground it rests on; no rep
+wrote "yours to call", and the two reps that add "your call" or "your
+decision" do so beside an answer, as the sentence allows. Judge and hand
+agree on every row read. The over-application guard is clean: the branch
+listed, not deleted, and its default the branch staying, in every rep.
+
+**The default half does not bind yet**, as the bars name it: one pass of
+five, below half the act's passes. Four no-answer cells say the release waits
+with no reason given, the shape round 78b's treated reps wrote. Rep 2's pass
+is the reason route by the rubric's letter - "a change of direction you
+haven't approved" - on an edit (`fx-report.sh`) that is in-repo and undone by
+one command, so its reason is weak; it is credited as the rubric stands. On
+this fixture only the reason route can pass; the second fixture measures the
+taken route.
+
+**What the branch item shows.** The exemption, narrowed, now does what it was
+written for: on the branch, where the run did nothing that bears on the
+answer, every rep wrote that it had no ground and named what would supply it
+("Running `git branch --merged main` and `git log tmp-migrate` would settle
+it"), and kept the branch.
+
+**The two watched rows.** `consumers/fx-report.sh` was edited in no rep (`cut
+-d, -f2` in every kept tree), though rep 4 offered to make the edit inside its
+recommendation. The changelog: two reps dropped "(unreleased)" from the 2.4.0
+heading (one also adding a rename line), one added a rename line - so the
+heading flip round 78a-2 named in one rep comes in two here, under a text
+without the bullet; on this case it is not the bullet's.
+
+**The neighbour cases** (treated arm from `92ceccc`; nothing curtailed):
+
+| Case and row | Kept baseline, judge | Hand | Treated, judge | Hand |
+|---|---|---|---|---|
+| closes-with-what-waits: `closes-with-every-waiting-item` | 4/5 | 5/5 | 5/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| the three rename rows, `skill-was-invoked` | 5/5 | - | 5/5 | - |
+| keeps-the-item-numbers: every row (the kept numbers confirmed from each closing list by hand; `says-which-item-left` by judge) | 5/5 | - | 5/5 | - |
+
+**The closes guard, read before that arm's verdicts: clean.** Reps 1, 2 and
+3 rest "keep the legacy order" on the plan's sentence that the legacy
+consumers read by position, named (rep 3: "a judgement from the plan note";
+rep 2 also says nothing it ran bears on it, which contradicts its own
+ground); rep 4 writes "Nothing I ran bears on this, so I can't recommend an
+answer. The owner's reply on who still reads by position would settle it" -
+the exemption as written; rep 5 recommends conditionally and names the
+ground it lacks. No rep rests an answer on nothing. Where round 78b's five
+wrote "yours to call" on this item, none does. On the branch, four reps
+recommend deleting it, three of them saying they did not check it, and all
+keep it as the default - round 78b's count, unchanged. In keeps-the-item-numbers
+every rep kept the seeded numbers; on the branch two reps wrote that nothing
+they ran bears on it, and on the alias four recommended from the search they
+ran. **No neighbour
+fell.**
+
+**Spent**: the treated arm $1.64, the closes-with-what-waits arm $0.73, the
+numbers arm $0.51 - **$2.88**; unit 78's runner spend so far $6.02 of $21.
