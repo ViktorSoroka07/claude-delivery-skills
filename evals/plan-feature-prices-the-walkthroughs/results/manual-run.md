@@ -1,9 +1,10 @@
 # Manual runs
 
-Not run. The case is the second domain for plan-feature's Step 3 paragraph
-that holds a chain's per-task dispatches to the smallest set, read first on
+The case is the second domain for plan-feature's Step 3 paragraph that
+holds a chain's per-task dispatches to the smallest set, read first on
 `plan-feature-prices-the-chain`, whose record quotes the text this case runs:
-that paragraph with its announcement clause cut.
+that paragraph with its announcement clause cut. The Sonnet round below is
+its reading.
 
 ## The case
 

@@ -1,9 +1,11 @@
 # Manual runs
 
-Not run. The case was built for the plan-feature sentence that announces a
-chain's dispatches with a count and defaults to the smallest set, and a blind
+The case was built for the plan-feature sentence that announces a chain's
+dispatches with a count and defaults to the smallest set, and a blind
 verifier read it before any draw. Its findings changed the case, and three of
-them are about the sentence rather than the case, so no arm was bought.
+them, about the sentence rather than the case, held every arm until the
+maintainer ruled them; the Sonnet round, the Fable baseline and the treated
+Fable arm below are the case's readings since.
 
 ## The case
 
