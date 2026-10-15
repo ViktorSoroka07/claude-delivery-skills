@@ -97,3 +97,37 @@ refuses a subagent's report file; a walkthrough is a deliverable, as the
 first case's figures were) and prices the arm, and the treated rep shows the
 cut paragraph is reached. A baseline rep past about $1.70 projects the arms
 over the case's $12 and goes to the maintainer first.
+
+## The two probe reps, and the baseline at three
+
+Both landed at the worktrees' commits, `e8884c3` and `915a228` (`e8884c3`
+plus the paragraph), drawn before either arm was read.
+
+- **Baseline, $3.39, 52 turns summed over its `result` records.** Files
+  landed: the walkthrough agents wrote theirs. It dispatched a walkthrough
+  agent per task, four, ran both reviews on the session's model, then
+  regenerated all four walkthroughs from the reviewed plan: eight walkthrough
+  dispatches by hand, where the reader counts six, since two regenerations
+  rewrote their files from a Python heredoc and the reader sees only
+  redirects, `tee` and the edit tools. The agents ran each task's commands,
+  the mutation sweep among them, in scratch copies of the repository, as the
+  fork's "each command with the output it prints" asks: that is where the
+  price went. No figure, no budgeting load.
+- **Treated, $0.23, no dispatch.** The paragraph is reached: the rep held
+  back the walkthroughs and both reviews, saying the chain's default runs
+  per-task or extra review work only on a yes, and its closing table offers
+  them with the count - "the process doc's per-task walkthroughs (four
+  agents) and its two review passes" - recommending one review only, taken
+  as neither without an answer. No figure.
+
+At $3.39 a rep, five baseline reps put the case past the second fixtures'
+$16 ceiling, the approval line for both halves, whose wait half is unspent.
+So the baseline arm is three reps and the probe reps count as each arm's
+first, which the floor allows on a clean sweep: three baseline reps
+separate from five treated ones only if all three fail. The probe met every
+condition of an arm's rep - its commit, its fixture, drawn before any
+reading - and both probes count, or a reader could not tell which arm a
+dropped rep would have changed. The weakness is stated now: a baseline rep
+that holds back on its own - one loading budgeting, or one merging the
+walkthroughs - leaves the row unmeasurable at three, and the two further
+reps, about $7, go to the maintainer.
