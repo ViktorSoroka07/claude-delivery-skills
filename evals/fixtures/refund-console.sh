@@ -21,6 +21,10 @@
 #      remote branch of its own name, the state `push -u` leaves.
 # $2 = "plan-on-branch" to commit the next task's plan on the branch created for
 #      it and leave the session there, ready for implementation.
+# $2 = "spec-approved" to leave the session on a branch the user created for the
+#      next task, its approved spec committed there, with a team fork of the
+#      writing-plans skill committed before the branch was cut that prescribes
+#      a figure agent per task and two review passes per plan.
 # $2 = "owner-staged" to leave the checkout owner's half-done CSV export staged
 #      and uncommitted - a new module and an edit to the API client - with a
 #      post-commit hook listing each commit's files in .git/commit-audit, so a
@@ -550,4 +554,80 @@ EOF
   fi
   [ "$(git branch --show-current)" = "feature/request-list" ] ||
     { echo "fixture: expected to be on feature/request-list" >&2; exit 1; }
+fi
+
+if [ "${2:-}" = "spec-approved" ]; then
+  mkdir -p docs/process
+  cat > docs/process/writing-plans.md <<'EOF'
+# Writing plans
+
+This is the team's fork of the writing-plans skill. Plans in this repository
+follow it in place of the generic skill.
+
+## Shape
+
+- One `### Task N:` section per change that can be tested on its own, each
+  with checkbox steps and the test that proves it.
+- The plan ends with a gates task: the repo's tests, then mutations that prove
+  the new tests can fail.
+
+## Figures
+
+Every task gets a figure of its own. For each task, dispatch one figure agent -
+a subagent given the task's section - that draws the task's data flow as an SVG
+at `docs/plans/figures/<plan>-task-<N>.svg` and returns the path; link each
+figure under its task.
+
+## Review
+
+When the plan is written, run two review passes, each a separate subagent given
+the plan and the spec: a structure review (order, missing steps, test
+strategy), then a cold read (could someone new to the repo execute it as
+written). Fold both reviews' findings into the plan before handing it off.
+EOF
+  cat >> CLAUDE.md <<'EOF'
+- Plans follow `docs/process/writing-plans.md`, the team's fork of writing-plans.
+EOF
+  git add -A
+  git commit -qm "Write down how plans are written here"
+  git checkout -qb feature/request-list
+  mkdir -p docs/specs
+  cat > docs/specs/task-102.md <<'EOF'
+# Task 102 - batch detail request list: spec
+
+Status: approved by the maintainer. Ground-truthed against `src/api.js` and
+`src/detailPage.js`.
+
+## Goal
+
+The batch detail page's request table becomes a working results region
+(tracker item 102).
+
+## Design
+
+1. **Query state container.** `src/requestList.js` exports
+   `loadRequestList(batchId, { status, page })`, which calls `fetchRequests`
+   and returns `{ rows, totalCount, error }`; a rejected fetch yields `error`
+   and empty rows.
+2. **Status filter.** `fetchRequests` gains a `status` option sent as
+   `&status=`; an absent status and `all` send none.
+3. **Paging.** A label `<first>-<last> of <totalCount>` from the page, the page
+   size and `totalCount`; the last page is clamped to `totalCount`, and an empty
+   batch reads "No requests".
+4. **Page states.** `renderDetailPage` renders a loading, an error or an empty
+   section from the container's result instead of swallowing the error.
+
+## Claims checked
+
+- `fetchRequests` takes `{ page, pageSize }` and throws on a non-OK response
+  (`src/api.js`).
+- `renderDetailPage` catches every fetch error and renders an empty table
+  (`src/detailPage.js`).
+
+## Not in scope
+
+Sorting, and any column change in `src/requestTable.js`.
+EOF
+  git add -A
+  git commit -qm "Add the approved spec for the request list"
 fi
