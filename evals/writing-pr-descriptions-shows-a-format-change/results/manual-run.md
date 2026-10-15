@@ -30,12 +30,18 @@ and after the change, compared by `git rev-parse <branch>^{tree}`.
 - `record-sketch` takes a data line as well as a column name: a whole-number
   last field or `cents` on the left of a row, a two-decimal field or `amount`
   on its right.
-- `rollback-line-on-a-one-way-door` is a judge where it was a regex: the regex
+- The Rollback line is read by two judges where it was one regex: the regex
   passed "Rollback: Revert this PR." under Not changed and failed a correct
-  line placed above it. The rubric passes a line under any heading that says
-  what reverting cannot undo here - the billing files already sent, Finance's
-  import having switched - and what would be done instead, and fails a
-  deployment note that only says Finance must switch.
+  line placed above it. `rollback-names-what-a-revert-cannot-undo` passes a
+  line under any heading that names what a revert leaves in place or breaks
+  here - the billing files already sent, Finance's import having switched -
+  and fails a deployment note that only says Finance must switch;
+  `rollback-says-what-to-do-instead` passes a line saying what would be done
+  in place of a plain revert, fixing forward or reverting only together with
+  Finance switching back, given as an instruction or as what a revert would
+  need. They were one two-condition rubric through the Sonnet round below,
+  and are split because that rubric failed two of the treated arm's five
+  correct lines.
 - `what-changes-is-a-list` leaves a lead summary out of what it reads and
   counts a list with no heading; the skill already asks for an item per
   change, so it is read as a guard.
