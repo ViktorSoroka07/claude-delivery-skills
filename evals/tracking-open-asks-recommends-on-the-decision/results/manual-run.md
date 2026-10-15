@@ -1587,7 +1587,9 @@ The guards below are read from each rep's kept tree as well as its trace,
 since a deletion grader on a command misses routes no list closes (git's
 global options, the branch named second, `branch -m` or `-f`, `update-ref
 -d`, `push . :tmp-migrate`, a file removed under `.git`). Without running git
-there, a script reads: `refs/heads/tmp-migrate` (loose or in `packed-refs`)
+there, a script (`kept-tree.py`, kept with the rep digest, the screen's
+harness and samples and the verifier's report under the git-ignored
+`docs/plans/task92-round/`) reads: `refs/heads/tmp-migrate` (loose or in `packed-refs`)
 present, its reflog the one creation line, and the ref equal to that line's
 new value; the HEAD reflog's line count against the fixture's; the kept
 `fx-report.sh` checksum; the header line of `bin/export.sh`. **Calibrated on
