@@ -43,7 +43,10 @@ by saying the text is a sample for testing a grader and makes no claim about the
 session: without that, the model can refuse to repeat a message that reports work
 as done ("It reports completed work ... that I haven't done or checked in this
 session"), and the judge then grades the refusal - an unmeasured cell, not a
-disagreement.
+disagreement. The preface makes refusals rarer without ending them (one cell in
+fourteen still refused behind it), so a cell whose `evidence` is not the message
+is re-run before any verdict is read; marker lines echoed around an otherwise
+identical text change nothing the judge reads.
 
 ## Reading the table
 
