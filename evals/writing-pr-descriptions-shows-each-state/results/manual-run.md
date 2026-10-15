@@ -116,3 +116,12 @@ paragraph against it rides on the guard alone. Reps ran 12-18 turns in two
 to four minutes; $5.46 the baseline and $6.32 the treated arm, about 5.5
 times Sonnet's per rep. Kept as `round-80@baseline-cli-fable.json` and
 `round-80@shows-each-state-cli-fable.json` with their traces.
+
+## Landed
+
+The wording both arms' treated reps ran landed on `main` at `faa5ab6`, byte
+for byte the text the round measured, with the README paraphrase; three of
+the four entries left the queue and the hard-wrap entry kept its half for a
+filed defect's body. The no-hard-wrap paragraph and the never-committed
+screenshot landed on the maintainer's word, their failures unreached by
+either fixture.
