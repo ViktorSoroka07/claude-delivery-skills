@@ -287,3 +287,13 @@ does not make a rep rewrite a cell it inherits. Declined; the record and
 the decline are in
 `evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
 "Unit 93".
+
+## The no-answer cell's opening word, landed unread here
+
+The skill's no-answer cell now opens with **Taken:** or **Waits:** (landed at
+`11d3440`), and this case's seed, which carries the skill's body, was
+regenerated in that commit. The sentence was measured on the two fresh
+tracking cases only, so this case is unread under it: its seeded table's
+cells are carried forward, the shape a phrase was shown not to move, and its
+next round reads the opening word in those carried cells first rather than
+reading a change there as a regression.
