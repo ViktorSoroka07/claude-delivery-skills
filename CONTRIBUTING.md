@@ -1192,7 +1192,7 @@ decides whether it runs at all.
 
 **The range is a watermark, not the last push.**
 
-    git diff prose-passed..HEAD -- hooks skills agents CLAUDE.md CONTRIBUTING.md README.md
+    git diff prose-passed..HEAD -- hooks skills agents CLAUDE.md CONTRIBUTING.md README.md evals/INSTRUMENT.md
 
 `prose-passed` is a lightweight local tag marking the commit through which this
 prose has actually been read - lightweight so that `git push --follow-tags`
