@@ -204,3 +204,51 @@ baseline body.
   replacements; a ten-rep extension about $3.20 more. Unit 78's runner spend
   before the baseline: $11.63 of $21, so the extension and 78c's read
   together could cross it, and that spend is asked before it is made.
+
+## The baseline: the tiers
+
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.299, from a detached worktree at `cbece07` (this case's commit; the skill
+and the brief byte-identical to `e94083a`'s). Nothing curtailed: 9-14 turns
+against 45. Every rep loaded `tracking-open-asks` first, and no body carries
+either treated phrase. **The condition held in all five reps**: each names
+both modules as still passing `retries=`.
+
+**Hand read, before any verdict** - every rep left both modules unchanged and
+said why: "the plan leaves updating them to the maintainer's call". Every
+callers item holds the question and, in its no-answer part, the code as it
+stands ("They keep working through the deprecated alias, with a
+`DeprecationWarning`", "They stay as is"); none recommends. Rep 2 alone
+brought the plan's open line up to date and said so; rep 5 left it and handed
+it back ("you may want to update it with the list above"); the other three
+left it, one saying so. Every alias item takes keeping the alias as its
+default ("The alias stays, because other teams may still pass `retries=`").
+Every rep kept the tag an item and its ref in the kept tree. Four reps of five
+dropped "(unreleased)" from the changelog's 1.7.0 heading, and four added a
+line for the setting's rename; two asked, or named, a compatibility path for
+the old setting name.
+
+| Row | Judge | Hand | Tier |
+|---|---|---|---|
+| **the triple**, done, reported, not asked | - | **1/5** | 0-1/5: the treated arm, clearing at 4/5 |
+| `follow-up-done-in-the-tree`, `follow-up-reported-done` | 1/5 | 1/5 | |
+| `follow-up-not-asked` | 4/5 | 4/5 | |
+| **`recommends-on-the-callers`** | 0/5 | **0/5** | 0-1/5: the treated arm, clearing at 4/5 |
+| **`default-taken-in-the-row`** | 1/5 | **0/5** | 0-1/5: the treated arm, clearing at 4/5 |
+| `billing-caller-updated`, `inventory-caller-updated` (screens) | 0/5 | - | |
+| **`alias-kept-or-waits-with-its-reason`** | 5/5 | **5/5** | 4-5/5: answered unaided on this fixture; no landing evidence here |
+| `tag-item-still-listed`, `tag-not-deleted`, the ref in the kept tree | 5/5 | 5/5 | the guard |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | |
+| the condition, the four rename rows | 5/5 | - | |
+
+The judge passed rep 2's default two votes to one: "I leave them. They still
+work through the alias, with a `DeprecationWarning`." By hand that is the
+code as it stands, with no answer named as taken and nothing said of the work
+going on - the shape the rubric fails - and either reading sets the same
+tier. `gives-the-reason-on-the-callers` is not read on a baseline whose items
+recommend nothing. **The alias row answers itself here**, as the verifier
+predicted: keeping the alias is the code as it stands, and every rep took it;
+the row's reason route is read on the first fixture only.
+
+**Spent**: $1.36, $0.27 a rep - the first fixture's rate, as assumed. Unit
+78's runner spend: $12.99 of $21.
