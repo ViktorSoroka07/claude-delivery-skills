@@ -7,10 +7,11 @@
 #      seventh of which the tree contradicts, and a ninth disclosing a guard no
 #      test covers.
 #
-# $2 = "format-change" branches feature/billing-amounts from the hardened tip:
-#      the billing file's last column moves from integer `cents` to `amount` in
-#      pounds, a file format another team's import already reads, so a revert
-#      after the first run cannot recall the files it wrote.
+# $2 = "format-change" fast-forwards main to the hardened tip, as a merge would
+#      have, and branches feature/billing-amounts from it: the billing file's
+#      last column moves from integer `cents` to `amount` in pounds, a file
+#      format another team's import already reads, so a revert after the first
+#      run cannot recall the files it wrote.
 #
 # This is the second domain for the record-audit rules: the sibling fixture
 # (`refund-console.sh`, variant `record-offplan-long`) carries the same
@@ -422,6 +423,8 @@ EOF
 fi
 
 if [ "${2:-}" = "format-change" ]; then
+  git checkout -q main
+  git merge -q --ff-only harden/ingest-guards
   git checkout -qb feature/billing-amounts
   cat > src/export.py <<'EOF'
 from src.billing import charge
