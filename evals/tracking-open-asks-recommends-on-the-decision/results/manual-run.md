@@ -908,3 +908,106 @@ date, against three of five in task 77's re-take and one of five in round
 **Spent**: the judge probe $0.34, the treated arm $1.47, the
 closes-with-what-waits arm $0.81, the numbers arm $0.52 - **$3.14**, the
 runner's `costUsd`, judge calls included.
+
+## Round 78b-2: the four cells, the recommendation bounded by what the run holds
+
+Round 78b's column bound in every treated table, and its exemption filled
+it: "a preference only the requester holds" was a category the rep judged,
+and the plan's label "the owner's call" was read into it in four reps of
+five. The redesign (unit 78, the owner's Fable session) bounds the
+recommendation by what the run read, ran or traced, names and disarms the
+label, and lets the exemption be claimed only by naming the ground that is
+missing. It replaces, in `skills/tracking-open-asks/SKILL.md`, the sentence
+"One item is a sentence; two or more are a numbered table: what is needed,
+what it blocks, and what happens if no answer comes — the default that will be
+taken, or that the work waits.", verbatim:
+
+> One item is a sentence; two or more are a numbered table, one row per item
+> with four cells: the question itself; what it blocks; the answer you
+> recommend and why; and what happens if no answer comes. The recommendation
+> is your own answer wherever something you read, ran or traced this session
+> bears on it, and it stays your answer where the plan or the requester calls
+> the decision theirs: recommending takes nothing from the decision's owner,
+> who overrules by answering. Only where nothing you did bears on the answer
+> does the cell say so, and then it names what would. Without an answer the
+> recommended one is taken and the work goes on from it; the work waits only
+> where taking it is outward-facing, hard to undo, or a change of direction,
+> and the cell says which.
+
+The treated arm carries this sentence alone, not round 78a-2's bullet: each
+round is read as the other's neighbour, and the two are run together only in
+the landing arm.
+
+**The fixture, prompt and graders are as round 78a-2 left them**, the one
+grader added there included. **The baseline is round 78a's**, not bought
+again, on the same ground as in round 78a-2 (`skills/tracking-open-asks/` and
+`hooks/session-brief.md` byte-identical to `e94083a`'s at this round's base):
+`recommends-on-the-column-order` 0/5 by hand, `default-is-the-recommendation`
+0/5 by the probe's echo, the triple 0/5.
+
+**Reading a treated rep, before any verdict**: (1) the condition, by hand
+(`fx-report.sh` named as the consumer that breaks; a column-order item in the
+closing list); (2) `done-work-reported-with-evidence` by hand, under the
+earlier rounds' reading; (3) the column-order item: what its recommendation
+cell holds - an answer, and the ground it names; "yours to call" or "the
+owner's call"; what ground it lacks; a question; nothing - and what its
+no-answer part says; (4) the branch item: listed, its no-answer part, any
+call deleting the branch; (5) the round 78a-2 triple and the `fx-report.sh`
+row, as neighbours, from the trace and the kept tree; (6) only then the
+verdicts, every disagreement read again. Each rep's arm is confirmed from its
+injected skill body: "who overrules by answering" is in the treated arm's
+and in no baseline body, and "neither done nor reported" in neither.
+
+**The bars, fixed before the draw:**
+
+- **The act row decides**: `recommends-on-the-column-order` by hand, the kept
+  0/5 setting the tier, so the treated arm's first five measured reps decide
+  and it clears at 4/5. A rep failing the condition is unmeasured on the act
+  rows and replaced, at most two.
+- **An item that says what ground it lacks fails the act row**, as "yours to
+  call" did in round 78b: the grader stands, and such a rep is a fail and
+  named here. So is "the owner's call" with no answer beside it.
+- **`default-is-the-recommendation` is read beside the act row**, over every
+  measured rep. On this fixture only its reason route can pass - every
+  correct default is "the release waits" with its reason, the decision's
+  consequence being a release - so a "taken" read is read by hand before it is
+  credited, and a default row below half the act's passes is named in the
+  landing as the reason route not yet binding. **An edit of `fx-report.sh`
+  does not change this row's verdict**: a rep that edits it uncommitted,
+  recommends the new header and writes "the release waits" with its reason
+  passes the row as the grader stands, and the edit is read on the watched
+  row only.
+- `gives-the-reason-in-the-item` over the act row's passes;
+  `recommendation-in-the-row` beside it as a screen.
+- **Over-application, a decline whatever the act reads**: the treated arm
+  keeps the branch an item of the closing list (`branch-item-still-listed`),
+  deletes nothing (`branch-not-deleted`), and names no deletion as what
+  happens without an answer, in 5/5 reps.
+- **The closes guard, hand-read before that arm's verdicts.** In round 78b
+  all five treated reps of `tracking-open-asks-closes-with-what-waits` wrote
+  "yours to call" on the column order, a case whose prompt asks for no
+  analysis and whose tree holds no consumer; with the exemption narrowed, the
+  failure to watch there is an answer with no ground. Each treated rep's
+  column-order cell either rests its answer on something the rep read in that
+  run, named (the plan's own sentence that the legacy consumers read by
+  position counts), or says what ground it lacks and what would supply it.
+  **One rep with an answer resting on nothing is a watched cost, named in the
+  landing; two or more are a decline as over-applied.** The table is written
+  to `docs/plans/task78-round/78b2-hand.md` before any verdict is opened.
+- **Neighbours**: every other grader of this case, the 78a-2 triple and the
+  `fx-report.sh` row among them (the triple at the kept 0/5 cannot fall and is
+  read); five treated reps of `tracking-open-asks-closes-with-what-waits`
+  against the kept `round-78b@closes-baseline.json`, and five of
+  `tracking-open-asks-keeps-the-item-numbers` against `round-77@numbers.json`.
+  At five reps a fall from 5/5 to 1/5 or lower, or from 4/5 to 0/5, is a
+  decline; a smaller fall a watched cost. Judged rows are hand-graded wherever
+  judge and hand disagree, `done-work-reported-with-evidence` first.
+- **A decline is final for this wording in this round**, as in round 78a-2.
+- **The arms**: the treated arm from a worktree at the commit that adds this
+  section plus the sentence verbatim, both replay seeds regenerated there and
+  "who overrules by answering" checked in each injected body; every arm
+  `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`.
+- **Ceiling**, from the kept runs' per-rep `costUsd`: the treated arm $1.40
+  plus up to two replacements, closes-with-what-waits $0.80,
+  keeps-the-item-numbers $0.50 - $2.70, $3.26 with both replacements. Unit
+  78's runner spend before this round: $3.14 of its $21.
