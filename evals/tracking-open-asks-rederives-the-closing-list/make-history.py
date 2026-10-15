@@ -44,7 +44,10 @@ Four constraints the file's shape answers:
   `post-rename` tree prints under the sandbox's grep, held here as text so the
   generator builds without a fixture; a change to the files
   `evals/fixtures/export-cli.sh` writes is copied here by hand, since no gate
-  compares the two.
+  compares the two. A seeded Read also leaves the resumed run a file-state
+  entry stamped with the fixed timestamp, older than the file the scaffold
+  writes, so a rep's own Edit of that file without a fresh Read applies with a
+  "modified on disk since you last read it" note.
 - The timestamps are written as JSON `\\u002D` escapes, so the committed bytes
   carry no date-shaped literal. The leak guard blocks that shape on sight and
   cannot tell an invented date from a real one; the escape is the same string
