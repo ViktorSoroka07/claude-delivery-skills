@@ -347,3 +347,11 @@ branch stays as it is"), as bare cells were in the baseline; the rest name
 one of the three reasons. $0.78 the baseline, $0.79 the treated arm; kept as
 `round-94@baseline-closes.json` and `round-94@taken-or-waits-closes.json`.
 The unit's round cost $4.76 of the $8 approved.
+
+### Landed
+
+The sentence the treated arm ran landed on `main` at `11d3440`, byte for byte,
+with the two replay seeds that carry the skill's body regenerated, the README
+paraphrase and the entry's removal. The watched neighbour,
+`follow-up-not-asked`, is the row the next round on the recommends case
+reads first.

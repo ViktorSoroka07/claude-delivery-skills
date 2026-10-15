@@ -2048,3 +2048,11 @@ that row first. No re-check was bought: at five reps against 5/5 it could
 convict only at 1/5 or below and could not clear. $1.61 the baseline, $1.58
 the treated arm; kept as `round-94@baseline-rec.json` and
 `round-94@taken-or-waits-rec.json` with traces in `round94-traces/`.
+
+### Landed
+
+The sentence the treated arm ran landed on `main` at `11d3440`, byte for byte,
+with the two replay seeds that carry the skill's body regenerated, the README
+paraphrase and the entry's removal. The watched neighbour,
+`follow-up-not-asked`, is the row the next round on the recommends case
+reads first.
