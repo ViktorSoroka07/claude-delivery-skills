@@ -1106,3 +1106,64 @@ fell.**
 
 **Spent**: the treated arm $1.64, the closes-with-what-waits arm $0.73, the
 numbers arm $0.51 - **$2.88**; unit 78's runner spend so far $6.02 of $21.
+
+## The landing arm: the bullet, the sentence and the brief's line together
+
+Both rounds cleared on their own. The F1 round showed the two halves pulling
+against each other (a stronger recommendation moved
+`done-work-reported-with-evidence` 4/5 -> 1/5), so the text carrying both is
+run once as its own arm before anything lands: round 78a-2's bullet and round
+78b-2's sentence, verbatim as quoted above, and `hooks/session-brief.md`'s
+core line rewritten from the sentence - "each restated as the question itself
+with what it blocks and what happens without an answer" becomes "each
+restated as the question itself with what it blocks, the answer you
+recommend and why, and what happens without an answer". The brief is read by
+every replay generator at build time, so all three replay seeds are
+regenerated - the two tracking seeds and
+`maintaining-project-memory-closes-on-what-generalizes`'s, whose seed carries
+the brief too - and the byte-identical condition every kept tracking baseline
+rests on ends here: **this arm is the current-text baseline 78c reads against,
+and the baseline of all three tracking cases from then on**; the memory case's
+kept rates stand only for the text before it.
+
+**Reading a rep** is the two rounds' protocols together, in this order: the
+condition; `done-work-reported-with-evidence` by hand; the plan line and what
+the message says of it (the triple); the column-order item's recommendation
+and no-answer cells; the branch item; the watched rows (`fx-report.sh`, the
+changelog); only then the verdicts. Each rep's arm is confirmed from its
+injected body or seed: all of "neither done nor reported", "who overrules by
+answering" and, in each seed, "the answer you recommend and why".
+
+**The bars, fixed before the draw:**
+
+- **Both act rows at their rounds' bars**, by hand over the first five
+  measured reps: the 78a-2 triple at 4/5 and `recommends-on-the-column-order`
+  at 4/5. `default-is-the-recommendation` is read beside them and named if
+  below half the act's passes, as in round 78b-2. A rep failing the condition
+  is unmeasured on the act rows and replaced, at most two.
+- **`done-work-reported-with-evidence` by hand at the neighbour's floor**: the
+  kept rate is 5/5, so a fall to 1/5 or lower is a decline and a smaller fall
+  a watched cost - the row F1's text cost.
+- **Over-application**: the branch listed, not deleted, and no deletion named
+  as its default, 5/5.
+- **The closes guard**, hand-read before that arm's verdicts, as round 78b-2
+  fixed it: one rep with a column-order answer resting on nothing a watched
+  cost, two a decline.
+- **Neighbours**: every other grader of this case; five reps of
+  `tracking-open-asks-closes-with-what-waits` against the kept
+  `round-78b@closes-baseline.json`, and five of
+  `tracking-open-asks-keeps-the-item-numbers` against `round-77@numbers.json`,
+  at the floor (5/5 to 1/5 or lower, or 4/5 to 0/5, a decline; a smaller fall
+  a watched cost).
+- **A bar missed here is the two halves pulling against each other**: unit 78
+  stops at this arm, the record says which row fell, and the text goes back to
+  the owner's Fable session; nothing is redrafted and the second fixture is
+  not built on it.
+- **The arm**: from a worktree at the landing commit (branch `78-landing`,
+  this section's commit plus the bullet, the sentence, the brief's line and
+  the three seeds), `--ablation none --model sonnet --judge-model sonnet -j 3
+  --keep-temp`. The text stays off `main` until the owner's Fable read is
+  clean.
+- **Ceiling**: $1.40 + $0.80 + $0.50 from the kept per-rep costs - $2.70,
+  $3.26 with both replacements; unit 78's runner spend before it $6.03 of
+  $21.
