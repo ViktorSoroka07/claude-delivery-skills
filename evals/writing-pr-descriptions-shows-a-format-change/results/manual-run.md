@@ -64,3 +64,39 @@ rubrics, every vote unanimous, and each regex grader matched all its labels.
 `no-hard-wrap` is a restraint row too: its sighting was a strong model's own
 wrapping, which the eval model may never show. Its strongest-model arms are
 not bought for this case, so a clean baseline here says nothing about them.
+
+## The Sonnet round
+
+Two arms of five on Sonnet with the settled judge, from worktrees of one
+commit: the baseline at `6777548` and the treated arm on that commit plus the
+drafted contract, applied by the round's `apply.py`. The Rollback line was
+then one rubric, `rollback-line-on-a-one-way-door`. Bars set before the first
+draw: a row the wording targets moves only from 0/5 or 1/5 to at least four
+more; a guard holds at 4/5 or better. Every judged cell was graded by hand
+from the run JSON's `evidence`.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `before-and-after-table` | 0/5 | 5/5 | moved; one bit with the next row |
+| `record-sketch` | 0/5 | 5/5 | moved; every treated table sets the header and a data line before against after |
+| Rollback line | 0/5 | 5/5 by hand, 3/5 judged | moved by hand; the two graders it is now split into read 0/5 and 5/5 on the same ten bodies |
+| `what-changes-is-a-list` | 0/5 | 5/5 | moved; every baseline rep led with an item of four or five sentences, or bold paragraphs |
+| `no-hard-wrap` | 5/5 | 5/5 | guard held; no rep wrapped |
+| `no-image-committed` | 5/5 | 5/5 | not counted |
+| `skill-was-invoked` | 5/5 | 5/5 | indicator |
+
+Every baseline rep wrote a "Before merging" or "Rollout" note on timing the
+merge with Finance and none said what a revert cannot undo; every treated
+rep wrote a Rollback line naming Finance's switched import or the files
+already sent and a revert made only together with Finance. The judge failed
+two of those five, each giving the alternative as a condition ("Revert
+together with their import, not alone"; what a revert would need) where the
+three it passed gave an instruction; it agreed with the hand grade on the
+other eighteen judged cells. Seven rows were read. Reps ran 8-10 turns in
+about 40 seconds, $0.80 the baseline and $0.84 the treated arm. Kept as
+`round-80@baseline-fmt.json` and `round-80@shows-each-state-fmt.json` with
+their traces in `round80-traces/`.
+
+The case is the second domain for the two Strong-tier entries, a screenshot
+of each state and one bullet per behaviour: a change with no screen fills the
+same slot with a sketch of its record, which no baseline rep wrote.

@@ -54,3 +54,34 @@ whether the skill loads, which a change to its body cannot move; the case's
 own indicator reads the load, so that spend is dropped. `no-rollback-line` is
 the restraint half of the Rollback rule and is read on the strongest model as
 well, in both arms of this case.
+
+## The Sonnet round
+
+Two arms of five on Sonnet with the settled judge, from worktrees of one
+commit: the baseline at `6777548`, where the graders above were settled, and
+the treated arm on that commit plus the drafted contract (item 2 one bullet
+per behaviour, a new item 3 Before and after, the Rollback sentence in Not
+changed, the no-hard-wrap paragraph after the list), applied by the round's
+`apply.py`. Bars set before the first draw: a row the wording targets moves
+only from 0/5 or 1/5 to at least four more; a guard holds at 4/5 or better.
+Every judged cell was graded by hand from the run JSON's `evidence`.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `before-and-after-table` | 0/5 | 5/5 | moved; one bit with the next row |
+| `one-row-per-state` | 0/5 | 5/5 | moved; every treated table has a row per list state and one for the side change |
+| `headline-state-first` | 5/5 | 5/5 | guard held; every rep put the list states first in both arms |
+| `what-changes-is-a-list` | 2/5 | 3/5 | unmeasurable at five reps from a 2/5 baseline |
+| `no-hard-wrap` | 5/5 | 5/5 | guard held; no rep wrapped, the fence-free reading agreeing |
+| `no-rollback-line` | 5/5 | 5/5 | restraint held on Sonnet |
+| `no-image-committed` | 5/5 | 5/5 | not counted |
+| `skill-was-invoked` | 5/5 | 5/5 | indicator |
+
+The judge and the hand grade agreed on all thirty judged cells. Four of the
+five list fails are the `bin/export.sh` item running to four sentences, its
+scope note and the dry-run note added to the problem and the fix; the fifth,
+a baseline rep, merged both list states into one item of five sentences.
+Eight rows were read. Reps ran 9-12 turns in about 50 seconds in both arms,
+$1.00 the baseline and $1.05 the treated arm. Kept as
+`round-80@baseline-cli.json` and `round-80@shows-each-state-cli.json` with
+their traces in `round80-traces/`.
