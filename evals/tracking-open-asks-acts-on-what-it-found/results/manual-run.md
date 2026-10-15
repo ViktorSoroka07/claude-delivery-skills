@@ -336,3 +336,13 @@ redraft; the landing text stays off `main` on branch `78-landing`
 (`c9c4e0f`), and 78c waits on the Fable read.
 
 **Spent**: $1.42, $0.28 a rep. Unit 78's runner spend: $14.41 of $21.
+
+**The owner's rulings at the close.** The four departures from the brief and
+the "kept, with no reason anywhere" pass label on the alias row stand as
+recorded above. If the Fable read of the landing text is clean, the text
+lands as it is, and this record's first boundary stands beside it: the
+taken route not yet seen to bind on either fixture. Its redesign - the label
+read as covering the act, the status quo unnamed, "taken" with no tense - is
+unit 92 of the plan, drafted and gated on the Fable read's verdict on the
+`fx-report.sh` edit. The commits this record cites moved when a fixup was
+folded the same day (`cbece07` is `d72720e` on `main`); the plan maps them.
