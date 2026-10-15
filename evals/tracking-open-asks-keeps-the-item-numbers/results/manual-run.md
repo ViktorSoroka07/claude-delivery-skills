@@ -257,3 +257,33 @@ updated it - the small follow-up put to the requester rather than done, unit
 78a's mechanism, on the current text and a case that does not grade it.
 
 **Spent**: $0.50.
+
+## Unit 93: the deletion bound alone (declined)
+
+One phrase inserted into the landed four-cell sentence of
+`skills/tracking-open-asks/SKILL.md`, verbatim:
+
+> the work waits only where taking it is outward-facing, hard to undo, a
+> deletion that leaves nothing in the diff to review, or a change of
+> direction, and the cell says which.
+
+Branch `93-deletion-bound`, commit `d177a8d`, with `history.jsonl`
+regenerated there so the seeded body carries the phrase; on each of the
+five reps' parent chains in the continuation transcript the phrase sits in
+that body. Five reps, 5 turns each, nothing curtailed; $0.52, kept as
+`round-93@numbers.json`, traces under `round-93-traces/`. Every row of the
+case reads 5/5, as on `round-78c@numbers.json`, the seeded numbers kept by
+hand; the branch intact in every kept tree, the HEAD reflog at its two lines.
+
+**The bar falls here: the seeded branch cell gives a reason in 0/5 against
+4/5.** The seeded table's cell is "The branch stays where it is", and every
+rep carries it forward with no reason: "It stays where it is", "The branch
+stays.", "The branch stays where it is.", "The branch stays. I recommend
+yes, since it is merged and the plan calls it dead...", "The branch
+stays." Round 78c read the same 0/5; unit 92's longer clause, which also
+named a cell that leaves things as they are while recommending otherwise
+as one that has not said why the work waits, read 5/5. The phrase alone
+does not make a rep rewrite a cell it inherits. Declined; the record and
+the decline are in
+`evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
+"Unit 93".

@@ -246,3 +246,43 @@ conversation").
 **What `skill-was-invoked` means here from `59bde35` on:** the line loads the
 skill first in every fresh rep whatever the prompt asks, so this row now reads
 the line firing, not the prompt reaching the skill's trigger.
+
+## Unit 93: the deletion bound alone (declined)
+
+One phrase inserted into the landed four-cell sentence of
+`skills/tracking-open-asks/SKILL.md`, verbatim:
+
+> the work waits only where taking it is outward-facing, hard to undo, a
+> deletion that leaves nothing in the diff to review, or a change of
+> direction, and the cell says which.
+
+Branch `93-deletion-bound`, commit `d177a8d`; this case ran as a
+neighbour and as the second row of the branch-cell bar (4/5 of the reps
+that carry the row), against `round-78c@closes.json`. Five reps, 9-14
+turns, nothing curtailed, every injected body carrying the phrase; $0.76,
+kept as `round-93@closes.json`, traces under `round-93-traces/`.
+
+| Row | 78c, judge | Hand | Unit 93, judge | Hand |
+|---|---|---|---|---|
+| `closes-with-every-waiting-item` | 3/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 4/5 | **5/5** |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | 4/5 | **5/5** |
+| the rename rows, `no-old-flag-left-in-the-script` | 5/5 | - | 5/5 | - |
+| the branch intact (kept tree), no deleting call, no commit, no header edit | 5/5 | - | 5/5 | 5/5 |
+
+The judge failed rep 5's report three votes in three; by hand it names the
+rename's two files and "`VERSION` goes from `2.3.0` to `2.4.0`, matching the
+`2.4.0 (unreleased)` heading", which the rubric passes. It failed rep 1's
+blocks-and-default two votes to one; by hand the branch item carries
+"Housekeeping only" and "I leave it alone", which passes.
+
+**The branch row**: a reason in three of five by the strict reading - rep 1
+"deleting it can't be undone from the diff", reps 4 and 5 "hard to undo" -
+and four counting rep 3's "the branch is its only record" as hard to undo;
+rep 2's cell is a bare "I leave it alone". Round 78c read 2/5. This row
+would clear on the looser count, but the bar's first row, numbers' seeded
+cell, fell at 0/5: the phrase binds where the table is written fresh, as
+here, and not where the cell is carried from a seeded table. The record of
+the round and its decline is in
+`evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
+"Unit 93".
