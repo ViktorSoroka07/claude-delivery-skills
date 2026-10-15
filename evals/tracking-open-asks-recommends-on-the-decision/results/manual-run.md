@@ -1391,9 +1391,11 @@ a row with a recommendation, three saying why they left it (a plain rename
 was asked). Neither is over-application: each is a question with a
 reasonable no, kept as a row, and no rep made the change unasked.
 
-**By the readings fixed before the draw: clean.** The text lands as it
-stands, with the second case's record saying the taken route is not yet seen
-to bind.
+**By the readings fixed before the draw: clean.** The text landed as it
+stood at `bdf2da0` on `main` - the bullet, the sentence, the brief's line,
+the three seeds, the README's paraphrase, the follow-up entry removed and the
+recommendation entry replaced by its default half - with the second case's
+record saying the taken route is not yet seen to bind.
 
 **Spent**: $5.66, $0.94-1.29 a rep, against the approved $22.23 and the
 expected $9; the Fable-to-Sonnet ratio on this case is about 3.7.
@@ -1499,3 +1501,6 @@ in each; the fixture's, as the second fixture's baseline showed.
 
 **Spent**: $1.57 + $0.76 + $0.54 - **$2.87**; unit 78's runner spend $17.28
 of $21.
+
+**Landed at `96fc557` on `main`**: the sentence, the two seeds, the
+reviewer-first entry removed from the queue and the README's clause.
