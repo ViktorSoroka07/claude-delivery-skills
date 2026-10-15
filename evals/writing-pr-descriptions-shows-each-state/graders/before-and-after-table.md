@@ -1,6 +1,8 @@
 ---
 type: regex
-target: PR.md
+target:
+  source: file
+  path: "PR.md"
 pattern: "^\\|[^\\n]*\\bBefore\\b[^\\n]*\\|[^\\n]*\\bAfter\\b"
 flags: m
 ---

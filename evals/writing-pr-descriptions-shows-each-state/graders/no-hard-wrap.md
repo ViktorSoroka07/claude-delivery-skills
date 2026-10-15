@@ -1,6 +1,8 @@
 ---
 type: regex
-target: PR.md
+target:
+  source: file
+  path: "PR.md"
 pattern: "^[A-Za-z`*][^\\n|]{30,93}[a-z,]\\n[a-z]"
 flags: m
 match: not_contains

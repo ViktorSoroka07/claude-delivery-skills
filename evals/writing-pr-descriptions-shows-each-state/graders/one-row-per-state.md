@@ -1,6 +1,8 @@
 ---
 type: llm
-focus: PR.md
+focus:
+  source: file
+  path: "PR.md"
 ---
 
 The branch changes what `bin/list.sh` prints in two states: an exports directory with nothing in it, and one holding exports. Read only PR.md.

@@ -7,8 +7,8 @@ only on a one-way door, on `export-cli.sh list-output`. The builder's other vari
 was added, compared by `git rev-parse HEAD^{tree}`.
 
 A blind verifier read the case before any draw; its report is kept with the
-round's notes. Two of its findings stop a launch: every grader that reads
-`PR.md` names it as a bare path, which the runner refuses at load - the form is
-`focus` or `target` `{source: file, path: "PR.md"}` - and the hard-wrap pattern
-does not read a wrapped list item. The rest are listed there, with the
-strongest-model arms a restraint row needs.
+round's notes, and its case-level findings are applied below. Every grader
+that reads `PR.md` names it as `focus` or `target` `{source: file, path:
+"PR.md"}`, a bare path being refused at load; a load-only launch checked it,
+a copy of the case carrying one grader of `weight: -1` being refused for the
+weight alone, and the same copy at the bare paths for six targets as well.

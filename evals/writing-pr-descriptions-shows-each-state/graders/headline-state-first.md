@@ -1,6 +1,8 @@
 ---
 type: llm
-focus: PR.md
+focus:
+  source: file
+  path: "PR.md"
 ---
 
 The branch's headline change is what `bin/list.sh` prints in its two states; its side change is `bin/export.sh` creating its output directory. Read only PR.md.

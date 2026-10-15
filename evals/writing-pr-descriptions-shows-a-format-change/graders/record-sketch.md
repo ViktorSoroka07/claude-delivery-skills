@@ -1,6 +1,8 @@
 ---
 type: regex
-target: PR.md
+target:
+  source: file
+  path: "PR.md"
 pattern: "^\\|[^\\n]*cents[^\\n]*\\|[^\\n]*amount"
 flags: m
 ---

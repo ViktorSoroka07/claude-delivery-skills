@@ -1,6 +1,8 @@
 ---
 type: llm
-focus: PR.md
+focus:
+  source: file
+  path: "PR.md"
 ---
 
 Read only the section of PR.md that says what the branch changes (headed "What this changes", "Changes", "Summary" or the like - the part that lists the behaviour, not the Before and After table).

@@ -1,6 +1,8 @@
 ---
 type: regex
-target: docs/plans/task-102.md
+target:
+  source: file
+  path: "docs/plans/task-102.md"
 pattern: "### Task \\d+:[^\\n]*[Ss]tates"
 ---
 
