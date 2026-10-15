@@ -165,3 +165,26 @@ where on Sonnet it is not, so a treated Fable arm would read it. The reps
 ran 17-74 turns in nine to twenty minutes, $5.36-12.46 each, $46.34 the arm:
 about 8.8 times Sonnet's median rep on this case, where unit 80's case ran
 5.5. Kept as `round-79@baseline-fable.json` with its traces.
+
+## The treated Fable arm
+
+Five reps on Fable with the sentence, one at a time under a ceiling, since
+the baseline showed the failure on that model.
+
+| Row | Fable baseline | Fable treated | Reading |
+|---|---|---|---|
+| `figure-files-at-most-three` | 0/5 | 5/5 | moved; no treated rep dispatched any agent |
+| The review set | 0/5 | 5/5 | moved, by absence as on Sonnet |
+| The announcement before spending | 0/5 | 1/5 | not moved: the moment is reached, every rep writing text before it acts, and one rep said "zero agents, one plan document, no per-task figures, no review pass unless asked at hand-off" |
+| `plan-written` | 5/5 by hand | 4/5, 5/5 by hand | one plan titled its page-states task "renders the container's result", its steps naming the loading, error and empty sections |
+
+The restraint holds on the strongest model as on the instrument. The
+announcement does not bind where it is placed: four reps narrated what they
+read and wrote before acting and said nothing of what they would dispatch.
+Every treated closing table on both models carries the count and the offer
+instead - the fork's four or five figure agents and its two reviews, each
+recommended against for the figures and as a single pass for the review,
+one rep proposing that pass on a cheaper model. Since the default dispatches
+nothing, nothing is spent before that offer is answered. The reps ran 22-27
+turns in three to four minutes, $1.42-1.60 each, $7.68 the arm. Kept as
+`round-79@step3-count-fable.json` with its traces.
