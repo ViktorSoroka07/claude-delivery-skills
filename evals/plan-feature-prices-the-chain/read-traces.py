@@ -20,12 +20,18 @@ def blocks(event):
     return [b for b in content if isinstance(b, dict)] if isinstance(content, list) else []
 
 
+SHELL_SVG_WRITE = re.compile(r"(?:>|\btee(?:\s+-a)?)\s*['\"]?[^\s;&|'\"]*\.svg\b")
+
+
 def svg_write(block):
     if block.get("type") != "tool_use":
         return False
     tool_input = block.get("input") or {}
-    target = tool_input.get("file_path") or tool_input.get("command") or ""
-    return isinstance(target, str) and ".svg" in target
+    if block.get("name") in ("Write", "Edit", "NotebookEdit"):
+        return str(tool_input.get("file_path", "")).endswith(".svg")
+    if block.get("name") == "Bash":
+        return bool(SHELL_SVG_WRITE.search(str(tool_input.get("command", ""))))
+    return False
 
 
 def read(path):
