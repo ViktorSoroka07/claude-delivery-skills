@@ -299,3 +299,27 @@ and the probe reads twelve of twelve labels here - ten kept passes and two
 labelled fails cut from kept messages. The probe and its numbers are in
 `evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
 "Unit 91".
+
+## The no-answer cell's opening word: graders and bars, before any draw
+
+The requester could not tell, in a closing table, whether a row's no-answer
+cell was the recommendation taken or a different act: the skill's "and the
+cell says which" names which of three reasons keeps an answer from being
+taken, and says nothing of whether it is. The candidate wording makes the
+cell open with **Taken:** or **Waits:**, keeping the skill's three reasons;
+the requester's own stopgap line names a fourth, a spend not yet approved,
+which the three already cover as hard to undo.
+
+Two regex graders read it as one bit: `waiting-items-in-a-numbered-table`, the
+screen, and `no-answer-cell-opens-taken-or-waits`, read only on reps that pass
+it. Calibrated before any draw on 145 kept final messages of the tracking
+cases (rounds 78, 92 and 93): as written, 143 fail the row and two have no
+numbered table; with each numbered row's last cell rewritten to open with
+the word, all 143 pass. A first pattern let its cell's non-space match a
+pipe, reading two cells as one, and failed every rewritten message; the
+calibration caught it. Bars: the row moves only from 0/5 or 1/5 to at least
+four more; `says-what-each-blocks-and-the-default`, judged and hand-graded, holds at
+4/5 or better, and the Waits cells are read by hand for a reason dropped to
+make room for the word, the watched cost. A capability rule, so no Fable arm;
+`tracking-open-asks-acts-on-what-it-found` is not read, its arms not fitting
+the approved $8.
