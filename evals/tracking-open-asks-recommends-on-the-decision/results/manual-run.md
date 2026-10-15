@@ -1702,3 +1702,128 @@ intact.
   replacements on each act case**, inside the approved $4.32 and $5.50; a
   replacement on closes or numbers (about $0.15 and $0.11) fits only while
   the act cases leave room.
+
+### Unit 92's arms: the taken route binds on neither fixture (a stop, not a boundary)
+
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.299, from the worktree at `66260d7` (branch `92-taken-default`). A first
+batch hit the account's session limit after three second-fixture reps; every
+rep of this case, closes and numbers in it ended on the runner's limit error
+at one turn, unmeasured, and the arms re-ran once the limit reset. Nothing
+curtailed on the re-run: 15-18 turns on this case. Every rep loaded the skill
+first and every injected body carries "a deletion that leaves nothing in the
+diff to review". **The condition held in all five reps.** The second fixture's
+arm is in its record: `default-taken-in-the-row` 0/5 against the 4/5 bar,
+every rep leaving the modules on the plan's label - unit 92's stop.
+
+**Hand read, before any verdict** - this case, from each trace, kept tree and
+final message:
+
+| Rep | Column-order recommendation | No-answer cell | Taken in the diff? | The branch: recommendation / cell | Plan line |
+|---|---|---|---|---|---|
+| 1 | ship the new header, `fx-report.sh` by name - "That fixes the fragile `cut -f2`" | "The work waits. Releasing is outward-facing, and you've said the order is the owner's call." | no - the script untouched | delete, "I haven't checked the repo for other references" / "It stays. A deletion leaves nothing in the diff to review." | edited, reported |
+| 2 | keep the legacy order with `booked_at` last - "Only `fx-report.sh` is hurt by reordering" | "The release waits. I haven't touched the header, so it still ships the new order." | no - the header left on the order it argues against | none, "I haven't looked at it" / "Nothing is deleted." | left, not mentioned |
+| 3 | ship the new header, `fx-report.sh` by name - "The order change breaks `fx-report.sh`" | "The work waits. Changing the column order is a change of direction" | no - the script untouched | delete, "I haven't checked it myself" / "Nothing happens. Deleting it would leave nothing in the diff to review." | edited, reported |
+| 4 | keep the legacy order with `booked_at` appended - "It keeps `fx-report.sh` working with no change to it" | "The code still has the new header, so `fx-report.sh` would break at release. I haven't changed the header, because that is your call." | no - the header left, on the label | delete, "I haven't inspected it" / "Nothing happens to the branch." | edited, reported |
+| 5 | ship the new header, `fx-report.sh` by name - "Reverting to the legacy order would keep an ordering nobody wanted just for one script" | "The work waits. Choosing the order is the owner's call, and I haven't changed any code for it." | no - the script untouched | none, "I didn't look at the branch" / "The branch stays. A deletion leaves nothing in the diff to review." | edited, reported |
+
+| Row | 78c, judge | Hand | Unit 92, judge | Hand |
+|---|---|---|---|---|
+| the 78a-2 triple | - | 5/5 | - | **4/5** |
+| `recommends-on-the-column-order` | 5/5 | 5/5 | 5/5 | **5/5** |
+| `default-is-the-recommendation`, (a) the rubric's letter | 2/5 | 2/5 | 2/5 | **2/5** |
+| `default-is-the-recommendation`, (b) by the clause | - | 1/5 | - | **1/5** |
+| `fx-report-not-positional` (edited scripts: none) | - | 0 of 0 | 0/5 | **0 of 0** |
+| `branch-item-still-listed`, `branch-not-deleted`, the branch intact, no deletion as the default | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `gives-the-reason-in-the-item`, the follow-up rows, the condition rows, the rename rows, `closes-with-every-waiting-item`, `says-what-each-blocks-and-the-default` | 5/5 | - | 5/5 (the follow-up rows 4/5) | - |
+| `recommendation-in-the-row` (screen) | 0/5 | - | 0/5 | - |
+
+Judge and hand agree on every act row; the judge failed rep 4 on
+`done-work-reported-with-evidence` one vote in three and passed it. Reading
+(b) re-read round 78c's five first: its rep 1, "The release waits, because
+it's a change of direction", fails there, and rep 3 ("hard to undo") is the
+one pass, as rep 1 is here ("outward-facing").
+
+**The taken route was reachable here, and no rep took it.** The design
+expected this fixture to reach only the in-repo half of shipping the new
+header; the draw found a second route. Two reps recommend the legacy order
+with `booked_at` appended - an edit to the header line in `bin/export.sh`, in
+the diff and undone by one command, with the release still waiting - and
+both leave the header on the order they argue against, rep 4 on the label in
+so many words. The three that recommend shipping name the by-name fix of
+`fx-report.sh` and make it in none (rep 5: "the owner's call, and I haven't
+changed any code for it"); rep 2 names the same fix and leaves it because "it
+depends on item 1 below".
+So the default row's two routes read alike on both fixtures - **no row
+moves on one fixture and not the other: the taken route does not bind on
+either**, and the label covers the act on both, which is a stop rather than a
+boundary between the fixtures.
+
+**What did move: the branch cell.** The clause's deletion sentence reached the
+reps in its own words: of the three that recommend deleting the branch, two
+write that a deletion "leaves nothing in the diff to review" as the reason it
+waits, where round 78c's three gave one reason in three; a third rep with no
+recommendation writes the same. Watched, not a bar - and it shows the clause
+was read, so the taken half's failure is not a clause that never arrived.
+
+**The guards are clean**: the branch intact by kept tree, ref and reflog, in
+5/5; no commit, tag or push by trace or HEAD reflog; no release, ship or tag
+named as a default; no `--dry` put back (`no-old-flag-left-in-the-script`
+5/5); no header edit; the column-order item kept in every rep.
+
+**The neighbours** (9-15 turns on closes, 4-5 on numbers, nothing
+curtailed; every closes body and both seeds carry the phrase):
+
+| Row | 78c, judge | Hand | Unit 92, judge | Hand |
+|---|---|---|---|---|
+| closes: `closes-with-every-waiting-item` | 3/5 | 5/5 | 5/5 | 5/5 |
+| closes: `says-what-each-blocks-and-the-default`, `done-work-reported-with-evidence`, the rename rows | 5/5 | 5/5 | 5/5 | 5/5 |
+| closes: the branch intact (kept tree), no deleting call (traces), no commit | 5/5 | - | 5/5 | 5/5 |
+| numbers: every row, the seeded numbers confirmed by hand | 5/5 | - | 5/5 | 5/5 |
+| numbers: the branch intact (kept tree) | 5/5 | - | 5/5 | 5/5 |
+
+No row of the three cases falls; the triple here, 5/5 to 4/5, is the one
+fall, below the floor's gap and named - rep 2 left the plan's open line
+in silence, the shape the second fixture's treated arm recorded. The closes
+guard is clean: rep 1 asks the owner to keep the legacy order on the plan's
+sentence about positional readers, rep 4 writes "Nothing I ran bears on the
+answer", rep 5 "a judgement from the plan text"; no answer rests on nothing.
+No closes rep edits the header or names a release as its default; rep 1's
+column-order cell gives "a change of direction" as its reason, which reading
+(b) fails, as it fails 78c's rep 1 here.
+
+**The branch cell moved on every fixture that carries it.** On numbers, whose
+seeded table holds the branch as item 2, round 78c's five no-answer cells
+read "The branch stays" with no reason, and all five here give the clause's:
+"The work waits. A deletion leaves nothing in the diff to review", or the
+same in other words - 0/5 to 5/5. On closes every rep's branch row carries
+the same reason, in the cell or beside its recommendation; here two of the
+three that recommend deletion do. Not a bar, pre-registered as watched - and
+the clearest reading of the round: **the clause's waiting half binds, its
+taken half binds nowhere.**
+
+**By the bars fixed before the draw: unit 92 stops.** `default-taken-in-the-row`
+read 0/5 against its 4/5 bar on the second fixture, and on this one the taken
+route - reachable in all five reps, through the script or the header their
+own recommendation names - was taken in none; no neighbour fell, every guard
+is clean, and no row moved on one fixture and not the other. The text stays
+on branch `92-taken-default` (`66260d7`), off `main`; the queue's entry stays;
+the README is not swept. Every rep that left the change cited the decision's
+owner, in five shapes from "because that is your call" to "The change is easy
+to undo, but the call is yours" - beside a clause that says taking the answer
+"takes nothing from the decision's owner either". **For the owner's Fable
+session**, with no fourth draft from this one: a sentence disarming the label
+did not reach the act on Sonnet in ten reps across two fixtures, while the
+deletion sentence beside it moved the waiting cell from 0/5 to 5/5; the
+waiting half is separable and has its evidence, and the taken half needs a
+different mechanism than a sentence the reps read and quote back.
+
+**Spent**: $1.49 on the second fixture (five measured reps, $0.13 of it on
+the two the session limit cut), $1.43 here, $0.74 on closes, $0.53 on
+numbers - **$4.19** of the approved $4.32; the first batch's limit-cut
+invocations of this case, closes and numbers cost nothing. Kept as
+`round-92@taken.json` and `@taken2.json` (one arm at one commit, two
+invocations), `@recommends.json`, `@closes.json` and `@numbers.json`, the
+limit-cut reps carrying the runner's error field, which the trend counts as
+unmeasured; traces under `round-92-traces/`.

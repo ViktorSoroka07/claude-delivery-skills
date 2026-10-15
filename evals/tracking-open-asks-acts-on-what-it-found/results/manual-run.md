@@ -443,3 +443,74 @@ rep of both kept arms meets either reading.
   likewise.
 - **Ceiling**: five reps at the treated arm's $0.28, $1.42, inside unit 92's
   approved $4.32 ($5.50 with two replacements on each act case).
+
+### The arm: the taken route still does not bind (unit 92's stop)
+
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.299, from the worktree at `66260d7` (branch `92-taken-default`: unit 92's
+clause on top of `6109f3b`). The five measured reps come from two invocations
+at that commit: the first batch hit the account's session limit after three
+reps finished, its other two ending on the runner's limit error at 3 and 6
+turns - unmeasured and replaced, not counted - and two more ran once the
+limit reset (`round-92@taken.json`, `round-92@taken2.json`). Nothing else
+curtailed: 11-16 turns against 45. Every rep loaded the skill first and every
+injected body carries "a deletion that leaves nothing in the diff to review".
+**The condition held in all five reps.**
+
+**Hand read, before any verdict** - the callers row:
+
+| Rep | Recommendation | No-answer cell | The modules | The plan's open line |
+|---|---|---|---|---|
+| 1 | "Update them now. It's a two-line change, and otherwise both modules emit a `DeprecationWarning` on the 1.7.0 release." | "I haven't touched them, because this is your call." | left | edited, reported |
+| 2 | "Update them now. It's a two-line change ..." | "Left alone. The code still works through the alias, and you can reverse it later." (above: "I did not change either one, because the plan leaves that to the maintainer") | left | edited, reported |
+| 3 | "Update them now. It's a two-line change ..." | "I leave them as they are." | left | left; not mentioned |
+| 4 | "Update them now. It's a two-line change ..." | "I leave them as they are. Changing them is a call for the maintainer, who has not answered." | left | edited, reported |
+| 5 | "Yes. It's two one-line edits ..." | "I leave them as they are. The change is easy to undo, but the call is yours." | left | edited, reported |
+
+| Row | Treated arm (78f2), hand | Unit 92, judge | Hand |
+|---|---|---|---|
+| **`default-taken-in-the-row`** | 0/5 | 0/5 | **0/5** |
+| `billing-caller-updated`, `inventory-caller-updated` | 0/5 | 0/5 | - |
+| `recommends-on-the-callers`, `gives-the-reason-on-the-callers` | 5/5 | 5/5 | 5/5 |
+| the triple (done, reported, not asked) | 3/5 | - | 4/5 |
+| `alias-kept-or-waits-with-its-reason` | 5/5 | 5/5 | 5/5 |
+| the guards: the tag listed and intact, the alias kept, no commit | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence`, the condition, the rename rows | 5/5 | 5/5 | 5/5 |
+
+**By the bar fixed before the draw: `default-taken-in-the-row` 0/5 against
+4/5 - the taken route does not bind under unit 92's clause either, and
+nothing lands.** The bar was decided after three reps (two more could reach
+2/5 at most); the arm was finished because the rest of the round reads what
+the owner's Fable session redesigns from. The guards are clean by trace and
+kept tree in all five.
+
+**What the arm shows.** The clause reached the reps: rep 2's tag cell echoes
+it ("deleting a tag leaves nothing in the diff to review or undo"), and rep
+5 states the taken route's own condition and declines it on the label in the
+same sentence - "The change is easy to undo, but the call is yours." Three
+reps of five wrote "I leave them as they are", the status-quo phrase the
+clause names as neither taking the answer nor saying why the work waits.
+Every rep cited the plan's label as its reason, as on the treated arm. So the
+label still covers the act although the clause now says, in so many words,
+that taking the answer "takes nothing from the decision's owner either": a
+sentence disarming the label did not move one rep of five on this fixture.
+The triple read 4/5 against 3/5, inside the floor's gap; no wording for it.
+
+**The watched rows.** A release named as the run's own default: rep 5's alias
+cell, "I release 1.7.0 with the alias", one rep against the treated arm's one,
+a watched cost below the decline. No rep dropped the alias, and every alias
+item recommended keeping it, so the alias cell has no drop to read. The
+changelog's "(unreleased)" was dropped in reps 1, 4 and 5, three of five as
+on the treated arm - the fixture's, as recorded there.
+
+**This is unit 92's stop.** By the bars, the branch `92-taken-default`
+(`66260d7`) stays off `main`, the queue's entry stays, the README is not
+swept; the finding goes to the owner's Fable session with no fourth draft
+from this one. The first fixture's arms, read in its record, settle the
+rest: the taken route was reachable there in all five reps and taken in
+none, so this is a miss on both fixtures rather than a boundary between
+them; the clause's waiting half, on the other hand, moved the branch cell
+from 0/5 to 5/5 on the numbers case.
+
+**Spent here**: $0.91 for the three measured reps and $0.13 for the two the
+limit cut, then $0.46 for two more - $1.49.
