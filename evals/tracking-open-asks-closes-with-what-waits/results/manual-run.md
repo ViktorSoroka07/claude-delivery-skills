@@ -323,3 +323,27 @@ four more; `says-what-each-blocks-and-the-default`, judged and hand-graded, hold
 make room for the word, the watched cost. A capability rule, so no Fable arm;
 `tracking-open-asks-acts-on-what-it-found` is not read, its arms not fitting
 the approved $8.
+
+### The round
+
+The same two arms and the same sentence as the recommends case's record
+quotes.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `waiting-items-in-a-numbered-table` | 5/5 | 5/5 | the screen |
+| `no-answer-cell-opens-taken-or-waits` | 0/5 | 5/5, 4/5 by hand | moved; one Taken cell names an act other than its row's recommendation |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | guard held |
+| `closes-with-every-waiting-item` | 4/5 | 5/5 | held |
+| every other row | 5/5 | 5/5 | held |
+
+The regex reads the word, not whether it is true, so each Taken cell was set
+beside its row's recommendation by hand: five of six match, and one rep
+recommended adding a changelog line while its cell said "**Taken:** I leave
+the changelog alone, since you wanted to review the diff first" - the
+failure the word exists to prevent, turned inside out, and a hand fail of a
+row the regex passed. Of the Waits cells across both cases one is bare ("the
+branch stays as it is"), as bare cells were in the baseline; the rest name
+one of the three reasons. $0.78 the baseline, $0.79 the treated arm; kept as
+`round-94@baseline-closes.json` and `round-94@taken-or-waits-closes.json`.
+The unit's round cost $4.76 of the $8 approved.

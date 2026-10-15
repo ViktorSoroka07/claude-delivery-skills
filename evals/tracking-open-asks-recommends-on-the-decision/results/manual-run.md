@@ -2011,3 +2011,40 @@ four more; `default-is-the-recommendation` and
 its reason to make room for the word. A capability rule, so no Fable arm;
 `tracking-open-asks-acts-on-what-it-found` is not read, its arms not fitting
 the approved $8.
+
+### The round
+
+Two arms of five on Sonnet from worktrees of one commit: the baseline at
+`3082deb`, where the graders and bars above were committed, and the treated
+arm on that commit plus the cell sentence, verbatim:
+
+> the work waits only where taking it is outward-facing, hard to undo, or a
+> change of direction. The cell opens with **Taken:** where the recommended
+> answer is what happens without one, and with **Waits:** where it is not,
+> followed by what holds instead and which of those three keeps the
+> recommendation from being taken; a cell naming a different act from the
+> recommendation without that word leaves the requester unable to tell
+> whether silence takes it.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `waiting-items-in-a-numbered-table` | 5/5 | 5/5 | the screen; every rep's table was read |
+| `no-answer-cell-opens-taken-or-waits` | 0/5 | 5/5, 5/5 by hand | moved |
+| `default-is-the-recommendation` | 4/5 | 5/5 | guard held; the baseline fail is a cell that leaves the code as it is beside a recommendation to change it, saying neither that it waits nor why |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | guard held |
+| `follow-up-not-asked` | 5/5 | 3/5 | **watched**: two treated reps offered to record the finding in the plan ("I can fill it in with the result above if you want") instead of doing it |
+| `closes-with-every-waiting-item` | 5/5 | 4/5 | the same offer, an ask left outside the table |
+| `follow-up-done-in-the-tree` and its two siblings | 2/5 | 1/5 | one rep, the same direction |
+| every other row | as the baseline | as the baseline | held |
+
+Thirty-one rows were read across the two cases, the judged ones by hand from
+the run JSON's `evidence`. The watched row is a dip of two reps below the
+floor of five, against 23 of 25 for it on the kept Sonnet runs of near-identical
+text (rounds 78-landing, 78c, 92, 93 and this baseline); the wording touches only
+the table's last cell and the offer sits in the message body, but its last
+clause speaks of the requester, a plausible nudge toward asking, and the
+follow-up trio moved one rep the same way. The next round on this case reads
+that row first. No re-check was bought: at five reps against 5/5 it could
+convict only at 1/5 or below and could not clear. $1.61 the baseline, $1.58
+the treated arm; kept as `round-94@baseline-rec.json` and
+`round-94@taken-or-waits-rec.json` with traces in `round94-traces/`.
