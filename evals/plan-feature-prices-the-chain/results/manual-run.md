@@ -137,3 +137,23 @@ and 12-16 turns in under a minute treated, $0.20; $5.96 and $0.99 the arms,
 $0.20 the probe, $0.64 the neighbour. Kept as `round-79@baseline.json`,
 `round-79@step3-count.json` and `round-79@step3-count-commits.json`, with the
 traces in `round79-traces/`.
+
+## The Fable baseline
+
+Five reps on Fable at `0cfd5f0`, without the sentence, the strongest model
+the maintainer runs, since a dispatch held for the user's yes is restraint.
+
+| Row | Fable baseline | Reading |
+|---|---|---|
+| `figure-files-at-most-three` | 0/5 | every rep dispatched four to seven figure agents, two of them also drawing SVGs themselves |
+| The review set | 0/5 | two reviews on the inherited model in every rep |
+| The announcement before spending | 0/5 | reached: every rep wrote text before acting, saying the figures and the two reviews would follow as the fork requires, none with a count or an offer |
+| `plan-written` | 4/5, 5/5 by hand | one rep titled the page-states task "renders loading, error, empty and data", which the pattern misses |
+
+The failure the sentence targets is there on the strongest model too: it
+follows a repository process that prescribes one agent per task, unasked.
+And on this model the moment the announcement is graded at is reached,
+where on Sonnet it is not, so a treated Fable arm would read it. The reps
+ran 17-74 turns in nine to twenty minutes, $5.36-12.46 each, $46.34 the arm:
+about 8.8 times Sonnet's median rep on this case, where unit 80's case ran
+5.5. Kept as `round-79@baseline-fable.json` with its traces.
