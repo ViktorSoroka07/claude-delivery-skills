@@ -188,3 +188,28 @@ one rep proposing that pass on a cheaper model. Since the default dispatches
 nothing, nothing is spent before that offer is answered. The reps ran 22-27
 turns in three to four minutes, $1.42-1.60 each, $7.68 the arm. Kept as
 `round-79@step3-count-fable.json` with its traces.
+
+## Text for the second fixture
+
+The maintainer ruled the announcement clause cut: it bound one rep in ten
+across the two models, while every treated closing table carried the count
+and the offer, and the default spends nothing before they are answered. The
+clause's opener, "Before calling the repository's `writing-plans`", went
+with it, since its one job was the announcement's timing; the paragraph
+still stands at the head of Step 3. Both arms here ran the paragraph with
+the clause, so the second fixture's round is the evidence for the text that
+lands, which is, verbatim:
+
+> A chain that prescribes one of something per task multiplies it by the
+> task count, so the default is the smallest set that lets the plan be read,
+> even where the repository's process prescribes one per task: an opening
+> example, an overview and a sequence; a per-task figure, a further review
+> pass or a second verifier runs only on the user's yes. One review set per
+> artifact: the pass that opens the cited files on the strong model, the
+> rest on a cheaper one. Split the chain at the written spec: brainstorm and
+> spec in one session, the plan in a fresh one that loads only what planning
+> needs — by the plan phase a single session carries every earlier phase's
+> skill text on every turn.
+
+That round also reads by hand whether the closing table's offer still
+carries a count without the clause, the one thing the cut could remove.
