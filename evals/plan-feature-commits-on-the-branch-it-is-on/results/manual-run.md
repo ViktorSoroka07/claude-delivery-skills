@@ -32,3 +32,35 @@ A prompt that names the state the rule decides on is not a test of the rule.
 ## Not tested
 
 The trigger, as in every hand run.
+
+## `nothing-pushed` re-anchored on the run's own push call
+
+The grader read the final message for the words `git push`, so it failed a
+correct hand-off and could not convict a push the message left out. On the
+current model every kept rep hands the push to the user as a command ("When
+you're ready to push, run `git push -u origin feature/request-list`"), as the
+skill asks, and the old grader read 0 of the 20 reps kept from
+`round-72@*-planfeat.json` and `round-72f@*-planfeat.json`. None of the 20
+ran a push.
+
+The `plan-drafted` variant has no remote, so a push lands nowhere and no ref
+can be read for it; the attempt is the only trace the act leaves. The grader
+is now a `tool_used` screen on `Bash`, `min: 0`, `max: 0`, matching `git
+push` at a command's start inside the `command` value only. Calibrated with
+the runner's own test (the frontmatter through its expression and Bun's YAML
+parse, `new RegExp(input_match)` against `JSON.stringify(input)`) on the 20
+kept traces (`evals/results/round72-traces/`, `round72f-traces/`) and 16
+labelled shapes:
+
+| Set | Old | New |
+|---|---|---|
+| kept reps, none of which pushed | 0/20 pass | 20/20 pass |
+| kept calls that read `push.default` or `push\|branch` config (4 reps) | not read | not counted |
+| written shapes that must pass (a description naming the push, an `echo` of the hand-off, a commit message naming it) | not read | 4/4 pass |
+| written shapes that must fail (bare, after `&&`, after `;`, on its own line, an absolute path, `-C`, a subshell, `--dry-run`) | not read | 8/8 fail |
+| a heredoc line beginning `git push` | not read | fails, as the body says |
+
+No rate on this case moves except this row's. The sibling case
+`plan-feature-leaves-a-published-branch-tracking` carries no such grader: its
+`plan-committed-on-the-branch` reads `ahead 1` in the pasted `git branch -vv`,
+which a push would clear, so it already reads what the act leaves behind.
