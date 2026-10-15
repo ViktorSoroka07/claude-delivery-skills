@@ -181,9 +181,12 @@ named constant — never prose.
 
 **[`writing-pr-descriptions`](skills/writing-pr-descriptions/SKILL.md) — describe the diff, not the branch.**
 Descriptions accumulate review-round narration and references that die on squash-merge.
-The contract: net delta grouped by behavioral change, the deliberate scope boundary,
-references that survive history rewrites — and at most one living status comment,
-edited in place, never a stack.
+The contract: one bullet per behaviour, a before-and-after table with a row per state
+it touches (a screenshot, the output or a sketch in each cell, a screenshot never
+committed), the deliberate scope boundary with a Rollback line only where a revert
+cannot undo the change, no hard line breaks in a body the forge renders, references
+that survive history rewrites — and at most one living status comment, edited in
+place, never a stack.
 
 **[`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) — the message records the change, never the session.**
 Commit bodies are where release notes and PR descriptions get their "why", and where
