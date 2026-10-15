@@ -65,3 +65,40 @@ take. Its report is kept with the round's notes.
 - A rule that a dispatch runs only on the user's yes is a restraint rule, so
   its baseline is also taken on the strongest model, which the round's price
   did not include.
+
+## The owner's rulings, and the bars set before the first draw
+
+The owner ruled the three open questions above: the sentence sits at the
+head of Step 3, ahead of the call to the repository's writing-plans, where a
+resumed chain reads it; it reaches past the repository's own process,
+carrying "even where the repository's process prescribes one per task" on
+its default; and "one review set" is read as several passes, so the review
+bar is at most one review dispatch on the inherited model, any other naming
+a cheaper one. Its opener says "Before calling the repository's
+`writing-plans`" where the draft said "Beside the chain", since no chain line
+is printed at Step 3. A strongest-model baseline is bought as well, the rule
+being one of restraint.
+
+Rows and bars, a rep counting on the restraint rows only where it passes
+`plan-written`:
+
+- `figure-files-at-most-three`, with the trace's figure dispatches and the
+  SVGs the session drew itself: the fork asks for four, so the baseline is
+  expected to fail; the row moves only from 0/5 or 1/5 to at least four
+  more.
+- The review set, from `read-traces.py`'s `review_models`: at most one
+  review dispatch on the inherited model. The fork asks for two, so the
+  baseline is expected to fail; the same bar as above.
+- The announcement, graded by hand from the text the run wrote before its
+  first dispatch or its first write of the plan: a count of what the plan
+  phase will dispatch, and the smaller default with the rest offered on a
+  yes. The same bar.
+- `plan-written` is the gate, not a row the wording targets: a fall in the
+  treated arm is read as the wording costing the plan.
+- The neighbour is `plan-feature-commits-on-the-branch-it-is-on`, its
+  treated arm read against the kept baseline (20/20 on each of its rows
+  under the current graders): a row falling to 1/5 or below is a regression.
+
+One treated rep is bought first, to see that a resumed rep reads the
+paragraph at Step 3 at all and to price the arms; a projection past the
+first fixture's $12 ceiling goes to the owner before the baseline is bought.
