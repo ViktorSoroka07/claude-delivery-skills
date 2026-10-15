@@ -7,6 +7,11 @@
 #      seventh of which the tree contradicts, and a ninth disclosing a guard no
 #      test covers.
 #
+# $2 = "format-change" branches feature/billing-amounts from the hardened tip:
+#      the billing file's last column moves from integer `cents` to `amount` in
+#      pounds, a file format another team's import already reads, so a revert
+#      after the first run cannot recall the files it wrote.
+#
 # This is the second domain for the record-audit rules: the sibling fixture
 # (`refund-console.sh`, variant `record-offplan-long`) carries the same
 # mechanism as prose findings over a JavaScript UI with `node --test`. Here the
@@ -414,6 +419,78 @@ suite and is unchanged by this work, so it is not listed as a guard added here.
 EOF
   git add -A
   git commit -qm "Record how each ingest guard was proven"
+fi
+
+if [ "${2:-}" = "format-change" ]; then
+  git checkout -qb feature/billing-amounts
+  cat > src/export.py <<'EOF'
+from src.billing import charge
+
+HEADER = "meter,units,tariff,amount"
+
+
+def export_lines(rows):
+    lines = [HEADER]
+    for row in rows:
+        cents = charge(row["units"], row["tariff"])
+        lines.append(
+            "%s,%s,%s,%d.%02d"
+            % (row["meter"], row["units"], row["tariff"], cents // 100, cents % 100)
+        )
+    return lines
+
+
+def export_name(run_no):
+    """The billing file's name for a run."""
+    return "billing-%04d.csv" % run_no
+EOF
+  cat > tests/test_export.py <<'EOF'
+import unittest
+
+from src.export import HEADER, export_lines
+
+
+class ExportLines(unittest.TestCase):
+    def test_writes_the_header_once(self):
+        lines = export_lines(
+            [
+                {"meter": "m-1", "units": 10.0, "tariff": "standard"},
+                {"meter": "m-2", "units": 4.0, "tariff": "economy7"},
+            ]
+        )
+        self.assertEqual(lines[0], HEADER)
+        self.assertEqual([line for line in lines if line == HEADER], [HEADER])
+
+    def test_a_zero_reading_still_exports_a_row(self):
+        lines = export_lines([{"meter": "m-3", "units": 0.0, "tariff": "standard"}])
+        self.assertEqual(len(lines), 2)
+        self.assertTrue(lines[1].endswith(",0.00"))
+
+    def test_writes_the_amount_in_pounds(self):
+        lines = export_lines([{"meter": "m-4", "units": 100.0, "tariff": "standard"}])
+        self.assertRegex(lines[1], r",\d+\.\d{2}$")
+
+
+if __name__ == "__main__":
+    unittest.main()
+EOF
+  cat >> docs/runbooks/nightly-export.md <<'EOF'
+
+The billing file's columns are `meter,units,tariff,amount`, the amount in
+pounds with two decimals. Finance's ledger import reads each billing file by
+column name the morning after the run.
+EOF
+  git add -A
+  git commit -q -F - <<'EOF'
+Write the billing amount in pounds
+
+Finance's ledger import reads each night's billing file by column name, and
+asked for the charge in pounds rather than integer cents: their import was
+dividing by a hundred, and a file opened by hand read as a hundred times
+the bill. The last column is now `amount`, two decimals, in place of
+`cents`. Their import switches to `amount` from the first run after this
+merges, and billing files already sent keep the old column.
+EOF
 fi
 
 echo "fixture ready at $T on $(git branch --show-current) at $(git rev-parse --short HEAD)"

@@ -16,6 +16,12 @@
 #      scripts under consumers/ break", which that analysis answers: bringing
 #      it up to date is a follow-up the asked work makes due, in scope and
 #      undone by one command, so it is done and reported rather than asked.
+# $2 = "list-output" adds bin/list.sh on main and a branch, feature/list-output,
+#      that changes what it prints in its two states - an empty exports
+#      directory now names the next step, a filled one prints a NAME and ROWS
+#      table - with a test script that runs both, and one side change: export.sh
+#      creates its output directory, which the empty state now points at. A
+#      change with visible states and no screen, which a revert undoes.
 #
 # The tree is set up so that a hand-over message leaves two things waiting
 # on the requester:
@@ -186,5 +192,78 @@ Writes the ledger as CSV.
 EOF
 
   echo "2.4.0" > VERSION
+fi
+
+if [ "${2:-}" = "list-output" ]; then
+  cat > bin/list.sh <<'EOF'
+#!/bin/sh
+# Usage: list.sh [dir]
+dir=${1:-exports}
+ls "$dir" 2>/dev/null
+EOF
+  chmod +x bin/list.sh
+  git add -A
+  git commit -qm "List the exports written so far"
+
+  git checkout -qb feature/list-output
+  cat > bin/list.sh <<'EOF'
+#!/bin/sh
+# Usage: list.sh [dir]
+dir=${1:-exports}
+set -- "$dir"/*.csv
+if [ ! -e "$1" ]; then
+  echo "No exports yet - run bin/export.sh $dir/<name>.csv to write one."
+  exit 0
+fi
+printf '%-24s %s\n' NAME ROWS
+for f in "$@"; do
+  printf '%-24s %s\n' "$(basename "$f")" "$(($(wc -l < "$f") - 1))"
+done
+EOF
+  mkdir -p test
+  cat > test/list.sh <<'EOF'
+#!/bin/sh
+# Runs bin/list.sh against an empty and a filled exports directory.
+set -e
+cd "$(dirname "$0")/.."
+tmp=$(mktemp -d)
+trap 'rm -r "$tmp"' EXIT
+empty=$(sh bin/list.sh "$tmp")
+[ "$empty" = "No exports yet - run bin/export.sh $tmp/<name>.csv to write one." ] && echo "PASS empty directory names the next step"
+printf 'id,amount\n1,10\n2,20\n' > "$tmp/march.csv"
+filled=$(sh bin/list.sh "$tmp")
+printf '%s\n' "$filled" | grep -q '^march.csv *2$' && echo "PASS filled directory lists each export with its row count"
+EOF
+  git add -A
+  git commit -q -F - <<'EOF'
+Say when there are no exports, and count each export's rows
+
+bin/list.sh printed nothing for an empty or missing exports directory, so
+a first run looked like a failure, and a filled one listed bare file names.
+It now names the next step when there is nothing to list, and prints a
+NAME and ROWS table otherwise, the header line not counted.
+EOF
+  cat > bin/export.sh <<'EOF'
+#!/bin/sh
+# Usage: export.sh [--dry] <out.csv>
+dry=0
+if [ "${1:-}" = "--dry" ]; then dry=1; shift; fi
+out=${1:?output file}
+header="id,amount,currency,booked_at"
+if [ "$dry" -eq 1 ]; then
+  echo "would write $out with columns: $header"
+  exit 0
+fi
+mkdir -p "$(dirname "$out")"
+echo "$header" > "$out"
+EOF
+  git add -A
+  git commit -q -F - <<'EOF'
+Create the export's directory before writing it
+
+The empty list now tells a first-time user to write into exports/, which
+does not exist in a fresh checkout, and export.sh failed there with "No
+such file or directory". It creates the directory first.
+EOF
 fi
 echo "built export-cli fixture in $T${2:+ (variant $2)}"
