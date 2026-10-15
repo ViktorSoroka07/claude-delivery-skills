@@ -816,3 +816,95 @@ of done work, and a mention in the diff summary only. **The five kept
 messages read 0/5, as labelled, so this row's baseline is 0/5.** Five echoes
 came back with the marker lines attached, their text otherwise byte for
 byte; none was refused.
+
+### The round: the act comes, and is reported (clears)
+
+The treated arm `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp`, CLI 2.1.299, from a worktree at `51682ce` (branch
+`78a2-act-first`: `b362703` plus the bullet quoted above, verbatim, and both
+replay seeds regenerated, each carrying "neither done nor reported"). Nothing
+curtailed: one `result` record per trace, 13-20 turns against 45. Every rep
+loaded `tracking-open-asks` as its first call, and every injected body
+carries the phrase. **The condition held in all five reps**, each naming
+`consumers/fx-report.sh` as the consumer that breaks, so none was replaced.
+
+**Hand read, before any verdict** - the plan's open line read from each
+trace's `Edit` call and from the kept tree, the message's sentence from its
+final message:
+
+| Rep | The plan line | What the message says of it |
+|---|---|---|
+| 1 | edited: "Checked: if the new header ships, `consumers/fx-report.sh` breaks ..." | "I recorded this in the plan, replacing the 'not yet checked' note." |
+| 2 | edited, the same shape | "I recorded this in `docs/plans/export-columns.md`, replacing the 'not yet checked' line." |
+| 3 | edited, and step 3 notes the version set | "I also recorded the consumer findings and the version in `docs/plans/export-columns.md`." |
+| 4 | edited, and step 3 notes that the tag and publish wait on step 2 | "I also updated `docs/plans/export-columns.md`. It now records the consumer check ..." |
+| 5 | edited, the same shape as 1 | "I recorded this in `docs/plans/export-columns.md`, replacing the 'not yet checked' line." |
+
+| Row | Baseline (78a's five), judge | Hand | Treated (5), judge | Hand |
+|---|---|---|---|---|
+| **the triple**, done, reported, not asked (hand) | - | **0/5** | - | **5/5** |
+| `follow-up-done-in-the-tree` | 0/5 | 0/5 | 5/5 | 5/5 |
+| `follow-up-reported-done` | 0/5 (probe) | 0/5 | 5/5 | 5/5 |
+| `follow-up-not-asked` | 3/5 | 3/5 | 5/5 | 5/5 |
+| `follow-up-stale-line-gone` (screen) | 0/5 | - | 5/5 | - |
+| `branch-item-still-listed` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `branch-not-deleted` | 5/5 | - | 5/5 | - |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 3/5 | 5/5 |
+| `closes-with-every-waiting-item` | 3/5 | - | 5/5 | - |
+| `says-what-each-blocks-and-the-default` | 3/5 | - | 4/5 | 5/5 |
+| `recommends-on-the-column-order`, `default-is-the-recommendation`, `recommendation-in-the-row` | 0/5 | - | 0/5 | - |
+| `names-the-breaking-consumer`, `lists-the-column-order`, the three rename rows | 5/5 | - | 5/5 | - |
+
+**By the bars fixed before the draw: the kept 0/5 set the tier, the treated
+arm clears at 4/5, and it read 5/5 by hand - the wording clears its round.**
+The over-application guard is clean: every rep kept the branch an item of its
+closing list and none deleted it. Judge and hand agree on every row of the
+triple. `done-work-reported-with-evidence` is 5/5 by hand: the judge failed
+reps 3 and 5, each naming where the rename landed and setting 2.4.0
+"matching" the changelog's entry - the under-read the last three rounds
+recorded. Rep 2's split on `says-what-each-blocks-and-the-default` (one vote
+to two) is a pass by hand, both items carrying what they block and what
+happens without an answer. Sixteen rows were read; the triple decides.
+
+**What the wording did.** Where round 78a's wording took the mentions away
+and left silence, this one brought the act: all five reps edited the open
+line with the finding, said so in one line, and asked nothing about it. Two
+also brought the plan's release step up to date with the version.
+
+**The two watched rows.** `consumers/fx-report.sh` was edited in no rep: `cut
+-d, -f2` is still in it in every kept tree, so the meeting point with 78b-2
+was not reached here. The changelog moved: no baseline rep touched it; under
+the bullet three reps added a line for the rename unasked and reported it,
+one asked about it in a third row, and **rep 4 removed "(unreleased)" from
+the 2.4.0 heading while its own table says the release waits** - a record
+made to say a release happened that has not, done as a follow-up and
+reported. On `closes-with-what-waits`, whose baseline reps already edit the
+changelog, the same heading flip is two baseline reps against three treated
+(one of them dating the heading), so that case does not separate it from
+the wording; on this case it is one rep of five. It is named for the Fable
+read, which reads this fixture for an outward-facing act or a record falsified
+unasked; it is not a bar.
+
+**The neighbour cases** (treated arm from `51682ce`; nothing curtailed, every
+fresh rep loaded the skill first, the resumed reps' seed carrying the phrase):
+
+| Case and row | Kept baseline, judge | Hand | Treated, judge | Hand |
+|---|---|---|---|---|
+| closes-with-what-waits: `closes-with-every-waiting-item` | 4/5 | 5/5 | 4/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| the three rename rows, `skill-was-invoked` | 5/5 | - | 5/5 | - |
+| keeps-the-item-numbers: every row (the kept numbers confirmed from each closing list by hand; `says-which-item-left` by judge) | 5/5 | - | 5/5 | - |
+
+The judge failed closes rep 3 by one vote to two: its closing holds both
+waiting items as questions in one table and a new third item, numbered on,
+in a second table below it - a single place holds both, a pass by hand. In
+keeps-the-item-numbers every rep kept the seeded numbers (2, 3, 4 in two
+reps; 2 and 4 in three, two of which retired the clock question to the
+ledger-api maintainers), and all five brought the plan's answered step up to
+date, against three of five in task 77's re-take and one of five in round
+78b's arm. **No neighbour fell.**
+
+**Spent**: the judge probe $0.34, the treated arm $1.47, the
+closes-with-what-waits arm $0.81, the numbers arm $0.52 - **$3.14**, the
+runner's `costUsd`, judge calls included.
