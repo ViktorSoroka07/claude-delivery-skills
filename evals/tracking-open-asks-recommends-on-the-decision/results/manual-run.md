@@ -561,3 +561,134 @@ Haiku refused to echo one hand-written message once despite the preface; that
 cell was unmeasured and its re-run echoed. Two kept messages came back with
 the marker lines attached, their text otherwise byte for byte. $0.36
 (`round-78b@judge-probe.json`, `-a.json`).
+
+### The round: the column binds, "yours to call" fills it (declined)
+
+The treated arm `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on every rep's `init` event,
+from a worktree at `f11b7a7` (branch `78b-four-cell-row`: `e94083a` plus the
+wording quoted above, verbatim, and both replay seeds regenerated, each
+carrying "who overrules by answering"). Nothing curtailed: one `result`
+record per trace, 8-18 turns against 45. Every rep loaded
+`tracking-open-asks` as its first call, and every treated body carries the
+phrase. **The condition held in all five reps**, each naming
+`consumers/fx-report.sh` and listing the column order, so none was replaced.
+
+**Hand read, before any verdict** - the column-order item:
+
+| Rep | Recommendation cell | No-answer cell |
+|---|---|---|
+| 1 | "Yours to call, but I'd ship the new header and change `fx-report.sh` to look up `currency` by name ... the only consumer affected" | "The release waits. I haven't changed the header or `fx-report.sh`." |
+| 2 | "Yours to call. If the new order ships, switch `fx-report.sh` to look up the column by name" | "Nothing is released. `export.sh` already writes the new header ..." |
+| 3 | "Yours to call. Shipping the new order means changing `fx-report.sh` ...; keeping the legacy order means moving `booked_at` to the end, which breaks nothing." | "The release waits, because this is a breaking change." |
+| 4 | "Ship the new header and fix `fx-report.sh` to look up `currency` by name, as `reconcile.sh` already does. Keeping the legacy order is also fine if ..." | "The release waits, since this is hard to undo once it ships." |
+| 5 | "Keep the legacy order with `booked_at` appended, or fix `fx-report.sh` to read the column by name. Either avoids silent breakage. The call is the owner's." | "The release waits. Nothing changes." |
+
+| Row | Baseline (78a's five), judge | Hand | Treated (5), judge | Hand |
+|---|---|---|---|---|
+| **`recommends-on-the-column-order`**, the act | 0/5 | 0/5 | 3/5 | **2/5** |
+| `default-is-the-recommendation` | 0/5 (echo) | 0/5 | 1/5 | 1/5 |
+| `gives-the-reason-in-the-item` (over the act's passes) | - | - | 3/3 | 2/2 |
+| `recommendation-in-the-row` (screen) | 0/5 | - | 1/5 | - |
+| the 78a pair, done and not asked (hand) | - | 0/5 | - | 1/5 |
+| `follow-up-done-in-the-tree` | 0/5 | 0/5 | 1/5 | 1/5 |
+| `follow-up-not-asked` | 3/5 | 3/5 | 4/5 | 4/5 |
+| `follow-up-stale-line-gone` (screen) | 0/5 | - | 1/5 | - |
+| `branch-item-still-listed` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `branch-not-deleted` | 5/5 | - | 5/5 | - |
+| no deletion named as the branch's default (hand) | - | 5/5 | - | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 2/5 | 5/5 |
+| `closes-with-every-waiting-item` | 3/5 | - | 5/5 | - |
+| `says-what-each-blocks-and-the-default` | 3/5 | - | 5/5 | - |
+| `names-the-breaking-consumer`, `lists-the-column-order`, the three rename rows | 5/5 | - | 5/5 | - |
+
+**By the bars fixed before the draw: 0/5 set the tier, the treated arm clears
+at 4/5, and it read 2/5 by hand - declined for this wording, no further
+draws.** The judge read 3/5, passing rep 5, whose item offers two answers
+and leaves the choice between them to the owner; by hand that is the options
+laid out, not an answer recommended. Rep 1 writes "Yours to call, but I'd
+ship the new header": as the grader stands it passes, since the item states
+the run's own answer, and under the literal reading of the bar above, which
+counts any "yours to call" on this item as a fail, the arm is 1/5. Every
+reading is under the bar. The default row's one pass is rep 4 ("hard to undo
+once it ships"); rep 3's "because this is a breaking change" was failed by
+the judge three votes to none and is a fail by hand too, a breaking change
+naming the effect rather than why taking an answer needs the requester.
+
+**The over-application guard is clean**: every treated rep kept the branch
+an item, deleted nothing, and gave "the branch stays" or its like as the
+branch's default. **No neighbour fell.** `done-work-reported-with-evidence`
+is 5/5 by hand in both arms; the judge failed three treated reps, each of
+which names where the rename landed and sets 2.4.0 "matching" the changelog's
+heading - the under-read round 78a recorded, again.
+
+**What the wording did.** The column bound: every treated rep's table
+carries a recommendation column, against none of the baseline's, and in
+`closes-with-what-waits` every treated rep's table carries one too (below).
+What filled it on the column order was the wording's own exemption: "Yours
+to call" in reps 1-3 and "The call is the owner's" in rep 5, on a decision the
+run's own analysis bears on; the plan calls the column order the owner's, and
+the reps read that label as "a preference only the requester holds", the
+judged category the parenthetical offers. The same phrase went on the branch
+item in all five reps and on the version in one. The default half cannot show
+"taken" on this fixture except as a reason: the decision's consequence is a
+release, outward-facing, so the wording's own exception covers "the release
+waits" in every rep, and the cell is then graded on whether it says so. Two
+treated reps added a changelog row recommending "Yes" for the rename's line,
+a follow-up the yes-test passes put as a question, which no baseline rep did;
+round 78a's treated arm had one.
+
+**What a next wording would have to change** - the owner's to design, not
+bought here, as the data shows it: the exemption's trigger is a category the
+run judges ("a preference only the requester holds"), and a plan line naming
+the decision as someone's call is judged into it. A shape whose boundary is
+a marking the run holds rather than a category it judges - a recommendation
+wherever the run's own findings bear on the answer, even when the plan names
+the decision as someone's call, and "yours to call" only where the run's work
+gives it no ground at all - or no parenthetical, with "where your work bears
+on it" carrying the boundary alone, is what this draw points to. The default
+half wants a fixture whose decision has an in-repo consequence the run could
+take, since a release-gated one makes waiting correct.
+
+### The neighbour cases
+
+Both `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`,
+the baseline from a detached worktree at `e94083a`, the treated arm from
+`f11b7a7`. Nothing curtailed; every fresh rep loaded the skill first.
+
+`tracking-open-asks-closes-with-what-waits`, hand read before the verdicts:
+
+| Row | Baseline, judge | Hand | Treated, judge | Hand |
+|---|---|---|---|---|
+| `closes-with-every-waiting-item` | 4/5 | 5/5 | 5/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 3/5 | 5/5 |
+| the three rename rows, `skill-was-invoked` | 5/5 | - | 5/5 | - |
+
+The judge failed baseline rep 2 on the list row, whose table restates the
+column order as "Has the owner said whether the legacy column order must be
+kept?" beside the branch question; by hand both are restated, a pass. The
+two treated fails of the evidence row name the rename's files and the version
+with "matching the ... heading", passes by hand. Every treated table carries a
+recommendation column or a merged recommendation-and-default cell; four reps
+recommend "Delete it" on the branch and every one keeps "I leave the branch
+alone" as its default, the wording applied as written, and all five give the
+column order "Yours to call, since it depends on the owner's answer" - on a
+case whose prompt asks for no consumer analysis, so the run's work gives that
+answer less ground than in the recommends case.
+
+`tracking-open-asks-keeps-the-item-numbers`, five treated reps against task
+77's re-take: **every row 5/5 in both** (`keeps-the-number`,
+`keeps-the-alias-number`, `renumbered-from-one`, `says-which-item-left`, the
+two changelog rows), and by hand every rep kept the seeded numbers - 2, 3, 4
+in three reps, 2 and 4 in two that retired the clock question to the
+ledger-api maintainers with the plan's reason. The resumed reps' traces carry
+no skill body, the seed holding it; two reps wrote "Yours to call" in a
+recommendation column, a phrase only the treated body has.
+
+**Spent**: the judge probe $0.36, the treated arm $1.43, the
+closes-with-what-waits arms $0.76 and $0.77, the numbers arm $0.50 -
+**$3.82**, the runner's `costUsd`, judge calls included. The neighbour arms
+were already queued in the one batch when the act row's verdict was read;
+they cost $2.03 and stand as the current-text baseline 78c's neighbour read
+needs and as evidence the four-cell shape costs the neighbours nothing.
