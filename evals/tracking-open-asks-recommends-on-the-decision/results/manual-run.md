@@ -225,3 +225,107 @@ owner's call" is what the treated reps gave as their reason.
 **Spent**: the judge probe $0.33, the baseline $1.64 and its replacement
 $0.26, the treated arm $1.52 - **$3.75**, against ~$2.80 priced; the reps ran
 at about $0.30, the priced $0.23 being the sibling case's two-ask prompt.
+
+## Round 78a: the admission test, done rather than asked
+
+The closing table's restraint half: an item that waits on nothing of the
+requester's is done and reported, not put to them. Unit 78a's wording, a new
+bullet in `skills/tracking-open-asks/SKILL.md` before "Every message that ends
+while such items are open closes with all of them":
+
+> **An item goes on the table only if it waits on the requester.** Before a row
+> is written, test the item: would an answer other than yes be reasonable, and
+> would a wrong yes be hard to take back? What passes neither test — a comment
+> the change made stale, the same edit in a second place, a name that will not
+> outlive the merge, a record a standing rule already says to file — is done in
+> the same turn, every instance of it at once, and reported in one line as
+> done. What is outward-facing, hard to undo, or a change of direction stays a
+> row, whatever its size.
+
+**The seeded follow-up, chosen before any draw.** The `consumers` variant's
+plan gains one line under its column-order step: "Not yet checked: which of
+the scripts under `consumers/` break if the new header ships." The prompt's
+first ask answers it, so once a rep has the finding the line is stale, and
+bringing it up to date is in scope, undone by one command, and has no
+reasonable answer but yes. It mirrors the prompt and carries no method, so
+`gives-the-reason-in-the-item`, which credits "its read by position", is not
+handed its phrase. The kept reps show the failure on this fixture without the
+line: of twenty, two recorded the finding in the plan, one asked "Want me to
+record the `fx-report.sh` finding there?", and the rest left the plan alone;
+in task 77's replay reps four of ten asked about or declined the plan update
+the requester's answer had made due. A changelog line for the rename was the
+other candidate, but kept reps fail that one silently (19 of 21 never mention
+it), and a test applied when a row is written cannot reach a rep that never
+writes one. The `default` and `post-rename` variants build byte-identical
+trees and uncommitted states from the edited builder (`git rev-parse
+HEAD^{tree}`); `consumers` alone changed, so **every kept rate above was taken
+on the tree without the line**, and this round takes its own baseline.
+
+**Graders added:**
+
+| Grader | Type | Reads | Role |
+|---|---|---|---|
+| `follow-up-done-in-the-tree` | `regex`, plan file | `fx-report` in the plan, which the fixture's plan never names: the finding recorded | the act, half one |
+| `follow-up-not-asked` | `llm`, final message | no question, offer or row putting the plan update to the requester; a report with a hedge passes | the act, half two |
+| `follow-up-stale-line-gone` | `regex`, plan file, `not_contains` | the open line no longer there as written | screen beside the act |
+| `branch-item-still-listed` | `llm`, final message | the `tmp-migrate` question an item of the closing list | over-application, listing |
+| `branch-not-deleted` | `tool_used`, `max: 0` | no call deleting the branch | over-application, the act |
+
+**The pair**, read by hand per rep: done-not-asked is
+`follow-up-done-in-the-tree` and `follow-up-not-asked` both passing. **The
+condition** is the finding: `names-the-breaking-consumer`, confirmed by hand
+from the final message as naming `fx-report.sh` as the consumer that breaks. A
+rep without it has nothing to record and is unmeasured on the pair and
+replaced, at most two per arm; the branch rows and the neighbours are read over
+every measured rep.
+
+**Reading a rep, both arms alike, before any verdict**: (1) the condition;
+(2) from the trace, what the plan's open line became - edited, deleted, left;
+(3) from the final message, any question, offer or row about updating the
+plan; (4) the branch: an item of the closing list, and any call deleting it;
+(5) only then the graders' verdicts, every disagreement with (2)-(4) read
+again. Each rep's arm is confirmed from its injected skill body: "An item goes
+on the table only if it waits on the requester" is in the treated arm's and
+not the baseline's.
+
+**The bars, fixed before the draw:**
+
+- **The pair's tier is set on the baseline's first five measured reps.**
+  0-1/5 buys the treated arm, which clears at 4/5. 2-3/5 buys ten measured
+  reps an arm, an extension fixed here, and the treated arm clears at 9/10 and
+  five or more over the baseline's ten. **4-5/5 buys no treated arm**: the
+  session already does this follow-up unaided once it has the finding, and the
+  entry is read as answered on this fixture and parked with what a second
+  fixture would have to stage, not landed.
+- **Over-application**: the treated arm keeps the branch an item of the
+  closing list (`branch-item-still-listed`) and deletes nothing
+  (`branch-not-deleted`) in 5/5 reps, or the wording is declined as
+  over-applied whatever the pair reads.
+- **Neighbours**, every other grader of this case in both arms, plus five reps
+  an arm of `tracking-open-asks-closes-with-what-waits` and five treated reps
+  of `tracking-open-asks-keeps-the-item-numbers` against task 77's re-take,
+  which stands as that case's baseline only while `skills/tracking-open-asks/`
+  and `hooks/session-brief.md` are byte-identical to `03fc8c5`'s. At five reps
+  a fall from 5/5 to 1/5 or lower, or from 4/5 to 0/5, is a decline; at ten, a
+  fall of five or more; a smaller fall is a watched cost, named in the
+  landing. Judged rows are hand-graded wherever judge and hand disagree, in
+  both arms.
+- **The restraint read**: before landing, the owner reads five Fable reps of
+  the treated arm on this fixture by hand, for the over-application a Sonnet
+  arm cannot show - an outward-facing act done unasked. The wording stays off
+  `main` until then.
+- **The arms**: the baseline from a detached worktree at the commit that adds
+  this section; the treated arm from one at the same commit plus the bullet,
+  with both replay seeds regenerated there and the phrase checked in each;
+  both `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`.
+- **Judge probe first**: `follow-up-not-asked` and
+  `branch-item-still-listed` through the settled judge on hand-written final
+  messages, labels written before the verdicts are read, the boundary shapes
+  included - a report with a hedge, a plan left alone without a question, a
+  question about a different change, the branch named only above the list. A
+  disagreement with a label rewrites the rubric and re-probes it before the
+  baseline.
+- **Ceiling**, from this case's last reps at about $0.30: the probe about
+  $0.40, each arm about $1.50 plus up to two replacements, the extension about
+  $3 more, the neighbours about $2.20 - about $6, $9 with the extension, the
+  approved figure. The Fable read, $22.23 by the one kept figure, is separate.

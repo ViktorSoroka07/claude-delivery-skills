@@ -12,6 +12,10 @@
 #      step as the owner's call without saying which consumer reads how - so
 #      a session asked which consumer breaks holds the analysis a
 #      recommendation on that call rests on, and still has to hand it over.
+#      The step also carries an open line, "Not yet checked: which of the
+#      scripts under consumers/ break", which that analysis answers: bringing
+#      it up to date is a follow-up the asked work makes due, in scope and
+#      undone by one command, so it is done and reported rather than asked.
 #
 # The tree is set up so that a hand-over message leaves two things waiting
 # on the requester:
@@ -115,6 +119,7 @@ EOF
 
 1. Add `booked_at` to the export. Done.
 2. Settle the column order. Blocked on the owner's call: keep the legacy order `id,currency,amount` for the scripts under `consumers/`, or ship the new header `id,amount,currency,booked_at`. Asked the owner; no answer yet.
+   - Not yet checked: which of the scripts under `consumers/` break if the new header ships.
 3. Release.
 
 ## Housekeeping
