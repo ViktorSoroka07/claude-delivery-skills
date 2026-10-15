@@ -20,3 +20,41 @@ note, `src/export.py` and its test, and `main`'s header reads
 `meter,units,tariff,cents`. The builder's other two variants, default and
 record-table, build every branch to the same tree from the builder before
 and after the change, compared by `git rev-parse <branch>^{tree}`.
+
+## The graders, settled before the first draw
+
+- `before-and-after-table` takes the common spellings of an earlier and a
+  later column (Before/After, Old/New, Was/Now, any case), since only the
+  treated wording supplies the words Before and After; a rep with no table
+  fails it and `record-sketch` for one cause, read as one bit.
+- `record-sketch` takes a data line as well as a column name: a whole-number
+  last field or `cents` on the left of a row, a two-decimal field or `amount`
+  on its right.
+- `rollback-line-on-a-one-way-door` is a judge where it was a regex: the regex
+  passed "Rollback: Revert this PR." under Not changed and failed a correct
+  line placed above it. The rubric passes a line under any heading that says
+  what reverting cannot undo here - the billing files already sent, Finance's
+  import having switched - and what would be done instead, and fails a
+  deployment note that only says Finance must switch.
+- `what-changes-is-a-list` leaves a lead summary out of what it reads and
+  counts a list with no heading; the skill already asks for an item per
+  change, so it is read as a guard.
+- `no-hard-wrap` reads a wrapped list item at any depth and its continuation,
+  indented or not; a fail inside a fenced block is settled by the same pattern
+  with the fenced blocks removed.
+- `no-image-committed` cannot fail here: the change has no screen, and the
+  prompt forbids a commit. It is kept and not counted.
+- The prompt says the body will be pasted into the pull request form, since
+  the treated rule binds a body the forge renders.
+
+Five hand-written bodies, labelled before any verdict, cover the treated
+ideal, the baseline shape (a summary wrapped like the commit body, file-led
+bullets, a deployment note, no table), an Old/New table of data lines with
+"Rollback: Revert this PR.", the changes as one paragraph with a correct
+Rollback section above Not changed, and a wrapped heading-less list with an
+After-only table. The settled judge agreed with all ten labels of the two
+rubrics, every vote unanimous, and each regex grader matched all its labels.
+
+`no-hard-wrap` is a restraint row too: its sighting was a strong model's own
+wrapping, which the eval model may never show. Its strongest-model arms are
+not bought for this case, so a clean baseline here says nothing about them.

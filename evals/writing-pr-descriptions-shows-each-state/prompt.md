@@ -7,4 +7,4 @@ timeout_seconds: 600
 allowed_tools: [Read, Grep, Glob, Bash, Write, Edit, Skill]
 ---
 
-`feature/list-output` is ready for the team. Write its pull request description into `PR.md` at the repo root. There is no remote and no forge here; do not commit.
+`feature/list-output` is ready for the team. Write its pull request description into `PR.md` at the repo root; I will paste it into the pull request form myself. There is no remote here; do not commit.
