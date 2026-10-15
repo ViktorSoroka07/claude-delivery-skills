@@ -16,14 +16,27 @@ because the call that carried it would have been refused otherwise. Past that
 point the percentage is meaningless, and saying so is the only honest thing
 the hook can do; telling such a session to wind down is a false alarm on every
 prompt it sends.
+
+Below the wind-down band, a session past a fixed size whose last turn pushed,
+handed a push over or opened a request is told once per phase what each turn
+now costs: every turn re-reads the whole context, and that turn is the point
+where the work is durable enough to write a brief and compact.
 """
 import json
 import os
+import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from shell_text import PR_CREATE, blank, git_verb  # noqa: E402
 
 DEFAULT_WINDOW = 200000
 THRESHOLD = 0.70
+COST_TOKENS = 300000
 TAIL_BYTES = 1 << 20
+
+HANDED = re.compile(r"!\s*git push\b")
+GIT_PUSH = git_verb("push")
 
 MISCALIBRATED = (
     "delivery-skills context meter: this session has passed %s tokens while the meter "
@@ -41,6 +54,17 @@ LINE = (
     "unwritten when the window fills is what no later session can recover."
 )
 
+COST_MARK = "each turn from here costs the whole transcript"
+
+COST = (
+    "delivery-skills context meter: this session carries %s tokens of context and "
+    "every turn re-reads all of it, so " + COST_MARK + ". The last turn pushed, "
+    "handed a push over or opened a request, so the work in hand is durable and this "
+    "is a seam: write the brief the next phase needs (the maintaining-project-memory "
+    "skill owns it), then compact here or go on in a fresh session, rather than "
+    "carrying this phase into every later turn."
+)
+
 
 def window():
     try:
@@ -49,38 +73,104 @@ def window():
         return DEFAULT_WINDOW
 
 
-def line_groups(path):
-    """The transcript's lines, tail first: the usage wanted is the last one
-    written, and a transcript runs to megabytes. The seek lands mid-line, so
-    the first line of the tail is dropped; the whole file follows as the
-    fallback for a tail that holds no usage at all."""
+def events_last_first(path):
+    """The transcript's records, last first: what is wanted sits near the end,
+    and a transcript runs to megabytes. The last megabyte is read first and
+    the rest only if a caller walks past it, the line the seek split rejoined."""
     size = os.path.getsize(path)
-    if size > TAIL_BYTES:
-        with open(path, "rb") as fh:
-            fh.seek(size - TAIL_BYTES)
-            yield fh.read().decode("utf-8", "replace").splitlines()[1:]
-    with open(path, encoding="utf-8", errors="replace") as fh:
-        yield fh.read().splitlines()
+    start = max(0, size - TAIL_BYTES)
+    with open(path, "rb") as fh:
+        fh.seek(start)
+        lines = fh.read().split(b"\n")
+        split = lines.pop(0) if start else b""
+        for line in reversed(lines):
+            yield from parsed(line)
+        if start:
+            fh.seek(0)
+            head = (fh.read(start) + split).split(b"\n")
+            for line in reversed(head):
+                yield from parsed(line)
+
+
+def parsed(line):
+    try:
+        event = json.loads(line.decode("utf-8", "replace"))
+    except Exception:
+        return
+    if isinstance(event, dict):
+        yield event
+
+
+def phase(path):
+    """This session's main-thread records since its last compaction, last first.
+    A compaction keeps every earlier line, so a usage above its summary is the
+    context that was summarised away; and a sidechain entry is a subagent's
+    window rather than this session's."""
+    for event in events_last_first(path):
+        if event.get("isCompactSummary"):
+            return
+        if not event.get("isSidechain"):
+            yield event
 
 
 def context_tokens(path):
-    """What the last main-thread call carried. A sidechain entry is a
-    subagent's window rather than this session's, and reading one reports a
-    fresh agent's few thousand tokens as the session's own."""
-    for lines in line_groups(path):
-        for line in reversed(lines):
-            try:
-                event = json.loads(line)
-            except Exception:
-                continue
-            if event.get("isSidechain"):
-                continue
-            usage = (event.get("message") or {}).get("usage")
-            if not isinstance(usage, dict):
-                continue
+    for event in phase(path):
+        usage = (event.get("message") or {}).get("usage")
+        if isinstance(usage, dict):
             return sum(usage.get(k) or 0 for k in (
                 "input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
     return 0
+
+
+def is_prompt(event):
+    if event.get("type") != "user" or event.get("isMeta"):
+        return False
+    content = (event.get("message") or {}).get("content")
+    if not isinstance(content, list):
+        return True
+    return not any(isinstance(b, dict) and b.get("type") == "tool_result" for b in content)
+
+
+def opens_a_seam(content):
+    """A push handed over as the harness's own `! <command>` line, or a push or
+    a request create the turn ran itself; a sentence that only names the
+    command is neither, nor is a heredoc's or a quoted span's text."""
+    for block in content if isinstance(content, list) else [content]:
+        if isinstance(block, str):
+            block = {"type": "text", "text": block}
+        if not isinstance(block, dict):
+            continue
+        if block.get("type") == "text" and HANDED.search(block.get("text") or ""):
+            return True
+        command = (block.get("input") or {}).get("command") if block.get("type") == "tool_use" else None
+        if isinstance(command, str):
+            _, stripped = blank(command)
+            if GIT_PUSH.search(stripped) or PR_CREATE.search(stripped):
+                return True
+    return False
+
+
+def last_turn_is_a_seam(path):
+    said = False
+    for event in phase(path):
+        if event.get("type") == "assistant":
+            said = True
+            if opens_a_seam((event.get("message") or {}).get("content")):
+                return True
+        elif said and is_prompt(event):
+            return False
+    return False
+
+
+def cost_told(path):
+    for event in phase(path):
+        attachment = event.get("attachment")
+        if isinstance(attachment, dict) and attachment.get("type") == "hook_additional_context":
+            content = attachment.get("content")
+            if any(COST_MARK in text for text in (content if isinstance(content, list) else [content])
+                   if isinstance(text, str)):
+                return True
+    return False
 
 
 def thousands(n):
@@ -94,13 +184,15 @@ def main():
         return
     limit = window()
     tokens = context_tokens(path)
-    if tokens < limit * THRESHOLD:
-        return
     if tokens > limit:
         context = MISCALIBRATED % (thousands(tokens), thousands(limit))
-    else:
+    elif tokens >= limit * THRESHOLD:
         context = LINE % (
             round(100.0 * tokens / limit), thousands(tokens), thousands(limit))
+    elif tokens >= COST_TOKENS and last_turn_is_a_seam(path) and not cost_told(path):
+        context = COST % thousands(tokens)
+    else:
+        return
     sys.stdout.write(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "UserPromptSubmit",

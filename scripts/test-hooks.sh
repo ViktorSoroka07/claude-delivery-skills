@@ -344,6 +344,105 @@ empty "context meter stays silent on a transcript with no usage" "$out"
 out=$(meter_payload "$WORK/quiet.jsonl" | DELIVERY_SKILLS_CONTEXT_WINDOW=50000 "$PY" "$METER_HOOK" 2>/dev/null)
 contains "context meter follows the window override" "$out" "82%"
 
+summary_line() {
+  printf '{"type":"user","isCompactSummary":true,"isVisibleInTranscriptOnly":true,"message":{"role":"user","content":"This session is being continued from a previous conversation."}}\n'
+}
+prompt_line() { printf '{"type":"user","message":{"role":"user","content":"%s"}}\n' "$1"; }
+said_line() { printf '{"type":"assistant","message":{"content":[{"type":"text","text":"%s"}]}}\n' "$1"; }
+ran_line() { printf '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"%s"}}]}}\n' "$1"; }
+result_line() { printf '{"type":"user","message":{"content":[{"type":"tool_result","content":"%s"}]}}\n' "$1"; }
+told_line() {
+  printf '{"type":"attachment","attachment":{"type":"hook_additional_context","hookEvent":"UserPromptSubmit","content":["%s"]}}\n' "$1"
+}
+context_of() { printf '%s' "$1" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])' 2>/dev/null; }
+
+# 20. Context meter after a compaction: the transcript keeps every line from
+#     before it, so the last usage above the next prompt is the context that
+#     was just summarised away until the first turn after it writes its own.
+{ usage_line 2000 188000; summary_line; } > "$WORK/compacted.jsonl"
+out=$(meter_payload "$WORK/compacted.jsonl" | meter 2>/dev/null)
+empty "context meter stays silent between a compaction and the next turn's usage" "$out"
+
+{ usage_line 2000 188000; summary_line; prompt_line "go on"; usage_line 2000 150000; } > "$WORK/compacted-on.jsonl"
+out=$(meter_payload "$WORK/compacted-on.jsonl" | meter 2>/dev/null)
+contains "context meter reads the usage below the last compaction" "$out" "76%"
+
+"$PY" -c 'import sys
+with open(sys.argv[1], "w") as fh:
+    fh.write("{\"type\":\"assistant\",\"message\":{\"usage\":{\"input_tokens\":2000,\"cache_read_input_tokens\":188000}}}\n")
+    fh.write("{\"type\":\"user\",\"isCompactSummary\":true,\"message\":{\"content\":\"continued\"}}\n")
+    fh.write("{\"type\":\"user\",\"pad\":\"" + "x" * 1200000 + "\"}\n")' "$WORK/compacted-big.jsonl"
+out=$(meter_payload "$WORK/compacted-big.jsonl" | meter 2>/dev/null)
+empty "context meter stops at a compaction above the tail it reads first" "$out"
+
+# 21. Context meter's cost line: below the wind-down band and past a fixed
+#     size, once per phase, on the prompt after a turn that pushed, handed a
+#     push over or opened a request - the point where the work is durable.
+cost_mark="each turn from here costs the whole transcript"
+
+{ prompt_line "ship it"; usage_line 2000 400000; said_line 'Committed. When ready: ! git push -u origin feature/x'; } > "$WORK/seam.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/seam.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter tells a session past the cost line at a seam what each turn costs" "$ctx" "$cost_mark"
+contains "context meter's cost line names the session's size" "$ctx" "402k"
+contains "context meter's cost line names the skill that owns the brief" "$ctx" "maintaining-project-memory"
+
+{ prompt_line "open it"; usage_line 2000 400000; ran_line 'gh pr create --fill'; result_line 'https://example.test/pull/7'; said_line 'Opened.'; } > "$WORK/opened.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/opened.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter counts a request the last turn opened as a seam" "$ctx" "$cost_mark"
+
+{ prompt_line "next"; usage_line 2000 400000; said_line 'Fixed the parser.'; } > "$WORK/no-seam.jsonl"
+out=$(meter_payload "$WORK/no-seam.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter stays silent past the cost line with no seam" "$out"
+
+{ prompt_line "next"; usage_line 2000 400000; said_line 'Never run git push or gh pr create from a brief.'; } > "$WORK/named.jsonl"
+out=$(meter_payload "$WORK/named.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter does not count a sentence naming the push as a seam" "$out"
+
+{ prompt_line "note it"; usage_line 2000 400000; ran_line "python3 - <<'EOF'\\nnote = 'cd main\\n&& git push'\\nEOF"; said_line 'Noted.'; } > "$WORK/heredoc.jsonl"
+out=$(meter_payload "$WORK/heredoc.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter does not count a push written inside a heredoc as a seam" "$out"
+
+{ prompt_line "open it"; usage_line 2000 400000; ran_line "cat <<'EOF' | gh pr create --body-file -\\nSummary\\nEOF"; said_line 'Opened.'; } > "$WORK/heredoc-pr.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/heredoc-pr.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter counts a request opened from a heredoc's first line" "$ctx" "$cost_mark"
+
+{ prompt_line "ship"; said_line 'When ready: ! git push'; prompt_line "next"; usage_line 2000 400000; said_line 'Fixed the parser.'; } > "$WORK/old-seam.jsonl"
+out=$(meter_payload "$WORK/old-seam.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter reads the seam from the last turn only" "$out"
+
+{ prompt_line "ship it"; usage_line 2000 250000; said_line 'When ready: ! git push'; } > "$WORK/small-seam.jsonl"
+out=$(meter_payload "$WORK/small-seam.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter stays silent at a seam below the cost line" "$out"
+
+{ prompt_line "ship"; said_line 'When ready: ! git push'; prompt_line "more"; told_line "meter: $cost_mark"; usage_line 2000 400000; said_line 'Still to run: ! git push'; } > "$WORK/told.jsonl"
+out=$(meter_payload "$WORK/told.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter gives the cost line once per phase" "$out"
+
+{ told_line "meter: $cost_mark"; summary_line; prompt_line "ship"; usage_line 2000 400000; said_line 'When ready: ! git push'; } > "$WORK/told-before.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/told-before.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter gives the cost line again after a compaction" "$ctx" "$cost_mark"
+
+{ prompt_line "ship"; ran_line 'git push origin HEAD'; result_line "the hook source says: $cost_mark"; usage_line 2000 400000; said_line 'Pushed.'; } > "$WORK/quoted.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/quoted.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter counts only its own injected line as told, and a push across a tool result" "$ctx" "$cost_mark"
+
+"$PY" -c 'import sys
+with open(sys.argv[1], "w") as fh:
+    fh.write("{\"type\":\"attachment\",\"attachment\":{\"type\":\"hook_additional_context\",\"content\":[\"meter: " + sys.argv[2] + "\"]}}\n")
+    fh.write("{\"type\":\"user\",\"pad\":\"" + "x" * 1200000 + "\"}\n")
+    fh.write("{\"type\":\"user\",\"message\":{\"content\":\"ship\"}}\n")
+    fh.write("{\"type\":\"assistant\",\"message\":{\"usage\":{\"input_tokens\":2000,\"cache_read_input_tokens\":400000},\"content\":[{\"type\":\"text\",\"text\":\"When ready: ! git push\"}]}}\n")' "$WORK/told-big.jsonl" "$cost_mark"
+out=$(meter_payload "$WORK/told-big.jsonl" | meter 1000000 2>/dev/null)
+empty "context meter finds its cost line above the tail it reads first" "$out"
+
+{ prompt_line "ship"; usage_line 2000 750000; said_line 'When ready: ! git push'; } > "$WORK/band-seam.jsonl"
+ctx=$(context_of "$(meter_payload "$WORK/band-seam.jsonl" | meter 1000000 2>/dev/null)")
+contains "context meter's wind-down line takes the band past 70%" "$ctx" "75%"
+lacks "context meter gives no cost line inside the wind-down band" "$ctx" "$cost_mark"
+
+ctx=$(context_of "$(meter_payload "$WORK/seam.jsonl" | meter 2>/dev/null)")
+lacks "context meter gives no cost line past a window it assumed too small" "$ctx" "$cost_mark"
+
 echo
 STOP_HOOK="$ROOT/hooks/uncommitted-changes.py"
 

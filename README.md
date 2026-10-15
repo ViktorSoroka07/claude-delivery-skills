@@ -314,7 +314,13 @@ instructions alone cannot:
     of the window it assumes, which is a session with most of its own window still
     to run; once the session passes that window - the one fact that disproves the
     assumption - it reports the window as bigger than it assumes rather than
-    repeating an instruction built on a number just shown to be wrong.
+    repeating an instruction built on a number just shown to be wrong. It reads
+    only usage written since the last compaction, which keeps every earlier line,
+    and says nothing until the first turn after one. Below that 70%, past 300k
+    tokens, it speaks once per compaction phase on the prompt after a turn that
+    pushed, handed a push over as a `! git push` line or opened a pull request:
+    every turn re-reads the whole context, so that durable point is where to write
+    the next phase's brief and compact.
   - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a `.md` under
