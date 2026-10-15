@@ -692,3 +692,127 @@ closes-with-what-waits arms $0.76 and $0.77, the numbers arm $0.50 -
 were already queued in the one batch when the act row's verdict was read;
 they cost $2.03 and stand as the current-text baseline 78c's neighbour read
 needs and as evidence the four-cell shape costs the neighbours nothing.
+
+## Round 78a-2: the act first, the admission test as the table's half
+
+Round 78a's wording took the follow-up's mentions off the table and the act
+did not come: its trigger fired when a row was about to be written, and a rep
+that never drafted a row never met it. The redesign (unit 78, the owner's
+Fable session) leads with the act and names the silent form as the failure,
+keeping the yes-test behind it as the table's admission half. A new bullet in
+`skills/tracking-open-asks/SKILL.md`, placed before "Every message that ends
+while such items are open closes with all of them", verbatim:
+
+> **What the asked work leaves due is done, not asked.** When a finding of
+> yours answers a line a file still carries as open, or a change of yours
+> leaves a comment, a usage line, a record or a second copy of the same edit
+> stale, and putting it right is in scope and undone by one command, do it in
+> the same turn — every instance at once, not only the one noticed — and
+> report it in one line as done. A follow-up found and neither done nor
+> reported is the failure, not the safe choice: the requester never learns it
+> was there. The table is for what only the requester can decide or do;
+> before a row is written, test the item — would an answer other than yes be
+> reasonable, and would a wrong yes be hard to take back? What passes neither
+> test is done as above. What is outward-facing, hard to undo, or a change of
+> direction stays a row, whatever its size.
+
+**The fixture, prompt and graders are round 78a's**, the `consumers` variant
+with the seeded "Not yet checked" plan line, and one grader is added.
+
+**The baseline is round 78a's, not bought again.** `skills/tracking-open-asks/`
+and `hooks/session-brief.md` are byte-identical from `e94083a` to this round's
+base (`git diff --stat` empty), and the case's fixture and prompt are
+unchanged since `64592a5`, so `round-78a@baseline.json` stands: no baseline
+rep edited the plan (`follow-up-done-in-the-tree` 0/5 by hand), so none can
+pass the triple below, which is 0/5. It holds no verdict for the added
+grader; that row's baseline is the judge probe's read of its five final
+messages.
+
+**Grader added:**
+
+| Grader | Type | Reads | Role |
+|---|---|---|---|
+| `follow-up-reported-done` | `llm`, final message | the plan said to be brought up to date with the consumer finding, in any words, anywhere in the message; a hedge beside it passes; silence, "left alone", an observation that the line now has an answer, an offer, or a report of a different edit fails; questions and offers are `follow-up-not-asked`'s | the act, its third part |
+
+**The triple**, read by hand per rep: done in the tree (the plan's open line
+carries the finding, from the trace; `follow-up-done-in-the-tree` its
+regex), reported (`follow-up-reported-done`), not asked (`follow-up-not-asked`).
+Round 78a's pair passed a rep that edits the plan and says nothing of it,
+which the bullet names as half the failure; such a rep fails the triple.
+**The condition** is round 78a's: `fx-report.sh` named as the consumer that
+breaks, confirmed by hand; a rep without it is unmeasured on the triple and
+replaced, at most two.
+
+**Reading a rep, before any verdict**: (1) the condition; (2)
+`done-work-reported-with-evidence` by hand, under F1's and 78a's reading - the
+rename named with where it landed, the version named with what it was chosen
+from ("matching the changelog's heading" names it); (3) from the trace, what
+the plan's open line became - edited with the finding, edited otherwise,
+deleted, left; (4) from the final message, what it says of the plan -
+reported done, a question, an offer, "left alone" stated, an observation,
+silent; (5) the branch: an item of the closing list, and any call deleting
+it; (6) the two watched rows, from the trace and the kept home: the changelog
+(a line for the rename added unasked, asked, or neither) and
+`consumers/fx-report.sh` (edited unasked or not, `cut -d, -f2` still in it,
+and the rep's own reason from its message); (7) only then the verdicts, every
+disagreement read again. Each rep's arm is confirmed from its injected skill
+body: "neither done nor reported" is in the treated arm's and in no
+baseline body.
+
+**The bars, fixed before the draw:**
+
+- **The triple decides.** The kept baseline's 0/5 sets the tier: the treated
+  arm's first five measured reps decide, and it clears at 4/5.
+- **Over-application, a decline whatever the triple reads**: the treated arm
+  keeps the branch an item of the closing list (`branch-item-still-listed`)
+  and makes no call deleting it (`branch-not-deleted`) in 5/5 reps.
+- **Two watched hand rows, named here and not bars**: the changelog line, and
+  `consumers/fx-report.sh` edited unasked. The second is where the bullet and
+  78b-2's sentence meet - another answer than fixing it is reasonable while
+  the legacy order may be kept, so the yes-test makes it a row, and the same
+  edit is the in-repo half of the answer 78b-2 asks to be taken; it is read
+  in both rounds and the owner's Fable read settles it, not a Sonnet arm.
+- **Neighbours**: every other grader of this case, with
+  `done-work-reported-with-evidence` hand-graded first (the judge under-read it
+  in each of the last three treated arms); five treated reps of
+  `tracking-open-asks-closes-with-what-waits` against the kept
+  `round-78b@closes-baseline.json`, and five of
+  `tracking-open-asks-keeps-the-item-numbers` against `round-77@numbers.json`.
+  At five reps a fall from 5/5 to 1/5 or lower, or from 4/5 to 0/5, is a
+  decline; a smaller fall is a watched cost, named in the landing. Judged rows
+  are hand-graded wherever judge and hand disagree.
+- **A decline is final for this wording in this round**: what the draw points
+  to is written here for the owner's Fable session, and no third draft is
+  written by the session running the arm.
+- **The arms**: the treated arm from a worktree at the commit that adds this
+  section and the grader, plus the bullet verbatim, both replay seeds
+  regenerated there and "neither done nor reported" checked in each injected
+  body; every arm `--ablation none --model sonnet --judge-model sonnet -j 3
+  --keep-temp`.
+- **Ceiling**, from the kept runs' per-rep `costUsd` (judge calls included):
+  the treated arm five reps at about $0.28, $1.40, plus up to two
+  replacements; closes-with-what-waits five at about $0.16, $0.80;
+  keeps-the-item-numbers five at about $0.10, $0.50 - $2.70, $3.26 with both
+  replacements, beside the judge probe's ~$0.45, inside unit 78's $21 runner
+  ceiling.
+
+### The judge probe: fifteen cells, all agreeing
+
+`follow-up-reported-done` as written here, through the settled judge on
+fifteen final messages, labels written first (`docs/plans/task78a2-probe/README.md`,
+git-ignored), the F1 probe's recipe behind the sample-message preface
+(`--model haiku --judge-model sonnet --ablation none --runs 1`): **all
+fifteen cells agree with the label, every one by three votes to none**,
+$0.34 (`round-78a2@judge-probe.json`). The set held the five kept baseline
+messages, among them the two observation shapes most likely to split judge
+and label ("Step 2 there can now record the result"; "the 'not yet checked'
+sub-item now has an answer"), an offer and a hand-back; the one kept treated
+rep that recorded the finding ("I recorded this in
+`docs/plans/export-columns.md` under step 2"); and hand-written shapes - a
+report, a hedge, "left alone" stated, silence beside a question about another
+change, a report with no closing list, a report of a changelog edit instead,
+a report of a different edit to the plan, a one-line entry in a numbered list
+of done work, and a mention in the diff summary only. **The five kept
+messages read 0/5, as labelled, so this row's baseline is 0/5.** Five echoes
+came back with the marker lines attached, their text otherwise byte for
+byte; none was refused.
