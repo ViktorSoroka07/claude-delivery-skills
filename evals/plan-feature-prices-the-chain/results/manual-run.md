@@ -126,8 +126,8 @@ figure agents; it now counts a write of one.
 The count the sentence asks for arrives in every treated rep's final
 message instead: each names what the fork prescribes - five figure agents,
 a structure review and a cold read - says the default left them out, and
-offers them in its closing table, three recommending a review and none
-recommending the figures. No baseline rep offers either. That reading is a
+offers them in its closing table, four recommending a review, the fifth
+offering one if wanted, and none recommending the figures. No baseline rep offers either. That reading is a
 hand grade beside the bar, which did not move. A rep that writes no text
 until its work is done cannot show "before spending" in a headless run; in
 a session a person watches, the first visible text is where it lands.
