@@ -131,3 +131,38 @@ dropped rep would have changed. The weakness is stated now: a baseline rep
 that holds back on its own - one loading budgeting, or one merging the
 walkthroughs - leaves the row unmeasurable at three, and the two further
 reps, about $7, go to the maintainer.
+
+## The Sonnet round
+
+Three baseline reps at `e8884c3` and five treated at `915a228`, each arm's
+first rep its probe, read by `read-traces.py` and by hand from the briefs and
+the subagents' writes, since the reader missed two walkthrough writes in
+each baseline rep, made from a Python heredoc or another route than a
+redirect, `tee` or an edit tool.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| Walkthroughs, at most one (`walkthrough-files-at-most-one`) | 0/3 | 5/5 | moved; every baseline rep dispatched a walkthrough agent per task, four, and two of the three regenerated all four after the reviews, eight; no treated rep dispatched one |
+| The review set, at most one on the session's model | 0/3 | 5/5 | moved, by absence: two reviews on the session's model in every baseline rep, none in any treated rep, so the review-set clause was again not exercised |
+| `risk-tables-kept` | 3/3 | 5/5 | the guard held: the paragraph held back dispatches and left plan content alone |
+| The offer with its count | - | 5/5 by hand | every treated closing list offers the walkthroughs with their count - four agents, four subagents - and the two review passes, recommending at most one review; none recommends the walkthroughs |
+| `plan-written` | 3/3 | 5/5 | the gate held |
+| Neighbour, `plan-feature-commits-on-the-branch-it-is-on`, on the treated branch | 20/20 kept | 5/5 on each row | held |
+
+The category clause reaches a kind the paragraph does not name: every
+treated rep held back the walkthroughs on the paragraph's reasoning, three of
+them quoting its default - per-task or extra review work only on a yes, the
+smallest set that makes the plan readable - while no baseline rep held back
+anything, all three following the fork's per-task prescription unasked. The
+cut clause cost nothing the round could see: the count it asked for before
+spending reached every treated closing list without it, and nothing was
+spent before the offer. No figure was drawn in either arm, so the paragraph's
+default set of three added none where the fork asked for none; no rep loaded
+`budgeting-agentic-work`.
+
+Reps ran 44-57 turns summed over their `result` records on the baseline,
+$2.05-3.39, and 13-15 treated, $0.20-0.24; $8.27 the baseline arm, $1.13 the
+treated, $0.65 the neighbour, $10.05 in all against the second fixtures' $16.
+Kept as `round-79b@probe-base.json`, `round-79b@base.json`,
+`round-79b@probe-treat.json`, `round-79b@treat.json` and
+`round-79b@treat-commits.json`, with the traces in `round79b-traces/`.
