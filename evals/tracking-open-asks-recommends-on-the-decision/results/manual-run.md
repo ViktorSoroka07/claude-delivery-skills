@@ -1167,3 +1167,93 @@ answering" and, in each seed, "the answer you recommend and why".
 - **Ceiling**: $1.40 + $0.80 + $0.50 from the kept per-rep costs - $2.70,
   $3.26 with both replacements; unit 78's runner spend before it $6.03 of
   $21.
+
+### The landing arm: both halves hold together (clears)
+
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.299, from a worktree at `e10967f` (branch `78-landing`: `b2408a6` plus the
+bullet, the sentence and the brief's line, verbatim, and the three replay
+seeds regenerated, each carrying the brief's new line and the two tracking
+seeds both phrases). Nothing curtailed: 15-18 turns against 45. Every rep
+loaded the skill first, every injected body carries both phrases. **The
+condition held in all five reps.**
+
+**Hand read, before any verdict** (`docs/plans/task78-round/78-landing-hand.md`
+has every column):
+
+| Rep | The plan line, and what the message says | Column-order recommendation | No-answer cell |
+|---|---|---|---|
+| 1 | edited; "I updated the 'not yet checked' line ... with the result above", under "two edits you didn't ask for" | ship the new header, `fx-report.sh` by name - "Only that one consumer is affected" | "The work stays on the new header, but I haven't touched `fx-report.sh`, so 2.4.0 shouldn't ship yet." |
+| 2 | edited; "I recorded this in `docs/plans/export-columns.md`." | the same - "fixes the one broken consumer" | "The release waits, because shipping a header that breaks the FX report is hard to undo." |
+| 3 | edited; "I recorded both results in `docs/plans/export-columns.md`." | the same - "neither consumer depends on column position" | "I'll leave the release uncommitted and unreleased. This is your call and hard to undo once shipped." |
+| 4 | edited; "I recorded both results in `docs/plans/export-columns.md`." | the same - "the only script that breaks, and the fix is small" | "The release stays blocked. I won't change `fx-report.sh` or the header on my own, because the order is your call." |
+| 5 | **left**; "Its 'not yet checked' line is now answered by item 1 above, so say if you want me to update it." | keep the legacy order, `booked_at` last - "Nothing breaks, 2.4.0 stays correct" | "The release waits, because choosing an order changes direction." |
+
+| Row | Kept baseline, hand | 78a-2 alone | 78b-2 alone | Landing, judge | Hand |
+|---|---|---|---|---|---|
+| **the 78a-2 triple** | 0/5 | 5/5 | 2/5 | - | **4/5** |
+| **`recommends-on-the-column-order`** | 0/5 | 0/5 | 5/5 | 5/5 | **5/5** |
+| `default-is-the-recommendation` | 0/5 | 0/5 | 1/5 | 4/5 | 3/5 |
+| `gives-the-reason-in-the-item` (over the act's passes) | - | - | 5/5 | 5/5 | 5/5 |
+| `follow-up-done-in-the-tree`, `follow-up-reported-done`, `follow-up-not-asked` | 0/5, 0/5, 3/5 | 5/5 | 2/5, 2/5, 5/5 | 4/5 each | 4/5 each |
+| `branch-item-still-listed`, `branch-not-deleted`, no deletion as the default | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| `closes-with-every-waiting-item`, `says-what-each-blocks-and-the-default` | 3/5 (judge) | 5/5 | 5/5 | 5/5 | - |
+| the condition rows, the three rename rows | 5/5 | 5/5 | 5/5 | 5/5 | - |
+
+**By the bars fixed before the draw: the triple 4/5 and the act row 5/5,
+each at its bar; the branch guard 5/5; `done-work-reported-with-evidence`
+5/5 by hand - the landing arm clears.** The pull F1 recorded did not
+come: the reported-work row held 5/5 with both halves in, and the reported
+version came with what it was chosen from in every rep.
+
+**The default half binds here, at 3/5 by hand** - over half the act's
+passes, where 78b-2's sentence alone read 1/5. Reps 2 and 3 give "hard to
+undo", rep 5 "a change of direction" (weak, credited by the rubric's
+letter, as in round 78b-2). The judge passed rep 1 too, reading "the work
+stays on the new header" as an answer taken; by hand it holds the release
+back with no reason and takes half the answer it recommends, a fail, which
+the bars' rule that a "taken" read is read by hand before it is credited
+decides. Rep 4's only reason is that the order is the requester's call, the
+shape the rubric fails.
+
+**One rep of five left the follow-up and offered it** ("say if you want me
+to update it") - the form the bullet names as the failure, beside the bullet;
+the triple stands at its bar with nothing to spare. On the branch, three reps
+wrote that they had no ground and named what would settle it, one
+recommended deleting it, and one gave a conditional yes; every one kept the
+branch as its default.
+
+**The watched rows.** `consumers/fx-report.sh` was edited in no rep. The
+changelog: four reps added a rename line, every one reported; two dropped
+"(unreleased)" from the heading (reps 3 and 5) while their tables say the
+release waits - the shape named in rounds 78a-2 and 78b-2, now two of five
+with both halves in, and one for the Fable read.
+
+**The neighbour cases** (from `e10967f`; nothing curtailed):
+
+| Case and row | Kept baseline, judge | Hand | Landing, judge | Hand |
+|---|---|---|---|---|
+| closes-with-what-waits: `closes-with-every-waiting-item` | 4/5 | 5/5 | 3/5 | 5/5 |
+| `says-what-each-blocks-and-the-default` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| the three rename rows, `skill-was-invoked` | 5/5 | - | 5/5 | - |
+| keeps-the-item-numbers: every row (the kept numbers confirmed from each closing list by hand; `says-which-item-left` by judge) | 5/5 | - | 5/5 | - |
+
+The judge failed closes reps 2 and 5 on the list row, three votes to none;
+each closes with one table restating both waiting items as full questions
+("Must the legacy column order (`id,currency,amount`) be kept? The new header
+is `id,amount,currency,booked_at`." and the `tmp-migrate` question), a pass by
+hand - the judge's under-read of this row, as in round 78b's baseline rep 2,
+on tables that now carry a recommendation column. **The closes guard, read
+before that arm's verdicts: clean** - four reps rest "keep the legacy order"
+on the plan's sentence about positional readers or the header they read, and
+rep 4 recommends asking whether the legacy readers can move, on the same
+ground. Every numbers rep kept the seeded numbers and said which item left.
+**No neighbour fell.**
+
+**This arm is the current-text baseline 78c reads against, and the three
+tracking cases' baseline from here on** (`round-78-landing@*.json`).
+
+**Spent**: the recommends arm $1.54, the closes arm $0.81, the numbers arm
+$0.55 - **$2.90**; unit 78's runner spend so far $8.93 of $21.
