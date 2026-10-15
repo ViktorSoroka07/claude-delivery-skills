@@ -346,3 +346,8 @@ read as covering the act, the status quo unnamed, "taken" with no tense - is
 unit 92 of the plan, drafted and gated on the Fable read's verdict on the
 `fx-report.sh` edit. The commits this record cites moved when a fixup was
 folded the same day (`cbece07` is `d72720e` on `main`); the plan maps them.
+
+**Landed.** The Fable read came back clean (the first case's record, "The
+Fable read"), and the text landed on `main` as it stood; this record's first
+boundary stands beside it - the taken route not yet seen to bind on either
+fixture - and is unit 92's to measure.

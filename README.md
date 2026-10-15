@@ -219,7 +219,10 @@ Every ask goes on an explicit ledger at arrival, every ask closes visibly (done,
 answered, declined, or deferred — never silently), and status reports cover the whole
 ledger, not the items that happened to finish. The ledger runs both ways: while anything is
 outstanding, every message ends with what waits on the requester, so an open
-question never has to be found by re-reading the conversation.
+question never has to be found by re-reading the conversation. Each open item
+carries the answer the session recommends and why, which is also the default it
+takes without one; and a small follow-up the work itself leaves due is done and
+reported, never asked.
 
 **[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**
 Looping `pull` over a workspace breaks on exactly the repos that matter: the one parked
