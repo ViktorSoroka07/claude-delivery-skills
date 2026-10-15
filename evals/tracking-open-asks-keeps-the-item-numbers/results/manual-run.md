@@ -201,3 +201,59 @@ that case reads them first.
 
 **Spent**: the probe $0.13, the baseline $0.65, the treated arm $0.67, the
 fresh-case neighbour $1.03 - **$2.48**.
+
+## The seeded tool calls (task 77)
+
+Task 72's draw on this case found reps retracting the seeded turn: it
+reported the rename and the version as done, and drew its list from the plan,
+with no call behind any of it, and a rep reading that back wrote "I described
+the rename and version edits without having made any tool calls in that
+turn ... please ignore #2-#4" or "I never opened
+`docs/plans/export-columns.md`", dropping the seeded items as invented. Two
+treated reps did it there, and `keeps-the-number` and
+`keeps-the-alias-number` read 3/5 for a reason no wording touched. Since
+`03fc8c5` the shared generator seeds the calls the turn rests on - a Read of
+the plan, a grep for the flag with the version and the changelog's head, a
+Read and an Edit per changed file, and a closing check of the diff - with
+relative paths and outputs taken from the `post-rename` tree under the
+sandbox's grep (the generator's docstring has the shape).
+
+**The re-take**: one arm, the current text, `--ablation none --model sonnet
+--judge-model sonnet -j 3 --keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on
+every rep's `init` event, from a detached worktree at `03fc8c5`. Nothing
+curtailed: one `result` record per trace, 3-5 turns against 40, 16-17 seconds
+against 600.
+
+**Hand read, every assistant text block of every rep**: no rep retracts the
+seeded turn's work or its list. Every rep arrived, closing item 1 as the
+column-order question, and every rep kept the seeded numbers: 2, 3, 4 in reps
+1, 4 and 5, and 2, 4 in reps 2 and 3, which retired the clock question as the
+ledger-api maintainers' ("I was wrong to put it to you") - a correction of
+one item on the plan's own evidence, not a retraction of the turn.
+
+| Row | Task 72, baseline (unseeded) | Task 72, asides (unseeded) | Re-take, judge | Hand |
+|---|---|---|---|---|
+| the act, every seeded number kept (hand) | - | - | - | 5/5 |
+| `keeps-the-number` (screen) | 5/5 | 3/5 | 5/5 | - |
+| `keeps-the-alias-number` (screen) | 5/5 | 3/5 | 5/5 | - |
+| `renumbered-from-one` (screen) | 5/5 | 5/5 | 5/5 | - |
+| `says-which-item-left` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `changelog-cut-to-the-release` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `changelog-carries-the-rename` | 5/5 | 5/5 | 5/5 | 5/5 |
+
+Seven rows were read; this is a reading of the instrument, with no wording
+under test, and it is the neighbour baseline for unit 78's rounds.
+
+**Two things the seed brings that its record should carry.** The seeded Read
+of the plan leaves a file-state entry stamped at the seed's fixed time, which
+is older than the file the scaffold writes, so a rep that edits the plan
+without reading it again gets "the file had been modified on disk since you
+last read it" on an edit that applied (reps 1 and 2); both read it again, and
+rep 1's final message mentions it. A rep that reads first sees nothing, and no
+grader here reads the plan. And two reps (3 and 4) left the plan's step 2
+reading "Blocked" after the requester's answer and asked instead ("Do you want
+me to update it?", "I can mark it settled if you want"), where reps 1, 2 and 5
+updated it - the small follow-up put to the requester rather than done, unit
+78a's mechanism, on the current text and a case that does not grade it.
+
+**Spent**: $0.50.
