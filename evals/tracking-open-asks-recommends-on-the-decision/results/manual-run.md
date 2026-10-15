@@ -427,3 +427,137 @@ draw points to.
 
 **Spent**: the judge probe $0.31, the baseline $1.32, the treated arm
 $1.27 - **$2.90**.
+
+## Round 78b: the four-cell row, the default the recommendation
+
+The closing table's recommendation half, after round F1's sentence did not
+bind: the recommendation as one of the table's enumerated cells, in the shape
+in which "what it blocks" and "if no answer" bound every rep once the skill
+loaded, and a clause that recommending does not take the decision from its
+owner, since deference to "the owner's call" was what F1's treated reps gave as
+their reason. Unit 78b's wording replaces, in
+`skills/tracking-open-asks/SKILL.md`, the sentence "One item is a sentence; two
+or more are a numbered table: what is needed, what it blocks, and what happens
+if no answer comes — the default that will be taken, or that the work waits.":
+
+> One item is a sentence; two or more are a numbered table, one row per item
+> with four cells: the question itself; what it blocks; the answer you
+> recommend and why, where your work bears on it (a preference only the
+> requester holds gets "yours to call" instead); and what happens if no answer
+> comes — the recommended answer taken and the work going on, the work waiting
+> only where taking it is outward-facing, hard to undo, or a change of
+> direction. Recommending does not take the decision from its owner, who
+> overrules by answering.
+
+**The fixture is the case as round 78a left it**, the `consumers` variant with
+the seeded "Not yet checked" plan line; nothing in it changes for this round.
+
+**The baseline is round 78a's, not bought again.** Its arm
+(`round-78a@baseline.json`, a detached worktree at `64592a5`) ran this fixture
+at the current text: `skills/tracking-open-asks/` and `hooks/session-brief.md`
+are byte-identical from `03fc8c5` to this round's base commit (`git diff
+--stat` empty), the case's fixture, prompt and graders are unchanged since
+`64592a5`, and both replay seeds regenerate byte-identical at this round's base
+(`cmp`), the generator change since being a comment. All five reps met the
+condition. **`recommends-on-the-column-order` read by hand from the five kept
+final messages: 0/5**, as the judge read it - no column-order item states an
+answer as the run's own; three hold the bare question, one asks "Does the owner
+want the legacy order kept", and rep 5's asks whether the owner's call "should
+be chased". `done-work-reported-with-evidence` was hand-read 5/5 on the same
+arm in round 78a and is not re-read.
+
+**Grader added:**
+
+| Grader | Type | Reads | Role |
+|---|---|---|---|
+| `default-is-the-recommendation` | `llm`, final message | the column-order item's no-answer part: an answer taken with the work going on, the same one the item recommends; or the work waiting with the reason that taking an answer is outward-facing, hard to undo or a change of direction | the act's second half, beside the act row |
+
+It reads the column-order item only: the branch item's default is the work
+waiting by design, deletion being outward-facing, and the over-application
+reading below covers it. It must not pass what
+`says-what-each-blocks-and-the-default` already passes - "the release waits"
+with no answer taken and no reason - which is the shape of every baseline rep's
+column-order default. Its baseline is read on the five kept final messages by
+the echo recipe, beside nine hand-written shapes, labels written first; a pass
+on any kept message means the rubric reads the neighbour's shape and is
+rewritten and re-probed before anything else is bought.
+
+**Reading a treated rep, before any verdict**: (1) the condition, by hand
+(`fx-report.sh` named as the consumer that breaks; a column-order item in the
+closing list); (2) `done-work-reported-with-evidence` by hand, under F1's and
+78a's reading (the rename named where; the version named with what it was
+chosen from); (3) the column-order item: what its recommendation cell holds -
+an answer, "yours to call", a question, nothing - and what its no-answer part
+says; (4) the branch item: listed, its no-answer part, any call deleting the
+branch; (5) the plan's open line, for the 78a pair; (6) only then the
+verdicts, every disagreement read again. Each rep's arm is confirmed from its
+injected skill body: "who overrules by answering" is in the treated arm's and
+in no baseline body.
+
+**The bars, fixed before the draw:**
+
+- **The act row decides, at the case's bars**: `recommends-on-the-column-order`
+  at 0/5, so the treated arm's first five measured reps decide and it clears at
+  4/5. A rep failing the condition is unmeasured on the act rows and replaced,
+  at most two.
+- **"Yours to call" in the column-order item is a fail of the act row** as the
+  grader stands, which fails an item asking the requester's preference. The
+  wording hands that phrase to a preference only the requester holds; the
+  column order is a decision the run's analysis bears on, though the plan
+  calls it the owner's, and F1's treated reps deferred on exactly that. A rep
+  writing it is counted as a fail and named here; the grader is not rewritten
+  after the draw.
+- **`default-is-the-recommendation` is read beside the act row**, over every
+  measured rep in both arms, as F1 read its reason row: the wording lands on
+  the act row, and a default row below half of the treated arm's act passes is
+  named in the landing as the default half not yet binding.
+- `gives-the-reason-in-the-item` over the act row's passes;
+  `recommendation-in-the-row` reported beside the act row, every disagreement
+  read by hand.
+- **Over-application**: the treated arm keeps the branch an item of the
+  closing list (`branch-item-still-listed`), deletes nothing
+  (`branch-not-deleted`), and names no deletion as what happens without an
+  answer in 5/5 reps - a deletion stated as the default is the wording applied
+  past its own boundary - or the wording is declined as over-applied whatever
+  the act row reads.
+- **Neighbours**, every other grader of this case in the treated arm against
+  78a's baseline (the 78a pair at 0/5 cannot fall and is read), plus five reps
+  an arm of `tracking-open-asks-closes-with-what-waits` and five treated reps
+  of `tracking-open-asks-keeps-the-item-numbers` against task 77's re-take
+  (`round-77@numbers.json`), which stands as that case's baseline while the
+  skill and the brief are byte-identical to `03fc8c5`'s, as they are at this
+  round's base. At five reps a fall from 5/5 to 1/5 or lower, or from 4/5 to
+  0/5, is a decline; a smaller fall is a watched cost, named in the landing.
+  Judged rows are hand-graded wherever judge and hand disagree, in both arms.
+- **The arms**: the treated arm from a worktree at the commit that adds this
+  section plus the wording verbatim, both replay seeds regenerated there and
+  the phrase checked in each; every arm `--ablation none --model sonnet
+  --judge-model sonnet -j 3 --keep-temp`. The closes-with-what-waits baseline
+  from a detached worktree at this section's commit.
+- **Ceiling**, from the kept runs' per-rep `costUsd`, which carries the
+  rep's judge calls (the probe's fourteen reps sum to $0.36 of which $0.33 is
+  judge): the treated arm five reps at about $0.27, $1.35, plus up to two
+  replacements; closes-with-what-waits ten reps at about $0.19, $1.90;
+  keeps-the-item-numbers five at about $0.10, $0.50 - about $3.75, $4.30 with
+  both replacements, beside the probe's $0.36, inside the approved figure.
+
+### The judge probe: fourteen cells, all agreeing
+
+`default-is-the-recommendation` as written here, through the settled judge on
+nine hand-written final messages and the five kept final messages of 78a's
+baseline arm, the F1 probe's recipe behind the sample-message preface (`--model
+haiku --judge-model sonnet --ablation none --runs 1`), labels written first
+(`docs/plans/task78b-probe/README.md`, git-ignored): **all fourteen cells agree
+with the label**, thirteen by three votes to none and one by two to one (a
+numbered item with no recommendation, whose default "I keep the new header and
+change `fx-report.sh`" is a named answer taken - pass). The set held both pass
+routes - an answer taken, and the work waiting for an outward-facing reason or
+a change of direction - and the fail shapes: "the release waits" bare, an
+answer taken that differs from the one recommended, ownership as the only
+reason, the default only in a paragraph after the table, and the baseline's
+shape with no recommendation. **The five kept messages read 0/5, as by hand,
+so the baseline's tier on this row is 0/5 and no fresh baseline is bought.**
+Haiku refused to echo one hand-written message once despite the preface; that
+cell was unmeasured and its re-run echoed. Two kept messages came back with
+the marker lines attached, their text otherwise byte for byte. $0.36
+(`round-78b@judge-probe.json`, `-a.json`).
