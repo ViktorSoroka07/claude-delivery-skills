@@ -14,6 +14,10 @@ asks for one figure agent per task and two review passes per plan. The fork is
 a document because the eval sandbox loads no project skill from the workspace
 (`evals/INSTRUMENT.md`). The prompt resumes the chain at Step 3.
 
+`plan-written` names its file as a bare path, which the runner refuses at load;
+it is rewritten as `target: {source: file, path: "docs/plans/task-102.md"}` before
+any launch, which a load-only launch then checks.
+
 Rows: `plan-written` (the plan carries the spec's page-states part as a task;
 the restraint rows count only on reps that pass it) and
 `figure-files-at-most-three` (fewer than four SVGs under a `figures/`
