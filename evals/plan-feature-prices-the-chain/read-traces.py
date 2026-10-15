@@ -59,11 +59,13 @@ def read(path):
             if event.get("type") == "user" and kind == "tool_result":
                 outcome[block.get("tool_use_id")] = bool(block.get("is_error"))
     ran = [(i, brief) for i, brief in dispatches if outcome.get(i) is False]
+    reviews = [json.loads(brief) for i, brief in ran if not drew.get(i) and REVIEW.search(brief)]
     return {
         "skills": skills,
         "text_before_spending": " | ".join(t.strip() for t in before if t.strip()),
         "figure_dispatches": sum(1 for i, _ in ran if drew.get(i)),
-        "review_dispatches": sum(1 for i, brief in ran if not drew.get(i) and REVIEW.search(brief)),
+        "review_dispatches": len(reviews),
+        "review_models": [review.get("model") or "inherited" for review in reviews],
         "other_dispatches": sum(1 for i, brief in ran if not drew.get(i) and not REVIEW.search(brief)),
         "refused_dispatches": sum(1 for i, _ in dispatches if outcome.get(i) is True),
         "unanswered_dispatches": sum(1 for i, _ in dispatches if i not in outcome),

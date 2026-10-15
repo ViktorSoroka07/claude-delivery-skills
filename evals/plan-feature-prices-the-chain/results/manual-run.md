@@ -44,8 +44,14 @@ take. Its report is kept with the round's notes.
   sentence sits in "Before starting: announce the chain". The sentence's own
   advice is to start the plan phase in a fresh session, which resumes there.
 - "One review set per artifact: the pass that opens the cited files on the
-  strong model, the rest on a cheaper one" allows a set of several passes; a
-  row cannot be fixed until the sentence says whether a set is one pass.
+  strong model, the rest on a cheaper one" reads, with its backlog entry, as a
+  set of several passes, so a row of one review dispatch measures something
+  the sentence does not ask. The bar that matches it is at most one review
+  dispatch on the inherited model, the rest naming a cheaper one, which
+  `read-traces.py` records. And the entry is about passes stacked on a set -
+  a requester's extra pass on top of the chain's own - while the fork's two
+  passes are the chain's own set, so this fixture may not reach the entry at
+  all; one where Step 4's review and a requester's extra pass stack would.
 - The skill says a repository skill's own gates are never weakened and that
   the repository's writing-plans governs the plan's content, and a fork that
   prescribes per-task figures is such a skill; the sentence does not say it
