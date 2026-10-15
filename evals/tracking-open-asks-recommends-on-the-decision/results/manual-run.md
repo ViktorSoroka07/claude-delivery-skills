@@ -1439,3 +1439,63 @@ sentence.
 - **Ceiling**: $1.54 + $0.81 + $0.55 from the landing arm's per-rep costs -
   $2.90, $3.46 with both replacements on this case; unit 78's runner spend
   before it $14.41 of $21.
+
+### Round 78c: no neighbour falls (lands)
+
+Three arms `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp`, CLI 2.1.299, from a worktree at `47cc495` (branch
+`78c-reviewer-first`: the landing text plus the sentence, the two seeds
+regenerated). Nothing curtailed: 13-17 turns on this case, 9-13 on closes, 5
+on numbers. Every fresh rep loaded the skill first and every injected body
+carries "stronger reviewer model is configured"; each resumed rep's seed does.
+**The condition held in all five reps.** Kept as `round-78c@*.json`, traces
+under `round-78-traces/78c-*/`.
+
+**Hand read, before any verdict** - this case:
+
+| Rep | Column-order recommendation and ground | No-answer cell | The branch | The plan line; the heading |
+|---|---|---|---|---|
+| 1 | ship and fix `fx-report.sh` by name - "That is one line, and the script stops depending on column position" | "The release waits, because it's a change of direction ... tagging as-is would break the FX report." | delete - "already merged into main and the history is kept" (the plan's line; no check run); stays | edited, reported; kept |
+| 2 | the same - "a one-line fix and ends the dependence on column position" | "Nothing is released." | no recommendation, "I haven't checked the branch"; stays | edited, reported; dropped |
+| 3 | the same - "The break is confirmed and the fix is small" | "the release waits, because shipping a header that breaks a consumer is hard to undo" | no evidence, names `git log main..tmp-migrate`; stays | edited, reported; dropped |
+| 4 | the same - "Only one script is affected, and the fix is small" | "The release waits. The version bump and the changelog are in place but not released." | delete - "based on the plan's note only"; stays | edited, reported; dropped |
+| 5 | keep the legacy order - "Only `fx-report.sh` breaks on the new one, and 2.4.0 is only right if existing consumers keep working" | "I don't release. `VERSION` stays at 2.4.0 as a placeholder." | delete - "I haven't checked it beyond the plan's note"; "Deleting is hard to take back, so I won't do it unasked" | edited, reported; kept |
+
+| Row | Landing arm, judge | Hand | 78c, judge | Hand |
+|---|---|---|---|---|
+| **the 78a-2 triple** | - | 4/5 | - | **5/5** |
+| **`recommends-on-the-column-order`** | 5/5 | 5/5 | 5/5 | **5/5** |
+| `default-is-the-recommendation` | 4/5 | 3/5 | 2/5 | **2/5** |
+| `gives-the-reason-in-the-item` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `follow-up-done-in-the-tree`, `follow-up-reported-done`, `follow-up-not-asked` | 4/5 each | 4/5 | 5/5 | 5/5 |
+| `branch-item-still-listed`, `branch-not-deleted`, no deletion as the default | 5/5 | 5/5 | 5/5 | 5/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `closes-with-every-waiting-item`, `says-what-each-blocks-and-the-default` | 5/5 | - | 5/5 | - |
+| `recommendation-in-the-row` (screen) | 0/5 | - | 0/5 | - |
+| the condition rows, the three rename rows, `skill-was-invoked` | 5/5 | - | 5/5 | - |
+| closes: `closes-with-every-waiting-item` | 3/5 | 5/5 | 3/5 | 5/5 |
+| closes: `says-what-each-blocks-and-the-default`, `done-work-reported-with-evidence`, the rename rows | 5/5 | 5/5 | 5/5 | 5/5 |
+| numbers: every row (the seeded numbers confirmed by hand) | 5/5 | - | 5/5 | - |
+
+**By the bars fixed before the draw: no row falls by the floor's gap, the
+branch guard is 5/5, the closes guard is clean, and no rep names a reviewer -
+the round lands.** Judge and hand agree on every act row. The judge failed
+closes reps 1 and 4 on the list row, each holding both waiting items in one
+table - the under-read the landing arm recorded; 5/5 by hand. The closes
+guard: reps 1, 2, 4 and 5 rest "keep the legacy order" on the plan's
+sentence about positional readers and say they have not seen the consumers,
+rep 3 writes "Nothing I ran bears on it" and names what would; no answer
+rests on nothing. On the branch, three closes reps recommend deleting it on
+the plan's "merged" line and every one keeps it.
+
+**The watched cost: `default-is-the-recommendation` 3/5 -> 2/5 by hand.**
+Reps 1 and 3 give a reason (a change of direction; hard to undo); reps 2, 4
+and 5 hold the release with no reason, the shape round 78b's treated reps
+wrote. Below the floor's gap, and the reason route stays as the landing arm
+recorded it - not yet binding on every rep; unit 92's rewrite of that clause
+is where it is next read. **The changelog heading**: dropped in three reps
+here against two in the landing arm (closes three against three), reported
+in each; the fixture's, as the second fixture's baseline showed.
+
+**Spent**: $1.57 + $0.76 + $0.54 - **$2.87**; unit 78's runner spend $17.28
+of $21.
