@@ -132,6 +132,14 @@ hand grade beside the bar, which did not move. A rep that writes no text
 until its work is done cannot show "before spending" in a headless run; in
 a session a person watches, the first visible text is where it lands.
 
+Two readings the rows do not show. The treated reps took the default to no
+figures at all, where the sentence names a set of three - an opening example,
+an overview and a sequence - and offered all of them on a yes; a reader may
+take that as the default misread rather than as the restraint it measures.
+And the review row passed by absence: no treated rep ran a review, so no rep
+ran a set of one strong and one cheaper pass, and the review-set clause and
+the stacking entry behind it were not exercised.
+
 Reps ran 4-32 turns in three to five minutes on the baseline, $1.23 median,
 and 12-16 turns in under a minute treated, $0.20; $5.96 and $0.99 the arms,
 $0.20 the probe, $0.64 the neighbour. Kept as `round-79@baseline.json`,
