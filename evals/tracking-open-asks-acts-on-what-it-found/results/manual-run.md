@@ -514,3 +514,12 @@ from 0/5 to 5/5 on the numbers case.
 
 **Spent here**: $0.91 for the three measured reps and $0.13 for the two the
 limit cut, then $0.46 for two more - $1.49.
+
+**The owner's Fable session's decision.** The taken route is declined as
+below what a skill sentence can move, its entry in `backlog/declined.md`
+with the reason: every rep that left the modules cited the decision's owner,
+a stated reservation in the plan, beside a clause saying the owner loses
+nothing - a sentence read at load moved the cell's words and not the act.
+The clause's deletion phrase goes to its own round, on which this fixture's
+comparator is `round-78f2@landing.json` and the tag cell is the watched
+surface; the first fixture's record, "Unit 92", has the rest.

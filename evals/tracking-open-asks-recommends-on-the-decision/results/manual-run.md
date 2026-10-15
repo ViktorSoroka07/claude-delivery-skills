@@ -1829,3 +1829,18 @@ invocations of this case, closes and numbers cost nothing. Kept as
 invocations), `@recommends.json`, `@closes.json` and `@numbers.json`, the
 limit-cut reps carrying the runner's error field, which the trend counts as
 unmeasured; traces under `round-92-traces/`.
+
+**The owner's Fable session's decision, read from both records.** The taken
+route is declined as below what a skill sentence can move - its entry is in
+`backlog/declined.md` with the reason and a re-open condition (a stop
+hand-off that names the row, once such a hand-off is shown to move an act) -
+and the waiting half goes to its own round as the phrase alone: "a deletion
+that leaves nothing in the diff to review" inserted into the landed
+sentence's list of waiting reasons, with neither the status-quo sentence
+(three of five second-fixture reps wrote the phrase it names) nor "an option
+the plan or the question itself names", so the verifier's wording note above
+is answered by omission. Its baselines are round 78c's arms here, on closes
+and on numbers, and `round-78f2@landing.json` on the second fixture; what the
+weaker model can show of it is the reason cell, the restraint itself being
+at risk only on the strongest model, which is priced as the owner's call.
+The plan's unit for that round carries the wording, bars and price.
