@@ -1,16 +1,20 @@
-"""Reads this case's kept traces: what the run said before it began spending,
-and what its dispatches drew. A tool_used grader counts a refused call as a
-call, and the skill gate refuses a rep's first dispatch until
-delegating-to-subagents loads, so a dispatch here is classed by what its
-subagent wrote, and a refused or unanswered one is counted apart.
+"""Reads the kept traces of this case and of plan-feature-prices-the-verifiers:
+what the run said before it began spending and at its end, and what its
+dispatches drew. A tool_used grader counts a refused call as a call, and the
+skill gate refuses a rep's first dispatch until delegating-to-subagents loads,
+so a dispatch here is classed by what its subagent wrote, and a refused or
+unanswered one is counted apart. A verifier writes nothing, so it is classed by
+its brief naming the role, before the review words are tried; every dispatch
+that ran is listed with its description for the hand read that settles both.
 
-Usage: python3 read-traces.py <trace.jsonl>...
+Usage: python3 read-traces.py [--plan docs/plans/<plan>.md] <trace.jsonl>...
 """
 import json
 import re
 import sys
 
 REVIEW = re.compile(r"[Rr]eview|[Cc]old[ -]read|[Ff]resh[ -]eyes")
+VERIFIER = re.compile(r"[Vv]erifier")
 PLAN = "docs/plans/task-102.md"
 
 
@@ -34,9 +38,14 @@ def svg_write(block):
     return False
 
 
-def read(path):
+def is_verifier(brief):
+    tool_input = json.loads(brief)
+    return bool(VERIFIER.search(f"{tool_input.get('description', '')} {tool_input.get('prompt', '')}"))
+
+
+def read(path, plan=PLAN):
     dispatches, outcome, drew = [], {}, {}
-    before, cut, skills, own_svgs = [], False, [], 0
+    before, cut, skills, own_svgs, last_text = [], False, [], 0, ""
     for line in open(path, encoding="utf-8", errors="replace"):
         try:
             event = json.loads(line)
@@ -49,8 +58,10 @@ def read(path):
                     drew[parent] = True
                 continue
             kind = block.get("type")
-            if event.get("type") == "assistant" and kind == "text" and not cut:
-                before.append(block.get("text") or "")
+            if event.get("type") == "assistant" and kind == "text":
+                last_text = block.get("text") or ""
+                if not cut:
+                    before.append(last_text)
             if event.get("type") == "assistant" and kind == "tool_use":
                 name, tool_input = block.get("name"), block.get("input") or {}
                 if name == "Skill":
@@ -58,30 +69,48 @@ def read(path):
                 if name in ("Agent", "Task"):
                     cut = True
                     dispatches.append((block["id"], json.dumps(tool_input)))
-                if name in ("Write", "Edit") and str(tool_input.get("file_path", "")).endswith(PLAN):
+                if name in ("Write", "Edit") and str(tool_input.get("file_path", "")).endswith(plan):
                     cut = True
                 if svg_write(block):
                     own_svgs += 1
             if event.get("type") == "user" and kind == "tool_result":
                 outcome[block.get("tool_use_id")] = bool(block.get("is_error"))
     ran = [(i, brief) for i, brief in dispatches if outcome.get(i) is False]
-    reviews = [json.loads(brief) for i, brief in ran if not drew.get(i) and REVIEW.search(brief)]
+
+    def kind_of(i, brief):
+        if drew.get(i):
+            return "figure"
+        if is_verifier(brief):
+            return "verifier"
+        return "review" if REVIEW.search(brief) else "other"
+
+    classed = [(kind_of(i, brief), json.loads(brief)) for i, brief in ran]
+    reviews = [tool_input for kind, tool_input in classed if kind == "review"]
     return {
         "skills": skills,
         "text_before_spending": " | ".join(t.strip() for t in before if t.strip()),
-        "figure_dispatches": sum(1 for i, _ in ran if drew.get(i)),
+        "figure_dispatches": sum(1 for kind, _ in classed if kind == "figure"),
+        "verifier_dispatches": sum(1 for kind, _ in classed if kind == "verifier"),
         "review_dispatches": len(reviews),
         "review_models": [review.get("model") or "inherited" for review in reviews],
-        "other_dispatches": sum(1 for i, brief in ran if not drew.get(i) and not REVIEW.search(brief)),
+        "other_dispatches": sum(1 for kind, _ in classed if kind == "other"),
         "refused_dispatches": sum(1 for i, _ in dispatches if outcome.get(i) is True),
         "unanswered_dispatches": sum(1 for i, _ in dispatches if i not in outcome),
         "svgs_drawn_by_the_session": own_svgs,
+        "dispatches_that_ran": [
+            [kind, tool_input.get("model") or "inherited", tool_input.get("description", "")]
+            for kind, tool_input in classed
+        ],
+        "final_text": last_text.strip(),
     }
 
 
 if __name__ == "__main__":
-    for path in sys.argv[1:]:
+    args, plan = sys.argv[1:], PLAN
+    if args[:1] == ["--plan"]:
+        plan, args = args[1], args[2:]
+    for path in args:
         try:
-            print(path, json.dumps(read(path)))
+            print(path, json.dumps(read(path, plan)))
         except OSError as error:
             print(path, "unreadable:", error)
