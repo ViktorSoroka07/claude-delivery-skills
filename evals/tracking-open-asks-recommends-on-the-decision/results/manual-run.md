@@ -329,3 +329,101 @@ not the baseline's.
   $0.40, each arm about $1.50 plus up to two replacements, the extension about
   $3 more, the neighbours about $2.20 - about $6, $9 with the extension, the
   approved figure. The Fable read, $22.23 by the one kept figure, is separate.
+
+### The judge probe: sixteen cells, all agreeing
+
+Eight hand-written final messages through `follow-up-not-asked` and
+`branch-item-still-listed` as committed at `64592a5`, labels written first,
+the F1 probe's recipe (`--model haiku --judge-model sonnet --ablation none
+--runs 1`): **all sixteen cells agree with the label, every one by three
+votes to none**, $0.31. The set held the poles and the boundary shapes - a
+report with a hedge ("drop it from the diff if you'd rather"), the plan left
+alone with no question, an offer, a fourth row asking, a question about a
+different change, the branch named only above the list, and no list at all.
+The hedge message needed a second run: on the first, Haiku refused to echo
+it ("It reports completed work ... that I haven't done or checked in this
+session"), so the judge read the refusal and that message was unmeasured,
+not a disagreement; a preface saying the text is a grader sample making no
+claim about the session got it echoed byte for byte.
+
+### The round: the questions go, the act does not come (declined)
+
+Both arms `--ablation none --model sonnet --judge-model sonnet -j 3
+--keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on every rep's `init` event;
+the baseline from a detached worktree at `64592a5`, the treated arm from one
+at `42026c7` (branch `78a-admission-test`: the same commit plus the bullet
+quoted above, verbatim, and both replay seeds regenerated, each carrying it).
+Nothing curtailed: one `result` record per trace, 13-17 turns against 45.
+Every rep loaded `tracking-open-asks` first, every treated body carries "An
+item goes on the table only if it waits on the requester" and no baseline
+body does. **The condition held in all ten reps** - each named
+`consumers/fx-report.sh` as the consumer that breaks - so none was replaced.
+
+**Hand read, before any verdict:**
+
+| Rep | Baseline: the plan line, and what the message says of it | Treated: the plan line, and what the message says of it |
+|---|---|---|
+| 1 | left; "I didn't edit `docs/plans/export-columns.md`. Step 2 there can now record the result" | left; "I did not touch the changelog heading or `docs/plans/export-columns.md`" |
+| 2 | left; not mentioned | left; not mentioned |
+| 3 | left; "I can do that if you want it recorded" - an offer | left; not mentioned |
+| 4 | left; "so you may want to update it" - handed back, close to the line | **edited**: "Checked: under the new header `consumers/fx-report.sh` breaks ...", and reported |
+| 5 | left; "the 'not yet checked' sub-item now has an answer" | left; not mentioned |
+
+| Row | Baseline, judge | Hand | Treated, judge | Hand |
+|---|---|---|---|---|
+| **the pair**, done and not asked (hand) | - | **0/5** | - | **1/5** |
+| `follow-up-done-in-the-tree` | 0/5 | 0/5 | 1/5 | 1/5 |
+| `follow-up-not-asked` | 3/5 | 3/5 | 5/5 | 5/5 |
+| `follow-up-stale-line-gone` (screen) | 0/5 | - | 1/5 | - |
+| `branch-item-still-listed` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `branch-not-deleted` | 5/5 | - | 5/5 | - |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 2/5 | 4/5 |
+| `closes-with-every-waiting-item` | 3/5 | - | 5/5 | - |
+| `says-what-each-blocks-and-the-default` | 3/5 | - | 5/5 | - |
+| `recommends-on-the-column-order`, `gives-the-reason-in-the-item`, `recommendation-in-the-row` | 0/5 | - | 0/5 | - |
+| `names-the-breaking-consumer`, `lists-the-column-order`, the three rename rows | 5/5 | - | 5/5 | - |
+
+**By the bars fixed before the draw: the baseline's 0/5 bought the treated
+arm, which clears at 4/5, and it read 1/5 - declined for this wording, the
+gap below the floor, no further draws.** The over-application guard is
+clean: every treated rep kept the branch an item of its closing list and none
+deleted it, so the wording does no harm here; it does not do the act. Neither
+the neighbour cases nor the Fable read were bought, both being gated on a
+landing. Seventeen rows were read; only the pair decides.
+
+**What the wording did instead.** It removed the mentions without producing
+the act. The baseline raised the plan update in four reps of five - a note,
+an offer, a hand-back - and the treated arm in two, one of them the rep that
+did it; three treated reps say nothing of the plan at all.
+`follow-up-not-asked` going 3/5 to 5/5 is that suppression, not compliance,
+and the pair is the row that shows it: an item kept off the table without
+being done is the backlog entry's silent form, which a restraint grader
+alone scores as a pass. The one treated pass is also the rep that held the
+version back as a row, recommending 3.0.0 - the pressure to hand work back
+that `done-work-reported-with-evidence` was put here to watch - so the arm's
+one act came with that row's one fail. Two treated reps met the changelog
+line, the follow-up this round did not seed: rep 2 added it unasked and
+reported it, rep 5 asked about it in a third row.
+
+**`done-work-reported-with-evidence` by hand**: baseline 5/5, treated 4/5.
+The judge failed treated reps 1 and 5, each of which names where the rename
+landed and says the version was set to 2.4.0 to match the changelog's top
+entry; rep 1 also asks in a row whether 2.4.0 is right, and rep 5 notes in
+its first row that a reorder could call for 3.0.0, neither of which the
+rubric fails. Rep 4 fails by hand, its version never set. A one-rep fall, noise
+at five, and the row 78b reads next on this fixture. The two other judged
+neighbour rows are judge-read only, and no decision rests on them.
+
+**What a next wording would have to change** - the owner's to design, not
+bought here, as the data shows it: the trigger fires when a row is about to
+be written, so a rep that never drafts a row for the follow-up never meets
+the test, and the act half sits behind it; here the follow-up was seen in
+most reps and turned into a note or a question, never into a row, and under
+the wording it turned into silence. A shape that leads with the act - when
+the work leaves something the yes-test passes, it is done in the same turn
+and reported in one line, and one found and neither done nor reported is the
+failure - and keeps the admission test as the table's half, is what this
+draw points to.
+
+**Spent**: the judge probe $0.31, the baseline $1.32, the treated arm
+$1.27 - **$2.90**.
