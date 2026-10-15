@@ -35,6 +35,16 @@ and a hand grade written beside one turns it into labelled data.
 Step 4 is the one that decays if skipped. A label written after seeing the votes
 is not a label.
 
+A grader with no `focus` judges the run's final message, so there the message is
+the artifact: the case's prompt has a cheap model (`--model haiku`) reply with the
+message verbatim between two marker lines, and the run JSON's `evidence` is
+compared with the message byte for byte before its verdict counts. Open the prompt
+by saying the text is a sample for testing a grader and makes no claim about the
+session: without that, the model can refuse to repeat a message that reports work
+as done ("It reports completed work ... that I haven't done or checked in this
+session"), and the judge then grades the refusal - an unmeasured cell, not a
+disagreement.
+
 ## Reading the table
 
 Each row is one grader against one file — a cell of the calibration, not a run.
