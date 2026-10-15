@@ -102,3 +102,38 @@ Rows and bars, a rep counting on the restraint rows only where it passes
 One treated rep is bought first, to see that a resumed rep reads the
 paragraph at Step 3 at all and to price the arms; a projection past the
 first fixture's $12 ceiling goes to the owner before the baseline is bought.
+
+## The Sonnet round
+
+Two arms of five on Sonnet from worktrees of one commit: the baseline at
+`0cfd5f0`, where the bars above were set, and the treated arm on that commit
+plus the sentence at the head of Step 3. One treated probe rep was bought
+first and is read apart: it reached the sentence, dispatched nothing where
+the fork prescribes seven agents, and cost $0.20; one baseline rep then
+priced the rest. Dispatches are read by `read-traces.py`, which counted a
+figure wherever a subagent's tool input named an SVG until the baseline's
+reviewers, listing and looping over the figures they checked, read as
+figure agents; it now counts a write of one.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `figure-files-at-most-three` | 0/5 | 5/5 | moved; every baseline rep dispatched five to seven figure agents, two of them redrawing after the reviews, and no treated rep dispatched any |
+| The review set, at most one on the inherited model | 0/5 | 5/5 | moved; two reviews on the inherited model in every baseline rep, none in any treated rep |
+| The announcement before spending | 0/5 | 0/5 | not reached: no rep in either arm wrote any text before it acted |
+| `plan-written` | 5/5 | 5/5 | the gate held |
+| Neighbour, `plan-feature-commits-on-the-branch-it-is-on` | 20/20 kept | 5/5 on each row | held |
+
+The count the sentence asks for arrives in every treated rep's final
+message instead: each names what the fork prescribes - five figure agents,
+a structure review and a cold read - says the default left them out, and
+offers them in its closing table, three recommending a review and none
+recommending the figures. No baseline rep offers either. That reading is a
+hand grade beside the bar, which did not move. A rep that writes no text
+until its work is done cannot show "before spending" in a headless run; in
+a session a person watches, the first visible text is where it lands.
+
+Reps ran 4-32 turns in three to five minutes on the baseline, $1.23 median,
+and 12-16 turns in under a minute treated, $0.20; $5.96 and $0.99 the arms,
+$0.20 the probe, $0.64 the neighbour. Kept as `round-79@baseline.json`,
+`round-79@step3-count.json` and `round-79@step3-count-commits.json`, with the
+traces in `round79-traces/`.
