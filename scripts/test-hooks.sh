@@ -588,8 +588,10 @@ print("\n".join("no skill directory: %s" % skill for skill in dead))
 sys.exit(1 if dead else 0)
 EOF
 }
-sed 's/"writing-commit-messages"/"renamed-away"/' "$GATE_HOOK" > "$WORK/dead-gate.py"
-out=$(gate_skills "$WORK/dead-gate.py")
+mkdir -p "$WORK/dead"
+cp "$ROOT/hooks/shell_text.py" "$WORK/dead/"
+sed 's/"writing-commit-messages"/"renamed-away"/' "$GATE_HOOK" > "$WORK/dead/gate.py"
+out=$(gate_skills "$WORK/dead/gate.py")
 check "a dead skill name in a copy of the gate's table fails the check" 1 $?
 contains "the check names the dead skill" "$out" "renamed-away"
 out=$(gate_skills "$GATE_HOOK")

@@ -11,15 +11,13 @@ Warn-only by design, and fails open on any error - a broken backstop must not
 disturb a merge that already succeeded.
 """
 import json
+import os
 import re
 import subprocess
 import sys
 
-QUOTED = re.compile(r"\"[^\"]*\"|'[^']*'")
-HEREDOC = re.compile(
-    r"<<-?\s*(?P<q>[\"']?)(?P<tag>\w+)(?P=q)[^\n]*\n(?P<body>.*?)\n[ \t]*(?P=tag)[ \t]*(?=\n|$)",
-    re.DOTALL,
-)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from shell_text import blank, git_verb  # noqa: E402
 
 # Matched against the command with quoted spans and heredoc bodies blanked:
 # both carry message text, and message text names merges without running
@@ -30,7 +28,7 @@ FORGE_MERGE = re.compile(
     r"|\bglab\b[^|;&]*\bmr\b[^|;&]*\bmerge(?![-\w])"
     r"|\baz\b[^|;&]*\brepos\b[^|;&]*\bpr\b[^|;&]*--status\s+completed\b"
 )
-LOCAL_MERGE = re.compile(r"\bgit(?:\s+-[\w-]+(?:=\S*)?|\s+-[Cc]\s+\S+)*\s+merge(?![-\w])")
+LOCAL_MERGE = git_verb("merge")
 INERT = re.compile(r"--(abort|continue|quit|help|dry-run)\b|\s-h\b")
 
 ADVICE = (
@@ -64,11 +62,6 @@ def on_default_branch():
     return head == default if default else head in ("main", "master")
 
 
-def blank_body(m):
-    start, end = m.span("body")
-    return m.group(0)[: start - m.start()] + " " * (end - start) + m.group(0)[end - m.start():]
-
-
 def failed(payload):
     response = payload.get("tool_response")
     if not isinstance(response, dict):
@@ -84,8 +77,7 @@ def main():
     if payload.get("tool_name") != "Bash" or failed(payload):
         return 0
     command = (payload.get("tool_input", {}) or {}).get("command", "") or ""
-    stripped = HEREDOC.sub(blank_body, command)
-    stripped = QUOTED.sub(lambda m: " " * len(m.group(0)), stripped)
+    _, stripped = blank(command)
     if INERT.search(stripped):
         return 0
     landed = FORGE_MERGE.search(stripped) or (
