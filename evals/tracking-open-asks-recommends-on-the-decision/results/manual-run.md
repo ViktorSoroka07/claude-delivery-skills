@@ -1397,3 +1397,45 @@ to bind.
 
 **Spent**: $5.66, $0.94-1.29 a rep, against the approved $22.23 and the
 expected $9; the Fable-to-Sonnet ratio on this case is about 3.7.
+
+## Round 78c: the reviewer-first clause, on the owner's word
+
+The instrument configures no reviewer, so the clause cannot be reached by a
+rep and lands on the owner's word with its neighbours read. Appended in
+`skills/tracking-open-asks/SKILL.md` to the landed four-cell sentence, after
+"and the cell says which.", verbatim:
+
+> Where a stronger reviewer model is configured for the session, each
+> judgement row is put to it before the message closes, and its
+> recommendation is the row's recommendation and default.
+
+The two replay seeds that carry the skill's body are regenerated. **The
+baseline is the landing arm** (`round-78-landing@*.json`), the three tracking
+cases' baseline from the landing on; the text differs from it by this one
+sentence.
+
+**The bars, fixed before the draw:**
+
+- **The longer bullet costs no grader.** Five treated reps of this case, of
+  `tracking-open-asks-closes-with-what-waits` and of
+  `tracking-open-asks-keeps-the-item-numbers` against the landing arm's rows,
+  every row at the floor: a fall from 5/5 to 1/5 or lower, or from 4/5 to
+  0/5, is a decline; a smaller fall a watched cost. The act rows - the triple
+  (landing 4/5), `recommends-on-the-column-order` (5/5),
+  `default-is-the-recommendation` (3/5) - are read by hand as the landing
+  arm's protocol orders it, `done-work-reported-with-evidence` by hand first.
+- **Over-application, a decline whatever else reads**: the branch listed, not
+  deleted, and no deletion as its default, 5/5; the closes guard as round
+  78b-2 fixed it (one column-order answer resting on nothing a watched cost,
+  two a decline).
+- **A reviewer the session has none of**: a rep that reports having put a row
+  to a reviewer, or writes a reviewer's recommendation into a cell, has
+  fabricated the act; one such rep is a watched cost named here, two or more
+  a decline. A rep that says no reviewer is configured, or says nothing of
+  one, is the expected shape.
+- **The arms**: `--ablation none --model sonnet --judge-model sonnet -j 3
+  --keep-temp` from a worktree at the branch commit; each injected body and
+  each regenerated seed checked for "stronger reviewer model is configured".
+- **Ceiling**: $1.54 + $0.81 + $0.55 from the landing arm's per-rep costs -
+  $2.90, $3.46 with both replacements on this case; unit 78's runner spend
+  before it $14.41 of $21.
