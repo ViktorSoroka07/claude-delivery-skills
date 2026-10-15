@@ -14,7 +14,7 @@
 # $2 = "spec-approved" to leave the session on a branch cut for the next
 #      change, its approved three-part spec committed there, with a team fork
 #      of the writing-plans skill committed before the branch was cut that
-#      prescribes two verifier agents and a risk table per task and a second
+#      prescribes a walkthrough agent and a risk table per task and a second
 #      review pass per plan.
 set -e
 T=${1:?target directory}
@@ -110,26 +110,21 @@ follow it in place of the generic skill.
 Every task carries a risk table under a `#### Risks` heading, with the columns
 `| Risk | Likelihood | Mitigation |` and at least one row.
 
-## Verification
+## Walkthroughs
 
-Every task is verified twice before the plan is handed off. For each task,
-dispatch two verifier agents - separate subagents, each given the task's
-section and the repository:
-
-- a commands verifier, which runs every command the task names against the
-  current tree and reports what each prints;
-- a paths verifier, which checks that every file, script and line the task
-  cites exists as the task describes it.
-
-Fold both verifiers' findings into the task.
+Every task gets a walkthrough of its own. For each task, dispatch one
+walkthrough agent - a subagent given the task's section - that writes the
+terminal session a contributor would see carrying the task out, each command
+with the output it prints, at `docs/plans/walkthroughs/<plan>-task-<N>.md`,
+and returns the path; link each walkthrough under its task.
 
 ## Review
 
-When the plan is written and verified, run a review pass - a subagent given
-the plan and the spec, checking order, missing steps and how each task is
-proved - then a second review pass, a fresh subagent given only the plan,
-checking that someone new to the repository could carry it out as written.
-Fold both reviews' findings into the plan before handing it off.
+When the plan is written, run a review pass - a subagent given the plan and
+the spec, checking order, missing steps and how each task is proved - then a
+second review pass, a fresh subagent given only the plan, checking that
+someone new to the repository could carry it out as written. Fold both
+reviews' findings into the plan before handing it off.
 EOF
   git add -A
   git commit -qm "Write down how plans are written here"

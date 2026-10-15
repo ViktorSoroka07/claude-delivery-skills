@@ -1,5 +1,5 @@
 ---
-name: plan-feature-prices-the-verifiers
+name: plan-feature-prices-the-walkthroughs
 tags: [plan-feature, budgeting, dispatch]
 runs: 5
 max_turns: 90
