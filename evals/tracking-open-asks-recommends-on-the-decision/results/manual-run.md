@@ -1957,3 +1957,32 @@ baselines, or on a strongest-model session that deletes a merged ref as its
 no-answer default. The branch `93-deletion-bound` stays off `main`, the
 owner's to delete; the README is not swept. The pre-commit hook's warning on
 the regenerated seeds matched their own message ids, already in the tree.
+
+## Unit 91: `done-work-reported-with-evidence` reads only the message
+
+The rounds above hand-graded this row wherever the judge under-read it. Of
+the 65 kept traces of this case and the closes case (rounds 78a2 to 93, the
+Fable read among them), six drew a failing vote on a message that passes by
+hand - five here, one there - and five of the six failed outright. Every one
+names the script and the README, or the diff, for the rename, and gives
+2.4.0 "matching the changelog". The second fixture's copy of the rubric was
+rewritten for the same under-read (its record, "The judge probe"): the rubric
+says it reads only what the final message says, whether the work was really
+done being other graders' business, and quotes a passing shape of each
+condition. The same two lines now stand in this case's copy and the closes
+case's, which stay identical.
+
+Re-probed on the second fixture's recipe (`docs/plans/task91-probe/`,
+git-ignored): twelve final messages per case, labelled before any verdict -
+for this case the five under-read messages, five kept passes from other
+rounds, and two labelled fails cut from kept messages (the version's source
+removed; the rename's files, its changelog line and the working-tree pointer
+removed). **Twelve of twelve agree here and twelve of twelve on the closes
+case**, the two under-read messages failed 0/3 before now 3/3, the four
+labelled fails 0/3. Two closes echoes came back as refusals and were re-run
+alone, unmeasured rather than counted; every counted echo is its message byte
+for byte, four with the marker lines kept around it. $0.47
+(`round-91@judge-probe.json`, `-closes-m03.json`, `-closes-m09.json`).
+
+A judged rate on this row before the change is not comparable with one
+after; the hand reads above are the row's record either way.

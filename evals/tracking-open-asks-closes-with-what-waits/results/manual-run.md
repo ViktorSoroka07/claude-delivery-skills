@@ -286,3 +286,16 @@ here, and not where the cell is carried from a seeded table. The record of
 the round and its decline is in
 `evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
 "Unit 93".
+
+## Unit 91: `done-work-reported-with-evidence` reads only the message
+
+This case's copy of the rubric, identical to the recommends case's, gained
+the second fixture's two lines: it reads only what the final message says,
+whether the work was really done being other graders' business, and it quotes
+a passing shape of each condition. Round 93's rep 5 here was failed 0/3 on a
+message that names `bin/export.sh` and `README.md` for the rename and 2.4.0
+"matching the `2.4.0 (unreleased)` heading"; under the new copy it passes 3/3,
+and the probe reads twelve of twelve labels here - ten kept passes and two
+labelled fails cut from kept messages. The probe and its numbers are in
+`evals/tracking-open-asks-recommends-on-the-decision/results/manual-run.md`,
+"Unit 91".

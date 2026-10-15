@@ -146,7 +146,9 @@ rubric's terms. The rubric was rewritten to say it reads only what the
 message says, the files being other graders' business, and to name a source
 of each shape ("1.7.0, matching the changelog's top entry"), and re-probed
 alone: **12 of 12 agree**. The first fixture's copy of this rubric, which the
-judge under-read in four treated arms, is not changed here. The
+judge under-read in four treated arms, is not changed here (unit 91 gave it
+and the closes case's copy the same lines, re-probed 24 of 24 - the
+recommends case's record). The
 "Waiting on the maintainer (not you)" message was observed, not counted: the
 judge read that list as the closing one on every rubric. Every echo was the
 message byte for byte. $2.51 and $0.19 (`round-78f2@judge-probe.json`,
