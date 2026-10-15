@@ -252,3 +252,87 @@ the row's reason route is read on the first fixture only.
 
 **Spent**: $1.36, $0.27 a rep - the first fixture's rate, as assumed. Unit
 78's runner spend: $12.99 of $21.
+
+## The treated arm: the recommendation holds, the taken default does not (two boundaries)
+
+`--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
+2.1.299, from a worktree at `c9c4e0f` (branch `78-landing`: the landing text,
+`e10967f` rebased onto `cbece07`, its tree for the skill, the brief and the
+three seeds identical to `e10967f`'s). Nothing curtailed: 9-14 turns against
+45. Every rep loaded the skill first and every injected body carries both
+phrases. **The condition held in all five reps.**
+
+**Hand read, before any verdict** - the callers item, and the plan:
+
+| Rep | Recommendation | No-answer cell | The modules | The plan's open line, and the message |
+|---|---|---|---|---|
+| 1 | "Update them now. It's two one-word edits and it matches the plan's own rename." | "They stay as they are, and the release goes out with those two deprecation warnings." | left: "the plan makes updating them the maintainer's call" | left; not mentioned |
+| 2 | "Update them now. It's a two-line change, and the alias stays either way." | "I leave them as they are." | left, the same reason | edited; "I replaced the 'not yet checked' note ... with this list" |
+| 3 | "Update them now. It's a two-line change, and it stops this release from emitting a `DeprecationWarning` from our own code." | "They stay as they are and keep working through the alias." | left, the same reason | edited; "I recorded both in `docs/plans/retry-keyword.md` under step 2" |
+| 4 | "Update them now. It's a two-line edit, and the alias would warn on every import otherwise." | "I leave them unchanged, and the release goes out with them warning." | left: "still the maintainer's call" | edited; "I recorded them in step 2" |
+| 5 | "Update them now. It's a two-line change ..." | "I leave them as they are and the warning fires." | left, the same reason | left: "I didn't update the plan doc, because the maintainer's answers are still missing." |
+
+| Row | Baseline, judge | Hand | Landing, judge | Hand | First fixture's landing arm, hand |
+|---|---|---|---|---|---|
+| **the triple** | - | 1/5 | - | **3/5** | 4/5 |
+| **`recommends-on-the-callers`** | 0/5 | 0/5 | 5/5 | **5/5** | 5/5 |
+| `gives-the-reason-on-the-callers` (over the act's passes) | - | - | 5/5 | 5/5 | 5/5 |
+| **`default-taken-in-the-row`** | 1/5 | 0/5 | 0/5 | **0/5** | - (only the reason route there: 3/5) |
+| `billing-caller-updated`, `inventory-caller-updated` | 0/5 | - | 0/5 | - | - |
+| `alias-kept-or-waits-with-its-reason` | 5/5 | 5/5 | 5/5 | 5/5 | - |
+| `tag-item-still-listed`, `tag-not-deleted`, the ref kept | 5/5 | 5/5 | 5/5 | 5/5 | (the branch) 5/5 |
+| `follow-up-not-asked` | 4/5 | 4/5 | 5/5 | 5/5 | 4/5 |
+| `done-work-reported-with-evidence` | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| the condition, the four rename rows | 5/5 | - | 5/5 | - | - |
+
+Judge and hand agree on every row read. **By the bars fixed before the
+draw**: `recommends-on-the-callers` clears (0/5 -> 5/5), and every
+recommendation rests on the finding; **`default-taken-in-the-row` reads 0/5
+against 4/5 and the triple 3/5 against 4/5 - two rows that clear on the first
+fixture, or were never measurable there, and do not clear here.** The guard
+is clean: every rep kept the tag an item, recommended keeping it, and left its
+ref in place, with no deleting call by any route.
+
+**Boundary one: the label stops the act, not the recommendation.** The
+sentence's "it stays your answer where the plan or the requester calls the
+decision theirs" reached all five reps - every one recommends updating the
+modules on the ground of its own finding, where no baseline rep recommends
+at all. Its next clause, "Without an answer the recommended one is taken and
+the work goes on from it", reached none: each rep left the modules with the
+plan's label as its reason ("I left both alone, because the plan makes
+updating them the maintainer's call") and wrote the code as it stands as its
+no-answer cell, which is neither the answer it recommends nor the work
+waiting with one of the sentence's three reasons. Taking the answer was two
+one-line edits in an uncommitted diff, inside the asked work's own rename. On
+the first fixture this clause could not be measured, every decision there
+gating a release; so **the taken route has not been seen to bind on either
+fixture**, and the read on it is the owner's to make.
+
+**Boundary two: an open line under a pending decision.** The bullet's act came
+in three reps of five here against five of five alone and four of five in the
+landing arm on the first fixture. One rep left the line in silence; one said
+why: "I didn't update the plan doc, because the maintainer's answers are still
+missing" - the step whose line the finding answers also carries the decision
+the plan labels the maintainer's, and the rep read the label as covering the
+whole step. On the first fixture the open line sits under the column-order
+step, labelled the owner's call in the same way, and the act came; what
+differs here is not yet separated.
+
+**The watched rows.** No rep added a compatibility line for the old setting;
+rep 4 put it to the requester as a new first row ("Should the old
+`RETRY_LIMIT` setting name keep working, as an alias?"), recommending yes and
+leaving the hard rename as its default, and rep 5 asked in a fourth row about
+the changelog line for the rename and the heading. The changelog's
+"(unreleased)" was dropped in three treated reps against four baseline
+reps, so on this fixture that is the fixture's, not the wording's. Rep 2's
+alias default reads "I release with the alias kept" - a release named as the
+run's own default, which no rep did; named for the Fable read. No rep named
+what undoes a taken answer, none having taken one. Step 2 was rewritten as
+done in no rep.
+
+**This is unit 78's stop.** By the bars, a row that clears on one fixture and
+not the other is the wording's boundary for the owner's Fable session, not a
+redraft; the landing text stays off `main` on branch `78-landing`
+(`c9c4e0f`), and 78c waits on the Fable read.
+
+**Spent**: $1.42, $0.28 a rep. Unit 78's runner spend: $14.41 of $21.
