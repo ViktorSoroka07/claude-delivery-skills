@@ -224,7 +224,9 @@ ledger, not the items that happened to finish. The ledger runs both ways: while 
 outstanding, every message ends with what waits on the requester, so an open
 question never has to be found by re-reading the conversation. Each open item
 carries the answer the session recommends and why, which is also the default it
-takes without one, and where a stronger reviewer model is configured each
+takes without one - the no-answer cell opening with Taken or Waits, so the
+requester sees at a glance whether silence takes the recommendation - and where
+a stronger reviewer model is configured each
 judgement item goes to it first and its answer is that default; and a small
 follow-up the work itself leaves due is done and reported, never asked.
 
