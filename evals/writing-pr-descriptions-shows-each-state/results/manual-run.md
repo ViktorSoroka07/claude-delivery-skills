@@ -85,3 +85,34 @@ Eight rows were read. Reps ran 9-12 turns in about 50 seconds in both arms,
 $1.00 the baseline and $1.05 the treated arm. Kept as
 `round-80@baseline-cli.json` and `round-80@shows-each-state-cli.json` with
 their traces in `round80-traces/`.
+
+## The Fable read
+
+The same two arms on Fable, five reps each, from the same commits, the
+strongest model the maintainer runs, for the restraint half: a Rollback line
+on a change a revert undoes, and the hard wrapping whose sighting was a
+strong model's own.
+
+| Row | Baseline | Treated | Reading |
+|---|---|---|---|
+| `before-and-after-table` | 0/5 | 5/5 | moved |
+| `one-row-per-state` | 0/5 | 5/5 | moved |
+| `headline-state-first` | 5/5 | 4/5 by hand, 3/5 judged | guard held at the bar, a watched cost |
+| `what-changes-is-a-list` | 1/5 | 4/5 | a gap of three, below the floor |
+| `no-hard-wrap` | 5/5 | 5/5 | no rep wrapped on either model |
+| `no-rollback-line` | 5/5 | 5/5 | restraint held: no Rollback line on the revertable change |
+| `no-image-committed` | 5/5 | 5/5 | not counted |
+| `skill-was-invoked` | 5/5 | 5/5 | indicator |
+
+The judge agreed with the hand grade on 29 of 30 judged cells. The one miss
+is a treated rep whose table puts the side change below both list states,
+which the judge failed unanimously. The order guard's real fail is a treated
+rep whose table follows a user's path - the empty listing, then the export
+into a missing directory, then the listing after it - so the side change's
+row sits between the two list states; its list of changes keeps the order.
+The hard-wrap entry's failure reproduced on neither model: every rep on both
+wrote its paragraphs as single lines through the Write tool, so the
+paragraph against it rides on the guard alone. Reps ran 12-18 turns in two
+to four minutes; $5.46 the baseline and $6.32 the treated arm, about 5.5
+times Sonnet's per rep. Kept as `round-80@baseline-cli-fable.json` and
+`round-80@shows-each-state-cli-fable.json` with their traces.
