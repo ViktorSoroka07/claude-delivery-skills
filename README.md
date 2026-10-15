@@ -221,8 +221,9 @@ ledger, not the items that happened to finish. The ledger runs both ways: while 
 outstanding, every message ends with what waits on the requester, so an open
 question never has to be found by re-reading the conversation. Each open item
 carries the answer the session recommends and why, which is also the default it
-takes without one; and a small follow-up the work itself leaves due is done and
-reported, never asked.
+takes without one, and where a stronger reviewer model is configured each
+judgement item goes to it first and its answer is that default; and a small
+follow-up the work itself leaves due is done and reported, never asked.
 
 **[`git-sync`](skills/git-sync/SKILL.md) — a folder of clones goes stale one repo at a time.**
 Looping `pull` over a workspace breaks on exactly the repos that matter: the one parked
