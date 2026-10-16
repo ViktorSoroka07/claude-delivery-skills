@@ -167,3 +167,11 @@ treated, $0.65 the neighbour, $10.05 in all against the second fixtures' $16.
 Kept as `round-79b@probe-base.json`, `round-79b@base.json`,
 `round-79b@probe-treat.json`, `round-79b@treat.json` and
 `round-79b@treat-commits.json`, with the traces in `round79b-traces/`.
+
+## Landed
+
+The paragraph quoted in the first case's record, its announcement clause
+cut, landed in plan-feature's Step 3 on `main` at `fb78162`, byte for byte
+the text the walkthrough case's treated arm ran. The chain and figure
+entries left the queue with it; the review-stacking entry stays queued, its
+set never exercised, since no treated rep on either case ran a review.

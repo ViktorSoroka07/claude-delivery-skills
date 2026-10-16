@@ -215,3 +215,11 @@ lands, which is, verbatim:
 
 That round also reads by hand whether the closing table's offer still
 carries a count without the clause, the one thing the cut could remove.
+
+## Landed
+
+The paragraph quoted in the first case's record, its announcement clause
+cut, landed in plan-feature's Step 3 on `main` at `fb78162`, byte for byte
+the text the walkthrough case's treated arm ran. The chain and figure
+entries left the queue with it; the review-stacking entry stays queued, its
+set never exercised, since no treated rep on either case ran a review.
