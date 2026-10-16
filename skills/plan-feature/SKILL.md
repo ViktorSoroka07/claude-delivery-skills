@@ -36,6 +36,8 @@ Skip this step only if the repo's `brainstorming` already performs it — read i
 
 ## Step 3 — Plan
 
+A chain that prescribes one of something per task multiplies it by the task count, so the default is the smallest set that lets the plan be read, even where the repository's process prescribes one per task: an opening example, an overview and a sequence; a per-task figure, a further review pass or a second verifier runs only on the user's yes. One review set per artifact: the pass that opens the cited files on the strong model, the rest on a cheaper one. Split the chain at the written spec: brainstorm and spec in one session, the plan in a fresh one that loads only what planning needs — by the plan phase a single session carries every earlier phase's skill text on every turn.
+
 Call the Skill tool twice — once for the repo's `writing-plans`, once for `writing-plan-docs` — the repo skill governs the plan's content, the personal one governs the document's shape (current-state spec, verification-record rules, reference hygiene) at both lifecycle stages: the plan written now, and the shipped-spec rewrite `implement-plan` performs later. Then confirm the plan **ends with a gates task**; if it does not, append `implementation-gates`' plan task verbatim (its section "The plan task that runs these gates").
 
 This is the load-bearing patch. `executing-plans` runs "verifications as specified" — specified by the plan — so a gate that is not written into the plan does not run. Writing it here means it survives even if the plan is later implemented by a different skill, or in a different session.

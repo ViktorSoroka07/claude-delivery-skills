@@ -67,7 +67,12 @@ argument is not evidence), puts the plan on the work's branch — created only w
 session is on the default branch — commits it there where the repo commits plans, then
 stops so the plan can be read before anything is built. Before handing the branch back it
 checks that the branch tracks nothing but its own name: an upstream naming the default
-branch turns a later push into a silent commit to the default branch.
+branch turns a later push into a silent commit to the default branch. A plan process
+that prescribes one of something per task multiplies it by the task count, so the plan
+draws the smallest set that lets it be read, even past the repository's own process, and
+runs a per-task figure or agent, a further review pass or a second verifier only on your
+yes; it keeps one review set per artifact, and splits the chain at the written spec, so
+the plan is written in a fresh session that loads only what planning needs.
 
 **[`implement-plan`](skills/implement-plan/SKILL.md) — the gate that is not written into the plan does not run.**
 Executors obey the plan, so a verification step that lives only in good intentions gets
