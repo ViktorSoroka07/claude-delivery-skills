@@ -147,8 +147,9 @@ taken from the owner, and a scan for rude vocabulary passes over every one of th
 Real incidents: a research agent invented a tool name ("confirmed from source") and the
 shipped check rejected every input; delegated diffs carried the agent's monologue into
 commits; and reports simply never arrived. The skill governs what dispatch
-guides lack — collision-safe partitioning, delivery instructions, liveness checks before
-taking over, verifying every reported identifier, auditing every delegated diff.
+guides lack — collision-safe partitioning, delivery instructions, a dispatch that wakes
+the orchestrator once rather than at every report, liveness checks before taking over,
+verifying every reported identifier, auditing every delegated diff.
 
 ### The send moment — two skills, one axis each
 
