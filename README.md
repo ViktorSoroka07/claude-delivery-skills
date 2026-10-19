@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and eight hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -261,15 +261,16 @@ instructions alone cannot:
   present; dispatch prompts shrink to the task itself — an axis, the draft or claims
   to refute, the test command — plus worktree, SHA, scope, and the file the report
   goes to.
-- **Eight hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
+- **Nine hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
   the judgment, and none of the four blocks. The comment rules are the most-relapsed
   discipline in the corpus behind this repo, which is why two of the four watch them.
-  One stops an act once until the skill that owns it is loaded. The other three inject
+  One stops an act once until the skill that owns it is loaded. The other four inject
   what a session cannot see for itself: the standing rules at session start, how far
-  into its context window it has run, and, at the end of a turn that changed a rule
-  file, the lines elsewhere that still say what the change replaced.
+  into its context window it has run, at the end of a turn that changed a rule file
+  the lines elsewhere that still say what the change replaced, and, when a run is
+  polled one call at a time, what each check costs.
   - **Write-time** — fires the moment an edit adds a narrative-comment tell
     ("Regression:", "used to", "harmless because"); backs `writing-code-comments`.
   - **Commit-time** — reads the staged diff when a commit is about to run, so the
@@ -332,6 +333,28 @@ instructions alone cannot:
     pushed, handed a push over as a `! git push` line or opened a pull request:
     every turn re-reads the whole context, so that durable point is where to write
     the next phase's brief and compact.
+  - **Poll watch** — after a forge query (`gh`, `az` or `glab`) answers with a pending
+    state - `in_progress`, `queued`, `pending` - for the third time running, injects
+    one line beside the result, once per compaction phase: every turn re-reads the
+    whole context, so each check costs a whole-context turn, where one blocking wait
+    costs one - the tool's own (`gh run watch`, `gh pr checks --watch`), a loop with a
+    timeout in one call, or either run in the background, whose completion notice
+    wakes the session once. A skill sentence would not reach that moment:
+    `budgeting-agentic-work`, where it would sit, is not loaded while a session polls.
+    A poll is re-typed between checks, so the query is its leading words up to the
+    first flag or redirection, which carry the run or request number; a form that puts
+    a flag first, such as `gh run view --repo o/r 123`, reads every run as one query,
+    as every `az` query does, its ids being flags. The tool's own wait (`--watch`,
+    `gh run watch`, `--live`) is the blocking call, never a check, though its output
+    repeats the pending rows it printed while waiting, and it ends a run of checks.
+    Only a forge CLI's answer is read, since code and documents other commands print
+    say "pending" with nothing waiting. A call that exits non-zero never reaches the
+    hook, so a bare `gh pr checks`, which exits 8 while checks are pending, is seen
+    only through a filter such as `| head`. A background command's own output file is
+    left to the harness, which since 2.1.300 tells a session not to poll it. Replayed
+    over 675 kept session transcripts, it spoke five times: four at a run checked
+    three times while it was still running, and once early, after three pushes whose
+    new runs were each checked once.
   - **Landing sweep** — at the end of a turn that changed a rule file (a `SKILL.md`,
     `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `GEMINI.md`, `CONTRIBUTING.md` or
     `README.md`, a contract directly under `agents/`, a `.md` under
@@ -377,7 +400,7 @@ instructions alone cannot:
     around. It speaks once per set of paths, because the end of every turn is the
     same moment as the end of the session.
 
-![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; eight hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and three inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, and the lines a turn's change to a rule file left stale elsewhere)](assets/diagrams/components.svg)
+![The three component types: eighteen skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; nine hooks are run by the harness — four warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 

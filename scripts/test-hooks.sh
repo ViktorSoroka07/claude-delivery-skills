@@ -444,6 +444,161 @@ ctx=$(context_of "$(meter_payload "$WORK/seam.jsonl" | meter 2>/dev/null)")
 lacks "context meter gives no cost line past a window it assumed too small" "$ctx" "$cost_mark"
 
 echo
+POLL_HOOK="$ROOT/hooks/poll-watch.py"
+poll_mark="each check costs a whole-context turn"
+
+poll_call() { # $1 = call id, $2 = command, $3 = answer, $4 = 'error' for a failed call
+  "$PY" -c 'import json, sys
+uid, command, answer, failed = sys.argv[1:5]
+print(json.dumps({"type": "assistant", "message": {"content": [
+    {"type": "tool_use", "id": uid, "name": "Bash", "input": {"command": command}}]}}))
+print(json.dumps({"type": "user", "message": {"content": [
+    {"type": "tool_result", "tool_use_id": uid, "content": answer, "is_error": failed == "error"}]}}))' \
+    "$1" "$2" "$3" "${4:-}"
+}
+
+poll() { # $1 = transcript, $2 = command, $3 = answer; the hook on the call with id "now"
+  "$PY" -c 'import json, sys
+print(json.dumps({"hook_event_name": "PostToolUse", "tool_name": "Bash", "tool_use_id": "now",
+                  "transcript_path": sys.argv[1], "tool_input": {"command": sys.argv[2]},
+                  "tool_response": {"stdout": sys.argv[3], "stderr": "", "interrupted": False}}))' \
+    "$1" "$2" "$3" | "$PY" "$POLL_HOOK" 2>/dev/null
+}
+
+# 21a. Poll watch: the third answer in a row from one forge query that still
+#      names a pending state draws one line per phase. A poll is re-typed
+#      between checks, so the query is its leading words up to the first flag;
+#      and only a forge CLI's answer is read, since other commands print code
+#      and documents that say "pending" with nothing waiting. The call the hook
+#      runs on is already in its transcript, and counting it twice fires early.
+printf '' | "$PY" "$POLL_HOOK" >/dev/null 2>&1
+check "poll watch fails open on empty stdin" 0 $?
+
+checks='gh pr checks 42'
+waiting=$(printf 'build\tpending\t0\thttps://ci.example/1')
+passed=$(printf 'build\tpass\t3m')
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; poll_call now "$checks" "$waiting"; } > "$WORK/poll3.jsonl"
+ctx=$(context_of "$(poll "$WORK/poll3.jsonl" "$checks" "$waiting")")
+contains "poll watch speaks at the third pending answer of one query" "$ctx" "$poll_mark"
+contains "poll watch names the query it saw" "$ctx" "gh pr checks 42"
+contains "poll watch names the pending state it saw" "$ctx" "answered pending"
+contains "poll watch names the tool's own wait" "$ctx" "--watch"
+
+{ poll_call a "$checks" "$waiting"; poll_call now "$checks" "$waiting"; } > "$WORK/poll2.jsonl"
+out=$(poll "$WORK/poll2.jsonl" "$checks" "$waiting")
+empty "poll watch stays silent at the second, its own call counted once" "$out"
+
+running='{"status":"in_progress"}'
+{ poll_call a 'sleep 30; gh run view 7001 --json status --jq .' "$running"
+  poll_call b 'cd /repo && gh run view 7001 --json status,jobs 2>&1 | head -5' "$running"
+  poll_call now 'gh run view 7001 --json status' "$running"; } > "$WORK/retyped.jsonl"
+ctx=$(context_of "$(poll "$WORK/retyped.jsonl" 'gh run view 7001 --json status' "$running")")
+contains "poll watch reads a re-typed poll as the same query" "$ctx" "gh run view 7001"
+
+{ poll_call a "$checks 2>&1 | cut -f1,2" "$waiting"; poll_call b "$checks" "$waiting"; poll_call now "$checks 2>/dev/null" "$waiting"; } > "$WORK/redirected.jsonl"
+ctx=$(context_of "$(poll "$WORK/redirected.jsonl" "$checks 2>/dev/null" "$waiting")")
+contains "poll watch reads a redirection as no part of the query" "$ctx" "$poll_mark"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$passed"; poll_call c "$checks" "$waiting"; poll_call now "$checks" "$waiting"; } > "$WORK/moved.jsonl"
+out=$(poll "$WORK/moved.jsonl" "$checks" "$waiting")
+empty "poll watch starts over after an answer that is not pending" "$out"
+
+{ poll_call a 'gh run view 7001' "$running"; poll_call b 'gh run view 7002' "$running"; poll_call now 'gh run view 7003' "$running"; } > "$WORK/runs.jsonl"
+out=$(poll "$WORK/runs.jsonl" 'gh run view 7003' "$running")
+empty "poll watch reads another run number as another query" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; poll_call now "$checks" "$passed"; } > "$WORK/done.jsonl"
+out=$(poll "$WORK/done.jsonl" "$checks" "$passed")
+empty "poll watch stays silent when the answer says finished" "$out"
+
+found='src/queue.ts:3:  status: pending'
+{ poll_call a 'grep -rn pending src' "$found"; poll_call b 'grep -rn pending src' "$found"; poll_call now 'grep -rn pending src' "$found"; } > "$WORK/grep.jsonl"
+out=$(poll "$WORK/grep.jsonl" 'grep -rn pending src' "$found")
+empty "poll watch reads only a forge CLI's answer" "$out"
+
+wait_loop='until gh run view 7001 --json status | grep -q completed; do sleep 10; done'
+{ poll_call a "$wait_loop" "$running"; poll_call b "$wait_loop" "$running"; poll_call now "$wait_loop" "$running"; } > "$WORK/loop.jsonl"
+out=$(poll "$WORK/loop.jsonl" "$wait_loop" "$running")
+empty "poll watch counts no loop, which is already the one blocking call" "$out"
+
+# The tool's own wait is the call the line recommends. Run without a terminal it
+# prints every refresh, so its answer still holds the pending rows it waited
+# through; it is read from the command, and it ends a run of checks.
+watched=$(printf 'build\tpending\t0\thttps://ci.example/1\nbuild\tpass\t3m\thttps://ci.example/1')
+{ poll_call a "$checks --watch" "$watched"; poll_call b "$checks --watch" "$watched"; poll_call now "$checks --watch" "$watched"; } > "$WORK/watched.jsonl"
+out=$(poll "$WORK/watched.jsonl" "$checks --watch" "$watched")
+empty "poll watch never counts the tool's own wait as a check" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; poll_call now "$checks -w" "$watched"; } > "$WORK/then-watched.jsonl"
+out=$(poll "$WORK/then-watched.jsonl" "$checks -w" "$watched")
+empty "poll watch stays silent on the wait a session turns to after two checks" "$out"
+
+{ poll_call a 'gh run watch 7001' "$running"; poll_call b 'gh run watch 7001' "$running"; poll_call now 'gh run watch 7001' "$running"; } > "$WORK/run-watch.jsonl"
+out=$(poll "$WORK/run-watch.jsonl" 'gh run watch 7001' "$running")
+empty "poll watch reads gh run watch as a wait" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; poll_call c "$checks --watch" "$watched"
+  poll_call now "$checks" "$waiting"; } > "$WORK/after-wait.jsonl"
+out=$(poll "$WORK/after-wait.jsonl" "$checks" "$waiting")
+empty "poll watch starts over after the tool's own wait" "$out"
+
+listed='7001  CI  in_progress'
+{ poll_call a 'gh run list -w ci.yml' "$listed"; poll_call b 'gh run list -w ci.yml' "$listed"; poll_call now 'gh run list -w ci.yml' "$listed"; } > "$WORK/workflow.jsonl"
+ctx=$(context_of "$(poll "$WORK/workflow.jsonl" 'gh run list -w ci.yml' "$listed")")
+contains "poll watch reads -w as a wait on gh pr checks only, on gh run list a workflow" "$ctx" "$poll_mark"
+
+prose='Keep the draft pending until the editor signs off.'
+{ poll_call a 'gh pr view 9' "$prose"; poll_call b 'gh pr view 9' "$prose"; poll_call now 'gh pr view 9' "$prose"; } > "$WORK/prose.jsonl"
+out=$(poll "$WORK/prose.jsonl" 'gh pr view 9' "$prose")
+empty "poll watch reads a pending state, not the word heading a phrase" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; poll_call c "$checks" "$waiting"
+  told_line "poll watch: $poll_mark"; poll_call d "$checks" "$waiting"; poll_call e "$checks" "$waiting"
+  poll_call now "$checks" "$waiting"; } > "$WORK/poll-told.jsonl"
+out=$(poll "$WORK/poll-told.jsonl" "$checks" "$waiting")
+empty "poll watch speaks once per phase" "$out"
+
+{ told_line "poll watch: $poll_mark"; summary_line; poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"
+  poll_call now "$checks" "$waiting"; } > "$WORK/poll-again.jsonl"
+ctx=$(context_of "$(poll "$WORK/poll-again.jsonl" "$checks" "$waiting")")
+contains "poll watch speaks again after a compaction" "$ctx" "$poll_mark"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"; summary_line; poll_call now "$checks" "$waiting"; } > "$WORK/poll-phase.jsonl"
+out=$(poll "$WORK/poll-phase.jsonl" "$checks" "$waiting")
+empty "poll watch counts the checks of one compaction phase only" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call x "$checks" 'HTTP 502: Bad Gateway' error; poll_call b "$checks" "$waiting"
+  poll_call now "$checks" "$waiting"; } > "$WORK/poll-failed.jsonl"
+ctx=$(context_of "$(poll "$WORK/poll-failed.jsonl" "$checks" "$waiting")")
+contains "poll watch neither counts nor breaks a run on a failed call" "$ctx" "$poll_mark"
+
+# The copy is written between the call and its result.
+{ poll_call a "$checks" "$waiting" | head -n 1
+  printf '{"type":"api-request-blob","message":{"role":"assistant","content":[{"type":"tool_use","id":"a","name":"Bash","input":{"command":"%s"}}]}}\n' "$checks"
+  poll_call a "$checks" "$waiting" | tail -n 1
+  poll_call now "$checks" "$waiting"; } > "$WORK/poll-copy.jsonl"
+out=$(poll "$WORK/poll-copy.jsonl" "$checks" "$waiting")
+empty "poll watch does not count a transcript's copy of an API request as a check" "$out"
+
+{ poll_call a "$checks" "$waiting"; poll_call q 'cat hooks/poll-watch.py' "MARK = \"$poll_mark\""
+  poll_call b "$checks" "$waiting"; poll_call now "$checks" "$waiting"; } > "$WORK/poll-quoted.jsonl"
+ctx=$(context_of "$(poll "$WORK/poll-quoted.jsonl" "$checks" "$waiting")")
+contains "poll watch counts only its own injected line as told" "$ctx" "$poll_mark"
+
+{ poll_call a "$checks" "$waiting"; poll_call b "$checks" "$waiting"
+  "$PY" -c 'print("{\"type\":\"user\",\"pad\":\"" + "x" * 1200000 + "\"}")'
+  poll_call now "$checks" "$waiting"; } > "$WORK/poll-big.jsonl"
+ctx=$(context_of "$(poll "$WORK/poll-big.jsonl" "$checks" "$waiting")")
+contains "poll watch counts checks above the tail it reads first" "$ctx" "$poll_mark"
+
+"$PY" -c 'import json, re, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"]["PostToolUse"]:
+    if any("poll-watch.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0 if re.fullmatch(matcher["matcher"], "Bash") else 1)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "registration runs poll watch after a Bash call" 0 $?
+
+echo
 STOP_HOOK="$ROOT/hooks/uncommitted-changes.py"
 
 stop_payload() { # $1 = cwd, $2 = session id

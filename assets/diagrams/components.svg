@@ -47,9 +47,13 @@
 <text x="450" y="540" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">the session reaches a commit, a pull request, a memory write or a subagent dispatch</text>
 <text x="450" y="566" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">skill-gate</text>
 <text x="450" y="588" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">stops the act once, until the skill that owns it is loaded</text>
-<rect x="26" y="618" width="848" height="86" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
-<text x="450" y="638" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a turn that changed a rule file ends</text>
-<text x="450" y="664" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">landing-sweep</text>
-<text x="450" y="686" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">the lines elsewhere that still say what the change replaced</text>
-<text x="26" y="732" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74">Four warn, three inject, one stops once: none can judge whether a comment earns its place or a session should stop, only that the moment arrived.</text>
+<rect x="26" y="618" width="418" height="86" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="235" y="638" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a turn that changed a rule file ends</text>
+<text x="235" y="664" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">landing-sweep</text>
+<text x="235" y="686" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">the lines elsewhere that still say what the change replaced</text>
+<rect x="456" y="618" width="418" height="86" rx="8" fill="#FFFFFF" stroke="#E2E0DB" stroke-width="1"/>
+<text x="665" y="638" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="400" font-style="italic" fill="#807C74" text-anchor="middle" dominant-baseline="central">a forge query answers pending a third time</text>
+<text x="665" y="664" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="600" fill="#1C5A51" text-anchor="middle" dominant-baseline="central">poll-watch</text>
+<text x="665" y="686" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="400" fill="#807C74" text-anchor="middle" dominant-baseline="central">what each check costs, against one blocking wait</text>
+<text x="26" y="732" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-style="italic" fill="#807C74">Four warn, four inject, one stops once: none can judge whether a comment earns its place or a session should stop, only that the moment arrived.</text>
 </svg>
