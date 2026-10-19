@@ -173,3 +173,36 @@ revised treated text above. A clear there would still be tested on one
 domain.
 
 **Spent on this round**: the probe $0.15 and the baseline $1.44 - **$1.59**.
+
+## The teammate line read as this case's neighbour
+
+The queue entry "An agent dispatched as a named teammate reports twice" has a
+drafted sentence for "Before dispatch", which the round puts as its own
+paragraph after "Name the file the report goes to":
+
+> **An agent whose output is a file is dispatched as a one-shot background
+> agent, never as a named teammate with a mailbox:** a teammate reports twice,
+> once with its result and once as it goes idle, and each report wakes the
+> orchestrator for a full-context turn.
+
+The sentence's own act is out of reach here: the runner configures no teammate
+mailbox, so it lands on the owner's word and this case is read only for what
+the paragraph costs the rows beside it - a rep that reads "whose output is a
+file" as a reason to send `log-summariser` a file instruction, or to leave the
+role for one that writes. One treated arm of five reps on the wording quoted
+above, the invocation above, read against the kept baseline
+(`round-E@baseline.json`): since `eb25595` the skill's text is unchanged bar
+its license frontmatter, the skill gate's stop message was reworded
+(`276e71b`) and the hooks read commands through one helper (`92da722`), and
+the CLI moved from 2.1.281 to 2.1.302.
+
+**The bars, fixed before the draw.** A row falls where it goes from 5/5 to
+1/5 or lower - the case's neighbour rule - and a fallen row declines the
+sentence with its reason, not a rewording. The baseline's 5/5 rows are
+`attempts-a-dispatch`, `dispatches-the-readonly-role`, `names-each-failure`
+and the three summary files; a move to 2-4/5 is watched. The act (2/4
+measured by hand) and its screen (2/5) have no fall the floor can see: both
+are read by hand from the briefs after the load and reported, a 0/N watched.
+Beside the rows, read by hand in both arms: whether each dispatch ran in the
+background (`run_in_background`), the one part of the sentence's act a rep
+here can take. Expected spend about $1.32, ceiling $2.50.
