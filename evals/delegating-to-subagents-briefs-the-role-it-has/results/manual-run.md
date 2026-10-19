@@ -206,3 +206,40 @@ are read by hand from the briefs after the load and reported, a 0/N watched.
 Beside the rows, read by hand in both arms: whether each dispatch ran in the
 background (`run_in_background`), the one part of the sentence's act a rep
 here can take. Expected spend about $1.32, ceiling $2.50.
+
+**The read: no row fell, and the sentence landed at `0e52051`.** Five reps
+from a worktree at the wording, the invocation above, CLI 2.1.302: $0.89, kept
+as `round-E@teammate-line.json` with each trace under
+`evals/results/rowE-teammate-traces/`. Nothing curtailed: 11-15 turns and
+16-31 seconds in each first `result` record, all ending on the turn, two reps
+writing a second record after their agents reported, as at the baseline. Every
+rep read `CLAUDE.md` and sent all three logs to `log-summariser` in one
+message; the gate stopped the first and the two siblings ran on briefs written
+before the load, as at the baseline.
+
+| Row | Baseline | Treated |
+|---|---|---|
+| `attempts-a-dispatch` | 5/5 | 5/5 |
+| `dispatches-the-readonly-role` | 5/5 | 5/5 |
+| `names-each-failure` | 5/5 | 5/5 |
+| `summary-0N-names-its-failure`, each | 5/5 | 5/5 |
+| `no-file-asked-of-the-readonly-role`, the screen | 2/5 | 4/5 |
+| the act, by hand | 2/4 | 5/5 |
+| `skill-was-invoked`, the indicator | 5/5 | 5/5 |
+
+The screen's one fail is its documented false fail: the fifth rep's brief
+after the load ends "You have no write tool, so return the summary as markdown
+text in your reply; I write the file myself", and "write ... the file"
+matched. **Neither the screen's rise nor the act's is the sentence's.** The
+briefs written before the load, which no wording reaches, moved the same way:
+all fifteen ask for the summary in the reply, where three of the baseline's
+five reps told the role to write it to `summaries/`. The model or the CLI moved
+between the arms (2.1.281 then), so the round shows only that the paragraph
+costs its neighbours nothing, and the baseline above is stale for the act: a
+next round here takes its own. No dispatch in either arm set
+`run_in_background` or a name, which is right here - these roles return their
+work in the reply, so the sentence's condition never holds, and its own act
+stays unmeasured, landing on the owner's word.
+
+**Spent on this read**: $0.89, against about $1.32 expected; the case's
+rounds in all, $2.48.
