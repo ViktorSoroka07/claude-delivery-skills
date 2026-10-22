@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->eighteen skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->nineteen skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -46,6 +46,7 @@ after this one explains *why* each exists; this table only answers *when*.
 | writing prose a specific person or audience will read, act on, or hear — a report, a deck or speech, teaching material, an explanation, a message — and when a reader signals they did not understand ("what is this number of?", "explain it in simpler terms", "I don't get what you mean"). | [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) |
 | writing or editing code and a comment is about to be added — new modules, bug-fix rounds, review-fix rounds, test files — and when auditing a diff's comments (your own or a delegate's) before commit. | [`writing-code-comments`](skills/writing-code-comments/SKILL.md) |
 | a branch is ready for the team and reviewers need to know what to read first - a pull request, its title and description, review notes or a reviewer-facing summary for a branch - when creating a pull request, writing or editing a PR title or description, when commits have landed on a branch whose PR description may no longer match - including "sync the PR description" and "update the PR body" asks - and when maintaining a living status comment on a PR or issue. GitHub and Azure DevOps. | [`writing-pr-descriptions`](skills/writing-pr-descriptions/SKILL.md) |
+| the requester asks for a visual or a page that explains what a piece of work fixed, built or found in simple terms — "make me a visual of what we fixed", "explain this to my team", "something I can show at the meeting", "explain it in plain words with pictures" — so they can retell it without the session. | [`explaining-changes-visually`](skills/explaining-changes-visually/SKILL.md) |
 | a commit is about to be made — "commit this", staged changes waiting, a fix-up after review, a delegated diff the orchestrator is committing — and when a commit message is being edited or squashed before a push. | [`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) |
 | writing, pruning, or restructuring project memory entries, when a merge or shipped milestone leaves memory describing finished work, when ending a session whose work continues in a later one — and whenever a statement is about to be copied from chat, a memory, or one document into another. | [`maintaining-project-memory`](skills/maintaining-project-memory/SKILL.md) |
 | launching work that will spend real money or context at scale — multi-agent passes, multi-phase implementations, long-running pipelines — when a session approaches a budget or context ceiling, and when unplanned rework cost has appeared. | [`budgeting-agentic-work`](skills/budgeting-agentic-work/SKILL.md) |
@@ -193,6 +194,9 @@ committed), the deliberate scope boundary with a Rollback line only where a reve
 cannot undo the change, no hard line breaks in a body the forge renders, references
 that survive history rewrites — and at most one living status comment, edited in
 place, never a stack.
+
+**[`explaining-changes-visually`](skills/explaining-changes-visually/SKILL.md) — a page the requester can retell from.**
+Work is explained in the engineers' words and the team cannot repeat it. A local page in plain words: the short version as a labelled story, the screen's words translated into what they mean for the person, a card per change with its symptom and real numbers, a picture only where the before-and-after is a structure, the questions the audience will ask, and a glossary — built from a bundled template. Untested so far; its eval waits in the backlog.
 
 **[`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) — the message records the change, never the session.**
 Commit bodies are where release notes and PR descriptions get their "why", and where

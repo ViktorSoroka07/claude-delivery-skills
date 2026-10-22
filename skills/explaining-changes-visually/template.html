@@ -1,0 +1,152 @@
+<title>{{Short distinctive title}}</title>
+<style>
+/* One reading column: the system as one pipeline with a lettered marker per change, then a card per change, then the questions a reader asks back. */
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --fg: #1c2330; --muted: #5a6577; --line: #d9dee6; --accent: #1f6f78;
+  --bad: #b0590e; --bad-bg: #fbefe3; --ok: #2e7d4f; --ok-bg: #e6f3eb; --info: #2f5fb3; --info-bg: #e8effb;
+  --code-bg: #eef1f5;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a2029; --fg: #e4e8ee; --muted: #9aa5b5; --line: #2c3440; --accent: #5cbcc6;
+    --bad: #f0a866; --bad-bg: #3a2715; --ok: #7fcf9e; --ok-bg: #173022; --info: #8fb3f0; --info-bg: #1c2a42; --code-bg: #232a35; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a2029; --fg: #e4e8ee; --muted: #9aa5b5; --line: #2c3440; --accent: #5cbcc6;
+  --bad: #f0a866; --bad-bg: #3a2715; --ok: #7fcf9e; --ok-bg: #173022; --info: #8fb3f0; --info-bg: #1c2a42; --code-bg: #232a35; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; padding-inline: 16px; padding-block: 32px 64px; }
+main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: 2rem; font-weight: 700; }
+h2 { font-size: 1.35rem; font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; }
+section { display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.lede { font-size: 1.08rem; color: var(--muted); }
+code { font-family: var(--font-mono); font-size: 0.86em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+ul { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+.summary { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+.dia-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; }
+.dia-wrap svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.dia-wrap svg text { font-family: var(--font-body); fill: var(--fg); }
+.dia-wrap .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.dia-wrap .sub { fill: var(--muted); font-size: 12px; }
+.dia-wrap .arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; marker-end: url(#tip); }
+.dia-wrap .pin { fill: var(--accent); }
+.dia-wrap .pin-t { fill: #fff; font-size: 11px; font-weight: 700; }
+.caption { font-size: 0.9rem; color: var(--muted); }
+.cards { display: flex; flex-direction: column; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.card-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .pair { grid-template-columns: 1fr; } }
+.was, .now { border-radius: 8px; padding: 10px 12px; font-size: 0.95rem; }
+.was { background: var(--bad-bg); }
+.now { background: var(--ok-bg); }
+.was b, .now b { display: block; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+.was b { color: var(--bad); }
+.now b { color: var(--ok); }
+.qa { display: flex; flex-direction: column; gap: 12px; }
+.qa details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+.qa summary { cursor: pointer; font-weight: 600; }
+.qa details p { margin-top: 8px; color: var(--fg); }
+.callout { background: var(--info-bg); border-left: 4px solid var(--info); border-radius: 6px; padding: 12px 14px; }
+dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
+dt { font-weight: 600; }
+dd { margin: 0; color: var(--muted); }
+@media (max-width: 560px) { dl { grid-template-columns: 1fr; } dd { margin-bottom: 6px; } }
+</style>
+
+<main>
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div class="eyebrow">{{Product}} · {{Area}} · {{Change reference}} · {{Date}}</div>
+    <h1>{{What we fixed, as an outcome}}</h1>
+    <p class="lede">{{One or two sentences: what the system does for its user, then what went wrong for them.}}</p>
+  </header>
+
+  <section>
+    <h2>The short version</h2>
+    <div class="summary">
+      <ul>
+        <li><strong>{{Bold lead: the user-visible gain}}.</strong> {{One sentence of what the person now sees.}}</li>
+        <li><strong>{{…}}.</strong> {{…}}</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where each fix lands</h2>
+    <div class="dia-wrap" role="img" aria-label="{{The flow in one sentence, and that lettered markers show where each change applies.}}">
+      <svg viewBox="0 0 720 272" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--muted)"/></marker></defs>
+        <!-- One box per stage the user's request passes through; keep every label inside its box (about 22 characters at this width). -->
+        <rect class="box" x="10" y="30" width="150" height="150" rx="10"/>
+        <text x="85" y="56" text-anchor="middle" font-weight="600">{{1 · Stage}}</text>
+        <text x="85" y="80" text-anchor="middle" class="sub">{{what it does}}</text>
+        <text x="85" y="130" text-anchor="middle" class="sub">{{what now holds}}</text>
+        <rect class="box" x="200" y="30" width="150" height="150" rx="10"/>
+        <text x="275" y="56" text-anchor="middle" font-weight="600">{{2 · Stage}}</text>
+        <text x="275" y="80" text-anchor="middle" class="sub">{{what it does}}</text>
+        <rect class="box" x="390" y="30" width="150" height="150" rx="10"/>
+        <text x="465" y="56" text-anchor="middle" font-weight="600">{{3 · Stage}}</text>
+        <text x="465" y="80" text-anchor="middle" class="sub">{{what it does}}</text>
+        <rect class="box" x="580" y="30" width="130" height="68" rx="10"/>
+        <text x="645" y="58" text-anchor="middle" font-weight="600">{{Screen}}</text>
+        <text x="645" y="80" text-anchor="middle" class="sub">{{what it shows}}</text>
+        <rect class="box" x="580" y="112" width="130" height="68" rx="10"/>
+        <text x="645" y="140" text-anchor="middle" font-weight="600">{{Screen}}</text>
+        <text x="645" y="162" text-anchor="middle" class="sub">{{what it shows}}</text>
+        <path class="arrow" d="M160 105 H196"/>
+        <path class="arrow" d="M350 105 H386"/>
+        <path class="arrow" d="M540 80 H576"/>
+        <path class="arrow" d="M540 135 H576"/>
+        <!-- One lettered marker per change, under the stage it lands in; the letter matches its card's tag. -->
+        <g><circle class="pin" cx="40" cy="210" r="11"/><text class="pin-t" x="40" y="214" text-anchor="middle">A</text></g>
+        <text x="58" y="214" class="sub">{{reference · what changed}}</text>
+        <g><circle class="pin" cx="230" cy="210" r="11"/><text class="pin-t" x="230" y="214" text-anchor="middle">B</text></g>
+        <text x="248" y="214" class="sub">{{reference · what changed}}</text>
+      </svg>
+    </div>
+    <p class="caption">{{Letters match the cards below. Say how the changes were checked: live, or by tests only.}}</p>
+  </section>
+
+  <section>
+    <h2>Each fix, before and after</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-head"><span class="tag">{{A · reference}}</span><h3>{{The symptom, as the person met it}}</h3></div>
+        <div class="pair">
+          <div class="was"><b>Before</b>{{What the person saw or paid, in their words, with the real numbers.}}</div>
+          <div class="now"><b>Now</b>{{What they see instead.}}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>If someone asks</h2>
+    <div class="qa">
+      <details><summary>{{A question the audience will ask back}}</summary><p>{{The answer, and where the mechanism lives if they want it.}}</p></details>
+    </div>
+  </section>
+
+  <section>
+    <h2>What's left</h2>
+    <div class="callout"><p>{{What is not done or not verified, in a sentence or two; delete the section when nothing is.}}</p></div>
+  </section>
+
+  <section>
+    <h2>Words used above</h2>
+    <dl>
+      <dt>{{Term}}</dt><dd>{{Plain definition, one line.}}</dd>
+    </dl>
+  </section>
+</main>
