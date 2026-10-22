@@ -59,6 +59,13 @@ ul { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap:
 .qa summary { cursor: pointer; font-weight: 600; }
 .qa details p { margin-top: 8px; color: var(--fg); }
 .callout { background: var(--info-bg); border-left: 4px solid var(--info); border-radius: 6px; padding: 12px 14px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button { font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.case-cap { color: var(--muted); font-size: 0.95rem; }
+#seq svg { display: block; width: 100%; height: auto; }
+#seq svg text { font-family: var(--font-body); fill: var(--fg); }
 dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
 dt { font-weight: 600; }
 dd { margin: 0; color: var(--muted); }
@@ -118,6 +125,17 @@ dd { margin: 0; color: var(--muted); }
     <p class="caption">{{Letters match the cards below. Say how the changes were checked: live, or by tests only.}}</p>
   </section>
 
+
+  <section>
+    <h2>{{The flow, step by step}}</h2>
+    <p>{{Pick a case to watch the same flow play out; say what the colours mean.}}</p>
+    <div class="tabs" role="group" aria-label="Choose a case">
+      <button type="button" data-case="before" aria-pressed="true">{{Case — before}}</button>
+      <button type="button" data-case="now" aria-pressed="false">{{Case — now}}</button>
+    </div>
+    <p class="case-cap" id="case-cap"></p>
+    <div class="dia-wrap"><div id="seq"></div></div>
+  </section>
   <section>
     <h2>Each fix, before and after</h2>
     <div class="cards">
@@ -150,3 +168,26 @@ dd { margin: 0; color: var(--muted); }
     </dl>
   </section>
 </main>
+<script>
+// One column per part the request passes through; keep each label inside its box (about 18 characters).
+window.SEQ_COLS = [
+  { id: "person", name: "{{Person}}", sub: "{{the screen they use}}" },
+  { id: "system", name: "{{System}}", sub: "{{what it is}}" },
+  { id: "dep", name: "{{Dependency}}", sub: "{{what it is}}" }
+];
+// One entry per button. A step is an arrow {from, to: id or [ids], text, kind, res} or a note
+// {at: id or [ids], note, kind}; kind "bad" or "ok" colours it, res makes a dashed reply, dim greys a column out.
+window.SEQ_CASES = {
+  before: { cap: "{{Before: what happens, in one sentence.}}", steps: [
+    { from: "person", to: "system", text: "{{the request}}" },
+    { from: "system", to: "dep", text: "{{what it asks}}" },
+    { at: "dep", note: ["{{what goes wrong}}"], kind: "bad" },
+    { from: "system", to: "person", res: true, text: ["{{what the person is told}}"], kind: "bad" }
+  ] },
+  now: { cap: "{{Now: what happens instead.}}", steps: [
+    { from: "person", to: "system", text: "{{the request}}" },
+    { from: "system", to: "person", res: true, text: ["{{what the person is told}}"], kind: "ok" }
+  ] }
+};
+</script>
+<script>/* paste seq.js here */</script>

@@ -196,7 +196,7 @@ that survive history rewrites — and at most one living status comment, edited 
 place, never a stack.
 
 **[`explaining-changes-visually`](skills/explaining-changes-visually/SKILL.md) — a page the requester can retell from.**
-Work is explained in the engineers' words and the team cannot repeat it. A local page in plain words: the short version as a labelled story, the screen's words translated into what they mean for the person, a card per change with its symptom and real numbers, a picture only where the before-and-after is a structure, the questions the audience will ask, and a glossary — built from a bundled template. Untested so far; its eval waits in the backlog.
+Work is explained in the engineers' words and the team cannot repeat it. A local page in plain words: the short version as a labelled story, the screen's words translated into what they mean for the person, a card per change with its symptom and real numbers, a picture only where the before-and-after is a structure, a step-by-step flow with a button per case, the questions the audience will ask, and a glossary — built from a bundled template. Untested so far; its eval waits in the backlog.
 
 **[`writing-commit-messages`](skills/writing-commit-messages/SKILL.md) — the message records the change, never the session.**
 Commit bodies are where release notes and PR descriptions get their "why", and where

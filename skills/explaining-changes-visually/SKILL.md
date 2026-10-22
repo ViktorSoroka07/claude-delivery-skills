@@ -28,11 +28,12 @@ The page is written for the requester's team, not for the engineers who built th
 Draw only what a sentence cannot carry:
 
 - **One diagram of the flow** the person's request passes through, with a lettered marker under the stage each change lands in; the letters match the cards' tags.
+- **A step-by-step flow with a button per case** where the same request plays out differently: before and after the change, or the cases the change distinguishes (one part times out, one part is missing). Each part the request passes through is a column, each message an arrow, each decision a note; steps that go wrong or mislead are drawn in the warning colour and what the change makes true in the success colour, and a part a case does not reach is dimmed. The reader clicks between cases and watches the flow change, which is what a paragraph per case cannot show. The renderer is [`seq.js`](seq.js), drawn from the data block the template carries; one caption per case says what it shows.
 - **A small picture inside a card whose before-and-after is a structure**: rows that count or do not toward a total, a grid with a column that should not exist, a step that moved. Two sentences describing a grid are slower to read than the grid. A change that is a sentence (a clearer message) stays a sentence.
 
 ## Build it
 
 1. Collect the facts from the record — the PR or issues, the commits, any live run's evidence — before writing; a claim with no source is not on the page.
-2. Copy [`template.html`](template.html) and fill it: it carries the palette (light and dark), the reading column, the diagram, the card, picture, question and glossary styles. Replace every `{{…}}`; delete a section that has nothing to say rather than filling it.
-3. Open the page in a browser before handing it over, at a desktop width and a phone width: every diagram label inside its box, no section overflowing sideways, each picture's numbers matching its card's text.
+2. Copy [`template.html`](template.html) and fill it: it carries the palette (light and dark), the reading column, the overview diagram, the case buttons and their flow, and the card, picture, question and glossary styles. Replace every `{{…}}`, paste [`seq.js`](seq.js) into the script tag that asks for it, and delete a section that has nothing to say rather than filling it.
+3. Open the page in a browser before handing it over, at a desktop width and a phone width, and click every case button: every label inside its box, no section overflowing sideways except a flow's own scroll, each picture's numbers matching its card's text.
 4. Deliver it as a local file. Publish it only when the requester asks.
