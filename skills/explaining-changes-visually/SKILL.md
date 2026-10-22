@@ -18,22 +18,23 @@ A page a requester can open at a meeting and retell from, without the session. T
 The page is written for the requester's team, not for the engineers who built the change:
 
 - **The short version is a story with labelled lines**, one bold label each: what the system does, what went wrong, what it cost the person, what is true now. No mechanism in this section.
-- **Every word the screen or the log shows gets translated** in a section of its own, as a quoted first-person sentence and what it means for the person: a status reading "aborted" is *"Something stopped me before I finished."* A code, a status, a symbol such as "≥" each get one.
-- **A card per change: its title is the symptom as the person met it**, its Before and Now are what they saw and see, with the real numbers from the run. File paths, function names and wire terms stay out of the cards; where a reader will ask how, the answer goes in the questions section.
-- **The questions section answers what the audience will ask back**, each with its evidence: a scope decision, something left out on purpose, a difference between two cases that looks arbitrary.
-- **The glossary defines every term the page uses**, the product's own names included. A term defined nowhere is the sentence the reader gets stuck on.
+- **Every word the screen or the log shows gets translated** in a section of its own, as a quoted first-person sentence and what it means for the person: a status reading "aborted" is *"Something stopped me before I finished."*
+- **A card per change, titled by the symptom as the person met it**, its Before and Now in their words, with the real numbers. Code names and wire terms stay out of the cards.
+- **The questions section answers what the audience will ask back**, each with its evidence: a scope decision, something left out on purpose, a difference that looks arbitrary.
+- **The glossary defines every term the page uses**, the product's own names included.
 
-## Pictures where the change is a structure
+## A picture only where words are slower
 
-Draw only what a sentence cannot carry:
+Every page gets **one overview diagram**: the flow the person's request passes through, with a lettered marker under the stage each change lands in, matching the cards' tags. Beyond it, draw only what a sentence cannot carry, and read the reference for that kind of picture when the change calls for it:
 
-- **One diagram of the flow** the person's request passes through, with a lettered marker under the stage each change lands in; the letters match the cards' tags.
-- **A step-by-step flow with a button per case** where the same request plays out differently: before and after the change, or the cases the change distinguishes (one part times out, one part is missing). Each part the request passes through is a column, each message an arrow, each decision a note; steps that go wrong or mislead are drawn in the warning colour and what the change makes true in the success colour, and a part a case does not reach is dimmed. The reader clicks between cases and watches the flow change, which is what a paragraph per case cannot show. The renderer is [`seq.js`](seq.js), drawn from the data block the template carries; one caption per case says what it shows.
-- **A small picture inside a card whose before-and-after is a structure**: rows that count or do not toward a total, a grid with a column that should not exist, a step that moved. Two sentences describing a grid are slower to read than the grid. A change that is a sentence (a clearer message) stays a sentence.
+- The same request plays out differently by case (before and after, or the cases a change tells apart) → [`references/flows.md`](references/flows.md): a step-by-step flow with a button per case.
+- A change's before-and-after is a structure (rows that count toward a total, a grid with a column too many) → [`references/pictures.md`](references/pictures.md): a small picture inside its card.
+
+A change that is a sentence stays a sentence.
 
 ## Build it
 
 1. Collect the facts from the record — the PR or issues, the commits, any live run's evidence — before writing; a claim with no source is not on the page.
-2. Copy [`template.html`](template.html) and fill it: it carries the palette (light and dark), the reading column, the overview diagram, the case buttons and their flow, and the card, picture, question and glossary styles. Replace every `{{…}}`, paste [`seq.js`](seq.js) into the script tag that asks for it, and delete a section that has nothing to say rather than filling it.
-3. Open the page in a browser before handing it over, at a desktop width and a phone width, and click every case button: every label inside its box, no section overflowing sideways except a flow's own scroll, each picture's numbers matching its card's text.
+2. Copy [`template.html`](template.html) and fill it: it carries the palette (light and dark), the reading column and every section's styles. Replace every `{{…}}`, and delete a section with nothing to say, the flow section included, rather than filling it.
+3. Open the page in a browser before handing it over, at a desktop width and a phone width: every label inside its box, nothing overflowing sideways except a diagram's own scroll.
 4. Deliver it as a local file. Publish it only when the requester asks.
