@@ -206,7 +206,7 @@ def load_json(path, default):
         return default
 
 
-def toplevel(directory, budget, cache={}):
+def toplevel(directory, budget, cache={}):  # noqa: B006
     if directory not in cache:
         out = git(directory, ["rev-parse", "--show-toplevel"], budget) if os.path.isdir(directory) else None
         cache[directory] = os.path.realpath(out.strip()) if out and out.strip() else None
@@ -680,7 +680,7 @@ def to_before(before, after, k):
     """The before-text's line index that line index k of the after-text stands
     for: itself where no change touched it, else where the change began."""
     _, _, ops = diff_lines(before, after)
-    for tag, i1, i2, j1, j2 in ops:
+    for tag, i1, _i2, j1, j2 in ops:
         if j1 <= k < j2:
             return i1 + (k - j1) if tag == "equal" else i1
     return len(before.splitlines())

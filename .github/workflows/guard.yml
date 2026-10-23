@@ -51,6 +51,15 @@ jobs:
       - name: ShellCheck the guard scripts
         run: shellcheck .githooks/pre-commit scripts/*.sh evals/fixtures/*.sh evals/*/fixture.sh skills/*/*.sh
 
+      # The hooks and the eval graders are Python with no type checker; ruff's
+      # defaults and its bug-pattern rules catch an unused loop variable or a
+      # shared mutable default before they reach a session. ruff.toml pins the
+      # version this installs, so a new release cannot fail an unchanged tree.
+      - name: Lint the Python
+        run: |
+          pipx install ruff==0.12.0
+          ruff check
+
       # The consistency gates: self-test the checkers, verify every internal
       # reference resolves, and prove the canonical inventory statements match
       # the tree (regenerate + diff; a failure's fix is running the generator).

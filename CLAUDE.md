@@ -31,7 +31,7 @@ Review findings are point-in-time, and review-pr keeps them in its folder outsid
 
 ## Gates
 
-The eight local gates are the steps of `.github/workflows/guard.yml` minus the skills-spec validator, which is not installed locally; run them at the head before handing over a push. The local shellcheck is newer than CI's, so a clean local lint does not prove CI's lint step.
+The nine local gates are the steps of `.github/workflows/guard.yml` minus the skills-spec validator, which is not installed locally - the Python lint runs as `uvx ruff@0.12.0 check`; run them at the head before handing over a push. The local shellcheck is newer than CI's, so a clean local lint does not prove CI's lint step.
 
 ## Evals
 
