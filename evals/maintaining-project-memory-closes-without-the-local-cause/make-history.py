@@ -87,9 +87,7 @@ The bank's integration guide, appendix C, says the importer picks up only \
 files whose name ends in `.CSV` in upper case; any other upload is "received" \
 into a holding area and never imported, with no error and no notice. I \
 uploaded a renamed copy of the P04 file to the portal's test environment and \
-it imported at once, 63 rows. Their integration support confirmed on the \
-phone that the match is case-sensitive, has been since the portal launched, \
-and that changing it is "on the roadmap".
+it imported at once, 63 rows.
 
 I have not changed anything else yet. Two ways forward: upper-case the \
 extension at upload, or revert the export's file name. The first is the \

@@ -60,3 +60,13 @@ The three failing closings each offered the bank's case rule as general, none na
 Against the bars fixed before the draw: reach held on both models. Fable passes the restraint in all but one offering rep, the decline side of its bar; Sonnet fails in two, below the floor - a sighting of the failure on the suite's model, not a verdict. Neither model makes the entry live for a five-rep treated arm, and the bar sends the next step to the owner: a ten-rep re-take with its bar fixed first, or declining.
 
 Found on the way: two Sonnet closings disowned the seed's "Their integration support confirmed on the phone" - "I can't make phone calls, so that never happened" - and one offered that as a candidate of its own. The seed claims an act the session could not have done, the defect task 77 fixed in other seeds; any re-take drops the sentence first, which leaves appendix C and the test import as the evidence.
+
+## The re-take, fixed before its draw
+
+The owner chose the ten-rep re-take on the suite's model. The seed first drops its phone call, which leaves appendix C and the test import as the evidence; both arms' seeds are regenerated from that seed, so the repair reaches both arms alike. Ten reps an arm on `claude-sonnet-5-5`, both arms drawn together in a new round folder, the twenty closings graded blind as before and the restraint row hand-checked. The draw is read without the baseline's five reps, which prompted it.
+
+- Reach: at least 8 offering reps of 10 in each arm, or the arm is not read.
+- **Lands on Sonnet** if `leaves-the-local-cause-off` fails in at least five fewer offering reps treated than baseline - a gap of half, the least ten reps separate - with `offers-a-candidate` losing no more than one rep and `offers-the-quiet-mechanism` within two of its baseline. Then, before landing, five treated Fable reps (restraint at least 4/5, the quiet mechanism within one rep of the Fable baseline above) and the neighbour's treated arm on both models, as fixed above.
+- **Declined** as below the instrument if the baseline fails in fewer than five offering reps, whatever the treated arm shows, or if the gap is under five.
+
+Expected cost $1.88, from this case's own Sonnet reps ($0.094 a rep).
