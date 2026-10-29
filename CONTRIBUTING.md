@@ -340,7 +340,8 @@ it:
   three reps `reapplied-the-contradicted-row` counted a refused source mutation,
   each beside one that ran, so no verdict moved. The plugin's own skill
   gate stops a commit, a pull request create, a memory write and a subagent
-  dispatch once each until the skill that owns the act is loaded, so under it a
+  dispatch once each until the skill that owns the act is loaded - with every
+  act of the same kind sent in the stopped call's message - so under it a
   `min: 1` grader on `Agent` passes a rep whose one dispatch was refused, and a
   pattern over `git commit` commands reads a narrated message the gate turned
   away as the one that landed. Anchor a grader on such an act in what the act
@@ -387,7 +388,8 @@ it:
   under that earlier wording and five of five under the landed one, on two
   seeds whose turns held no tool call; and the skill gate stops a commit,
   a pull request create, a memory write and a subagent dispatch once each
-  until the skill owning the act is loaded. In every kept rep it stopped - a
+  until the skill owning the act is loaded, with every act of the same kind
+  sent in the stopped call's message. In every kept rep it stopped - a
   commit on a smaller model, a dispatch on the suite's - the first call it
   made after the stop loaded that skill, though the retry passes whether or
   not one does, and a pull request create or a subagent's own act is

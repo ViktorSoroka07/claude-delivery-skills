@@ -667,7 +667,7 @@ gate_hook() { # $@ = NAME=value pairs added to the hook's environment
     -u CLAUDE_PROJECT_DIR HOME="$WORK/home" USERPROFILE="$WORK/home" TMPDIR="$GSTATE" "$@" "$PY" "$GATE_HOOK"
 }
 
-gate_payload() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path
+gate_payload() { # $1 = tool, $2 = session, $3 = agent id ('' = main thread), $4 = transcript, $5 = command or path, $6 = tool use id (optional)
   "$PY" -c 'import json, sys
 tool, session, agent, transcript, value = sys.argv[1:6]
 key = {"Bash": "command", "Write": "file_path", "Edit": "file_path", "Agent": "prompt", "Task": "prompt"}[tool]
@@ -675,6 +675,8 @@ p = {"hook_event_name": "PreToolUse", "session_id": session, "transcript_path": 
      "tool_name": tool, "tool_input": {key: value}}
 if agent:
     p["agent_id"] = agent
+if len(sys.argv) > 6:
+    p["tool_use_id"] = sys.argv[6]
 print(json.dumps(p))' "$@"
 }
 
@@ -800,6 +802,50 @@ contains "skill gate's combined stop names the commit's skill too" "$out" "writi
 contains "skill gate's combined stop tells the person watching both skills" "$out" "paused this command so the session can load \`writing-commit-messages\` and \`writing-pr-descriptions\` first"
 out=$(gate Bash g14 '' "$WORK/t-none.jsonl" 'git -C "/tmp/some repo" commit -m x && gh pr create --fill')
 empty "skill gate stands aside on the combined command's retry" "$out"
+
+# A message's calls reach the transcript together, after every one of them has
+# passed its hook, so the stopped call's own line is absent at its siblings and
+# present at its retry, which a later message makes.
+tool_use_line() { # $1 = tool use id; one transcript line holding that call
+  printf '{"type":"assistant","message":{"id":"msg_x","content":[{"type":"tool_use","id":"%s","name":"Agent","input":{}}]}}\n' "$1"
+}
+printf '{"type":"user","message":{"content":"dispatch three reviewers"}}\n' > "$WORK/t-batch.jsonl"
+out=$(gate Agent g40 '' "$WORK/t-batch.jsonl" 'review a' toolu_g40a)
+contains "skill gate stops the first dispatch of a batch" "$out" "$DENY"
+out=$(gate Agent g40 '' "$WORK/t-batch.jsonl" 'review b' toolu_g40b)
+contains "skill gate stops a dispatch sent in the stopped one's message" "$out" "$DENY"
+contains "skill gate tells a sibling it shares the stopped call's message" "$out" "same message"
+out=$(gate Agent g40 '' "$WORK/t-batch.jsonl" 'review c' toolu_g40c)
+contains "skill gate stops every sibling, not the second alone" "$out" "$DENY"
+tool_use_line toolu_g40a >> "$WORK/t-batch.jsonl"
+out=$(gate Agent g40 '' "$WORK/t-batch.jsonl" 'review a' toolu_g40d)
+empty "skill gate passes the retry once the stopped call is on disk" "$out"
+out=$(gate Agent g40 '' "$WORK/t-batch.jsonl" 'review e' toolu_g40e)
+empty "skill gate stands aside for the rest of the conversation after the retry" "$out"
+
+out=$(gate Bash g41 '' "$WORK/t-none.jsonl" 'git commit -m a' toolu_g41a)
+contains "skill gate stops the first commit of a pair" "$out" "$DENY"
+out=$(gate Bash g41 '' "$WORK/t-none.jsonl" 'git commit -m b' toolu_g41b)
+contains "skill gate stops the commit sent beside it" "$out" "delivery-skills:writing-commit-messages"
+out=$(gate Agent g41 '' "$WORK/t-none.jsonl" 'review it' toolu_g41c)
+contains "skill gate keys a sibling stop per act" "$out" "delivery-skills:delegating-to-subagents"
+printf '{"type":"user","message":{"content":"commit both"}}\n' > "$WORK/t-pair.jsonl"
+out=$(gate Bash g44 '' "$WORK/t-pair.jsonl" 'git commit -m a' toolu_g44a)
+contains "skill gate stops the first commit of a serial pair" "$out" "$DENY"
+printf '{"type":"attachment","attachment":{"type":"hook_system_message","toolUseID":"toolu_g44a"}}\n{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"toolu_g44a"}]}}\n' >> "$WORK/t-pair.jsonl"
+out=$(gate Bash g44 '' "$WORK/t-pair.jsonl" 'git commit -m b' toolu_g44b)
+contains "skill gate reads the stopped call's own line, not its notice or result, as on disk" "$out" "$DENY"
+
+out=$(gate Agent g42 '' "$WORK/no-such-g42.jsonl" 'review a' toolu_g42a)
+contains "skill gate stops once where the transcript is absent, ids given" "$out" "$DENY"
+out=$(gate Agent g42 '' "$WORK/no-such-g42.jsonl" 'review b' toolu_g42b)
+empty "skill gate never blocks where the transcript is absent, ids given" "$out"
+
+out=$(gate Agent g43 '' "$WORK/t-none.jsonl" 'review a' toolu_g43a)
+contains "skill gate stops the first dispatch whose stop then goes stale" "$out" "$DENY"
+touch -t 200001010000 "$GSTATE/delivery-skills-gate/g43-main-dispatch"
+out=$(gate Agent g43 '' "$WORK/t-none.jsonl" 'review b' toolu_g43b)
+empty "skill gate passes a later dispatch once its stop is past the sibling window" "$out"
 
 mkdir -p "$WORK/parent/subagents"
 skill_call writing-commit-messages > "$WORK/parent.jsonl"

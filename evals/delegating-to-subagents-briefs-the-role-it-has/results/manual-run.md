@@ -26,9 +26,11 @@ the agent listing ("Use for every log under logs/"). Each rep's read of
 naming the path the agent writes its full report to" sends a path to every
 role, read-only ones included, and the skill gate stops the first dispatch
 until `delegating-to-subagents` is loaded. **In a batch of sibling dispatches
-the gate stops only the first**: the siblings, written in the same message
-before the skill loaded, run - five of five such batches in this machine's
-real sessions - so their briefs carry no text either arm could differ on.
+the gate stopped only the first** when this case was drawn: the siblings,
+written in the same message before the skill loaded, ran - five of five such
+batches in this machine's real sessions - so their briefs carry no text either
+arm could differ on. The gate now stops the siblings too, so a re-take's
+batched briefs are all written after the load.
 
 **Where the role lives, settled by a probe for $0.15.** A scaffold-written role
 in the run's own config directory (`../../config/agents/`) is offered to the

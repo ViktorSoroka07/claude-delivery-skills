@@ -15,6 +15,13 @@ conversation, with a reason naming the skill, so the session loads it and runs
 the act again, rewritten where the skill changes it. A session that declines
 the skill loses one turn.
 
+A message's calls reach the transcript together, after every one of them has
+passed this hook, so the stopped call's own line is absent while its siblings
+in that message arrive and present at the retry a later message makes: an act
+of the same kind arriving while it is absent is stopped too, its brief or
+message written before the skill was read. Where the transcript cannot be read,
+or the stop is older than the sibling window, the act passes.
+
 Claude Code shows every stop to the person watching as a red "hook error", so
 the stop carries a second line addressed to them, which the model never sees.
 
@@ -34,6 +41,7 @@ import re
 import shlex
 import sys
 import tempfile
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from shell_text import PR_CREATE, blank, git_verb  # noqa: E402
@@ -48,6 +56,7 @@ REDIRECT = re.compile(r">>?\|?")
 REDIRECT_WORD = re.compile(r"\d*[<>]|&>")
 IN_PLACE = re.compile(r"\b(?:sed|perl)\b.*\s(?:-[a-zA-Z]*i\b|--in-place\b)")
 COPY = re.compile(r"\b(?:mv|cp|tee)\b")
+SIBLING_WINDOW_SECONDS = 300
 
 ACTS = {
     "commit": ("writing-commit-messages", "this commit"),
@@ -178,16 +187,35 @@ def skill_loaded(transcript, skill):
     return False
 
 
+def on_disk(transcript, tool_use_id):
+    own_line = re.compile(r'"id"\s*:\s*"%s"' % re.escape(tool_use_id))
+    try:
+        with open(transcript, encoding="utf-8", errors="replace") as fh:
+            return any(tool_use_id in line and own_line.search(line) for line in fh)
+    except OSError:
+        return None
+
+
+def stopped_call(flag):
+    try:
+        with open(flag, encoding="utf-8") as fh:
+            words = fh.read().split()
+        age = time.time() - os.path.getmtime(flag)
+    except OSError:
+        return None
+    return words[1] if len(words) == 2 and words[0] == "stopped" and age < SIBLING_WINDOW_SECONDS else None
+
+
 def stand_aside_file(payload, act):
     key = "%s-%s-%s" % (payload.get("session_id"), payload.get("agent_id") or "main", act)
     return os.path.join(tempfile.gettempdir(), "delivery-skills-gate", re.sub(r"[^\w.-]", "_", key)[:160])
 
 
-def record(path):
+def record(path, state="done"):
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as fh:
-            fh.write("done\n")
+            fh.write(state + "\n")
         return True
     except OSError:
         return False
@@ -201,19 +229,33 @@ def main():
     if not isinstance(payload, dict) or not payload.get("session_id"):
         return 0
     transcript = own_transcript(payload)
-    stops = []
+    tool_use_id = payload.get("tool_use_id")
+    stops, siblings = [], []
     for act in acts_of(payload):
         flag = stand_aside_file(payload, act)
         if os.path.exists(flag):
+            stopped = stopped_call(flag)
+            if stopped and on_disk(transcript, stopped) is False:
+                stops.append(act)
+                siblings.append(act)
+            elif stopped:
+                record(flag)
             continue
         if skill_loaded(transcript, ACTS[act][0]):
             record(flag)
             continue
-        if record(flag):
+        state = "stopped " + tool_use_id if isinstance(tool_use_id, str) and re.fullmatch(r"\S+", tool_use_id) else "done"
+        if record(flag, state):
             stops.append(act)
     if not stops:
         return 0
-    if len(stops) == 1:
+    if stops == siblings and len(stops) == 1:
+        skill, what = ACTS[stops[0]]
+        why = ("%s too: it was sent in the same message as one stopped until `delivery-skills:%s` "
+               "loads, so it was written before that skill was read. Call the Skill tool with "
+               "`delivery-skills:%s`, follow it, then run it again - rewritten where the skill "
+               "changes it." % (what, skill, skill))
+    elif len(stops) == 1:
         skill, what = ACTS[stops[0]]
         why = ("%s once, because `delivery-skills:%s` owns it and this conversation has not "
                "loaded it. Call the Skill tool with `delivery-skills:%s`, follow it, then run the "
@@ -228,15 +270,15 @@ def main():
     sys.stdout.write(json.dumps({
         "systemMessage": (
             "delivery-skills paused %s so the session can load %s first and run it again. "
-            "Claude Code labels every hook stop a \"hook error\"; nothing failed, and this act "
-            "is not paused again in this conversation." % (what, skills)
+            "Claude Code labels every hook stop a \"hook error\"; nothing failed, and once it "
+            "has run again this act is not paused again in this conversation." % (what, skills)
         ),
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
             "permissionDecisionReason": (
-                "Not an error: delivery-skills stops %s The gate stands aside for the rest of "
-                "the conversation; where no Skill tool is available, run the act again as it "
+                "Not an error: delivery-skills stops %s From its retry on the gate stands "
+                "aside for the rest of the conversation; where no Skill tool is available, run the act again as it "
                 "was." % why
             ),
         }
