@@ -40,5 +40,5 @@ The instrument's rules live in `evals/INSTRUMENT.md`; a session that designs, ru
 - No eval run launches from the main checkout: run from a worktree of the commit under test, with any probe case under that worktree's git-ignored `docs/plans/`.
 - The runner needs Docker Desktop closed and `~/.docker` moved aside for the run; say so once, with the end time, never in every message.
 - `--judge-model sonnet` on any invocation whose verdicts will be read, and `--keep-temp` on any arm whose acts will be hand-read.
-- `--case` takes one `*` glob; a batch's `--max-cost-usd` sits above its expected spend, since a breach scores the runs in flight as fails.
+- `--case` takes one `*` glob; a batch's `--max-cost-usd` sits above its expected spend, since the run that reaches it has its judged graders scored as fails.
 - A curtailed rep is unmeasured and replaced, never counted; a judged row is hand-graded from the run JSON's `evidence` before any decision rests on it.
