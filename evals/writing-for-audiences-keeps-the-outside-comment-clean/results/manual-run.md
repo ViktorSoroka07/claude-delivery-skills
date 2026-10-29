@@ -288,6 +288,6 @@ condition this case does not stage - a comment condensed from internal text,
 or written in the course of a landing with the board's rules only in memory,
 where the session that failed had loaded the landing skill and not the
 audience one. The entry stays queued for a fixture that stages that. The
-package above stays drafted, never drawn. Spent on this case: $5.44 (the
+package above stays drafted, never drawn. Spent on this case: $5.45 (the
 judge probe $0.28, the instrument's baseline $0.52, the strongest model's
 $4.64).
