@@ -99,3 +99,5 @@ Drawn at `dbe6a6c` ($0.38, five reps, `claude-sonnet-5-5`, none curtailed), grad
 | `offers-no-held-principle` | 4/5 | 5/5 | 5/5 |
 
 The baseline re-graded alone reproduced its earlier verdicts. Three closings named a sweep of the other inputs as well as the sibling code before pushing, which reaches both follow-ups; two still named a search of the code for the same pattern and claimed the first follow-up caught. What the bound tail did move: three of five closings now said which failure their step would not have caught, which none did under the first wording. A gap of two is below the floor, so the shape does not move by the bar fixed before its draw: no third wording, and the entry's disposition goes back to the owner.
+
+Disposition, on the stand-in advisor's recommendation as the default the owner overrules by answering: declined, on the ground that the effect on the suite's model is below what five reps separate rather than that a wording failed, re-openable on another carrier; the entry is in `backlog/declined.md`. The CONTRIBUTING text stays unlanded with the brief's clause.
