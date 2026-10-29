@@ -94,7 +94,21 @@ git add -A
 git commit -q -m "Export a payroll period and upload it to the bank portal"
 
 # The refactor that broke the import: output paths lower-cased.
-sed -i.bak 's/PAYROLL_${period}.CSV/payroll_${period}.csv/' bin/export.js && rm bin/export.js.bak
+cat > bin/export.js <<'EOF'
+const fs = require('node:fs');
+const path = require('node:path');
+
+// Writes one payroll period's payments as the bank's bulk-payment CSV.
+function exportPeriod(period, payments, dir = 'out') {
+  const rows = ['iban,amount_cents,reference'];
+  for (const p of payments) rows.push(`${p.iban},${p.amountCents},${p.reference}`);
+  const file = path.join(dir, `payroll_${period}.csv`);
+  fs.writeFileSync(file, rows.join('\r\n') + '\r\n');
+  return file;
+}
+
+module.exports = { exportPeriod };
+EOF
 git commit -q -am "Lower-case output paths"
 
 # The seeded session's uncommitted fix: the upload names the file with an
