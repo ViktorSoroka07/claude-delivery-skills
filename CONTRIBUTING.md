@@ -347,6 +347,17 @@ it:
   leaves behind - the log the commits landed in, the file a dispatch was told to
   write - or count the refused calls out of the trace by hand before its rate is
   read.
+- **A `tool_used` grader that declares `max` alone requires the call it meant
+  to bound.** The runner reads an omitted `min` as 1 - `passed = count >= (min
+  ?? 1) && count <= (max ?? Infinity)` - so `max: 0` with no `min` fails every
+  rep, the clean ones included, and `max: 1` fails every rep that made no such
+  call: a screen that bounds a call declares `min: 0` beside its `max`. **And a
+  word boundary before a word that can follow a line break never fires there**,
+  because `input_match` reads JSON, where the break is the two characters `\n`
+  and the `n` is a word character: `\bWrite` missed "\n\nWrite your summary to
+  ...", the plainest instruction a dispatch screen was built to catch. Open such
+  a word with `(?:\\n|\b)`, which an escaped break and an ordinary boundary both
+  satisfy. Both were met building one screen, before any draw.
 - **A `tool_used: Skill` grader is the trigger's own indicator.** Mark it
   `arm: with-only`: under the two-arm run it is shown and scored in neither
   arm, and the arm without the plugin never evaluates it, so it cannot throw
