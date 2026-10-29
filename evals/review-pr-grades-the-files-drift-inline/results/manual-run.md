@@ -269,3 +269,16 @@ Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms wi
 | skill-was-invoked | 5/5 | 5/5 |
 
 No row moved: the path the prompt names won over the state folder in every treated rep.
+
+## The hook-read row in runner runs
+
+`base-not-brought-into-the-read-tree` reads `.git/git-audit`, which only the
+fixture's `post-checkout` and `reference-transaction` hooks write, and no git
+hook runs in a runner rep on CLI 2.1.312: every command a rep runs sets
+`core.hooksPath` to `/dev/null` and disables each hook by name (CONTRIBUTING,
+"Nor does a fixture's git hook run in a rep"). A runner row of this grader
+therefore passes whatever the rep did. The 2/5 and 0/5 above were a hand round,
+where hooks run, and measured it; the runner rows above (3/3, 3/3; 5/5, 5/5) were
+taken on CLI 2.1.289 and earlier, whose sandbox environment no kept run
+recorded, so they are not evidence either way. Re-anchoring the row on the
+run's git wrapper, as the commit case's audit was, is queued in the plan.
