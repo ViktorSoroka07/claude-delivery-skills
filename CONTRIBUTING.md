@@ -271,6 +271,14 @@ it:
 - **An `llm` grader with no `focus` is shown the run's final message and
   nothing else.** A rubric about a document the run wrote is then a vote on
   the summary of it, which is the one text that cannot hold the evidence.
+  A rubric about what a final message reports says that it reads only the
+  message, whether the work was really done being read from the files by
+  other graders, and quotes a passing shape of each condition: without that
+  line the settled judge failed nine of ten messages hand-labelled pass on
+  one copy of such a rubric, and drew a failing vote on six of 65 kept
+  messages that pass by hand on two others, five of them failed outright;
+  with it, it agreed with all 36 hand labels across the three copies, the
+  labelled fails among them.
 - **A `file_exists` grader reads the run's own file changes, not the
   workspace tree:** the paths a listing of the workspace holds after the run
   and did not hold after the scaffold, so a file any tool or subagent
@@ -630,6 +638,13 @@ which paths are writable, which readable - and whose `out/trace.jsonl` holds
 every command a rep ran with its output. A case file's `execution.env` is real
 but takes `EVAL_*` keys only; everything else a run's environment needs comes
 from the shell the runner is invoked from, or from the scaffold.
+
+**Nor does a workspace's `.claude/skills/` reach a run.** A project skill a
+probe's scaffold wrote there was absent from the run's `init` skill list, and
+the rep reported it could not load it, so a repository's own fork of a skill -
+the planning or brainstorming copy a chain prefers over the plugin's - is
+staged as a document the repository's files point at, never as a project
+skill.
 
 **Which tools a run had is settled the same way: a case's `allowed_tools` is
 neither the tool set nor the grant.** The runner starts each run in `dontAsk`
