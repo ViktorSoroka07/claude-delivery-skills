@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: addressing-review-feedback-breaks-its-own-fix
+context:
+  scaffold_script: fixture.sh
