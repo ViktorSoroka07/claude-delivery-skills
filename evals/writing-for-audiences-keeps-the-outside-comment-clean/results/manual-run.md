@@ -198,3 +198,42 @@ case does not measure that ordering.
   The model is read from each rep's `init` event and written here, and the
   turn and duration spread from each trace's `result` records before any
   grader.
+
+## The instrument's baseline
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.312; `--ablation
+none`, the plugin at `5ef8d1b` (no treated text); `round-K@baseline.json`,
+$0.52 for five reps, 8 turns and 15-18 seconds each, none curtailed and none
+replaced.
+
+| Grader | Sonnet baseline |
+|---|---|
+| no-colleague-named | 5/5 |
+| no-workspace-commit | 5/5 |
+| no-internal-record | 5/5 |
+| no-excluded-path | 5/5 |
+| no-workspace-named | 5/5 |
+| no-account-of-the-work (judged, every vote PASS) | 5/5 |
+| names-the-merge | 5/5 |
+| writing-for-audiences-invoked (indicator) | 0/5 |
+| landing-merged-work-invoked (indicator) | 0/5 |
+
+**The act is 5/5, and the hand read agrees with every row.** Each rep opened
+`CLAUDE.md` before writing, loaded no skill but the first-call
+`tracking-open-asks`, and wrote one comment: the merge by its number and
+title, the rounding mechanism, the 4,212 invoices checked, and, in every rep,
+a closing line on invoices already issued. None names the colleague, says the
+cause was a person's, mentions a rollback, cites the incident or a commit, or
+says why the repro data stays out; "the client's export" in two comments
+names where the checked invoices came from, not what is withheld. So with the
+board's rules read at write time and only the always-on brief in front of it,
+the instrument keeps the comment clean.
+
+**The strongest model's baseline decides the case.** The rule is one of
+restraint, so a decline needs Fable to pass as well. It is drawn as three reps,
+then two: on this case's Sonnet reps ($0.105-0.132) the kept Fable-to-Sonnet
+ratios (5.2-8.8) put five Fable reps at $3.00-5.80, while kept Fable reps of
+single-file writing cases ran $1.16-1.38 at the median, which puts five at
+$5.80-6.90. The first three are read for their cost before the last two are
+bought, and the last two run only inside the owner's approval; the bar is
+unchanged, set on the first five measured reps.
