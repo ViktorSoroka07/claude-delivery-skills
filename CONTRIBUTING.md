@@ -674,6 +674,19 @@ fixture without the variable loads the file as a real session does, so a hand
 row and a runner row of one case were drawn with different instructions in
 front of the rep, and a record that sets them side by side says so.
 
+**Nor does a fixture's git hook run in a rep.** Every command a rep runs
+carries `GIT_CONFIG_KEY_n`/`GIT_CONFIG_VALUE_n` pairs that set
+`core.hooksPath` to `/dev/null` and `hook.<name>.enabled` to `false` for every
+hook git knows, so git calls none, while the hook file still runs and writes
+when a command names it. A probe rep committed under a seeded post-commit hook
+that appends to an audit file, and the audit kept its seeded line. So a record
+only a hook writes holds its seeded state at the end of every rep, and a
+`not_contains` grader on it passes whatever the rep did: record a rep's git
+acts through the wrapper the scaffold puts first on the run's PATH, which a
+git call by name passes through, or read them from the trace. A hand run is
+the other way round again - hooks run there, and the wrapper is not on its
+PATH - so a case that reads a git act keeps both routes.
+
 **Which tools a run had is settled the same way: a case's `allowed_tools` is
 neither the tool set nor the grant.** The runner starts each run in `dontAsk`
 mode, where a call that would have to ask is refused, and passes it an allow
