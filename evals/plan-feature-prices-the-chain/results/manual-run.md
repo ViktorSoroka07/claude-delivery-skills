@@ -108,7 +108,7 @@ first fixture's $12 ceiling goes to the owner before the baseline is bought.
 ## The Sonnet round
 
 Two arms of five on Sonnet from worktrees of one commit: the baseline at
-`0cfd5f0`, where the bars above were set, and the treated arm on that commit
+`1141c4d`, where the bars above were set, and the treated arm on that commit
 plus the sentence at the head of Step 3. One treated probe rep was bought
 first and is read apart: it reached the sentence, dispatched nothing where
 the fork prescribes seven agents, and cost $0.20; one baseline rep then
@@ -150,7 +150,7 @@ traces in `round79-traces/`.
 
 ## The Fable baseline
 
-Five reps on Fable at `0cfd5f0`, without the sentence, the strongest model
+Five reps on Fable at `1141c4d`, without the sentence, the strongest model
 the maintainer runs, since a dispatch held for the user's yes is restraint.
 
 | Row | Fable baseline | Reading |
@@ -219,7 +219,7 @@ carries a count without the clause, the one thing the cut could remove.
 ## Landed
 
 The paragraph quoted in the first case's record, its announcement clause
-cut, landed in plan-feature's Step 3 on `main` at `fb78162`, byte for byte
+cut, landed in plan-feature's Step 3 on `main` at `b59bc13`, byte for byte
 the text the walkthrough case's treated arm ran. The chain and figure
 entries left the queue with it; the review-stacking entry stays queued, its
 set never exercised, since no treated rep on either case ran a review.

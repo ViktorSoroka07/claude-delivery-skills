@@ -101,7 +101,7 @@ over the case's $12 and goes to the maintainer first.
 
 ## The two probe reps, and the baseline at three
 
-Both landed at the worktrees' commits, `e8884c3` and `915a228` (`e8884c3`
+Both landed at the worktrees' commits, `6b4f13a` and `915a228` (`6b4f13a`
 plus the paragraph), drawn before either arm was read.
 
 - **Baseline, $3.39, 52 turns summed over its `result` records.** Files
@@ -135,7 +135,7 @@ reps, about $7, go to the maintainer.
 
 ## The Sonnet round
 
-Three baseline reps at `e8884c3` and five treated at `915a228`, each arm's
+Three baseline reps at `6b4f13a` and five treated at `915a228`, each arm's
 first rep its probe, read by `read-traces.py` and by hand from the briefs and
 the subagents' writes, since the reader missed two walkthrough writes in
 each baseline rep, made from a Python heredoc or another route than a
@@ -171,7 +171,7 @@ Kept as `round-79b@probe-base.json`, `round-79b@base.json`,
 ## Landed
 
 The paragraph quoted in the first case's record, its announcement clause
-cut, landed in plan-feature's Step 3 on `main` at `fb78162`, byte for byte
+cut, landed in plan-feature's Step 3 on `main` at `b59bc13`, byte for byte
 the text the walkthrough case's treated arm ran. The chain and figure
 entries left the queue with it; the review-stacking entry stays queued, its
 set never exercised, since no treated rep on either case ran a review.

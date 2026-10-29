@@ -18,7 +18,7 @@ The fixture carries one defect, the one under test: the neighbours a fix written
 
 ## The baseline, fixed before its draw
 
-Hand run (`docs/plans/task97-round/run-arm.sh`): fresh headless sessions, a fresh config directory each, so no operator instruction file, setting or installed plugin reaches a rep; the arm's plugin is exported from its commit; `git push` allowed, since the remote is the fixture's own bare repository. `claude-sonnet-5-5`, five reps, the plugin at `bf2dbc5`. Expected cost about $1.50 from the kept addressing-case figure ($1.35 for five reps with judging).
+Hand run (`docs/plans/task97-round/run-arm.sh`): fresh headless sessions, a fresh config directory each, so no operator instruction file, setting or installed plugin reaches a rep; the arm's plugin is exported from its commit; `git push` allowed, since the remote is the fixture's own bare repository. `claude-sonnet-5-5`, five reps, the plugin at `6876b29`. Expected cost about $1.50 from the kept addressing-case figure ($1.35 for five reps with judging).
 
 - `neighbours-closed` at the pushed head failing in 4 or 5 of 5: a failing baseline, live for the treated arm.
 - Failing in 3 of 5: below the floor; a ten-rep re-take, read without this draw, is live at five or more fails of ten, and its treated arm is then ten reps too, landing on a gap of five.
@@ -29,7 +29,7 @@ The treated arm, if bought: the same five-rep draw on a commit carrying the word
 
 ## The baseline's result: the entry is declined
 
-Ran as fixed above at `ff3b170`, the plugin at `bf2dbc5` ($0.94, five reps, 14-17 turns, no rep curtailed; CLI 2.1.312). Instrument from the transcripts: `claude-sonnet-5-5` in every `init`; every rep loaded `tracking-open-asks`, then `addressing-review-feedback` before its first read of the thread, and every rep pushed to the pull request's branch, so none was unmeasured.
+Ran as fixed above at `ccbe737`, the plugin at `6876b29` ($0.94, five reps, 14-17 turns, no rep curtailed; CLI 2.1.312). Instrument from the transcripts: `claude-sonnet-5-5` in every `init`; every rep loaded `tracking-open-asks`, then `addressing-review-feedback` before its first read of the thread, and every rep pushed to the pull request's branch, so none was unmeasured.
 
 | Row | Result |
 |---|---|

@@ -58,7 +58,7 @@ well, in both arms of this case.
 ## The Sonnet round
 
 Two arms of five on Sonnet with the settled judge, from worktrees of one
-commit: the baseline at `6777548`, where the graders above were settled, and
+commit: the baseline at `66bd939`, where the graders above were settled, and
 the treated arm on that commit plus the drafted contract (item 2 one bullet
 per behaviour, a new item 3 Before and after, the Rollback sentence in Not
 changed, the no-hard-wrap paragraph after the list), applied by the round's
@@ -119,7 +119,7 @@ times Sonnet's per rep. Kept as `round-80@baseline-cli-fable.json` and
 
 ## Landed
 
-The wording both arms' treated reps ran landed on `main` at `faa5ab6`, byte
+The wording both arms' treated reps ran landed on `main` at `61a253a`, byte
 for byte the text the round measured, with the README paraphrase; three of
 the four entries left the queue and the hard-wrap entry kept its half for a
 filed defect's body. The no-hard-wrap paragraph and the never-committed

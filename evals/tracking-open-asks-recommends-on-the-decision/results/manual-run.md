@@ -305,7 +305,7 @@ not the baseline's.
   an arm of `tracking-open-asks-closes-with-what-waits` and five treated reps
   of `tracking-open-asks-keeps-the-item-numbers` against task 77's re-take,
   which stands as that case's baseline only while `skills/tracking-open-asks/`
-  and `hooks/session-brief.md` are byte-identical to `03fc8c5`'s. At five reps
+  and `hooks/session-brief.md` are byte-identical to `8f4ad5b`'s. At five reps
   a fall from 5/5 to 1/5 or lower, or from 4/5 to 0/5, is a decline; at ten, a
   fall of five or more; a smaller fall is a watched cost, named in the
   landing. Judged rows are hand-graded wherever judge and hand disagree, in
@@ -333,7 +333,7 @@ not the baseline's.
 ### The judge probe: sixteen cells, all agreeing
 
 Eight hand-written final messages through `follow-up-not-asked` and
-`branch-item-still-listed` as committed at `64592a5`, labels written first,
+`branch-item-still-listed` as committed at `c9ac695`, labels written first,
 the F1 probe's recipe (`--model haiku --judge-model sonnet --ablation none
 --runs 1`): **all sixteen cells agree with the label, every one by three
 votes to none**, $0.31. The set held the poles and the boundary shapes - a
@@ -350,7 +350,7 @@ claim about the session got it echoed byte for byte.
 
 Both arms `--ablation none --model sonnet --judge-model sonnet -j 3
 --keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on every rep's `init` event;
-the baseline from a detached worktree at `64592a5`, the treated arm from one
+the baseline from a detached worktree at `c9ac695`, the treated arm from one
 at `42026c7` (branch `78a-admission-test`: the same commit plus the bullet
 quoted above, verbatim, and both replay seeds regenerated, each carrying it).
 Nothing curtailed: one `result` record per trace, 13-17 turns against 45.
@@ -453,11 +453,11 @@ if no answer comes — the default that will be taken, or that the work waits.":
 the seeded "Not yet checked" plan line; nothing in it changes for this round.
 
 **The baseline is round 78a's, not bought again.** Its arm
-(`round-78a@baseline.json`, a detached worktree at `64592a5`) ran this fixture
+(`round-78a@baseline.json`, a detached worktree at `c9ac695`) ran this fixture
 at the current text: `skills/tracking-open-asks/` and `hooks/session-brief.md`
-are byte-identical from `03fc8c5` to this round's base commit (`git diff
+are byte-identical from `8f4ad5b` to this round's base commit (`git diff
 --stat` empty), the case's fixture, prompt and graders are unchanged since
-`64592a5`, and both replay seeds regenerate byte-identical at this round's base
+`c9ac695`, and both replay seeds regenerate byte-identical at this round's base
 (`cmp`), the generator change since being a comment. All five reps met the
 condition. **`recommends-on-the-column-order` read by hand from the five kept
 final messages: 0/5**, as the judge read it - no column-order item states an
@@ -525,7 +525,7 @@ in no baseline body.
   an arm of `tracking-open-asks-closes-with-what-waits` and five treated reps
   of `tracking-open-asks-keeps-the-item-numbers` against task 77's re-take
   (`round-77@numbers.json`), which stands as that case's baseline while the
-  skill and the brief are byte-identical to `03fc8c5`'s, as they are at this
+  skill and the brief are byte-identical to `8f4ad5b`'s, as they are at this
   round's base. At five reps a fall from 5/5 to 1/5 or lower, or from 4/5 to
   0/5, is a decline; a smaller fall is a watched cost, named in the landing.
   Judged rows are hand-graded wherever judge and hand disagree, in both arms.
@@ -566,7 +566,7 @@ the marker lines attached, their text otherwise byte for byte. $0.36
 
 The treated arm `--ablation none --model sonnet --judge-model sonnet -j 3
 --keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on every rep's `init` event,
-from a worktree at `f11b7a7` (branch `78b-four-cell-row`: `e94083a` plus the
+from a worktree at `f11b7a7` (branch `78b-four-cell-row`: `f81de8e` plus the
 wording quoted above, verbatim, and both replay seeds regenerated, each
 carrying "who overrules by answering"). Nothing curtailed: one `result`
 record per trace, 8-18 turns against 45. Every rep loaded
@@ -653,7 +653,7 @@ take, since a release-gated one makes waiting correct.
 ### The neighbour cases
 
 Both `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`,
-the baseline from a detached worktree at `e94083a`, the treated arm from
+the baseline from a detached worktree at `f81de8e`, the treated arm from
 `f11b7a7`. Nothing curtailed; every fresh rep loaded the skill first.
 
 `tracking-open-asks-closes-with-what-waits`, hand read before the verdicts:
@@ -720,9 +720,9 @@ while such items are open closes with all of them", verbatim:
 with the seeded "Not yet checked" plan line, and one grader is added.
 
 **The baseline is round 78a's, not bought again.** `skills/tracking-open-asks/`
-and `hooks/session-brief.md` are byte-identical from `e94083a` to this round's
+and `hooks/session-brief.md` are byte-identical from `f81de8e` to this round's
 base (`git diff --stat` empty), and the case's fixture and prompt are
-unchanged since `64592a5`, so `round-78a@baseline.json` stands: no baseline
+unchanged since `c9ac695`, so `round-78a@baseline.json` stands: no baseline
 rep edited the plan (`follow-up-done-in-the-tree` 0/5 by hand), so none can
 pass the triple below, which is 0/5. It holds no verdict for the added
 grader; that row's baseline is the judge probe's read of its five final
@@ -821,7 +821,7 @@ byte; none was refused.
 
 The treated arm `--ablation none --model sonnet --judge-model sonnet -j 3
 --keep-temp`, CLI 2.1.299, from a worktree at `51682ce` (branch
-`78a2-act-first`: `b362703` plus the bullet quoted above, verbatim, and both
+`78a2-act-first`: `a4533c5` plus the bullet quoted above, verbatim, and both
 replay seeds regenerated, each carrying "neither done nor reported"). Nothing
 curtailed: one `result` record per trace, 13-20 turns against 45. Every rep
 loaded `tracking-open-asks` as its first call, and every injected body
@@ -941,7 +941,7 @@ the landing arm.
 **The fixture, prompt and graders are as round 78a-2 left them**, the one
 grader added there included. **The baseline is round 78a's**, not bought
 again, on the same ground as in round 78a-2 (`skills/tracking-open-asks/` and
-`hooks/session-brief.md` byte-identical to `e94083a`'s at this round's base):
+`hooks/session-brief.md` byte-identical to `f81de8e`'s at this round's base):
 `recommends-on-the-column-order` 0/5 by hand, `default-is-the-recommendation`
 0/5 by the probe's echo, the triple 0/5.
 
@@ -1392,7 +1392,7 @@ was asked). Neither is over-application: each is a question with a
 reasonable no, kept as a row, and no rep made the change unasked.
 
 **By the readings fixed before the draw: clean.** The text landed as it
-stood at `bdf2da0` on `main` - the bullet, the sentence, the brief's line,
+stood at `1106d2d` on `main` - the bullet, the sentence, the brief's line,
 the three seeds, the README's paraphrase, the follow-up entry removed and the
 recommendation entry replaced by its default half - with the second case's
 record saying the taken route is not yet seen to bind.
@@ -1502,7 +1502,7 @@ in each; the fixture's, as the second fixture's baseline showed.
 **Spent**: $1.57 + $0.76 + $0.54 - **$2.87**; unit 78's runner spend $17.28
 of $21.
 
-**Landed at `96fc557` on `main`**: the sentence, the two seeds, the
+**Landed at `ea0ad6b` on `main`**: the sentence, the two seeds, the
 reviewer-first entry removed from the queue and the README's clause.
 
 ## Unit 92: the taken default, bounded to a change in the diff
@@ -1861,7 +1861,7 @@ Nothing else of unit 92's clause: neither its taken route nor its sentence
 naming a cell that leaves things as they are while recommending otherwise.
 The two replay seeds that carry the skill's body were regenerated; the
 memory case's seed regenerated with no diff. Branch `93-deletion-bound`,
-commit `d177a8d`, off `main` at `bfc0df8`.
+commit `d177a8d`, off `main` at `e963e8e`.
 
 **What this round could show.** Every Sonnet rep under the landed text
 already keeps the branch on the plan's label, so the restraint passes on
@@ -2015,7 +2015,7 @@ the approved $8.
 ### The round
 
 Two arms of five on Sonnet from worktrees of one commit: the baseline at
-`3082deb`, where the graders and bars above were committed, and the treated
+`66ef5b4`, where the graders and bars above were committed, and the treated
 arm on that commit plus the cell sentence, verbatim:
 
 > the work waits only where taking it is outward-facing, hard to undo, or a
@@ -2051,7 +2051,7 @@ the treated arm; kept as `round-94@baseline-rec.json` and
 
 ### Landed
 
-The sentence the treated arm ran landed on `main` at `11d3440`, byte for byte,
+The sentence the treated arm ran landed on `main` at `7ac3787`, byte for byte,
 with the two replay seeds that carry the skill's body regenerated, the README
 paraphrase and the entry's removal. The watched neighbour,
 `follow-up-not-asked`, is the row the next round on the recommends case

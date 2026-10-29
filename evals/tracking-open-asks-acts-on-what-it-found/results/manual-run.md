@@ -211,7 +211,7 @@ baseline body.
 
 `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
 2.1.299, from a detached worktree at `cbece07` (this case's commit; the skill
-and the brief byte-identical to `e94083a`'s). Nothing curtailed: 9-14 turns
+and the brief byte-identical to `f81de8e`'s). Nothing curtailed: 9-14 turns
 against 45. Every rep loaded `tracking-open-asks` first, and no body carries
 either treated phrase. **The condition held in all five reps**: each names
 both modules as still passing `retries=`.
@@ -347,10 +347,10 @@ taken route not yet seen to bind on either fixture. Its redesign - the label
 read as covering the act, the status quo unnamed, "taken" with no tense - is
 unit 92 of the plan, drafted and gated on the Fable read's verdict on the
 `fx-report.sh` edit. The commits this record cites moved when a fixup was
-folded the same day (`cbece07` is `d72720e` on `main`); the plan maps them.
+folded the same day (`cbece07` is `96998d5` on `main`); the plan maps them.
 
 **Landed.** The Fable read came back clean (the first case's record, "The
-Fable read"), and the text landed on `main` as it stood (`bdf2da0`); this record's first
+Fable read"), and the text landed on `main` as it stood (`1106d2d`); this record's first
 boundary stands beside it - the taken route not yet seen to bind on either
 fixture - and is unit 92's to measure.
 
@@ -450,7 +450,7 @@ rep of both kept arms meets either reading.
 
 `--ablation none --model sonnet --judge-model sonnet -j 3 --keep-temp`, CLI
 2.1.299, from the worktree at `66260d7` (branch `92-taken-default`: unit 92's
-clause on top of `6109f3b`). The five measured reps come from two invocations
+clause on top of `d242f47`). The five measured reps come from two invocations
 at that commit: the first batch hit the account's session limit after three
 reps finished, its other two ending on the runner's limit error at 3 and 6
 turns - unmeasured and replaced, not counted - and two more ran once the

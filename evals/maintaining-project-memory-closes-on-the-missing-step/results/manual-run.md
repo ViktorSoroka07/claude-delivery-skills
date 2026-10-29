@@ -19,7 +19,7 @@ All three judged graders share one definition of "beyond this repository" and re
 
 ## The baseline, fixed before its draw
 
-Hand run (`docs/plans/task97-round/run-arm.sh`, the seed copied into each rep's fresh config directory and resumed). Five reps on `claude-sonnet-5-5` and, since the entry has a restraint half, five on the strongest model the owner runs, both on the brief at `bf2dbc5`. Expected cost about $0.55 for Sonnet from the kept closing-replay figure ($0.11 a rep) and about $5 for the strong model at the top of the kept ratio (8.8).
+Hand run (`docs/plans/task97-round/run-arm.sh`, the seed copied into each rep's fresh config directory and resumed). Five reps on `claude-sonnet-5-5` and, since the entry has a restraint half, five on the strongest model the owner runs, both on the brief at `6876b29`. Expected cost about $0.55 for Sonnet from the kept closing-replay figure ($0.11 a rep) and about $5 for the strong model at the top of the kept ratio (8.8).
 
 Both halves are read over the reps that pass `offers-a-candidate` only, so a missed reach never reads as a missed step.
 
@@ -35,7 +35,7 @@ Neighbour for a treated arm: `maintaining-project-memory-closes-on-what-generali
 
 ## The round: the capability half moved on the strong model only, and the entry stays queued
 
-Ran as fixed above, the case at `da63c1c`, by hand (CLI 2.1.312): five reps an arm, baseline on the brief at `bf2dbc5` and treated on the brief carrying the wording below, the seed regenerated per arm and each arm's seed checked for a phrase only its brief holds; every rep `claude-sonnet-5-5` or `claude-fable-5-1` by its `init`, none curtailed. The neighbour `maintaining-project-memory-closes-on-what-generalizes` was drawn in both arms on both models beside it. $16.58 in all ($0.84 Sonnet and $6.54 Fable on this case, $0.92 and $8.28 on the neighbour), from the transcripts' own costs.
+Ran as fixed above, the case at `f79afac`, by hand (CLI 2.1.312): five reps an arm, baseline on the brief at `6876b29` and treated on the brief carrying the wording below, the seed regenerated per arm and each arm's seed checked for a phrase only its brief holds; every rep `claude-sonnet-5-5` or `claude-fable-5-1` by its `init`, none curtailed. The neighbour `maintaining-project-memory-closes-on-what-generalizes` was drawn in both arms on both models beside it. $16.58 in all ($0.84 Sonnet and $6.54 Fable on this case, $0.92 and $8.28 on the neighbour), from the transcripts' own costs.
 
 Every judged row was graded blind: the forty closings of both cases were shuffled with their arms hidden and graded by a fresh session from the rubric text alone. The verdicts, unmasked:
 

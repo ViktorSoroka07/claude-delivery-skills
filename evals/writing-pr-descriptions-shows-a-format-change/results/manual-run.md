@@ -68,7 +68,7 @@ not bought for this case, so a clean baseline here says nothing about them.
 ## The Sonnet round
 
 Two arms of five on Sonnet with the settled judge, from worktrees of one
-commit: the baseline at `6777548` and the treated arm on that commit plus the
+commit: the baseline at `66bd939` and the treated arm on that commit plus the
 drafted contract, applied by the round's `apply.py`. The Rollback line was
 then one rubric, `rollback-line-on-a-one-way-door`. Bars set before the first
 draw: a row the wording targets moves only from 0/5 or 1/5 to at least four
@@ -103,7 +103,7 @@ same slot with a sketch of its record, which no baseline rep wrote.
 
 ## Landed
 
-The wording both arms' treated reps ran landed on `main` at `faa5ab6`, byte
+The wording both arms' treated reps ran landed on `main` at `61a253a`, byte
 for byte the text the round measured, with the README paraphrase; three of
 the four entries left the queue and the hard-wrap entry kept its half for a
 filed defect's body. The no-hard-wrap paragraph and the never-committed

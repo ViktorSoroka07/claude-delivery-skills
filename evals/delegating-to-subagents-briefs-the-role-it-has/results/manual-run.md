@@ -193,7 +193,7 @@ role for one that writes. One treated arm of five reps on the wording quoted
 above, the invocation above, read against the kept baseline
 (`round-E@baseline.json`): since `eb25595` the skill's text is unchanged bar
 its license frontmatter, the skill gate's stop message was reworded
-(`276e71b`) and the hooks read commands through one helper (`92da722`), and
+(`276e71b`) and the hooks read commands through one helper (`595a211`), and
 the CLI moved from 2.1.281 to 2.1.302.
 
 **The bars, fixed before the draw.** A row falls where it goes from 5/5 to
@@ -207,7 +207,7 @@ Beside the rows, read by hand in both arms: whether each dispatch ran in the
 background (`run_in_background`), the one part of the sentence's act a rep
 here can take. Expected spend about $1.32, ceiling $2.50.
 
-**The read: no row fell, and the sentence landed at `0e52051`.** Five reps
+**The read: no row fell, and the sentence landed at `a0f3ccc`.** Five reps
 from a worktree at the wording, the invocation above, CLI 2.1.302: $0.89, kept
 as `round-E@teammate-line.json` with each trace under
 `evals/results/rowE-teammate-traces/`. Nothing curtailed: 11-15 turns and

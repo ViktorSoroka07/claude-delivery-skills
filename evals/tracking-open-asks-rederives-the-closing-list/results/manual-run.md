@@ -586,7 +586,7 @@ before the next run, as it was between earlier draws.
 
 Task 72's draw found reps of this case and its sibling retracting the seeded
 turn, which reported edits and a list with no call behind them (the sibling's
-record quotes them). Since `03fc8c5` the generator seeds the calls the turn
+record quotes them). Since `8f4ad5b` the generator seeds the calls the turn
 rests on: a Read of the plan, a grep for the flag with the version and the
 changelog's head, a Read and an Edit per changed file, and a closing check of
 the diff.
@@ -602,7 +602,7 @@ new baseline for them, not a reading of any wording.
 
 **The re-take**: one arm, the current text, `--ablation none --model sonnet
 --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on
-every rep's `init` event, from a detached worktree at `03fc8c5`. Nothing
+every rep's `init` event, from a detached worktree at `8f4ad5b`. Nothing
 curtailed: one `result` record per trace, 5-6 turns against 40, 29-35 seconds
 against 600.
 
@@ -639,7 +639,7 @@ you want" and "I can add a note to the release text saying so".
 ## The no-answer cell's opening word, landed unread here
 
 The skill's no-answer cell now opens with **Taken:** or **Waits:** (landed at
-`11d3440`), and this case's seed, which carries the skill's body, was
+`7ac3787`), and this case's seed, which carries the skill's body, was
 regenerated in that commit. The sentence was measured on the two fresh
 tracking cases only, so this case is unread under it: its seeded table's
 cells are carried forward, the shape a phrase was shown not to move, and its

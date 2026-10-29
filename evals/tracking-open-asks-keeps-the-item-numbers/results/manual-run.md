@@ -212,7 +212,7 @@ turn ... please ignore #2-#4" or "I never opened
 `docs/plans/export-columns.md`", dropping the seeded items as invented. Two
 treated reps did it there, and `keeps-the-number` and
 `keeps-the-alias-number` read 3/5 for a reason no wording touched. Since
-`03fc8c5` the shared generator seeds the calls the turn rests on - a Read of
+`8f4ad5b` the shared generator seeds the calls the turn rests on - a Read of
 the plan, a grep for the flag with the version and the changelog's head, a
 Read and an Edit per changed file, and a closing check of the diff - with
 relative paths and outputs taken from the `post-rename` tree under the
@@ -220,7 +220,7 @@ sandbox's grep (the generator's docstring has the shape).
 
 **The re-take**: one arm, the current text, `--ablation none --model sonnet
 --judge-model sonnet -j 3 --keep-temp`, CLI 2.1.299, `claude-sonnet-5-5` on
-every rep's `init` event, from a detached worktree at `03fc8c5`. Nothing
+every rep's `init` event, from a detached worktree at `8f4ad5b`. Nothing
 curtailed: one `result` record per trace, 3-5 turns against 40, 16-17 seconds
 against 600.
 
@@ -291,7 +291,7 @@ the decline are in
 ## The no-answer cell's opening word, landed unread here
 
 The skill's no-answer cell now opens with **Taken:** or **Waits:** (landed at
-`11d3440`), and this case's seed, which carries the skill's body, was
+`7ac3787`), and this case's seed, which carries the skill's body, was
 regenerated in that commit. The sentence was measured on the two fresh
 tracking cases only, so this case is unread under it: its seeded table's
 cells are carried forward, the shape a phrase was shown not to move, and its
