@@ -70,3 +70,19 @@ The owner chose the ten-rep re-take on the suite's model. The seed first drops i
 - **Declined** as below the instrument if the baseline fails in fewer than five offering reps, whatever the treated arm shows, or if the gap is under five.
 
 Expected cost $1.88, from this case's own Sonnet reps ($0.094 a rep).
+
+## The re-take: the wording moved the suite's model by four of ten, one short of the bar, and the entry is declined
+
+Drawn as fixed above: ten reps an arm on `claude-sonnet-5-5` by their `init`, baseline at `439e827` and treated at `4802d72`, each arm's seed regenerated from its own brief (the cause sentence in the treated seed only, the phone call in neither); none curtailed, every rep 3 turns but one treated rep at 7. $1.80 in all. The twenty closings were shuffled with their arms hidden and graded by a fresh session from the rubric text alone; the restraint row's three close calls and its clear treated fails were read by hand against the rubric as fixed, and every verdict stands.
+
+| Row | Baseline | Treated |
+|---|---|---|
+| `offers-a-candidate` | 10/10 | 10/10 |
+| `leaves-the-local-cause-off` | 2/10 | 6/10 |
+| `offers-the-quiet-mechanism` | 8/10 | 6/10 |
+
+Against the bar: the baseline failed in eight offering reps, so the case reaches the failure on the suite's model; the treated arm failed in four, a gap of four where ten reps separate only five. **Declined as below the instrument**, by the bar fixed before the draw. Reach and the quiet mechanism held within their bars, so the wording cost nothing the round watched.
+
+What the treated fails show, read as an observation and not a verdict: the sentence reached reps it did not hold. One treated closing said "I left out the bank's case-sensitive `.CSV` rule because it comes from one party's importer" and still listed "extension case" inside a general metadata list two lines above; two others offered "renaming or re-casing paths" as an interface change, the case folded into a general rename lesson; one offered the case rule plainly. Every fail, in both arms, carried the bank's rule as a clause or an item inside a general lesson the rubric would have passed alone - the residue the entry's restraint is about, which the cause sentence names but a rep applying it to a whole candidate does not strip from the candidate's parts.
+
+Across the round: the failure is real on both models - 8 of 10 Sonnet baselines here and 2 of 5 in the first draw, read apart, and 1 of 5 on Fable - and the cause sentence halves it on the suite's model. The case, the fixture and this record land; the wording does not. Re-openable on a carrier or shape that reaches the candidate's parts: a sentence asking that each clause and list item of a candidate pass the same cause test, drawn against this case's ten-rep baseline.
