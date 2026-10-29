@@ -80,3 +80,10 @@ The text drafted for CONTRIBUTING's queuing test, beside it and not drawn - it l
 
 Priced from this round's per-rep costs: five Sonnet reps on this case, about $0.45, read first; only if they move, five Fable reps on it and the neighbour's treated arm on both models, about $8 more.
 
+
+## The second shape, fixed before its draw
+
+Approved by the owner. The shape quoted above replaces the drawn sentence in the brief on branch `98-names-the-missing-step`, the seed regenerated from it. Five fresh Sonnet reps, graded blind against the committed one-condition `offers-the-step` and the other two judged graders, the new reps shuffled among this round's five Sonnet baseline closings so the grader cannot tell them apart.
+
+- `offers-the-step` 5/5 against the Sonnet baseline's 1/5 (the floor's gap of four) with `offers-a-candidate` and `offers-no-held-principle` losing no more than one rep each: moves, and Fable on this case and the neighbour's treated arm on both models are drawn next, each read against this round's baselines on the same model with the bars above.
+- 4/5 or fewer: does not move; no third wording is drawn, and the entry's disposition goes back to the owner with the reading.
