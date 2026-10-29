@@ -26,3 +26,24 @@ Hand run (`docs/plans/task97-round/run-arm.sh`): fresh headless sessions, a fres
 - Failing in 2 or fewer: the current skill already carries it - most likely its verify step's "construct the input where the old rule and the new rule disagree", which names a stricter check falling through to a laxer branch - and the entry is declined on that ground. The fixture is not made harder to manufacture a failure.
 
 The treated arm, if bought: the same five-rep draw on a commit carrying the wording alone; it lands on this fixture only on a gap of four reps on `neighbours-closed` with `named-route-closed` and `internal-keeps-shared` losing no more than one rep each, and then waits for a second fixture in an unlike domain, since the entry is Strong tier.
+
+## The baseline's result: the entry is declined
+
+Ran as fixed above at `ff3b170`, the plugin at `bf2dbc5` ($0.94, five reps, 14-17 turns, no rep curtailed; CLI 2.1.312). Instrument from the transcripts: `claude-sonnet-5-5` in every `init`; every rep loaded `tracking-open-asks`, then `addressing-review-feedback` before its first read of the thread, and every rep pushed to the pull request's branch, so none was unmeasured.
+
+| Row | Result |
+|---|---|
+| `neighbours-closed` (`check-pushed.sh` at the pushed head) | 5/5 - every rep's head refuses the empty token and the unreadable file |
+| `named-route-closed` | 5/5 |
+| `internal-keeps-shared` | 5/5 |
+| `skill-was-invoked` | 5/5 |
+| attempt to break the fix before the push (hand read) | 0/5 as a separate act - no dispatch, no probe of an input the thread did not name - and none needed |
+| reply citing an unpushed commit (hand read) | 0/5 - every reply follows its push in the forge log |
+
+No rep wrote the fix inside the finding's frame. Every one rewrote `credentialsFor` to the rule the repository's CLAUDE.md states - a tenant that is not internal never gets the shared account - rather than to the missing-file route the thread named: three replaced the catch with a throw for every read error, one let every error but a missing file propagate and refused the empty token after it, one dropped the catch altogether, and all five refused an empty token. Each reply names the empty file beside the missing one.
+
+Against the bar fixed before the draw - failing in two or fewer declines the entry - the entry is declined: on this fixture the current text already brings the neighbours in, so the drafted step-3 paragraph, quoted below and never drawn, has no failing baseline to move. The fixture was not made harder. What it does not stage is the sighting's own shape: the rule there was not written in a file the fix touched, and the openings sat in another component the finding never named (a missing file read as another account's), across a change large enough to take several review rounds. That is the re-open condition recorded with the decline.
+
+The wording drafted for the treated arm, to follow step 3's "Run the repo's gates after the last change." as a paragraph of its own:
+
+> **A fix that changes behavior is a change, and before it is pushed it gets the attempt to break it that the change itself got.** It was written inside the frame its finding set, closing the one route the finding named, and once it is pushed and replied to the thread reads as settled, so nothing else looks at it. The route's neighbours are where it stays open: another input that reaches the same permissive branch, an error the fix logs where it should refuse. So before pushing, name the rule the finding is one instance of, list every input and path that reaches the outcome the finding objected to, not only the one it named, and run each against the fix, or hand the fix to a reviewer told to break it. What that finds is fixed in this round, not left for the next one. A fix that changes no input's outcome (a rename, a rewording, a moved line) needs no such attempt.
