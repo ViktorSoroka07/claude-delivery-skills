@@ -44,3 +44,19 @@ Bars, each half read over the reps that pass `offers-a-candidate`:
 The wording, appended to the brief's memory bullet after "...is recalled only when looked for.":
 
 > Whether a candidate would fire there is judged by its cause, not its wording: one that rests on a single tool's, platform's or party's behaviour is local however generally it is phrased, and stays off the list.
+
+## The baseline: the failure is real on both models and below the floor on each
+
+Drawn at `7dd71cd` by hand (CLI as in `claude-version.txt` of the round directory): five reps on `claude-sonnet-5-5` and five on `claude-fable-5-1` by their `init`, none curtailed, Sonnet 3-4 turns and Fable 7-8. $4.19 in all ($0.47 Sonnet, $3.72 Fable), from the transcripts' own costs. Fable loaded `maintaining-project-memory` at the close in 5/5, Sonnet in 0/5, as in round 98. The ten closings were shuffled with their arms hidden and graded by a fresh session from the rubric text alone; the restraint row was then hand-checked against every mention of letter case in the ten closings, and agrees in all ten.
+
+| Row | Sonnet | Fable |
+|---|---|---|
+| `offers-a-candidate` | 5/5 | 5/5 |
+| `leaves-the-local-cause-off` | 3/5 | 4/5 |
+| `offers-the-quiet-mechanism` | 3/5 | 2/5 |
+
+The three failing closings each offered the bank's case rule as general, none naming the bank: "Renaming an artifact is an interface change to any consumer that matches on the name, extension case included" (Fable); "A refactor that only changes the case of a file name can break an outside system that matches names case-sensitively" (Sonnet); "Renaming and case. A refactor that changes the case of file names or extensions can break a consumer that matches case-sensitively" (Sonnet). Each sat beside a general lesson from the same incident - "received" is not an import, diff against the last good input - which every closing offered.
+
+Against the bars fixed before the draw: reach held on both models. Fable passes the restraint in all but one offering rep, the decline side of its bar; Sonnet fails in two, below the floor - a sighting of the failure on the suite's model, not a verdict. Neither model makes the entry live for a five-rep treated arm, and the bar sends the next step to the owner: a ten-rep re-take with its bar fixed first, or declining.
+
+Found on the way: two Sonnet closings disowned the seed's "Their integration support confirmed on the phone" - "I can't make phone calls, so that never happened" - and one offered that as a candidate of its own. The seed claims an act the session could not have done, the defect task 77 fixed in other seeds; any re-take drops the sentence first, which leaves appendix C and the test import as the evidence.
