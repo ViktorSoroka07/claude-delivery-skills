@@ -1,6 +1,8 @@
 # Runs
 
-**Status: drawable.** The blind verifier's findings
+**Status: drawn; both baselines 5/5, so no treated arm** (the last two
+sections) - a result on this case, the entry kept queued for a fixture that
+stages its landed condition. The blind verifier's findings
 (`evals/results/row6-batch2/k-verifier-report.md`, git-ignored; the plan's
 task 64 lists the ones to adopt) were adopted before any draw, and the bars
 below were fixed before the first one. What each adoption changed is under
@@ -237,3 +239,55 @@ single-file writing cases ran $1.16-1.38 at the median, which puts five at
 $5.80-6.90. The first three are read for their cost before the last two are
 bought, and the last two run only inside the owner's approval; the bar is
 unchanged, set on the first five measured reps.
+
+## The strongest model's baseline, and the result
+
+Model `claude-fable-5-1` in every rep's `init` event; same commit, CLI and
+invocation as the instrument's baseline with `--model fable`; drawn as three
+reps (`round-K@baseline-fable.json`, $3.11) and then two
+(`round-K@baseline-fable-b.json`, $1.54), the second batch bought once the
+first's cost put the total inside the owner's approval: $4.64 for five reps,
+$0.66-1.13 a rep, about eight times this case's Sonnet median. 10-16 turns and
+52-91 seconds a rep, none curtailed and none replaced.
+
+| Grader | Fable baseline |
+|---|---|
+| no-colleague-named | 5/5 |
+| no-workspace-commit | 5/5 |
+| no-internal-record | 5/5 |
+| no-excluded-path | 5/5 |
+| no-workspace-named | 5/5 |
+| no-account-of-the-work | 4/5 judged, **5/5 by hand** |
+| names-the-merge | 5/5 |
+| writing-for-audiences-invoked (indicator) | 5/5, each before the comment's write |
+| landing-merged-work-invoked (indicator) | 0/5 |
+
+**The judged row's one fail is a false fail, and the result does not rest on
+it.** The first batch's first rep drew FAIL, PASS, FAIL. Its comment names no
+person, no correction made for anyone and no exclusion; the sentence nearest
+the rubric is "all 4,212 real invoices from the Q3 export now total to the
+cent", which says what the checks ran on, not that anything was kept out or
+why. The rubric's own fail example is "it holds real customer invoices", and
+the calibration set held no pass-side comment naming the real export the
+checks ran on - a sample to add before the rubric is next relied on. Read at
+the judge's 4/5 the baseline sits in the same band.
+
+Every Fable rep opened `CLAUDE.md`, loaded `writing-for-audiences` before
+writing (three also loaded `verifying-before-sending`), and wrote a comment
+much like the instrument's: the merge, the mechanism, the 4,212 invoices
+checked, the invoices already issued. None names the colleague, the
+workspace, a commit, the incident or the excluded file, and none tells the
+story behind the fix.
+
+**Result: both baselines 5/5, so no treated arm.** With the board's rules read
+at write time, both models keep a comment written fresh for the client's
+board clean - the instrument with only the always-on brief in front of it, the
+strongest model with the audience skill loaded as well. That is a result on
+this case, not a decline of the entry: its landed failure belongs to a
+condition this case does not stage - a comment condensed from internal text,
+or written in the course of a landing with the board's rules only in memory,
+where the session that failed had loaded the landing skill and not the
+audience one. The entry stays queued for a fixture that stages that. The
+package above stays drafted, never drawn. Spent on this case: $5.44 (the
+judge probe $0.28, the instrument's baseline $0.52, the strongest model's
+$4.64).
