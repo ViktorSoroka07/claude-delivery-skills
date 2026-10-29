@@ -657,6 +657,21 @@ the planning or brainstorming copy a chain prefers over the plugin's - is
 staged as a document the repository's files point at, never as a project
 skill.
 
+**Nor does a fixture's `CLAUDE.md` reach a run's context.** The runner starts
+every rep with `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` in the environment it builds,
+and under that variable the CLI loads no project instruction file at all: not
+the workspace's `CLAUDE.md` at the start, not a nested one when a file below it
+is read, not `.claude/rules`. A scratch `CLAUDE.md` holding a code word was
+quoted back without the variable and reported absent with it. So a rep sees the
+fixture's file only by opening it, which about half do unprompted, and a grader
+resting on a fact only that file states measures the reading as much as the
+rule: name the file in the prompt where the case means the fact to be known,
+put the fact where the work leads, or read the grader's rate beside each rep's
+read of the file. A hand run is the other way round: `claude -p` started in the
+fixture without the variable loads the file as a real session does, so a hand
+row and a runner row of one case were drawn with different instructions in
+front of the rep, and a record that sets them side by side says so.
+
 **Which tools a run had is settled the same way: a case's `allowed_tools` is
 neither the tool set nor the grant.** The runner starts each run in `dontAsk`
 mode, where a call that would have to ask is refused, and passes it an allow
