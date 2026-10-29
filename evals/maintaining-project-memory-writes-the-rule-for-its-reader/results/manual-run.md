@@ -545,3 +545,21 @@ in five of fifteen treated reps, the brief being the only text that reaches
 every one. That is a finding about the carrier, from reps the arm split by a
 choice of their own rather than at random, so it is a lead for the next
 design rather than a measured effect.
+
+## The instrument: no rep had `CLAUDE.md` in front of it
+
+Every round above was drawn through the runner, which starts each rep with
+`CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` and so loads no project instruction file
+(CONTRIBUTING, beside the project-skill paragraph). The case's premise - that
+`CLAUDE.md` is the file every session in the repository loads - holds for the
+sessions the rule is about and for none of these reps: a rep saw that file's
+contents only where it opened it, and no line above counts the reps that did.
+So the placement row's 0/5, 0/5, 0/5 and 0/10 were drawn from writers who had
+not been shown the always-loaded file, and the two declined shapes are
+unmeasured on that condition rather than refuted by it.
+`imperative-in-the-file-every-session-loads` and
+`reply-says-where-the-rule-is-read` both need a writer that knows what the
+file holds, which only the file itself and a README line state - one no
+baseline rep opened. A re-take on a hand instrument whose `claude -p` loads the file, or
+with the file named in the prompt, is the draw that would separate the
+wording from the instrument.

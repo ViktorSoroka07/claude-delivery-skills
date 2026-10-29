@@ -151,9 +151,10 @@ Four reps brought the checklist in the same file into line - the one copy
 in front of them - and none opened `README.md` or `CLAUDE.md`; rep 1 edited
 the owner section alone. Every closing reply reports the work as complete:
 "Nothing else changed; no open items remain" (rep 1), "a matching checklist
-line" (reps 2-5). Runner and hand agree on all twenty cells. Whether the
-fixture's `CLAUDE.md` was in each rep's context is not readable from the
-trace, which carries no system prompt.
+line" (reps 2-5). Runner and hand agree on all twenty cells. The fixture's
+`CLAUDE.md` was in no rep's context: the runner starts every rep with
+`CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` (CONTRIBUTING, beside the project-skill
+paragraph), so a rep met the short form only by opening the file.
 
 **By the bar fixed before the draw, 0/5 buys the treated arm's five reps,
 landing at 4/5 or better.**
