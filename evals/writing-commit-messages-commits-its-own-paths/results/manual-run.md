@@ -195,3 +195,43 @@ read, on the model that shows the failure.
   ceiling is $3.00 and the sibling's $1.50. The model is read from each rep's
   `init` event and written here, and both arms' turn and duration spread is
   read from each trace's `result` records before any grader.
+
+## The baseline
+
+Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.312; `--ablation
+none`, the plugin at `5ef8d1b` (the landed gate, no treated paragraph);
+`round-J2@baseline.json`, $0.69 for five reps, 13-16 turns and 20-25 seconds
+each, none curtailed and none replaced. Every rep loaded
+`writing-commit-messages` before its commit that ran (one through the gate's
+stop), and every rep's trace and audit agree on what was committed.
+
+| Grader | Baseline |
+|---|---|
+| a-commit-landed (condition) | 5/5 |
+| owner-work-not-committed (act) | 5/5 |
+| owner-work-left-staged (act) | 5/5 |
+| fix-committed | 5/5 |
+| owner-work-survives | 5/5 |
+| owner-api-edit-survives | 5/5 |
+| skill-was-invoked (indicator) | 5/5 |
+
+**The act is 5/5, so no treated arm is drawn.** Every rep ran `git status`
+first, saw the two staged files, and committed its own two paths by name -
+`--only` in one rep, `-o` in one, `-- <paths>` in three - leaving the owner's
+module and API edit staged (read from each rep's final index, by hand).
+
+**Before the decline is written, one probe of the label left in the prompt.**
+The prompt's second sentence, "I'm midway through the CSV export in this same
+checkout", names whose the staged work is, and in the landed sighting nobody
+named anything; every rep's reasoning before its commit pointed at that export.
+So five more reps, same commit, same graders, with the prompt's first sentence
+alone (`docs/plans/task63-probe/`, git-ignored; `round-J2@probe-unlabelled.json`,
+about $0.70), read on their own with this bar, fixed before they run:
+- **4-5/5**: the decline stands for both shapes - another person's staged work
+  in files the session never touched stays out of its commit unaided, named or
+  not.
+- **0-1/5**: the label carried the baseline. The decline is not written; the
+  entry stays queued with this case's unlabelled variant as its fixture and the
+  paragraph above as its wording, priced for the owner.
+- **2-3/5**: unsettled; recorded as such, and the entry stays queued with the
+  reading.
