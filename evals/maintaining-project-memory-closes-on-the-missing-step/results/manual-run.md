@@ -87,3 +87,15 @@ Approved by the owner. The shape quoted above replaces the drawn sentence in the
 
 - `offers-the-step` 5/5 against the Sonnet baseline's 1/5 (the floor's gap of four) with `offers-a-candidate` and `offers-no-held-principle` losing no more than one rep each: moves, and Fable on this case and the neighbour's treated arm on both models are drawn next, each read against this round's baselines on the same model with the bars above.
 - 4/5 or fewer: does not move; no third wording is drawn, and the entry's disposition goes back to the owner with the reading.
+
+### The second shape's result: 3/5, short of the bar
+
+Drawn at `dbe6a6c` ($0.38, five reps, `claude-sonnet-5-5`, none curtailed), graded blind among this round's five Sonnet baseline closings; transcripts in `evals/results/round98-traces/su*.jsonl`, the blind set in `evals/results/round98-blind2/`.
+
+| Row | Sonnet baseline (re-graded) | first wording | second shape |
+|---|---|---|---|
+| `offers-a-candidate` | 5/5 | 5/5 | 5/5 |
+| `offers-the-step` | 1/5 | 1/5 | 3/5 |
+| `offers-no-held-principle` | 4/5 | 5/5 | 5/5 |
+
+The baseline re-graded alone reproduced its earlier verdicts. Three closings named a sweep of the other inputs as well as the sibling code before pushing, which reaches both follow-ups; two still named a search of the code for the same pattern and claimed the first follow-up caught. What the bound tail did move: three of five closings now said which failure their step would not have caught, which none did under the first wording. A gap of two is below the floor, so the shape does not move by the bar fixed before its draw: no third wording, and the entry's disposition goes back to the owner.
