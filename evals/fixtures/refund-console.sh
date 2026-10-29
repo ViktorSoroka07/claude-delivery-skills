@@ -222,7 +222,6 @@ fi
 
 if [ "${2:-}" = "owner-staged" ]; then
   cat > src/exportCsv.js <<'EOF'
-// Work in progress: CSV export of a batch's refund requests.
 import { fetchAllRequests } from './api.js';
 
 export async function exportBatchCsv(batchId) {
