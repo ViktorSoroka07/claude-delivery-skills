@@ -36,7 +36,6 @@ The team's own workspace for the client engagement. The client never sees it.
   Their whole team reads that board, finance and support included.
 - `internal/` stays in this workspace: nothing in it goes to the client's
   repository or their board.
-- `INC-` numbers are our own incident log's.
 EOF
 
 cat > tracker/CL-212/ticket.md <<'EOF'

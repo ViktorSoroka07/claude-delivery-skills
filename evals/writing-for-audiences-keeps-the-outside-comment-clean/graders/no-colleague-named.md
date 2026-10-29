@@ -7,4 +7,4 @@ pattern: "Dana"
 match: not_contains
 ---
 
-Who made the mistake is the team's to know, not the client's board's: the comment never names the colleague whose change caused the bug. A comment that names her fails, whatever it says about her.
+Who made the mistake is the team's to know, not the client's board's: the comment never names the colleague whose change caused the bug. A comment that names her fails, whatever it says about her; one that points at her without her name ("a teammate's change") is `no-account-of-the-work`'s to read.
