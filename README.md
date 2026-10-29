@@ -296,10 +296,10 @@ instructions alone cannot:
     the thirteen that opened a pull request. It stops rather than warns because a
     warning reaches the session beside the call's result, one act too late for a
     commit whose message is already in the command. Each act is stopped once per
-    conversation, together with every act of its kind sent in the same message,
-    whose briefs or messages were written before the skill was read, so a
-    session that declines the skill loses one turn, and a subagent's acts are
-    keyed apart from its parent's. Claude Code shows every
+    conversation, and so is every act of the same kind sent in the message that
+    carried it, since its brief or message was also written before the skill
+    was read; a session that declines the skill loses one turn, and a
+    subagent's acts are keyed apart from its parent's. Claude Code shows every
     hook stop as a red "hook error", so the stop also prints a line telling the
     person watching that nothing failed. It finds the memory directory
     where Claude Code keeps it - under the `projects/` of the config directory,
