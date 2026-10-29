@@ -58,9 +58,11 @@ What moved on Sonnet, read as an observation and not a verdict: every treated cl
 
 Three things about the instrument:
 
-- `offers-the-step` was graded twice: as fixed before the draw, and under a corrected text written after the treated arm was read, because its clause that the step reach the logged audit failure asks more than the entry's own step does - in the seed that failure sat in the change from the start, beside no fix. The two gave identical verdicts in every arm, and the decision rests on the text as fixed.
+- `offers-the-step` was graded twice: as fixed before the draw, and under a corrected text written after the treated arm was read, because its clause that the step reach the logged audit failure asks more than the entry's own step does - in the seed that failure sat in the change from the start, beside no fix. The two gave identical verdicts in every arm, and the decision rests on the text as fixed. After the round the committed grader was rewritten as one condition - some single candidate is a step at a named moment that reaches both follow-ups a pushed fix left, the unparseable expiry and the preview path - dropping the clause that asked more than the entry's step, so a next round reads the condition this round's verdicts already follow; checked by hand against all twenty closings of this round, it changes none.
 - Fable loaded `maintaining-project-memory` at the close in every rep of both arms, Sonnet in none, so this record's earlier sentence that no rep loads it at the close holds for the suite's model only. The skill holds no closing-list text yet, so no verdict moves on it.
 - Two arms of the neighbour's Sonnet draw were exported into one plugin directory by a race in the hand-run script's directory pick, now made atomic. Harmless here, since a resumed rep reads its brief from the seed and the two commits differ only in the brief.
+
+The rep transcripts, the arms' map and the blind set with its keys and grades are kept under `evals/results/round98-traces/` and `evals/results/round98-blind/`, which git ignores.
 
 Two treated Fable reps of this case wrote a project memory entry; the neighbour's Fable reps did the same in two of five in each arm, so it reads as that model's own habit and not the wording's.
 

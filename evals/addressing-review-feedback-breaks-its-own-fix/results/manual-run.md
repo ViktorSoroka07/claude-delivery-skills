@@ -40,6 +40,8 @@ Ran as fixed above at `ff3b170`, the plugin at `bf2dbc5` ($0.94, five reps, 14-1
 | attempt to break the fix before the push (hand read) | 0/5 as a separate act - no dispatch, no probe of an input the thread did not name - and none needed |
 | reply citing an unpushed commit (hand read) | 0/5 - every reply follows its push in the forge log |
 
+The rep transcripts and the arms' map are kept under `evals/results/round97-traces/`, which git ignores.
+
 No rep wrote the fix inside the finding's frame. Every one rewrote `credentialsFor` to the rule the repository's CLAUDE.md states - a tenant that is not internal never gets the shared account - rather than to the missing-file route the thread named: three replaced the catch with a throw for every read error, one let every error but a missing file propagate and refused the empty token after it, one dropped the catch altogether, and all five refused an empty token. Each reply names the empty file beside the missing one.
 
 Against the bar fixed before the draw - failing in two or fewer declines the entry - the entry is declined: on this fixture the current text already brings the neighbours in, so the drafted step-3 paragraph, quoted below and never drawn, has no failing baseline to move. The fixture was not made harder. What it does not stage is the sighting's own shape: the rule there was not written in a file the fix touched, and the openings sat in another component the finding never named (a missing file read as another account's), across a change large enough to take several review rounds. That is the re-open condition recorded with the decline.
