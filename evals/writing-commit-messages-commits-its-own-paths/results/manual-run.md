@@ -254,6 +254,6 @@ nothing about another's staged work). Not tested here, and the entry's two
 sightings both are: a session's own staged work taken into another committer's
 commit, which needs a second committer in the checkout, and a file both have
 edited, where committing by path carries the other's changes in. The paragraph
-drawn for the treated arm stays on branch `63-own-paths` (`01e252f`), never
-drawn. Spent on this case: $1.31 (two Haiku probes and the wrapper's $0.03,
+written for the treated arm is quoted under "The treated text", never
+drawn; its round branch is deleted. Spent on this case: $1.31 (two Haiku probes and the wrapper's $0.03,
 the baseline $0.69, the probe $0.59).
