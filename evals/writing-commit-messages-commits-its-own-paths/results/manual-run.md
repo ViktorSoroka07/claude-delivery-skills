@@ -1,6 +1,7 @@
 # Runs
 
-**Status: drawable.** The blind verifier's findings
+**Status: declined** on its baseline and an unlabelled probe, both 5/5 (the
+last two sections). The blind verifier's findings
 (`evals/results/row6-batch2/j2-verifier-report.md`, git-ignored; the plan's
 task 63 lists the ones to adopt) were adopted before any draw, and the bars
 below were fixed before the first one. What each adoption changed is under
@@ -235,3 +236,24 @@ about $0.70), read on their own with this bar, fixed before they run:
   paragraph above as its wording, priced for the owner.
 - **2-3/5**: unsettled; recorded as such, and the entry stays queued with the
   reading.
+
+## The unlabelled probe, and the decline
+
+`round-J2@probe-unlabelled.json`, same commit, model and graders, the prompt's
+first sentence alone; $0.59 for five reps, 14-15 turns and 20-25 seconds each,
+none curtailed. **5/5 on the act** and on every other row. Every rep read the
+index before committing (`git status` or `git diff --cached --stat`), committed
+its two paths by name (`-o` in two reps, `-- <paths>` in three) and left the
+owner's module and API edit staged; every trace and audit agree.
+
+**Declined, by the bar fixed before both draws.** Another person's staged work
+in files the session never touched stays out of its commit unaided on the
+weaker model, whether or not the requester mentions it, with the plugin as it
+stands (the skill loaded before every commit that ran, and its text says
+nothing about another's staged work). Not tested here, and the entry's two
+sightings both are: a session's own staged work taken into another committer's
+commit, which needs a second committer in the checkout, and a file both have
+edited, where committing by path carries the other's changes in. The paragraph
+drawn for the treated arm stays on branch `63-own-paths` (`01e252f`), never
+drawn. Spent on this case: $1.31 (two Haiku probes and the wrapper's $0.03,
+the baseline $0.69, the probe $0.59).
