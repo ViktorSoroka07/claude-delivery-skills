@@ -55,6 +55,8 @@ A child's question for the requester reaches them through the coordinator's open
 
 A child whose deliverable has landed, or whose work has moved to a successor, is finished, and a finished session left open costs twice: its process and checkout stay allocated, and its branch stays checked out where the next owner cannot take it. The coordinator closes them, not the requester: at every boundary it names each session it started with its state — working, idle with work left, finished — and archives the finished ones, asking first where the harness asks and taking a refusal to the requester with the session named. The sweep is the coordinator's own step at the end of each landed piece, not a list handed over; a requester who has to read the session list and archive by hand is doing the coordinator's job (learned from real coordination work, where the requester did exactly that). `budgeting-agentic-work`'s "stop what you started" is the same rule for compute; this is its form for sessions.
 
+The boundary that is missed is the hand-over itself: a successor starts, and the predecessor it replaces stays open because "at each boundary" did not read as "now". So the two are one step, in this order: read the predecessor's note into the successor's brief, start the successor, archive the predecessor, confirm the successor and its folder are untouched. A worry that the two share a folder is checked before the archive, not a reason to leave the predecessor open (learned when a coordinator that had just written this rule started a successor and left its predecessor for the requester to notice).
+
 ## Where the harness gives you less
 
 The rules above name moves, not tools, because harnesses differ in what a session can do to another. Three moves depend on the harness, and each has a fallback that keeps the rule:
@@ -78,3 +80,4 @@ Messages between sessions on one machine exist in most harnesses, and a session 
 | "The requester told the child; the child will tell me"       | Only in a report you may not read in time. Ask, and tell the child what you heard |
 | "Both sessions can share the branch for a bit"               | Two heads, one loses. One writer at a time                                    |
 | "The requester can archive the finished ones"               | Closing what you started is yours. Sweep at each boundary, and ask where the harness asks |
+| "I'll archive the predecessor once the successor settles"    | The start is the boundary. Start, archive, confirm, as one step              |
