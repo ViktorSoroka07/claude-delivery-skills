@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->nineteen skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -42,6 +42,7 @@ after this one explains *why* each exists; this table only answers *when*.
 | review feedback has arrived on your own pull request or merge request — from a person, a review bot, or a scanner — and it needs working through — "address the comments", "go through the review", "check the bot threads", "reply to the reviewers", "resolve the threads"; and, when asked to, re-checking threads already marked resolved — "check the resolved threads too", "re-check the resolved ones before we merge". | [`addressing-review-feedback`](skills/addressing-review-feedback/SKILL.md) |
 | filing a defect, a data point or an improvement request into a system another team owns — a shared pipeline, a platform, an internal tool, a library — that they did not ask you to review; and when reviewing such a report before it is sent. | [`reporting-defects-upstream`](skills/reporting-defects-upstream/SKILL.md) |
 | handing work to subagents — writing dispatch briefs, partitioning parallel edits across agents, deciding whether a silent agent is stuck — and whenever anything a subagent produced is about to be used — an identifier wired into code, a diff committed, a finding acted on, a "done" accepted. | [`delegating-to-subagents`](skills/delegating-to-subagents/SKILL.md) |
+| one session runs other long-lived sessions that each own a deliverable — a branch, a pull request, a measurement — forwarding the requester's rulings to them, taking their reports, pacing their context windows and handing their work to successors; and whenever such a session reports done, asks to hand off, or asks a question only the requester can answer. | [`coordinating-sessions`](skills/coordinating-sessions/SKILL.md) |
 | a runbook, hand-off, message, comment, instruction or spec that someone else will act on is about to reach them or already waits for them - the on-call engineer who works from a document tonight, a teammate who acts on a message, a reviewer reading a comment on their PR or work item, another engineer building against instructions, a future session obeying skill or agent text, another team reading a spec or wiki - and the question is whether anything in it is wrong or would trip its reader; and earlier, before drafting such text at all. | [`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) |
 | writing prose a specific person or audience will read, act on, or hear — a report, a deck or speech, teaching material, an explanation, a message — and when a reader signals they did not understand ("what is this number of?", "explain it in simpler terms", "I don't get what you mean"). | [`writing-for-audiences`](skills/writing-for-audiences/SKILL.md) |
 | writing or editing code and a comment is about to be added — new modules, bug-fix rounds, review-fix rounds, test files — and when auditing a diff's comments (your own or a delegate's) before commit. | [`writing-code-comments`](skills/writing-code-comments/SKILL.md) |
@@ -159,6 +160,17 @@ together and split the work: one asks *are the claims true?*, the other *does th
 prose fit the reader?*
 
 ![The send moment as two axes: verifying-before-sending owns whether the claims are true, writing-for-audiences owns whether the prose fits the reader; only text in the corner that is both true and fits leaves the workspace, and the other three corners name the failure each skill catches](assets/diagrams/send-moment.svg)
+
+**[`coordinating-sessions`](skills/coordinating-sessions/SKILL.md) — a session you start is a peer that outlives your turn, not a subagent.**
+Real incidents: a child about to build the requester's opening ask rather than the design
+settled after it; two sessions writing one branch; a build run on a larger model than the one
+named for it because no model was passed; a child asking for a successor at a third of its
+window; a "ready" reported over a head that had not moved. The skill governs what only a
+long-lived peer has — the settled design as the brief, rulings forwarded in the requester's
+words on both channels, reports checked against the branch, one writer per branch, windows
+read from the harness's measure, hand-overs through a shared note, denials surfaced rather
+than routed around — and says what to do where the harness cannot start, read or measure
+another session.
 
 **[`verifying-before-sending`](skills/verifying-before-sending/SKILL.md) — text that reads fine and is wrong.**
 A blind pass once corrected four claims in a document that had already passed
