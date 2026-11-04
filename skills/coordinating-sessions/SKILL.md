@@ -57,6 +57,8 @@ A child whose deliverable has landed, or whose work has moved to a successor, is
 
 The boundary that is missed is the hand-over itself: a successor starts, and the predecessor it replaces stays open because "at each boundary" did not read as "now". So the two are one step, in this order: read the predecessor's note into the successor's brief, start the successor, archive the predecessor, confirm the successor and its folder are untouched. A worry that the two share a folder is checked before the archive, not a reason to leave the predecessor open (learned when a coordinator that had just written this rule started a successor and left its predecessor for the requester to notice).
 
+A pause is a boundary too. When the coordination stops for longer than the model's cache keeps a conversation warm — overnight, or until a reviewer answers — an idle child left open for "when it is needed" is the dearest way to keep it: waking it writes its whole window back into the cache before it reads a word, and the prompt that needed it may be about something else by then. At such a pause the coordinator archives every child, its own successor included, and keeps the notes: a fresh session primed from a note costs less than a cold wake, and starts on the question actually asked (learned from real coordination work, where the requester asked for exactly this rather than wake a held session).
+
 ## Where the harness gives you less
 
 The rules above name moves, not tools, because harnesses differ in what a session can do to another. Three moves depend on the harness, and each has a fallback that keeps the rule:
@@ -81,3 +83,4 @@ Messages between sessions on one machine exist in most harnesses, and a session 
 | "Both sessions can share the branch for a bit"               | Two heads, one loses. One writer at a time                                    |
 | "The requester can archive the finished ones"               | Closing what you started is yours. Sweep at each boundary, and ask where the harness asks |
 | "I'll archive the predecessor once the successor settles"    | The start is the boundary. Start, archive, confirm, as one step              |
+| "Keep it open in case the reviewer answers tonight"          | A cold wake reloads the whole window. Archive at the pause, prime a fresh one from the note |
