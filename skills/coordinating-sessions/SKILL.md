@@ -17,6 +17,10 @@ Every rule below was paid for in real coordination work: a child about to build 
 
 The requester's first message names a problem; the design is what the conversation makes of it afterwards. A child started from the opening ask builds the wrong thing with great care. Its brief is the design as last settled, in your own words, with the paths not taken and why, and the figures a judgement rests on. When the design changes after the child has started, the change reaches the child before it is next asked for anything, and the brief it would hand a successor changes with it.
 
+## The coordinator's hands stay off the branches
+
+A coordinator runs on the dearest model with the longest context, and every tool call it makes re-reads that whole context; a child starts small, on the model the work needs. So the coordinator writes no code, resolves no conflict and runs no gate on a branch: it reads a branch's state, verifies a child's claim against it, briefs and relays. Three things make it pick the work up itself, and all three are wrong. The requester hands it the next step in the second person ("you can just sync the branch"), which asks for the outcome, not for the coordinator's own hands. The piece reads as one command, and a merge with conflicts, the test run after it and the push are never one command. And each step after the first reads as a small continuation of the last, so no step is the one at which it stops to brief a child. The test comes before the first tool call that would change a branch: would the brief for this piece fit in a paragraph? Then write that paragraph and start the child with it. A piece that has already grown under the coordinator's hands is handed over at the next boundary, a commit landed or a push made, with what it holds, never carried on because it is nearly done (learned when a coordinator asked only to coordinate did two merges, a conflict resolution, the redrawing of a settings card and a screenshot bed itself, each step the obvious next one, until the requester asked why nothing had been delegated).
+
 ## Rulings travel in the requester's words, and both channels hear them
 
 A ruling forwarded as a paraphrase is a ruling re-decided by the forwarder. Send the requester's sentence, in order with the other rulings that bear on the same work, and say which question each answered. Then confirm it arrived by reading the child's transcript for the sentence; do not wait for an acknowledgement that may never come.
@@ -80,6 +84,8 @@ Messages between sessions on one machine exist in most harnesses, and a session 
 | "The default model is fine"                                  | The default is yours. Pass the one named                                      |
 | "I'll file it, since the child was denied"                   | That launders a denial. Surface it                                            |
 | "The requester told the child; the child will tell me"       | Only in a report you may not read in time. Ask, and tell the child what you heard |
+| "The requester said I can just do this one"                  | A request for the outcome. Brief a child with the paragraph you would otherwise reason through |
+| "It's one merge, nearly done, I'll finish it"                 | Each step reads as the last. Hand over at the next landed commit or push       |
 | "Both sessions can share the branch for a bit"               | Two heads, one loses. One writer at a time                                    |
 | "The requester can archive the finished ones"               | Closing what you started is yours. Sweep at each boundary, and ask where the harness asks |
 | "I'll archive the predecessor once the successor settles"    | The start is the boundary. Start, archive, confirm, as one step              |
