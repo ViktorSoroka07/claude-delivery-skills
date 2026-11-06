@@ -297,11 +297,11 @@ instructions alone cannot:
     branch, a merge through any of the three forge CLIs or a local merge from the
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
-  - **Hard-wrapped body** — reads a pull request body the moment a create or edit
-    command sends it, from a body file, a substitution over one, a heredoc or a
-    quoted literal, and warns on a line break mid-sentence, because the forge
-    renders every newline inside a paragraph as a break and the paragraph arrives
-    chopped; backs `writing-pr-descriptions`.
+  - **Hard-wrapped body** — reads a pull request or issue body, or a comment on
+    either, the moment the command sends it, from a body file, a substitution over
+    one, a heredoc or a quoted literal, and warns on a line break mid-sentence,
+    because the forge renders every newline inside a paragraph as a break and the
+    paragraph arrives chopped; backs `writing-pr-descriptions`.
   - **Commit-body reference** — in a repository whose messages commitlint lints,
     reads a commit's message the moment the command runs, from each `-m`, a heredoc
     inside one, or a `-F` file or heredoc, and warns on a `#` before a word in the
@@ -449,7 +449,7 @@ instructions alone cannot:
     requester must run on their list but says nothing of how wide it may be, since
     a sentence there would load into every session to guard one moment.
 
-![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; thirteen hooks are run by the harness — eight warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a pull request body about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
+![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; thirteen hooks are run by the harness — eight warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a pull request or issue body or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 

@@ -262,10 +262,11 @@ out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}
 check "landing hook ignores non-Bash tools" 0 $?
 
 echo
-# 17b. Body hook: a pull request body sent with a line break mid-sentence
-#      warns, from every place a command takes the body; a body whose short
-#      lines are list items, table rows, fenced code or HTML stays quiet, as
-#      does a command that only names the send inside a message.
+# 17b. Body hook: a pull request or issue body, or a comment on either, sent
+#      with a line break mid-sentence warns, from every place a command takes
+#      the body; a body whose short lines are list items, table rows, fenced
+#      code or HTML stays quiet, as do a merge commit's body, a work item's
+#      HTML field and a command that only names the send inside a message.
 cd "$WORK" || exit 9
 body_payload() { # $1 = file holding the command, $2 = the session cwd, $WORK unless given
   "$PY" -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":open(sys.argv[1]).read()},"cwd":sys.argv[2]}))' "$1" "${2:-$WORK}"
@@ -281,7 +282,14 @@ body_payload() { # $1 = file holding the command, $2 = the session cwd, $WORK un
   printf 'gh pr create --title "x" --body "$(cat <<'"'"'EOF'"'"'\nThe export failed on every timeout\nand was rerun by hand.\nEOF\n)"\n' > cmd-heredoc
   printf 'gh pr create --title "x" --body "The export failed\nand was rerun."\n' > cmd-literal
   printf 'gh pr create --title "x" --body-file %s/clean.md\n' "$WORK" > cmd-clean
-  printf 'gh pr comment 42 --body-file %s/wrapped.md\n' "$WORK" > cmd-comment
+  printf 'The export log, verbatim:\n\n```\nshort code\nlines here\n```\n' > code.md
+  printf 'gh issue create --title "x" --body-file %s/wrapped.md\n' "$WORK" > cmd-issue-create
+  printf 'gh issue edit 7 -F wrapped.md\n' > cmd-issue-edit
+  printf 'gh issue comment 7 --body "$(cat wrapped.md)"\n' > cmd-issue-comment
+  printf 'gh pr comment 42 --edit-last -b "The export failed\nand was rerun."\n' > cmd-pr-comment
+  printf 'gh issue comment 7 --body-file %s/code.md\n' "$WORK" > cmd-code
+  printf 'gh pr merge 42 --squash --body-file %s/wrapped.md\n' "$WORK" > cmd-merge
+  printf 'az boards work-item create --type Bug --title x --description "$(cat wrapped.md)"\n' > cmd-work-item
   printf 'gh pr create --title "x" --body-file %s/no-such.md\n' "$WORK" > cmd-missing
   printf 'cd sub && gh pr create --title "x" --body-file wrapped.md\n' > cmd-cd
   printf 'git commit -m "gh pr create --body-file wrapped.md"\n' > cmd-message
@@ -301,10 +309,22 @@ out=$(body_payload cmd-heredoc | "$PY" "$BODY_HOOK")
 contains "body hook reads a heredoc body" "$out" "hard-wrapped"
 out=$(body_payload cmd-literal | "$PY" "$BODY_HOOK")
 contains "body hook reads a quoted literal body" "$out" "hard-wrapped"
+out=$(body_payload cmd-issue-create | "$PY" "$BODY_HOOK")
+contains "body hook reads an issue body" "$out" "hard-wrapped"
+out=$(body_payload cmd-issue-edit | "$PY" "$BODY_HOOK")
+contains "body hook reads an issue edit's short body-file flag" "$out" "hard-wrapped"
+out=$(body_payload cmd-issue-comment | "$PY" "$BODY_HOOK")
+contains "body hook reads an issue comment" "$out" "hard-wrapped"
+out=$(body_payload cmd-pr-comment | "$PY" "$BODY_HOOK")
+contains "body hook reads a pull request comment's short body flag" "$out" "hard-wrapped"
 out=$(body_payload cmd-clean | "$PY" "$BODY_HOOK")
 empty "body hook stays quiet on lists, tables, code and HTML" "$out"
-out=$(body_payload cmd-comment | "$PY" "$BODY_HOOK")
-empty "body hook ignores a command that is not a create or edit" "$out"
+out=$(body_payload cmd-code | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a comment whose short lines are fenced code" "$out"
+out=$(body_payload cmd-merge | "$PY" "$BODY_HOOK")
+empty "body hook ignores a merge commit's body, which git stores wrapped" "$out"
+out=$(body_payload cmd-work-item | "$PY" "$BODY_HOOK")
+empty "body hook ignores a work item's description, an HTML field that reflows" "$out"
 out=$(body_payload cmd-missing | "$PY" "$BODY_HOOK")
 empty "body hook stays quiet on a body file it cannot read" "$out"
 out=$(body_payload cmd-cd | "$PY" "$BODY_HOOK")

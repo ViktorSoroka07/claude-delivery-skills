@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""PreToolUse hook (Bash): warn when a pull request body about to be sent is hard-wrapped.
+"""PreToolUse hook (Bash): warn when a body about to be sent to a forge is hard-wrapped.
 
 A forge renders every newline inside a paragraph as a line break, so a body
 wrapped at a column arrives as chopped lines that never reflow. The skill says
-so; this reads the body at the moment the create or edit command runs, from
-wherever the command takes it - a body file, a command substitution over one, a
-heredoc, a quoted literal - because that is the last point before the text is
-public, and the one a session steered toward the shell always passes.
+so; this reads the body at the moment the command sends it - a pull request or
+issue created or edited, or a comment on either, through gh; a pull request
+created or updated through az - from wherever the command takes it - a body
+file, a command substitution over one, a heredoc, a quoted literal - because
+that is the last point before the text is public, and the one a session steered
+toward the shell always passes. az's work-item description and discussion are
+not read: the CLI stores them in HTML fields, where a newline is whitespace and
+a wrapped paragraph reflows.
 
 Warn-only: a deliberate line break reads the same as a wrapped one, and the
 skill owns the judgment. Fails open on any error - a broken backstop must not
@@ -20,8 +24,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from shell_text import CD_ANCHOR, HEREDOC, argument_at, blank  # noqa: E402
 
-PR_SEND = re.compile(
-    r"\bgh\b[^|;&\n]*\bpr\s+(?:create|edit)(?![-\w])"
+BODY_SEND = re.compile(
+    r"\bgh\b[^|;&\n]*\b(?:pr|issue)\s+(?:create|edit|comment)(?![-\w])"
     r"|\baz\b[^|;&\n]*\brepos\s+pr\s+(?:create|update)(?![-\w])"
 )
 FLAGS = {
@@ -67,7 +71,7 @@ def read_file(path, blanked, cwd):
 
 def body_of(command, cwd):
     unfenced, blanked = blank(command)
-    m = PR_SEND.search(blanked)
+    m = BODY_SEND.search(blanked)
     if not m:
         return None
     flags = FLAGS["gh" if blanked[m.start():m.start() + 2] == "gh" else "az"]
