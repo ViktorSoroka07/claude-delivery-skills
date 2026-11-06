@@ -782,6 +782,68 @@ out=$(stop_payload "$WORK" s20d | TMPDIR="$WORK" "$PY" "$STOP_HOOK")
 empty "uncommitted hook stays silent outside a repository" "$out"
 
 echo
+WIDTH_HOOK="$ROOT/hooks/handover-width.py"
+
+width_payload() { # $1 = the final message, as Python source for a str
+  "$PY" -c 'import json, sys
+print(json.dumps({"hook_event_name": "Stop", "stop_hook_active": False,
+                  "last_assistant_message": eval(sys.argv[1])}))' "$1"
+}
+
+# 20a. Handover-width hook: a command handed over on a line wider than a plain
+#      terminal is copied from a display that wrapped it, and the shell runs
+#      the fragments. The width is the hook's guess of 120 columns, so each
+#      case sits clearly on one side of it.
+printf '' | "$PY" "$WIDTH_HOOK" >/dev/null 2>&1
+check "width hook fails open on empty stdin" 0 $?
+out=$(printf '{"hook_event_name":"Stop"}' | "$PY" "$WIDTH_HOOK")
+empty "width hook stays silent where the harness sends no message" "$out"
+
+LONG='"git -C /very/long/path/" + "x" * 90 + " push -u origin feature-branch"'
+out=$(width_payload "'Run this:\n\n\`\`\`bash\n' + $LONG + '\n\`\`\`\n'" | "$PY" "$WIDTH_HOOK")
+msg=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["systemMessage"])' 2>/dev/null)
+check "width hook output is the systemMessage shape" 0 $?
+contains "width hook names the width it measured against" "$msg" "past 120 columns"
+contains "width hook quotes the start of the wide line" "$msg" "git -C /very/long/path/"
+contains "width hook names the remedy" "$msg" "one-line invocation"
+
+out=$(width_payload "'\`\`\`\n' + $LONG + '\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+contains "width hook reads an unlabelled fence as a command block" "$out" "handover-width"
+out=$(width_payload "'~~~sh\n' + $LONG + '\n~~~'" | "$PY" "$WIDTH_HOOK")
+contains "width hook reads a tilde fence" "$out" "handover-width"
+out=$(width_payload "'\`\`\`bash\n' + $LONG + '\n' + $LONG + '\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+contains "width hook counts every wide line" "$out" "2 command lines"
+
+# The harness's own prompt form, a span opening with "! ", is a hand-over too.
+out=$(width_payload "'Hand-over: \`! ' + $LONG + '\` and done.'" | "$PY" "$WIDTH_HOOK")
+contains "width hook reads an inline ! span" "$out" "handover-width"
+
+# Silence: a short command, a wide line in a block that is not a shell's, a
+# wide line of prose, a wide inline span that is not a ! command, and a wide
+# line after its fence has closed.
+out=$(width_payload "'\`\`\`bash\ngit push -u origin main\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+empty "width hook stays silent on a short command" "$out"
+out=$(width_payload "'\`\`\`python\n' + $LONG + '\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+empty "width hook ignores a block in another language" "$out"
+out=$(width_payload "'prose ' * 40" | "$PY" "$WIDTH_HOOK")
+empty "width hook ignores a wide line of prose" "$out"
+out=$(width_payload "'See \`' + $LONG + '\` for the path.'" | "$PY" "$WIDTH_HOOK")
+empty "width hook ignores a wide inline span that is not a ! command" "$out"
+out=$(width_payload "'\`\`\`bash\nls\n\`\`\`\n' + $LONG" | "$PY" "$WIDTH_HOOK")
+empty "width hook stops reading at the closing fence" "$out"
+out=$(width_payload "'\`\`\`bash\n' + 'echo ' + 'y' * 115 + '\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+empty "width hook stays silent at exactly 120 columns" "$out"
+out=$(width_payload "'\`\`\`bash\n' + 'echo ' + 'y' * 116 + '\n\`\`\`'" | "$PY" "$WIDTH_HOOK")
+contains "width hook speaks at 121 columns" "$out" "widest 121"
+
+"$PY" -c 'import json, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"]["Stop"]:
+    if any("handover-width.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "registration runs the width hook at the stop" 0 $?
+
+echo
 GATE_HOOK="$ROOT/hooks/skill-gate.py"
 GSTATE="$WORK/gate-state"
 mkdir -p "$GSTATE"
