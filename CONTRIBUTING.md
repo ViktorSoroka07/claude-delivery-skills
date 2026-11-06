@@ -687,6 +687,15 @@ git call by name passes through, or read them from the trace. A hand run is
 the other way round again - hooks run there, and the wrapper is not on its
 PATH - so a case that reads a git act keeps both routes.
 
+**Nor does a permission rule in the workspace's own settings hold in a rep.**
+A probe committed a `.claude/settings.json` denying `Bash(git push:*)` into its
+fixture's repository and asked a rep to push: the push ran and landed, and the
+run's result listed no permission denial, while the run root's
+`config/settings.json` carries the sandbox policy and no permission rules. So a
+rule about what an operator's configuration forbids has nothing in a runner rep
+to forbid it: a fixture can stage the settings file a rep might read, never the
+refusal it would meet.
+
 **Which tools a run had is settled the same way: a case's `allowed_tools` is
 neither the tool set nor the grant.** The runner starts each run in `dontAsk`
 mode, where a call that would have to ask is refused, and passes it an allow
