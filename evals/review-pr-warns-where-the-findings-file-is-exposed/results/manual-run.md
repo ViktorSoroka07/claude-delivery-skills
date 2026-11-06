@@ -119,3 +119,23 @@ Model `claude-sonnet-5-5` in every rep's `init` event; CLI 2.1.289; both arms wi
 | skill-was-invoked | 5/5 | 5/5 |
 
 The treated wording keeps the exposure warning for a findings file inside the clone, and this prompt names a root path, so every treated rep wrote the file where the prompt said and named the stash hook beside it. The case stays a valid test of the narrowed warning.
+
+## What a runner rep sees of the hook
+
+No git hook runs in a runner rep: from CLI 2.1.312 every command a rep runs
+carries `GIT_CONFIG_KEY_n` pairs that set `core.hooksPath` to `/dev/null` and
+disable each hook by name (CONTRIBUTING, "Nor does a fixture's git hook run in
+a rep"). This case's graders need no record of a hook run, unlike the drift
+case's audit: they read the final message and whether the findings file
+exists, and the hook only has to be there for the rep to read, which it is.
+
+The same pairs answer a rep that asks. Built from this fixture and run under
+the pairs copied from the kept probe traces, `git config core.hooksPath` prints
+`/dev/null`; without them it prints `.githooks`. So a rep that checks whether
+the hook is wired, as the plugin-arm miss in the retake above did when it
+wrote "this checkout currently has it disabled", is told it is off. That
+retake ran before any kept run recorded the sandbox's environment, so whether
+the pairs reached it is unknown and its verdict stands as read; but on a CLI
+that sets them, a miss of that shape is read from the trace first: a
+`core.hooksPath` query answered `/dev/null` makes it the instrument's, not
+the rep's misreading of the setup.
