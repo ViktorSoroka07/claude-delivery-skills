@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: writing-commit-messages-splits-one-page-by-version
+context:
+  scaffold_script: fixture.sh

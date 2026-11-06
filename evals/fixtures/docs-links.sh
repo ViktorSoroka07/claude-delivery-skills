@@ -3,6 +3,9 @@
 # docs repository whose docs gate checks relative links over `git ls-files
 # '*.md'` only, as part 4 of this plugin's own scripts/check-refs.sh does.
 # $1 = target directory (created; must not exist or be empty).
+# $2 = "two-in-one-page" to leave two of the session's own changes uncommitted
+#      in the retries page - the attempt limit corrected, and a new section at
+#      the end - so a commit per change needs the one file split by version.
 #
 # The gate is honest about its scope - its header says "tracked markdown" and
 # its loop is a `git ls-files` - but what it prints on success is "links OK",
@@ -122,4 +125,26 @@ EOF
 
 git add -A
 git commit -q -m "Docs: setup, configuration and retries, with a link gate"
+
+if [ "${2:-}" = "two-in-one-page" ]; then
+  cat > docs/retries.md <<'EOF'
+# Retries
+
+A failed delivery is retried with exponential backoff: 30 seconds, then
+doubling, up to twelve attempts in all. The attempt limit is set per endpoint
+in [Configuration](configuration.md).
+
+## Replaying
+
+A delivery can be sent again by id with `hookrelay replay <id>`, whether it
+succeeded or not.
+
+## Dead letters
+
+A delivery that has used every attempt is kept on the dead-letter list, which
+`hookrelay dead-letters` prints; a replay of one of its ids takes it off the
+list once the delivery succeeds.
+EOF
+  echo "built" > .git/commit-audit
+fi
 echo "built docs-links fixture in $T"

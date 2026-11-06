@@ -29,6 +29,10 @@
 #      and uncommitted - a new module and an edit to the API client - with a
 #      post-commit hook listing each commit's files in .git/commit-audit, so a
 #      commit that takes the whole index is readable after the run.
+# $2 = "two-in-one-file" to leave two of the session's own changes uncommitted
+#      in the request table and its test - a currency field on each row, and a
+#      different heading for an empty table - so a commit per change needs the
+#      one file split by version rather than by path.
 #
 # Invented content throughout - a refund console that never existed.
 set -e
@@ -629,4 +633,34 @@ Sorting, and any column change in `src/requestTable.js`.
 EOF
   git add -A
   git commit -qm "Add the approved spec for the request list"
+fi
+
+if [ "${2:-}" = "two-in-one-file" ]; then
+  cat > src/requestTable.js <<'EOF'
+// The heading counts the rows handed in, not the batch total; the paging task
+// owns totalCount reconciliation.
+export function renderRequestTable(rows) {
+  return {
+    kind: 'requestTable',
+    heading: rows.length === 0 ? 'Awaiting requests' : `Requests (${rows.length})`,
+    rows: rows.map((r) => ({ id: r.id, amount: r.amount, currency: r.currency, status: r.status })),
+  };
+}
+EOF
+  cat > test/requestTable.test.js <<'EOF'
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { renderRequestTable } from '../src/requestTable.js';
+
+test('heading counts the rows given', () => {
+  const t = renderRequestTable([{ id: 1, amount: 5, currency: 'USD', status: 'Pending' }, { id: 2, amount: 7, currency: 'EUR', status: 'Refunded' }]);
+  assert.equal(t.heading, 'Requests (2)');
+  assert.deepEqual(t.rows[1], { id: 2, amount: 7, currency: 'EUR', status: 'Refunded' });
+});
+
+test('empty input renders a bare heading', () => {
+  assert.deepEqual(renderRequestTable([]), { kind: 'requestTable', heading: 'Awaiting requests', rows: [] });
+});
+EOF
+  echo "built" > .git/commit-audit
 fi
