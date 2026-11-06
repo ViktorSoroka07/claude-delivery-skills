@@ -20,6 +20,7 @@ WRITE_HOOK="$ROOT/hooks/comment-discipline.py"
 COMMIT_HOOK="$ROOT/hooks/comment-discipline-commit.py"
 LAND_HOOK="$ROOT/hooks/landed-branch.py"
 BODY_HOOK="$ROOT/hooks/hard-wrapped-body.py"
+HASH_HOOK="$ROOT/hooks/commit-body-reference.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -88,6 +89,8 @@ printf '' | "$PY" "$LAND_HOOK"
 check "landing hook fails open on empty stdin" 0 $?
 printf '' | "$PY" "$BODY_HOOK"
 check "body hook fails open on empty stdin" 0 $?
+printf '' | "$PY" "$HASH_HOOK"
+check "commit-body hook fails open on empty stdin" 0 $?
 
 # 2. Write hook: a narrative tell in an edit warns (exit 2, stderr names it).
 out=$(write_payload /x/f.py '# previously a loop\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>&1)
@@ -258,8 +261,8 @@ echo
 #      lines are list items, table rows, fenced code or HTML stays quiet, as
 #      does a command that only names the send inside a message.
 cd "$WORK" || exit 9
-body_payload() { # $1 = file holding the command; the session cwd is $WORK
-  "$PY" -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":open(sys.argv[1]).read()},"cwd":sys.argv[2]}))' "$1" "$WORK"
+body_payload() { # $1 = file holding the command, $2 = the session cwd, $WORK unless given
+  "$PY" -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":open(sys.argv[1]).read()},"cwd":sys.argv[2]}))' "$1" "${2:-$WORK}"
 }
 # shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
 {
@@ -309,6 +312,69 @@ for matcher in cfg["hooks"]["PreToolUse"]:
         sys.exit(0)
 sys.exit(1)' "$ROOT/hooks/hooks.json"
 check "body hook is registered on PreToolUse Bash" 0 $?
+
+# 17c. Commit-body hook: in a repository commitlint lints, a `#` before a
+#      word in the message body warns, wherever the command takes the
+#      message from; the closing trailers, a `#` before no word, the subject,
+#      a message it cannot read and a repository without commitlint stay quiet.
+mkrepo t17c
+mkdir -p sub
+printf 'module.exports = {}\n' > commitlint.config.js
+printf 'fix: move the token\n\nThe token moved and\nis now #1a2b3c here.\n\nMore text.\n' > msg.txt
+mkrepo t17c-pkg
+printf '{"commitlint": {}}\n' > package.json
+mkrepo t17c-plain
+cd "$WORK" || exit 9
+LINTED="$WORK/t17c"
+# shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
+{
+  printf 'git commit -m "fix: x" -m "The export failed and relates to #12 too."\n' > hash-two-m
+  printf 'git commit -m "$(cat <<'"'"'EOF'"'"'\nfix: x\n\nThe token moved and\nis now #1a2b3c here.\n\nCloses #12\nEOF\n)"\n' > hash-heredoc
+  printf 'git commit -F - <<'"'"'EOF'"'"'\nfix: x\n\nThe export failed and\nrelates to #12 too.\n\nMore text.\nEOF\n' > hash-stdin
+  printf 'git commit -F msg.txt\n' > hash-file
+  printf 'cd %s && git commit -F msg.txt\n' "$LINTED" > hash-cd
+  printf 'git commit -am "fix: x" -m "The export failed and relates to #12 too." -m "More text."\n' > hash-cluster
+  printf 'git commit -m "fix: x" -m "Body text." -m "Closes #12\nCo-authored-by: A <a@b.c>"\n' > hash-trailers
+  printf 'git commit -m "fix: x" -m "Written in C# now.\n# a heading"\n' > hash-no-word
+  printf 'git commit -m "fix: the token #12"\n' > hash-subject
+  printf 'git commit -m "$MSG"\n' > hash-variable
+  printf 'echo "git commit -m x -m #12"\n' > hash-named
+}
+out=$(body_payload hash-two-m "$LINTED" | "$PY" "$HASH_HOOK")
+check "commit-body hook exits 0 (warn-only)" 0 $?
+contains "commit-body hook warns on a reference in a second -m paragraph" "$out" "#12 at line 3"
+out=$(body_payload hash-heredoc "$LINTED" | "$PY" "$HASH_HOOK")
+contains "commit-body hook reads a heredoc inside -m" "$out" "#1a2b3c at line 4"
+contains "commit-body hook leaves a reference in the closing trailers alone" "$out" "body carries #1a2b3c (first"
+out=$(body_payload hash-stdin "$LINTED" | "$PY" "$HASH_HOOK")
+contains "commit-body hook reads a heredoc on stdin behind -F -" "$out" "#12 at line 4"
+out=$(body_payload hash-file "$LINTED" | "$PY" "$HASH_HOOK")
+contains "commit-body hook reads a -F file against the session cwd" "$out" "#1a2b3c at line 4"
+out=$(body_payload hash-cd "$WORK/t17c-plain" | "$PY" "$HASH_HOOK")
+contains "commit-body hook follows a cd into the linted repository" "$out" "#1a2b3c"
+out=$(body_payload hash-cluster "$LINTED/sub" | "$PY" "$HASH_HOOK")
+contains "commit-body hook reads -m inside a flag cluster, from a subdirectory" "$out" "#12 at line 3"
+out=$(body_payload hash-two-m "$WORK/t17c-pkg" | "$PY" "$HASH_HOOK")
+contains "commit-body hook takes a package.json commitlint key as a configuration" "$out" "#12"
+out=$(body_payload hash-two-m "$WORK/t17c-plain" | "$PY" "$HASH_HOOK")
+empty "commit-body hook stays quiet where commitlint has no configuration" "$out"
+out=$(body_payload hash-trailers "$LINTED" | "$PY" "$HASH_HOOK")
+empty "commit-body hook stays quiet on references in the trailers" "$out"
+out=$(body_payload hash-no-word "$LINTED" | "$PY" "$HASH_HOOK")
+empty "commit-body hook stays quiet on a # before no word" "$out"
+out=$(body_payload hash-subject "$LINTED" | "$PY" "$HASH_HOOK")
+empty "commit-body hook leaves the subject to the subject rules" "$out"
+out=$(body_payload hash-variable "$LINTED" | "$PY" "$HASH_HOOK")
+empty "commit-body hook stays quiet on a message it cannot read" "$out"
+out=$(body_payload hash-named "$LINTED" | "$PY" "$HASH_HOOK")
+empty "commit-body hook reads a commit named inside a message as message text" "$out"
+"$PY" -c 'import json,sys
+cfg = json.load(open(sys.argv[1]))
+for matcher in cfg["hooks"]["PreToolUse"]:
+    if any("commit-body-reference.py" in hook["command"] for hook in matcher["hooks"]) and "Bash" in matcher["matcher"]:
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "commit-body hook is registered on PreToolUse Bash" 0 $?
 
 BRIEF_HOOK="$ROOT/hooks/session-brief.py"
 

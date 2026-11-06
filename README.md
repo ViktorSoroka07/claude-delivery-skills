@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and ten hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and eleven hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -277,11 +277,11 @@ instructions alone cannot:
   present; dispatch prompts shrink to the task itself — an axis, the draft or claims
   to refute, the test command — plus worktree, SHA, scope, and the file the report
   goes to.
-- **Ten hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Five
+- **Eleven hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Six
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
-  the judgment, and none of the five blocks. The comment rules are the most-relapsed
-  discipline in the corpus behind this repo, which is why two of the five watch them.
+  the judgment, and none of the six blocks. The comment rules are the most-relapsed
+  discipline in the corpus behind this repo, which is why two of the six watch them.
   One stops an act once until the skill that owns it is loaded. The other four inject
   what a session cannot see for itself: the standing rules at session start, how far
   into its context window it has run, at the end of a turn that changed a rule file
@@ -302,6 +302,13 @@ instructions alone cannot:
     quoted literal, and warns on a line break mid-sentence, because the forge
     renders every newline inside a paragraph as a break and the paragraph arrives
     chopped; backs `writing-pr-descriptions`.
+  - **Commit-body reference** — in a repository whose messages commitlint lints,
+    reads a commit's message the moment the command runs, from each `-m`, a heredoc
+    inside one, or a `-F` file or heredoc, and warns on a `#` before a word in the
+    body outside the closing trailers, because commitlint's parser reads it as an
+    issue reference or a footer token and starts the footer there, and a repository
+    holding `footer-leading-blank` at error level refuses a message that has no
+    footer; backs `writing-commit-messages`.
   - **Skill gate** — stops a commit, a pull request create (`gh` or `az`), a write
     into the session's memory directory, or a subagent dispatch until
     the conversation has loaded the skill that owns it: `writing-commit-messages`,
@@ -423,7 +430,7 @@ instructions alone cannot:
     around. It speaks once per set of paths, because the end of every turn is the
     same moment as the end of the session.
 
-![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; ten hooks are run by the harness — five warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a branch landing on its target, a turn leaving tracked changes uncommitted, a pull request body about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
+![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; eleven hooks are run by the harness — six warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a branch landing on its target, a turn leaving tracked changes uncommitted, a pull request body about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
