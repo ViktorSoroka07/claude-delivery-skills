@@ -18,7 +18,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from shell_text import HEREDOC, argument_at, blank  # noqa: E402
+from shell_text import CD_ANCHOR, HEREDOC, argument_at, blank  # noqa: E402
 
 PR_SEND = re.compile(
     r"\bgh\b[^|;&\n]*\bpr\s+(?:create|edit)(?![-\w])"
@@ -29,7 +29,6 @@ FLAGS = {
     "az": {"file": (), "text": ("--description", "-d")},
 }
 CAT = re.compile(r"""^\s*\$\(\s*cat\s+(?:"([^"]*)"|'([^']*)'|(\S+))\s*\)\s*$""")
-CD_BEFORE = re.compile(r"(?:^|&&|;|\||\n)\s*cd(?=\s|$)")
 
 FENCE = re.compile(r"\s*(?:```|~~~)")
 STRUCTURAL = re.compile(r"\s*(?:#|\||>|<|!\[|\[[^\]]*\]:)")
@@ -56,7 +55,7 @@ def read_file(path, blanked, cwd):
         return None
     path = os.path.expanduser(path)
     if not os.path.isabs(path):
-        if CD_BEFORE.search(blanked):
+        if CD_ANCHOR.search(blanked):
             return None
         path = os.path.join(cwd or os.getcwd(), path)
     try:
