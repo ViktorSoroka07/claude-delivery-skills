@@ -5,6 +5,10 @@ rule fires on**, so the draw leaves the entry untested rather than
 cleared, and it was not declined on it. Every rep's first command listed
 the whole month's commits with every author, which shows the second
 identity before any search keyed on one spelling could come back empty.
+The sibling case `verifying-before-sending-dates-against-the-search-key`
+asks the question whose direct route is that keyed search; it reached the
+condition in five of five and held the act in five of five, and its record
+carries the reading for both.
 
 The case for the entry "A negative claim about what a read returns or what a
 search finds is true of the inputs it was checked with": among its sightings,
