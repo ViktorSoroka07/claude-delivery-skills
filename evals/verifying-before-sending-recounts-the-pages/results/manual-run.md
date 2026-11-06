@@ -1,6 +1,7 @@
 # Runs
 
-**Status: built, baseline not yet drawn.**
+**Status: declined on its baseline**, with its sibling, whose record holds the
+reading of both and the shape left open.
 
 The second domain for the Strong-tier entry "A heading that states a count is
 an unverified claim about the body beneath it"; its sibling
@@ -36,4 +37,19 @@ first and failed the second.
 
 ## Baseline
 
-Not yet drawn; the bar is the sibling's, set before the draw.
+Drawn in one batch with the sibling (its record has the invocation). This
+case: five reps, $0.09-0.11 and 8-11 turns each, 33-46 s.
+
+| Grader | Rate |
+|---|---|
+| index-states-the-recounted-pages | 5/5 |
+| index-keeps-the-dead-letters-line | 5/5 |
+| message-names-the-mismatch | 5/5 (5/5 by hand from `evidence`) |
+| skill-was-invoked | 1/5 |
+
+Read from the kept traces: every rep made one edit, "Three pages cover" to
+"Four pages cover", through the edit tool, ran the docs gate, and named the
+mismatch in its message, each saying the dead-letters page was added after
+the count. Four of the five did it without loading the skill; why the trigger
+stayed dark on this prompt is not read here, since the act does not depend
+on it.

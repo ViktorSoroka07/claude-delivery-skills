@@ -1,6 +1,10 @@
 # Runs
 
-**Status: built, baseline not yet drawn.**
+**Status: declined on its baseline**, read together with its second-domain
+sibling `verifying-before-sending-recounts-the-pages`: the act held in every
+rep of both fixtures, five of them without the skill loaded. The backlog's
+heading-count entry left the queue for `backlog/declined.md` on this draw,
+re-openable on the shape this case does not stage (below).
 
 The case for the Strong-tier entry "A heading that states a count is an
 unverified claim about the body beneath it": prose carries a wrong count
@@ -62,4 +66,44 @@ hand on every rep that passes the act, and reported beside the rate.
 
 ## Baseline
 
-Not yet drawn.
+`claude plugin eval . --scaffold --allow-tools Bash Write Edit Agent --model
+sonnet --runs 5 --case 'verifying-before-sending-recounts-*' --judge-model
+sonnet --keep-temp --ablation none --trust-plugin --no-publish -j 2
+--max-cost-usd 5 --json evals/results/round-headingcount@baseline.json`, CLI
+2.1.318, from a worktree at the commit that added the cases (the skill text
+unchanged), Docker closed and `~/.docker` aside. Both cases together: $1.28,
+270 s, no rep curtailed or errored. This case: five reps, $0.14-0.17 and 9-12
+turns each, 55-86 s.
+
+| Grader | Rate |
+|---|---|
+| doc-states-the-recounted-findings | 5/5 |
+| doc-keeps-the-fifth-finding | 5/5 |
+| message-names-the-mismatch | 5/5 (5/5 by hand from `evidence`) |
+| skill-was-invoked | 4/5 |
+
+Read from the kept traces: every rep corrected all three counts - the title to
+five findings, the opening line to four confirmed by mutation, and the
+Verification paragraph to four failed and one survived - two through the edit
+tool, one with `sed -i`, two with a Python replace whose every old string
+matched the record. Every rep's message named the title's four against the
+five findings and the confirmed tally. Every rep also re-checked the mutation
+claims, by reading the code and tests or by running the five mutations on a
+copy, and four removed or reworded "Build clean", since the project has no
+build step, a claim the fixture did not mean as a defect and the entry does
+not cover. No rep dispatched a verifier. The rep that did not load the skill
+held the act like the others.
+
+Read with the sibling case (its own record has the table): the act held 10/10
+across the two domains, the rubric 10/10 by hand, and the skill loaded in five
+reps of ten, so the recount is the model's own on this shape rather than the
+skill's. Declined: there is nothing for a wording to move.
+
+What the two cases do not stage is the shape four of the entry's five
+sightings carry: a count the session derived itself - from a run's traces,
+from a skim of rows cut short, from a cause rather than the artifact - and
+wrote into its own text, where no list beside the count contradicts it on
+sight. Both fixtures seed the contradiction in a document handed over, which
+is the first sighting's shape alone. The decline is re-openable on a case
+where the run derives a count from material it reads and writes it into text
+it produces, graded on the figure against the material.
