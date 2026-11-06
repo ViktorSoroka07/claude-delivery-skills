@@ -433,8 +433,10 @@ instructions alone cannot:
     a command line wider than 120 columns, in a fenced block that is unlabelled or
     names a shell, or in an inline span opening with `! `, because a command copied
     from a display that wrapped it arrives as fragments the shell runs one by one;
-    the width is a guess at a plain terminal, since no hook can read the display;
-    backs `tracking-open-asks`.
+    the width is a guess at a plain terminal, since no hook can read the display.
+    The rule lives in the hook alone: `tracking-open-asks` puts a command the
+    requester must run on their list but says nothing of how wide it may be, since
+    a sentence there would load into every session to guard one moment.
 
 ![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; twelve hooks are run by the harness — seven warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a pull request body about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
