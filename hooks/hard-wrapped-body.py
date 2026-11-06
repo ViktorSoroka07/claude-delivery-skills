@@ -18,7 +18,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from shell_text import HEREDOC, blank  # noqa: E402
+from shell_text import HEREDOC, argument_at, blank  # noqa: E402
 
 PR_SEND = re.compile(
     r"\bgh\b[^|;&\n]*\bpr\s+(?:create|edit)(?![-\w])"
@@ -28,7 +28,6 @@ FLAGS = {
     "gh": {"file": ("--body-file", "-F"), "text": ("--body", "-b")},
     "az": {"file": (), "text": ("--description", "-d")},
 }
-ARG = re.compile(r"""\s*(?:"((?:[^"\\]|\\.)*)"|'([^']*)'|(\S+))""")
 CAT = re.compile(r"""^\s*\$\(\s*cat\s+(?:"([^"]*)"|'([^']*)'|(\S+))\s*\)\s*$""")
 CD_BEFORE = re.compile(r"(?:^|&&|;|\||\n)\s*cd(?=\s|$)")
 
@@ -47,10 +46,7 @@ def flag_value(command, blanked, names):
     m = pattern.search(blanked)
     if not m:
         return None
-    a = ARG.match(command, m.end())
-    if not a:
-        return None
-    return a.group(1) if a.group(1) is not None else (a.group(2) if a.group(2) is not None else a.group(3))
+    return argument_at(command, m.end())
 
 
 def read_file(path, blanked, cwd):

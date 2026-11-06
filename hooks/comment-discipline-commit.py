@@ -19,46 +19,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from comment_tells import SKIP_SUFFIXES, tells_in  # noqa: E402
+from shell_text import QUOTED, target_dir  # noqa: E402
 
 GIT_COMMIT = re.compile(r"\bgit\b[^|;&]*\bcommit\b")
 STAGES_TRACKED = re.compile(r"\bcommit\b[^|;&]*(?:\s-\w*a|\s--all\b)")
-QUOTED = re.compile(r"\"[^\"]*\"|'[^']*'")
-CD_ANCHOR = re.compile(r"(?:^|&&|;|\||\n)\s*cd(?=\s|$)")
-C_ANCHOR = re.compile(r"\s-C(?=\s|$)")
-ARG = re.compile(r"""\s*(?:"([^"]*)"|'([^']*)'|(\S+))""")
-
-
-def argument_after(command, pos):
-    m = ARG.match(command, pos)
-    if not m:
-        return None
-    return m.group(1) or m.group(2) or m.group(3)
-
-
-def target_dir(command, stripped, match):
-    """The directory the matched commit runs in, None for the CWD, or a lie:
-    a dir the command names that cannot be resolved here means the diff below
-    must not run at all - '' signals that. Anchors are found in the stripped
-    string so quoted text cannot fake structure; the argument is then read
-    from the original at the same offset, which the length-preserving
-    blanking guarantees is the right place."""
-    cwd = None
-    cds = [c for c in CD_ANCHOR.finditer(stripped) if c.start() < match.start()]
-    if cds:
-        d = argument_after(command, cds[-1].end())
-        if not d:
-            return ""
-        cwd = os.path.expanduser(d)
-    c = C_ANCHOR.search(stripped, match.start(), match.end())
-    if c:
-        d = argument_after(command, c.end())
-        if not d:
-            return ""
-        d = os.path.expanduser(d)
-        cwd = os.path.join(cwd, d) if cwd else d
-    if cwd is not None and not os.path.isdir(cwd):
-        return ""
-    return cwd
 
 
 def added_comment_lines(diff_args, cwd):
