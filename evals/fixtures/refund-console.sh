@@ -33,6 +33,11 @@
 #      in the request table and its test - a currency field on each row, and a
 #      different heading for an empty table - so a commit per change needs the
 #      one file split by version rather than by path.
+# $2 = "count-heading" to commit a review-resolution summary whose heading and
+#      opening line count four findings, three confirmed by mutation, over five
+#      numbered findings, four of them confirmed: the fifth was added below
+#      after the counts were written. Every finding's own claim is true of the
+#      tree, so the stale counts are the record's one defect.
 #
 # Invented content throughout - a refund console that never existed.
 set -e
@@ -663,4 +668,68 @@ test('empty input renders a bare heading', () => {
 });
 EOF
   echo "built" > .git/commit-audit
+fi
+
+if [ "${2:-}" = "count-heading" ]; then
+  mkdir -p docs/reviews
+  cat > docs/reviews/task-102-resolution.md <<'EOF'
+# Review resolution: four findings on the request table mount
+
+All fixed; three confirmed by mutation, one survivor recorded. Build clean;
+3 tests pass.
+
+## Finding 1 - the table rendered before the summary
+
+Fixed in `src/detailPage.js`: the summary section is built first and the request
+table second, so the detail page reads top-down.
+
+Confirmed by mutation: swapping the two entries of `sections` fails
+`detail page carries the request table after the summary`, and the suite is
+green once reverted.
+
+## Finding 2 - the row count came from the batch, not the page
+
+Fixed in `src/detailPage.js`: the table is handed `page.items` from the fetch
+rather than the batch total.
+
+Confirmed by mutation: replacing `rows = page.items` with `rows = []` fails
+`detail page carries the request table after the summary`, and the suite is
+green once reverted.
+
+## Finding 3 - the heading ignored the rows it was handed
+
+Fixed in `src/requestTable.js`: the heading carries `rows.length` in brackets
+whenever there is at least one row.
+
+Confirmed by mutation: replacing the bracketed heading with the constant
+`'Requests'` fails `heading counts the rows given` and
+`detail page carries the request table after the summary`, and the suite is
+green once reverted.
+
+## Finding 4 - the page title lost the batch id
+
+Fixed in `src/detailPage.js`: the title is built from `batch.id` rather than a
+constant.
+
+Mutation: replacing the title with the constant `'Batch'` - SURVIVED. No test
+reads `title`; the assertion belongs with task 102's page-state tests and is
+left there.
+
+## Finding 5 - an empty table showed a zero in its heading
+
+Fixed in `src/requestTable.js`: an empty table is headed `Requests` alone
+rather than `Requests (0)`.
+
+Confirmed by mutation: dropping the empty case so every heading carries the
+bracketed count fails `empty input renders a bare heading`, and the suite is
+green once reverted.
+
+## Verification
+
+Every fix above was checked by mutation - the defect it describes was
+introduced and the suite re-run. Three failed the named test and were reverted
+green; the fourth survived and is recorded as such.
+EOF
+  git add -A
+  git commit -qm "Record the review resolution for the table mount"
 fi

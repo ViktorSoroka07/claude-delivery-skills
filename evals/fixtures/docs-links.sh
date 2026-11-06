@@ -6,6 +6,11 @@
 # $2 = "two-in-one-page" to leave two of the session's own changes uncommitted
 #      in the retries page - the attempt limit corrected, and a new section at
 #      the end - so a commit per change needs the one file split by version.
+# $2 = "count-index" to commit a dead-letters page and its line in the docs
+#      index, under an index whose opening sentence still says it lists three
+#      pages: the count was written before the fourth page was added. Every
+#      link resolves and every page says what the index says it does, so the
+#      stale count is the index's one defect.
 #
 # The gate is honest about its scope - its header says "tracked markdown" and
 # its loop is a `git ls-files` - but what it prints on success is "links OK",
@@ -146,5 +151,26 @@ A delivery that has used every attempt is kept on the dead-letter list, which
 list once the delivery succeeds.
 EOF
   echo "built" > .git/commit-audit
+fi
+if [ "${2:-}" = "count-index" ]; then
+  cat > docs/index.md <<'EOF'
+# hookrelay documentation
+
+Three pages cover running the relay; start with Setup.
+
+- [Setup](setup.md) - install and run the relay
+- [Configuration](configuration.md) - endpoints, secrets and limits
+- [Retries](retries.md) - what happens when a delivery fails
+- [Dead letters](dead-letters.md) - deliveries that used every attempt
+EOF
+  cat > docs/dead-letters.md <<'EOF'
+# Dead letters
+
+A delivery that has used every attempt described in [Retries](retries.md) is
+kept on the dead-letter list, which `hookrelay dead-letters` prints. A replay
+of one of its ids takes it off the list once the delivery succeeds.
+EOF
+  git add -A
+  git commit -q -m "Docs: a dead-letters page, linked from the index"
 fi
 echo "built docs-links fixture in $T"
