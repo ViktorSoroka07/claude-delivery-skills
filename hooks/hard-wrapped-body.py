@@ -140,8 +140,8 @@ def main():
                 "%d line(s) of the body (first at line %d) continue a sentence the line above left "
                 "open. The forge renders every newline inside a paragraph as a line break, so "
                 "the paragraph arrives as chopped lines that never reflow. Join each wrapped "
-                "paragraph into one line before sending; a list item, a table row or a code "
-                "block is not a paragraph and keeps its lines."
+                "paragraph or list item into one line before sending; each list item still "
+                "starts its own line, and a table row or a code block keeps its lines."
                 % (len(joins), joins[0])
             ),
         },

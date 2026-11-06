@@ -281,6 +281,7 @@ out=$(body_payload cmd-file | "$PY" "$BODY_HOOK")
 check "body hook exits 0 (warn-only)" 0 $?
 contains "body hook warns on a wrapped body file" "$out" "hard-wrapped"
 contains "body hook names the first wrapped line" "$out" "first at line 2"
+contains "body hook counts a wrapped list item's second line" "$out" "carries 2 hard-wrapped"
 out=$(body_payload cmd-relative | "$PY" "$BODY_HOOK")
 contains "body hook resolves a relative body file against the session cwd" "$out" "hard-wrapped"
 out=$(body_payload cmd-cat | "$PY" "$BODY_HOOK")
