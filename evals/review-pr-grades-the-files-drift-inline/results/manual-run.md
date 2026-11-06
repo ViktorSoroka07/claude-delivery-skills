@@ -334,3 +334,27 @@ match in all twelve. Commit SHAs match wherever a scaffold pins its dates; the
 three that do not (this case, `review-pr-axis-reads-without-fixing` and
 `review-pr-warns-where-the-findings-file-is-exposed`) differ between any two
 builds of the same tree.
+
+One probe rep through the runner, from a worktree at the commit that added
+the wrapper: `claude plugin eval . --scaffold --allow-tools Bash Write Edit
+Agent --model haiku --runs 1 --case 'review-pr-grades-the-files-drift-inline'
+--judge-model sonnet --keep-temp --ablation none --trust-plugin --no-publish
+-j 1 --max-cost-usd 1`, CLI 2.1.318, `claude-haiku-5-5` in the `init` event,
+Docker closed and `~/.docker` aside. $0.04 and $0.01 of judging, 18 turns,
+159 s; kept as `evals/results/round-100@probe-haiku.json`. Every grader
+passed. Read by hand from the kept run root:
+
+- the sealed home's `.evalbin/git` is the audit wrapper, and the rep's every
+  git call was a plain `git` or `git -C` that returned real output, so each
+  went through it;
+- the rep never brought the base into the tree: it read the change with
+  `git diff` and `git show`, and ran its lint and mutation checks on files it
+  exported with `git show` into scratch directories under its temp folder;
+- `.git/git-audit` holds only the seeded `built`, which is what those calls
+  should leave.
+
+So the probe shows the wrapper in place and silent on a clean review; a
+marker from a rep's own stash or checkout rests on the shape tests above,
+which ran under the same environment. The rep also asked
+`git config --get core.hooksPath` and was answered `/dev/null`, the
+environment the warns case's record describes, now seen in a rep.
