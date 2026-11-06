@@ -2,7 +2,9 @@
 
 One definition, because heredoc bodies and quoted spans carry message text that
 names acts without running them, and two copies of the blanking drift until one
-hook reads as an act what its neighbour reads as a message.
+hook reads as an act what its neighbour reads as a message. The same holds for
+the arguments and the directory an act runs in: two hooks reading one commit
+must settle one repository, or each checks a different one.
 """
 import os
 import re
