@@ -2,8 +2,9 @@
 # Read-only reference-integrity gate. Verifies that the tree's internal
 # references resolve: references/*.md named by skills (their own or another
 # skill's, as ../<skill>/references/*.md), delivery-skills:<name>
-# mentions, hooks.json command paths, relative markdown links, and each replay
-# case's history.jsonl against what its generator builds from the tree. Exit 0
+# mentions, hooks.json command paths, relative markdown links, each replay
+# case's history.jsonl against what its generator builds from the tree, and
+# skill bodies free of positional arguments. Exit 0
 # clean; exit 1 with one BROKEN line per failure. Optional $1 = tree root.
 # shellcheck disable=SC2013  # word-splitting the $(grep) and $(git ls-files)
 # loops is intended: grep tokens are spaceless by their charsets, and tracked
@@ -68,6 +69,18 @@ for g in "$ROOT"/evals/*/make-history.py; do
   elif ! cmp -s "$BUILT" "$h"; then
     broken "${h#"$ROOT"/} is stale - run: python3 ${g#"$ROOT"/}"
   fi
+done
+
+# 6. No skill body names a positional argument. The loader replaces $0
+#    through $9 with the invocation's arguments whenever the skill is called
+#    with any, so an awk or shell snippet naming a field reaches the session
+#    rewritten and prints nothing. A referenced file is read, not loaded, so
+#    a snippet that needs a field lives there.
+for f in "$ROOT"/skills/*/SKILL.md; do
+  [ -f "$f" ] || continue
+  for n in $(grep -nE '\$[0-9]' "$f" | cut -d: -f1); do
+    broken "${f#"$ROOT"/}:$n names a positional argument the loader rewrites"
+  done
 done
 
 if [ "$fails" -gt 0 ]; then

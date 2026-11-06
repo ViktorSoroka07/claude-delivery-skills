@@ -1186,6 +1186,15 @@ Two rules the gates themselves have to obey:
   and the assertion downstream then reported a healthy repo as a defect. Assert
   the setup built what it claims before asserting anything about the result.
 
+A command written inline in a skill body meets the loader before it meets a
+session: `$0` through `$9` are replaced with the invocation's arguments
+whenever the skill is called with any, so an awk or shell snippet naming a
+positional field arrives rewritten - the field becomes a word of the request -
+and prints nothing wherever its output decides something. Such a snippet is
+written with no positional `$` (a `sed` expression, a named variable), or
+lives in a referenced file, which is read rather than loaded;
+`scripts/check-refs.sh` fails on any `$` followed by a digit in a skill body.
+
 ## Versioning and releases
 
 The manifest version in `.claude-plugin/plugin.json` is the release trigger:
@@ -1232,7 +1241,8 @@ reaches the remote is fixed only by rewriting history.
    catalog does not name fails the generator rather than landing at the end of
    the table.
 3. `sh scripts/check-refs.sh` - verifies the tree's internal references
-   resolve, and that each replay case's `history.jsonl` is byte-identical to
+   resolve, that no skill body names a positional argument the loader
+   rewrites, and that each replay case's `history.jsonl` is byte-identical to
    what its `make-history.py` builds from the tree now. Any change that alters
    what a generator builds - to the brief, to the skill a seed loads, or to the
    generator itself - fails it as stale until the fixture is regenerated,

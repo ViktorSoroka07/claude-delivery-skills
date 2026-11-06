@@ -141,6 +141,20 @@ printf 'A skill line added since.\n' >> "$WORK/t5d/skills/tracking-open-asks/SKI
 sh "$CHECK" "$WORK/t5d" >/dev/null 2>&1
 check "a replay fixture older than the skill it seeds is caught" 1 $?
 
+# 5e. A skill body naming a positional argument fails, because the loader
+#     rewrites it; the same snippet in a referenced file, which is read rather
+#     than loaded, and the $ARGUMENTS placeholder itself both pass.
+mkplugin t5e
+printf 'Key: `ssh -G host | awk '"'"'$1 == "hostname" { print $2 }'"'"'`.\n' > "$WORK/t5e/skills/demo/references/how.md"
+printf 'Run it on $ARGUMENTS.\n' >> "$WORK/t5e/skills/demo/SKILL.md"
+( cd "$WORK/t5e" && git add -A && git commit -qm x )
+sh "$CHECK" "$WORK/t5e" >/dev/null 2>&1
+check "positional argument in a referenced file and the arguments placeholder pass" 0 $?
+printf 'Key: `ssh -G host | awk '"'"'$1 == "hostname" { print $2 }'"'"'`.\n' >> "$WORK/t5e/skills/demo/SKILL.md"
+( cd "$WORK/t5e" && git add -A && git commit -qm y )
+sh "$CHECK" "$WORK/t5e" >/dev/null 2>&1
+check "positional argument in a skill body is caught" 1 $?
+
 GEN="$ROOT/scripts/generate-inventory.sh"
 
 # 6. The generator rewrites a stale count from the tree, and the result is
