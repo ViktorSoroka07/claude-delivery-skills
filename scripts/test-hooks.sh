@@ -24,6 +24,7 @@ COMMIT_HOOK="$ROOT/hooks/comment-discipline-commit.py"
 LAND_HOOK="$ROOT/hooks/landed-branch.py"
 BODY_HOOK="$ROOT/hooks/hard-wrapped-body.py"
 HASH_HOOK="$ROOT/hooks/commit-body-reference.py"
+GATE_PATH_HOOK="$ROOT/hooks/hooks-path-missing.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -94,6 +95,8 @@ printf '' | "$PY" "$BODY_HOOK"
 check "body hook fails open on empty stdin" 0 $?
 printf '' | "$PY" "$HASH_HOOK"
 check "commit-body hook fails open on empty stdin" 0 $?
+printf '' | "$PY" "$GATE_PATH_HOOK"
+check "hooks-path hook fails open on empty stdin" 0 $?
 
 # 2. Write hook: a narrative tell in an edit warns (exit 2, stderr names it).
 out=$(write_payload /x/f.py '# previously a loop\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>&1)
@@ -378,6 +381,80 @@ for matcher in cfg["hooks"]["PreToolUse"]:
         sys.exit(0)
 sys.exit(1)' "$ROOT/hooks/hooks.json"
 check "commit-body hook is registered on PreToolUse Bash" 0 $?
+
+# 17d. Hooks-path hook: a commit or push about to run where core.hooksPath
+#      names a path missing from the worktree, or a directory missing a hook
+#      file the index tracks for that act, warns, in the directory a cd or -C
+#      gives the act; a hook file the repository never had, a path that is not
+#      a directory, an unconfigured repository and an act named inside a
+#      message stay quiet. Global and system config are shut out so the
+#      machine's own settings cannot reach the rows.
+gate_path() { # $1 = command, $2 = session cwd
+  commit_payload "$1" | "$PY" -c 'import json,sys;d=json.load(sys.stdin);d["cwd"]=sys.argv[1];print(json.dumps(d))' "$2" \
+    | GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 "$PY" "$GATE_PATH_HOOK"
+}
+mkrepo t17d-generated
+git config core.hooksPath .husky/_
+mkdir -p .husky/_ && printf '#!/bin/sh\n' > .husky/_/pre-commit && chmod +x .husky/_/pre-commit
+git commit -q --allow-empty -m init
+git worktree add -q "$WORK/t17d-fresh" 2>/dev/null
+mkrepo t17d-swept
+mkdir -p .githooks && printf '#!/bin/sh\n' > .githooks/pre-commit && printf '#!/bin/sh\n' > .githooks/pre-push
+git add .githooks && git commit -q -m hooks
+git config core.hooksPath .githooks
+rm .githooks/pre-push
+mkrepo t17d-gone
+mkdir -p .githooks && printf '#!/bin/sh\n' > .githooks/pre-commit
+git add .githooks && git commit -q -m hooks
+git config core.hooksPath .githooks
+rm .githooks/pre-commit && rmdir .githooks
+mkrepo t17d-commit-only
+mkdir -p .githooks && printf '#!/bin/sh\n' > .githooks/pre-commit
+git add .githooks && git commit -q -m hooks
+git config core.hooksPath .githooks
+mkdir sub
+mkrepo t17d-off
+git config core.hooksPath /dev/null
+mkrepo t17d-plain
+cd "$WORK" || exit 9
+out=$(gate_path "git commit -m x" "$WORK/t17d-fresh")
+check "hooks-path hook exits 0 (warn-only)" 0 $?
+contains "hooks-path hook warns in a fresh worktree lacking the generated directory" "$out" ".husky/_, which does not exist in this worktree"
+contains "hooks-path hook sends an untracked directory to the install" "$out" "dependency install"
+out=$(gate_path "git commit -m x" "$WORK/t17d-generated")
+empty "hooks-path hook stays quiet in the checkout that holds the generated directory" "$out"
+out=$(gate_path "git push" "$WORK/t17d-swept")
+contains "hooks-path hook warns on a push whose tracked pre-push is gone" "$out" "pre-push under core.hooksPath .githooks is tracked but gone"
+contains "hooks-path hook restores a tracked hook by checkout" "$out" "git checkout -- .githooks"
+out=$(gate_path "git commit -m x" "$WORK/t17d-swept")
+empty "hooks-path hook stays quiet on a commit whose own hooks are present" "$out"
+out=$(gate_path "git commit -m x" "$WORK/t17d-gone")
+contains "hooks-path hook restores a swept tracked directory by checkout" "$out" "git checkout -- .githooks"
+out=$(gate_path "git -C $WORK/t17d-fresh commit -m x" "$WORK")
+contains "hooks-path hook follows -C" "$out" "does not exist"
+out=$(gate_path "cd $WORK/t17d-swept && git push origin HEAD" "$WORK")
+contains "hooks-path hook follows a cd" "$out" "pre-push"
+out=$(gate_path "git add -A && git commit -m x && git push" "$WORK/t17d-swept")
+contains "hooks-path hook reads a push after a commit in one command" "$out" "this push runs without it"
+out=$(gate_path "git push" "$WORK/t17d-commit-only")
+empty "hooks-path hook stays quiet on a hook the repository never had" "$out"
+out=$(gate_path "git commit -m x" "$WORK/t17d-commit-only/sub")
+empty "hooks-path hook reads a relative path against the worktree root, not the subdirectory" "$out"
+out=$(gate_path "git commit -m x" "$WORK/t17d-off")
+empty "hooks-path hook stays quiet where the path is not a directory" "$out"
+out=$(gate_path "git commit -m x" "$WORK/t17d-plain")
+empty "hooks-path hook stays quiet where no hooks path is configured" "$out"
+out=$(gate_path "git status && git log -1" "$WORK/t17d-fresh")
+empty "hooks-path hook stays quiet on an act that runs no hook" "$out"
+out=$(gate_path "printf %s 'git commit -m x'" "$WORK/t17d-fresh")
+empty "hooks-path hook reads an act named inside quotes as message text" "$out"
+"$PY" -c 'import json,sys
+cfg = json.load(open(sys.argv[1]))
+for matcher in cfg["hooks"]["PreToolUse"]:
+    if any("hooks-path-missing.py" in hook["command"] for hook in matcher["hooks"]) and "Bash" in matcher["matcher"]:
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "hooks-path hook is registered on PreToolUse Bash" 0 $?
 
 BRIEF_HOOK="$ROOT/hooks/session-brief.py"
 
