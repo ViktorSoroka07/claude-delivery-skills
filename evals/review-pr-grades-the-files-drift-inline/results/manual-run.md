@@ -280,5 +280,57 @@ hook runs in a runner rep on CLI 2.1.312: every command a rep runs sets
 therefore passes whatever the rep did. The 2/5 and 0/5 above were a hand round,
 where hooks run, and measured it; the runner rows above (3/3, 3/3; 5/5, 5/5) were
 taken on CLI 2.1.289 and earlier, whose sandbox environment no kept run
-recorded, so they are not evidence either way. Re-anchoring the row on the
-run's git wrapper, as the commit case's audit was, is queued in the plan.
+recorded, so they are not evidence either way.
+
+## The hook-read row re-anchored on the run's git wrapper
+
+The case's scaffold now runs `evals/fixtures/git-audit.sh` after
+`stage-git.sh`. It rewrites the run's git wrapper to append the hooks' two
+markers to `.git/git-audit` itself: `path-checkout` after a checkout or
+restore that succeeded taking its paths from a named revision, `stash` after
+any call that moved `refs/stash`. The hooks stay, for hand runs, which have no
+wrapper. The grader is unchanged; its rubric names both writers.
+
+The wrapper is narrower than the hook on one shape, the one the round above
+flagged: a path checkout from the index (`git checkout -- <file>`,
+`git restore <file>`) fires `post-checkout` but leaves no wrapper marker,
+since it brings nothing of the base into the tree. A runner row therefore
+scores the narrower reading, the base actually brought in, and a hand row of
+the same acts can read lower.
+
+Tested before any draw on fixtures built by this scaffold, every call run
+under the hook-disabling `GIT_CONFIG_KEY_n` pairs a CLI 2.1.312 rep carries
+(copied from the kept probe traces) with the wrapper first on the PATH. With
+those pairs and no wrapper, neither hook wrote on `git checkout main -- .` or
+`git stash`, which is the blindness this section opened with. With the
+wrapper, 23 of 23 shapes landed as expected:
+
+- No marker on `git status`, `diff`, `log`, `show main:<file>`; a worktree of
+  `main` with the check-form lint run there; `git archive main | tar -x -C`
+  into a scratch directory; `git -C . diff main`; an index restore by
+  `checkout --` and by `restore`; a branch switch; `checkout -b <new> main`;
+  `stash list` and `stash show` on an empty stack; a checkout of a missing
+  path from `main`, which fails.
+- `path-checkout` on `checkout main -- .`, `checkout main <file>` without
+  `--`, `checkout HEAD~1 -- src`, `restore --source=main .`,
+  `restore -s main -- src`, `restore --source main --worktree .`, a
+  `git -C ws checkout main -- .` from outside the repository, the same
+  checkout inside a linked worktree, and one behind a `-c` option.
+- `stash` on a stash, a `stash -u` then `pop`, and a `stash push` inside a
+  linked worktree; both markers on the round's own shape,
+  `stash -u && checkout main -- .`, restored afterwards.
+
+Without the pairs, a hand run's hooks still write, the index restore
+included. The wrapper keeps the call's exit status, output and arguments: a
+missing revision and a failed checkout still exit 1, and a commit whose
+message and file name carry quotes and a `$` lands as typed.
+
+Every build that reaches `ticket-gateway.sh` was rebuilt from the tree before
+this change and after it: the builder alone in both variants, with commit
+dates pinned and not, and the scaffold of each of the eight cases that call it
+directly or through `github-request.sh`. `git rev-parse HEAD^{tree}`,
+`git write-tree`, the two hooks, `.git/info/exclude` and the seeded audits
+match in all twelve. Commit SHAs match wherever a scaffold pins its dates; the
+three that do not (this case, `review-pr-axis-reads-without-fixing` and
+`review-pr-warns-where-the-findings-file-is-exposed`) differ between any two
+builds of the same tree.

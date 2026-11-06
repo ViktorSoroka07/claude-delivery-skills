@@ -237,6 +237,8 @@ echo "built" > .git/lint-audit
 # .git/hooks by default, and .githooks where core.hooksPath points there - and
 # there they are excluded, so they neither stand in the tree under review nor
 # travel into the stash the pre-commit hook takes of everything untracked.
+# They are the record in a hand run only: no hook runs in a runner rep, where
+# git-audit.sh writes the same two markers from the run's git wrapper.
 mkdir -p .git/hooks
 cat > .git/hooks/post-checkout <<'HOOK'
 #!/bin/sh

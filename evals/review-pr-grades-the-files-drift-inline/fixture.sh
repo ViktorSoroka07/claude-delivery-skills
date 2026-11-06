@@ -8,3 +8,6 @@ sh "$f" . >/dev/null
 
 # a working git first on the run's PATH; the sandbox's plain `git` is a stub
 sh "$here/../fixtures/stage-git.sh" || exit 1
+# the base brought into the tree leaves its marker through the wrapper, since
+# no hook runs in a rep
+sh "$here/../fixtures/git-audit.sh" || exit 1
