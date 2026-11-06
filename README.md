@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and nine hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and ten hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -277,11 +277,11 @@ instructions alone cannot:
   present; dispatch prompts shrink to the task itself — an axis, the draft or claims
   to refute, the test command — plus worktree, SHA, scope, and the file the report
   goes to.
-- **Nine hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Four
+- **Ten hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Five
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
-  the judgment, and none of the four blocks. The comment rules are the most-relapsed
-  discipline in the corpus behind this repo, which is why two of the four watch them.
+  the judgment, and none of the five blocks. The comment rules are the most-relapsed
+  discipline in the corpus behind this repo, which is why two of the five watch them.
   One stops an act once until the skill that owns it is loaded. The other four inject
   what a session cannot see for itself: the standing rules at session start, how far
   into its context window it has run, at the end of a turn that changed a rule file
@@ -297,6 +297,11 @@ instructions alone cannot:
     branch, a merge through any of the three forge CLIs or a local merge from the
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
+  - **Hard-wrapped body** — reads a pull request body the moment a create or edit
+    command sends it, from a body file, a substitution over one, a heredoc or a
+    quoted literal, and warns on a line break mid-sentence, because the forge
+    renders every newline inside a paragraph as a break and the paragraph arrives
+    chopped; backs `writing-pr-descriptions`.
   - **Skill gate** — stops a commit, a pull request create (`gh` or `az`), a write
     into the session's memory directory, or a subagent dispatch until
     the conversation has loaded the skill that owns it: `writing-commit-messages`,

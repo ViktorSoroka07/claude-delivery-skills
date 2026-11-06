@@ -19,6 +19,7 @@ fails=0
 WRITE_HOOK="$ROOT/hooks/comment-discipline.py"
 COMMIT_HOOK="$ROOT/hooks/comment-discipline-commit.py"
 LAND_HOOK="$ROOT/hooks/landed-branch.py"
+BODY_HOOK="$ROOT/hooks/hard-wrapped-body.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -85,6 +86,8 @@ printf '' | "$PY" "$COMMIT_HOOK"
 check "commit hook fails open on empty stdin" 0 $?
 printf '' | "$PY" "$LAND_HOOK"
 check "landing hook fails open on empty stdin" 0 $?
+printf '' | "$PY" "$BODY_HOOK"
+check "body hook fails open on empty stdin" 0 $?
 
 # 2. Write hook: a narrative tell in an edit warns (exit 2, stderr names it).
 out=$(write_payload /x/f.py '# previously a loop\nx = 1\n' | "$PY" "$WRITE_HOOK" 2>&1)
@@ -250,6 +253,62 @@ out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}
 check "landing hook ignores non-Bash tools" 0 $?
 
 echo
+# 17b. Body hook: a pull request body sent with a line break mid-sentence
+#      warns, from every place a command takes the body; a body whose short
+#      lines are list items, table rows, fenced code or HTML stays quiet, as
+#      does a command that only names the send inside a message.
+cd "$WORK" || exit 9
+body_payload() { # $1 = file holding the command; the session cwd is $WORK
+  "$PY" -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":open(sys.argv[1]).read()},"cwd":sys.argv[2]}))' "$1" "$WORK"
+}
+# shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
+{
+  printf 'The export failed on every gateway timeout\nand the operator reran it by hand.\n\n- a list item wrapped\n  onto a second line\n' > wrapped.md
+  printf 'One paragraph on one line, however long it runs, never breaks until it ends.\n\n- a list item\n- another item\n\n| Before | After |\n|---|---|\n| short | cells |\n\n```\nshort code\nlines here\n```\n\n<td valign="top">\nhtml cell\n</td>\n' > clean.md
+  printf 'gh pr create --title "x" --body-file %s/wrapped.md\n' "$WORK" > cmd-file
+  printf 'gh pr edit 42 --body-file wrapped.md\n' > cmd-relative
+  printf 'gh pr create --title "x" --body "$(cat %s/wrapped.md)"\n' "$WORK" > cmd-cat
+  printf 'az repos pr update --id 5 --description "$(cat wrapped.md)"\n' > cmd-az
+  printf 'gh pr create --title "x" --body "$(cat <<'"'"'EOF'"'"'\nThe export failed on every timeout\nand was rerun by hand.\nEOF\n)"\n' > cmd-heredoc
+  printf 'gh pr create --title "x" --body "The export failed\nand was rerun."\n' > cmd-literal
+  printf 'gh pr create --title "x" --body-file %s/clean.md\n' "$WORK" > cmd-clean
+  printf 'gh pr comment 42 --body-file %s/wrapped.md\n' "$WORK" > cmd-comment
+  printf 'gh pr create --title "x" --body-file %s/no-such.md\n' "$WORK" > cmd-missing
+  printf 'cd sub && gh pr create --title "x" --body-file wrapped.md\n' > cmd-cd
+  printf 'git commit -m "gh pr create --body-file wrapped.md"\n' > cmd-message
+}
+out=$(body_payload cmd-file | "$PY" "$BODY_HOOK")
+check "body hook exits 0 (warn-only)" 0 $?
+contains "body hook warns on a wrapped body file" "$out" "hard-wrapped"
+contains "body hook names the first wrapped line" "$out" "first at line 2"
+out=$(body_payload cmd-relative | "$PY" "$BODY_HOOK")
+contains "body hook resolves a relative body file against the session cwd" "$out" "hard-wrapped"
+out=$(body_payload cmd-cat | "$PY" "$BODY_HOOK")
+contains "body hook reads a cat substitution" "$out" "hard-wrapped"
+out=$(body_payload cmd-az | "$PY" "$BODY_HOOK")
+contains "body hook reads the second forge CLI's description" "$out" "hard-wrapped"
+out=$(body_payload cmd-heredoc | "$PY" "$BODY_HOOK")
+contains "body hook reads a heredoc body" "$out" "hard-wrapped"
+out=$(body_payload cmd-literal | "$PY" "$BODY_HOOK")
+contains "body hook reads a quoted literal body" "$out" "hard-wrapped"
+out=$(body_payload cmd-clean | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on lists, tables, code and HTML" "$out"
+out=$(body_payload cmd-comment | "$PY" "$BODY_HOOK")
+empty "body hook ignores a command that is not a create or edit" "$out"
+out=$(body_payload cmd-missing | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a body file it cannot read" "$out"
+out=$(body_payload cmd-cd | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a relative path behind a cd it cannot follow" "$out"
+out=$(body_payload cmd-message | "$PY" "$BODY_HOOK")
+empty "body hook reads a send named inside a message as message text" "$out"
+"$PY" -c 'import json,sys
+cfg = json.load(open(sys.argv[1]))
+for matcher in cfg["hooks"]["PreToolUse"]:
+    if any("hard-wrapped-body.py" in hook["command"] for hook in matcher["hooks"]) and "Bash" in matcher["matcher"]:
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "body hook is registered on PreToolUse Bash" 0 $?
+
 BRIEF_HOOK="$ROOT/hooks/session-brief.py"
 
 # 18. Session brief: emits the SessionStart context as JSON naming every
