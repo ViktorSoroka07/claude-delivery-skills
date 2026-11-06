@@ -2,7 +2,8 @@
 # Self-tests for the hooks (hooks/*.py). Each test feeds a
 # hook the JSON payload the harness sends it and asserts on the verdict; the
 # commit-time tests build a throwaway repo with real staged content. Run from
-# anywhere inside the repo; exits non-zero on any FAIL. Every hook fails open,
+# anywhere inside the repo; exits non-zero on any FAIL or UNMEASURED row (the
+# landing sweep's budget rows, below). Every hook fails open,
 # so an import or syntax error is invisible in a session - the smoke tests
 # here are the only place such a break surfaces.
 set -u
@@ -15,6 +16,8 @@ trap 'rm -rf "$WORK"' EXIT
 WORK=$(cd "$WORK" && { pwd -W 2>/dev/null || pwd; })
 PY=$(command -v python3 || command -v python)
 fails=0
+owed=0
+unmeasured=
 
 WRITE_HOOK="$ROOT/hooks/comment-discipline.py"
 COMMIT_HOOK="$ROOT/hooks/comment-discipline-commit.py"
@@ -1209,9 +1212,51 @@ sweep_submit() { # $1 = cwd, $2 = session, $3 = prompt
   printf '{"hook_event_name":"UserPromptSubmit","session_id":"%s","prompt_id":"%s","cwd":"%s"}' "$2" "$3" "$1" \
     | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
 }
-sweep_stop() { # $1 = cwd, $2 = session, $3 = prompt, $4 = stop_hook_active, $5 = transcript
+stop_payload() { # $1 = cwd, $2 = session, $3 = prompt, $4 = stop_hook_active, $5 = transcript
   printf '{"hook_event_name":"Stop","session_id":"%s","prompt_id":"%s","cwd":"%s","stop_hook_active":%s,"transcript_path":"%s"}' \
-    "$2" "$3" "$1" "${4:-false}" "${5:-}" | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
+    "$2" "$3" "$1" "${4:-false}" "${5:-}"
+}
+sweep_stop() { # stop_payload's arguments
+  stop_payload "$@" | TMPDIR="$SW" "$PY" "$SWEEP_HOOK"
+}
+# A budget row passes only where the sweep finishes inside its wall-clock
+# budget, and a loaded machine spends that budget on the sweep waiting for a
+# core. A budget row that fails where the sweep ran its whole budget and the
+# one-minute load average is at least the core count is UNMEASURED: past one
+# runnable process a core the sweep's clock runs while it waits, so the budget
+# no longer times its own work. Counted against cores, the threshold holds on a
+# runner of any size. Without a load average (native Windows) the FAIL stands.
+# An unmeasured row is never a pass: it is named in the summary and the suite
+# exits non-zero, owed a run on a quiet machine.
+timed_stop() { # stop_payload's arguments; leaves the run's wall time and budget in $WORK/sweep-wall
+  stop_payload "$@" | TMPDIR="$SW" "$PY" -c 'import runpy, subprocess, sys, time
+start = time.monotonic()
+code = subprocess.call([sys.executable, sys.argv[1]])
+wall = time.monotonic() - start
+budget = runpy.run_path(sys.argv[1])["budget_for"]("Stop").left()
+open(sys.argv[2], "w").write("%f %f" % (wall, budget))
+sys.exit(code)' "$SWEEP_HOOK" "$WORK/sweep-wall"
+}
+starved() { # prints the load and succeeds where the last timed_stop ran its budget past one process a core
+  "$PY" -c 'import os, sys
+wall, budget = map(float, open(sys.argv[1]).read().split())
+if not hasattr(os, "getloadavg"):
+    sys.exit(1)
+load, cores = os.getloadavg()[0], os.cpu_count()
+if wall < budget or load < cores:
+    sys.exit(1)
+print("%.0f on %d cores" % (load, cores))' "$WORK/sweep-wall"
+}
+budget_row() { # $1 = contains or lacks, then that check's arguments, read against the last timed_stop
+  case "$3" in *"$4"*) found=contains ;; *) found=lacks ;; esac
+  if [ "$found" != "$1" ] && load=$(starved); then
+    echo "UNMEASURED: $2 (the sweep ran its whole budget at load $load)"
+    owed=$((owed+1))
+    unmeasured="$unmeasured
+  - $2"
+    return
+  fi
+  "$1" "$2" "$3" "$4"
 }
 # Python on Windows writes each newline to a pipe as CRLF, and a check whose
 # needle spans a line break then never matches; both helpers write bare ones.
@@ -1755,8 +1800,8 @@ p = sys.argv[1]
 text = open(p).read()
 open(p, "w").write(text.replace("returns the item list for", "lists the items of"))
 EOF
-got=$(handed "$(sweep_stop "$R" s35 p1)")
-contains "sweep diffs a large block line by line" "$got" "docs/api.md:1"
+got=$(handed "$(timed_stop "$R" s35 p1)")
+budget_row contains "sweep diffs a large block line by line" "$got" "docs/api.md:1"
 lacks "sweep reads only the rows a large block changed" "$got" "CLAUDE.md"
 R="$WORK/sw-rows-unlike"; sweep_repo "$R"
 "$PY" - "$R" <<'EOF'
@@ -2010,7 +2055,8 @@ p = sys.argv[1]
 text = open(p).read()
 open(p, "w").write(text.replace("keeps the ledger sync notes", "holds the ledger notes"))
 EOF
-contains "sweep diffs a document whose every paragraph changed within its budget" "$(handed "$(sweep_stop "$R" s54 p1)")" "docs/para.md:1"
+got=$(handed "$(timed_stop "$R" s54 p1)")
+budget_row contains "sweep diffs a document whose every paragraph changed within its budget" "$got" "docs/para.md:1"
 R="$WORK/sw-longlist"; sweep_repo "$R"
 "$PY" - "$R" <<'EOF'
 import sys
@@ -2031,9 +2077,9 @@ for n, line in enumerate(lines):
         lines[n] = line.replace("keeps the ledger sync notes", "holds the ledger notes")
 open(p, "w").write("\n".join(lines))
 EOF
-text=$(context "$(sweep_stop "$R" s63 p1)")
-contains "sweep reads a long loose list whose items carry nested bullets within its budget" "$text" "docs/para.md:1"
-lacks "sweep finishes a long loose list's search before its time limit" "$text" "stopped at its time limit"
+text=$(context "$(timed_stop "$R" s63 p1)")
+budget_row contains "sweep reads a long loose list whose items carry nested bullets within its budget" "$text" "docs/para.md:1"
+budget_row lacks "sweep finishes a long loose list's search before its time limit" "$text" "stopped at its time limit"
 
 # A state directory that is open to others or a link is never used.
 R="$WORK/sw-open"; sweep_repo "$R"
@@ -2147,7 +2193,10 @@ sys.exit(1)' "$ROOT/hooks/hooks.json" "$event"
   check "registration runs the sweep on $event" 0 $?
 done
 
-if [ $fails -eq 0 ]; then
+if [ $owed -gt 0 ]; then
+  echo "$owed row(s) UNMEASURED, the machine too loaded for their time budget; a run on a quiet machine is owed:$unmeasured"
+fi
+if [ $fails -eq 0 ] && [ $owed -eq 0 ]; then
   echo "ALL PASS"
   exit 0
 fi
