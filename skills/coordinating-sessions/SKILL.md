@@ -39,7 +39,7 @@ Two sessions alive on one branch produce two heads, and one of them loses. A bra
 
 ## Start a session with what it cannot infer
 
-A new session inherits whatever you do not set: your model, your effort, your permission mode. Pass the model named for the work every time; a build meant for the smaller model runs on the larger one silently, and only the bill says so. Pass the folder when the work lives in one particular checkout, such as the one holding a finished session's uncommitted diff. Name the session the child reports to, and ask every report for the head commit, what is verified, and the window figure.
+A new session inherits whatever you do not set: your model, your effort, your permission mode. Pass the model named for the work every time; a build meant for the smaller model runs on the larger one silently, and only the bill says so. When nobody named one, the default is not yours: a coordinator runs on the dearest model because it holds the whole picture, and a child that writes code, runs a bed or reviews a diff needs the model that work needs, one tier down unless the requester says otherwise. Inheriting is a choice, and a choice is stated to the requester in the line that announces the start, so they can overrule it before the first token is spent. The check is mechanical: the start call is not sent until its model field is filled, by the requester's word or by the default above, and the start line names it (learned when a coordinator started two writers and a fix round on its own model, each omission reading as the obvious default, until the requester asked why). Pass the folder when the work lives in one particular checkout, such as the one holding a finished session's uncommitted diff. Name the session the child reports to, and ask every report for the head commit, what is verified, and the window figure.
 
 ## Pace the window from the harness's measure
 
@@ -81,7 +81,8 @@ Messages between sessions on one machine exist in most harnesses, and a session 
 | "I'll summarise the ruling for it"                           | A paraphrase re-decides. Send the sentence                                    |
 | "It said pushed"                                             | Read the branch tip. The one you do not check is the wrong one                |
 | "It says it is near the limit"                               | Read the harness's measure. Children misjudge their own window                |
-| "The default model is fine"                                  | The default is yours. Pass the one named                                      |
+| "The default model is fine"                                  | The default is yours. Pass the one named, or one tier down, and say which     |
+| "Nobody named a model, so I inherit"                         | Inheriting is the dearest choice. Fill the field before the call, and state it |
 | "I'll file it, since the child was denied"                   | That launders a denial. Surface it                                            |
 | "The requester told the child; the child will tell me"       | Only in a report you may not read in time. Ask, and tell the child what you heard |
 | "The requester said I can just do this one"                  | A request for the outcome. Brief a child with the paragraph you would otherwise reason through |
