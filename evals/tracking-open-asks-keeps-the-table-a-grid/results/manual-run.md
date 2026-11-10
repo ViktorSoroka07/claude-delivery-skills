@@ -26,7 +26,7 @@ whole table into stacked label-value records.
 The unbreakable token is not the cause on its own: it matters only by the
 width it takes, which pushes its neighbours' sentences past four lines.
 
-## Wording under test (landed)
+## Wording under test (landed second; the third, below, replaced its command clause)
 
 > One item is a sentence. Two or more are walked through first, each under its number in a paragraph of its own: the question itself; what it blocks; the answer you recommend and why; and what happens if no answer comes, and where acting on the answer means a command the requester runs, that command in full in a fenced code block of its own beneath the paragraph, never inline or in the table. A numbered table then indexes them, one row per item, each cell a few words: the item's name, what it blocks, the recommended answer, what happens without one. A terminal draws a table as a grid only while every row fits in a few wrapped lines, so one cell of sentences, or a path or command whose unbroken length takes the width from its neighbours, turns the whole table into stacked records, and a command in a cell wraps where it cannot be copied whole.
 
@@ -84,3 +84,28 @@ list and failed all five, though each rep restated both questions in full in
 the numbered walk-through directly above it. The rubric, in this case and its
 two copies, now names the walk-through followed by its index table as one
 place.
+
+## Third wording: the command block after the paragraph, never in its place
+
+The landed wording's command clause now reads "that command in full in a
+fenced code block of its own beneath the paragraph, after all four parts and
+never in place of one, and never inline or in the table." Same prompt as the
+landed table above; the comparison is that table's treatment column.
+
+| Grader | Second wording | Third wording |
+|---|---|---|
+| each-waiting-item-explained-above-the-table | 1/5 | 4/5 |
+| table-cells-stay-short | 4/5 | 5/5 |
+| no-command-in-a-table-cell | 5/5 | 5/5 |
+| command-in-a-code-block | 5/5 | 5/5 |
+| closes-with-every-waiting-item | 5/5 | 5/5 |
+| says-what-each-blocks-and-the-default | 5/5 | 5/5 |
+| no-answer-cell-opens-taken-or-waits | 5/5 | 5/5 |
+| rename-done-in-the-script | 5/5 | 5/5 |
+
+The one fail, read by hand, recommends deleting the branch with no reason.
+A gap of three in five is under the five-rep floor, so the third wording
+lands as the better reading with no neighbour moving, not as a measured
+win. Three of the five reps replace three the runner curtailed at launch,
+when the CLI was upgraded under it: two reps ran on 2.1.319, three on
+2.1.322, which every earlier arm of this case did not mix.
