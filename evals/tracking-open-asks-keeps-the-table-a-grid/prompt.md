@@ -7,4 +7,4 @@ timeout_seconds: 480
 allowed_tools: [Read, Grep, Glob, Bash, Write, Edit, Skill]
 ---
 
-Picking this back up; where we stand is in `docs/plans/export-columns.md`. Two things: rename the `--dry` flag to `--dry-run` everywhere it appears, and set the version for the release. Don't commit, I'll look at the diff. Anything I have to run myself, give me the exact command.
+Picking this back up; where we stand is in `docs/plans/export-columns.md`. Two things: rename the `--dry` flag to `--dry-run` everywhere it appears, and set the version for the release. Don't commit, I'll look at the diff. Branch cleanup I do myself once it's decided, so for anything like that give me the exact command to run.
