@@ -944,6 +944,51 @@ sys.exit(1)' "$ROOT/hooks/hooks.json"
 check "registration runs the width hook at the stop" 0 $?
 
 echo
+GRID_HOOK="$ROOT/hooks/table-grid.py"
+
+# 20b. Table-grid hook: a terminal stops drawing a table as a grid once a row
+#      wraps past four lines. Tall is five columns of sentences, the shape
+#      the closing table took before its cells shrank; short is the index
+#      shape; the boundary pair is one long cell at four and five lines.
+printf '' | "$PY" "$GRID_HOOK" >/dev/null 2>&1
+check "grid hook fails open on empty stdin" 0 $?
+out=$(printf '{"hook_event_name":"Stop"}' | "$PY" "$GRID_HOOK")
+empty "grid hook stays silent where the harness sends no message" "$out"
+
+S='"Should the old worktree be removed now that its branch has merged into main, nothing else uses it and every commit it holds is already there"'
+TALL="'| # | Question | Blocks | Recommendation | Without |\n|---|---|---|---|---|\n| 1 | ' + $S + ' | ' + $S + ' | ' + $S + ' | ' + $S + ' |\n'"
+out=$(width_payload "'Open items:\n\n' + $TALL" | "$PY" "$GRID_HOOK")
+msg=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["systemMessage"])' 2>/dev/null)
+check "grid hook output is the systemMessage shape" 0 $?
+contains "grid hook names the limit it measured against" "$msg" "fits in 4"
+contains "grid hook names the remedy" "$msg" "a few words"
+out=$(width_payload "$TALL + 'between\n\n' + $TALL" | "$PY" "$GRID_HOOK")
+contains "grid hook counts every tall table" "$out" "2 tables"
+
+SHORT="'| # | Item | Blocks | Recommended | Without |\n|---|---|---|---|---|\n| 1 | Delete branch? | Nothing | Yes | **Waits:** stays |\n'"
+out=$(width_payload "$SHORT" | "$PY" "$GRID_HOOK")
+empty "grid hook stays silent on an index of short cells" "$out"
+out=$(width_payload "'\`\`\`\n' + $TALL + '\`\`\`\n'" | "$PY" "$GRID_HOOK")
+empty "grid hook ignores a table inside a fenced block" "$out"
+out=$(width_payload "($TALL).replace('|---|---|---|---|---|\n', '| 0 | a | b | c | d |\n')" | "$PY" "$GRID_HOOK")
+empty "grid hook needs a separator row to read a table" "$out"
+
+W='"the branch landed on main and every commit in it is there so nothing is lost "'
+LONG4="'| # | Q | B | Rec | D |\n|---|---|---|---|---|\n| 1 | Go? | No | ' + $W * 4 + ' | Taken |\n'"
+LONG5="'| # | Q | B | Rec | D |\n|---|---|---|---|---|\n| 1 | Go? | No | ' + $W * 6 + ' | Taken |\n'"
+out=$(width_payload "$LONG4" | "$PY" "$GRID_HOOK")
+empty "grid hook stays silent on a row of four lines" "$out"
+out=$(width_payload "$LONG5" | "$PY" "$GRID_HOOK")
+contains "grid hook speaks on a row past four lines" "$out" "table-grid"
+
+"$PY" -c 'import json, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"]["Stop"]:
+    if any("table-grid.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "registration runs the grid hook at the stop" 0 $?
+
+echo
 GATE_HOOK="$ROOT/hooks/skill-gate.py"
 GSTATE="$WORK/gate-state"
 mkdir -p "$GSTATE"

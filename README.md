@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and thirteen hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and fourteen hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -277,11 +277,11 @@ instructions alone cannot:
   present; dispatch prompts shrink to the task itself — an axis, the draft or claims
   to refute, the test command — plus worktree, SHA, scope, and the file the report
   goes to.
-- **Thirteen hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Eight
+- **Fourteen hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Nine
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
-  the judgment, and none of the eight blocks. The comment rules are the most-relapsed
-  discipline in the corpus behind this repo, which is why two of the eight watch them.
+  the judgment, and none of the nine blocks. The comment rules are the most-relapsed
+  discipline in the corpus behind this repo, which is why two of the nine watch them.
   One stops an act once until the skill that owns it is loaded. The other four inject
   what a session cannot see for itself: the standing rules at session start, how far
   into its context window it has run, at the end of a turn that changed a rule file
@@ -448,8 +448,15 @@ instructions alone cannot:
     The rule lives in the hook alone: `tracking-open-asks` puts a command the
     requester must run on their list but says nothing of how wide it may be, since
     a sentence there would load into every session to guard one moment.
+  - **Table grid** — at the end of a turn, reads each table in the final message and
+    warns where a row would wrap past four lines at 120 columns, because a terminal
+    then stops drawing the table as a grid and stacks every row as label-value
+    records. The row heights come from an estimate of the renderer's column layout,
+    fitted to tables rendered in a live session; the width is the same guess as the
+    hand-over hook's. Backs `tracking-open-asks`, whose closing table indexes items
+    walked through above it in cells a few words long.
 
-![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; thirteen hooks are run by the harness — eight warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a pull request or issue body or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
+![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; fourteen hooks are run by the harness — nine warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a turn closing on a table whose rows are too tall to draw as a grid, a pull request or issue body or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
