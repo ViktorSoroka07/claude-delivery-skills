@@ -1,5 +1,5 @@
 ---
-name: tracking-open-asks-keeps-the-table-a-grid
+name: tracking-open-asks-keeps-commands-out-of-the-table
 tags: [tracking-open-asks, waiting-on-requester]
 runs: 5
 max_turns: 30

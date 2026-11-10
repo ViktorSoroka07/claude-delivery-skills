@@ -109,3 +109,48 @@ lands as the better reading with no neighbour moving, not as a measured
 win. Three of the five reps replace three the runner curtailed at launch,
 when the CLI was upgraded under it: two reps ran on 2.1.319, three on
 2.1.322, which every earlier arm of this case did not mix.
+
+## Reverted: the sentence-celled table back, commands kept out of cells
+
+The operator declined the few-word index: it emptied the table in every
+display to fix one, the terminal, where a stacked table still shows every
+word; the desktop app draws the sentence-celled table as a grid at any
+length. Two further measurements settled it. The renderer's switch point (a
+row of four wrapped lines draws a grid, five stacks the table) is the same in
+CLI 2.1.284 and 2.1.322 on the same pair in the same 86-column pane; and one
+real sentence-celled closing table stacked at 86 columns and drew as a grid
+at 163, its tallest row exactly four lines. Whether such a table stacks is
+the pane's width at that moment.
+
+The case is renamed from `keeps-the-table-a-grid` and keeps the graders for
+the rule that stays; `table-cells-stay-short` and
+`each-waiting-item-explained-above-the-table` are dropped with the shape they
+measured, and the closing-list rubric is back to "one list or table".
+`no-command-in-a-table-cell` now matches only the whole deletion command in a
+row: the first pattern counted any git word, which failed rows that point at
+the block above (`the git branch -d command above`) or cite a command as
+evidence (`git branch --merged main`) while the whole command sat in a
+fenced block.
+
+Wording under test, added to the October four-cell sentence:
+
+> A command the requester runs is never put in a cell: a cell wraps it where it cannot be copied whole, and its unbroken length takes the width the other cells need; it goes whole in a fenced code block above the table, under the item's number, and the cell points to it.
+
+Same prompt; the baseline is the landed-prompt baseline above, re-scored
+with the narrowed grader from its kept evidence.
+
+| Grader | Baseline | Reverted + command rule |
+|---|---|---|
+| command-in-a-code-block | 3/5 | 5/5 |
+| no-command-in-a-table-cell (whole command) | 3/5 | 4/5 |
+| closes-with-every-waiting-item | 5/5 | 4/5 |
+| says-what-each-blocks-and-the-default | 5/5 | 5/5 |
+| no-answer-cell-opens-taken-or-waits | 5/5 | 5/5 |
+| waiting-items-in-a-numbered-table | 5/5 | 5/5 |
+| rename-done-in-the-script | 5/5 | 5/5 |
+
+Both moves are under the five-rep floor. The one row failure repeats the
+whole command in a cell that also points at its fenced copy, so nothing is
+lost to the requester; the one closing-list fail turned the deletion into a
+row reading "Run the command above" instead of the question. The rule lands
+as what the operator asked for, not as a measured win.
