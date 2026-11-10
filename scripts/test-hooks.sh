@@ -944,49 +944,46 @@ sys.exit(1)' "$ROOT/hooks/hooks.json"
 check "registration runs the width hook at the stop" 0 $?
 
 echo
-GRID_HOOK="$ROOT/hooks/table-grid.py"
+CELL_HOOK="$ROOT/hooks/table-command.py"
 
-# 20b. Table-grid hook: a terminal stops drawing a table as a grid once a row
-#      wraps past four lines. Tall is five columns of sentences, the shape
-#      the closing table took before its cells shrank; short is the index
-#      shape; the boundary pair is one long cell at four and five lines.
-printf '' | "$PY" "$GRID_HOOK" >/dev/null 2>&1
-check "grid hook fails open on empty stdin" 0 $?
-out=$(printf '{"hook_event_name":"Stop"}' | "$PY" "$GRID_HOOK")
-empty "grid hook stays silent where the harness sends no message" "$out"
+# 20b. Table-command hook: a command in a table cell wraps at the column's
+#      edge and is copied in fragments, and its length squeezes the other
+#      cells. Speaks on a backticked command in a row, by a command word or
+#      the "! " form; silent on a file name or flag in a cell, a command in
+#      a fenced block above the table, and pipe lines with no separator row.
+printf '' | "$PY" "$CELL_HOOK" >/dev/null 2>&1
+check "cell hook fails open on empty stdin" 0 $?
+out=$(printf '{"hook_event_name":"Stop"}' | "$PY" "$CELL_HOOK")
+empty "cell hook stays silent where the harness sends no message" "$out"
 
-S='"Should the old worktree be removed now that its branch has merged into main, nothing else uses it and every commit it holds is already there"'
-TALL="'| # | Question | Blocks | Recommendation | Without |\n|---|---|---|---|---|\n| 1 | ' + $S + ' | ' + $S + ' | ' + $S + ' | ' + $S + ' |\n'"
-out=$(width_payload "'Open items:\n\n' + $TALL" | "$PY" "$GRID_HOOK")
+HEAD="'| # | Question | Recommendation | Without an answer |\n|---|---|---|---|\n'"
+out=$(width_payload "$HEAD + '| 1 | Delete the branch? | Yes, run \`git branch -d tmp-migrate\` | **Waits:** stays |\n'" | "$PY" "$CELL_HOOK")
 msg=$(printf '%s' "$out" | "$PY" -c 'import json,sys; print(json.load(sys.stdin)["systemMessage"])' 2>/dev/null)
-check "grid hook output is the systemMessage shape" 0 $?
-contains "grid hook names the limit it measured against" "$msg" "fits in 4"
-contains "grid hook names the remedy" "$msg" "a few words"
-out=$(width_payload "$TALL + 'between\n\n' + $TALL" | "$PY" "$GRID_HOOK")
-contains "grid hook counts every tall table" "$out" "2 tables"
+check "cell hook output is the systemMessage shape" 0 $?
+contains "cell hook quotes the command it found" "$msg" "git branch -d tmp-migrate"
+contains "cell hook names the remedy" "$msg" "fenced block above the table"
+out=$(width_payload "$HEAD + '| 1 | Push? | Run \`! git push -u origin main\` | **Waits:** unpushed |\n| 2 | Clean? | \`rm build.log\` | **Taken:** removed |\n'" | "$PY" "$CELL_HOOK")
+contains "cell hook reads the ! form and counts every command" "$out" "2 commands"
 
-SHORT="'| # | Item | Blocks | Recommended | Without |\n|---|---|---|---|---|\n| 1 | Delete branch? | Nothing | Yes | **Waits:** stays |\n'"
-out=$(width_payload "$SHORT" | "$PY" "$GRID_HOOK")
-empty "grid hook stays silent on an index of short cells" "$out"
-out=$(width_payload "'\`\`\`\n' + $TALL + '\`\`\`\n'" | "$PY" "$GRID_HOOK")
-empty "grid hook ignores a table inside a fenced block" "$out"
-out=$(width_payload "($TALL).replace('|---|---|---|---|---|\n', '| 0 | a | b | c | d |\n')" | "$PY" "$GRID_HOOK")
-empty "grid hook needs a separator row to read a table" "$out"
-
-W='"the branch landed on main and every commit in it is there so nothing is lost "'
-LONG4="'| # | Q | B | Rec | D |\n|---|---|---|---|---|\n| 1 | Go? | No | ' + $W * 4 + ' | Taken |\n'"
-LONG5="'| # | Q | B | Rec | D |\n|---|---|---|---|---|\n| 1 | Go? | No | ' + $W * 6 + ' | Taken |\n'"
-out=$(width_payload "$LONG4" | "$PY" "$GRID_HOOK")
-empty "grid hook stays silent on a row of four lines" "$out"
-out=$(width_payload "$LONG5" | "$PY" "$GRID_HOOK")
-contains "grid hook speaks on a row past four lines" "$out" "table-grid"
+out=$(width_payload "$HEAD + '| 1 | Keep \`VERSION\` at 2.4.0? | Yes, \`--dry-run\` changed | **Taken:** kept |\n'" | "$PY" "$CELL_HOOK")
+empty "cell hook ignores a file name or a flag in a cell" "$out"
+out=$(width_payload "'\`\`\`\ngit branch -d tmp-migrate\n\`\`\`\n\n' + $HEAD + '| 1 | Delete? | Yes, command above | **Waits:** stays |\n'" | "$PY" "$CELL_HOOK")
+empty "cell hook ignores a command in a fenced block above the table" "$out"
+out=$(width_payload "'\`\`\`\ngit branch -d tmp-migrate\n\`\`\`\n\n' + $HEAD + '| 1 | Delete? | Run the \`git branch -d tmp-migrate\` command above | **Waits:** stays |\n'" | "$PY" "$CELL_HOOK")
+empty "cell hook ignores a cell naming a command a fenced block holds whole" "$out"
+out=$(width_payload "'\`\`\`markdown\n' + $HEAD + '| 1 | Delete? | \`git branch -d x\` | **Waits:** stays |\n\`\`\`\n'" | "$PY" "$CELL_HOOK")
+empty "cell hook ignores a table shown inside a fenced block" "$out"
+out=$(width_payload "'| a | b |\n| run \`git push origin main\` | x |\n'" | "$PY" "$CELL_HOOK")
+empty "cell hook needs a separator row to read a table" "$out"
+out=$(width_payload "'Run \`git push origin main\` when ready.'" | "$PY" "$CELL_HOOK")
+empty "cell hook ignores a command in prose" "$out"
 
 "$PY" -c 'import json, sys
 for matcher in json.load(open(sys.argv[1]))["hooks"]["Stop"]:
-    if any("table-grid.py" in hook["command"] for hook in matcher["hooks"]):
+    if any("table-command.py" in hook["command"] for hook in matcher["hooks"]):
         sys.exit(0)
 sys.exit(1)' "$ROOT/hooks/hooks.json"
-check "registration runs the grid hook at the stop" 0 $?
+check "registration runs the cell hook at the stop" 0 $?
 
 echo
 GATE_HOOK="$ROOT/hooks/skill-gate.py"

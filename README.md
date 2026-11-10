@@ -448,15 +448,15 @@ instructions alone cannot:
     The rule lives in the hook alone: `tracking-open-asks` puts a command the
     requester must run on their list but says nothing of how wide it may be, since
     a sentence there would load into every session to guard one moment.
-  - **Table grid** — at the end of a turn, reads each table in the final message and
-    warns where a row would wrap past four lines at 120 columns, because a terminal
-    then stops drawing the table as a grid and stacks every row as label-value
-    records. The row heights come from an estimate of the renderer's column layout,
-    fitted to tables rendered in a live session; the width is the same guess as the
-    hand-over hook's. Backs `tracking-open-asks`, whose closing table indexes items
-    walked through above it in cells a few words long.
+  - **Table command** — at the end of a turn, reads each table in the final message
+    and warns on a command inside a cell - an inline code span opening with `! ` or a
+    common command word and an argument - because a cell wraps a command at its
+    column's edge, where it is copied in fragments, and its unbroken length squeezes
+    the other cells until the terminal stops drawing the table as a grid. Backs
+    `tracking-open-asks`, which puts such a command whole in a fenced block above the
+    table.
 
-![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; fourteen hooks are run by the harness — nine warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a turn closing on a table whose rows are too tall to draw as a grid, a pull request or issue body or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
+![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; fourteen hooks are run by the harness — nine warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a turn putting a command inside a table cell, a pull request or issue body or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 
