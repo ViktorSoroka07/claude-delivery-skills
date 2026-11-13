@@ -262,9 +262,9 @@ out=$(printf '%s' '{"tool_name":"Edit","tool_input":{"command":"gh pr merge 42"}
 check "landing hook ignores non-Bash tools" 0 $?
 
 echo
-# 17b. Body hook: a pull request or issue body, or a comment on either, sent
-#      with a line break mid-sentence warns, from every place a command takes
-#      the body; a body whose short lines are list items, table rows, fenced
+# 17b. Body hook: a pull request or issue body, a comment on either, a review
+#      body or a closing comment, sent with a line break mid-sentence warns,
+#      from every place a command takes the body; a body whose short lines are list items, table rows, fenced
 #      code or HTML stays quiet, as do a merge commit's body, a work item's
 #      HTML field and a command that only names the send inside a message.
 cd "$WORK" || exit 9
