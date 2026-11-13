@@ -3,7 +3,7 @@
 [![CI](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml/badge.svg)](https://github.com/ViktorSoroka07/claude-delivery-skills/actions/workflows/guard.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2F7A6F.svg)](LICENSE)
 
-A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and fourteen hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
+A [Claude Code plugin](https://code.claude.com/docs/en/plugins) — <!-- inventory -->twenty skills, three agent types, and fifteen hooks<!-- /inventory --> — that hardens the path from idea to merged PR, and
 the moments around it. It exists because the failure mode of agent-driven development
 is rarely the code itself: it is everything around the code. Plans built on unverified claims. Tests that pass but would never have
 failed. Subagent reports treated as facts. Messages that read fine and are wrong.
@@ -277,12 +277,13 @@ instructions alone cannot:
   present; dispatch prompts shrink to the task itself — an axis, the draft or claims
   to refute, the test command — plus worktree, SHA, scope, and the file the report
   goes to.
-- **Fourteen hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Nine
+- **Fifteen hooks** ([`hooks/`](hooks/)) — run by the harness, invoked by nobody. Nine
   are warn-only backstops at the moments a skill is most often skipped: a rule the
   model can rationalize past needs a gate the harness executes; the skill still owns
   the judgment, and none of the nine blocks. The comment rules are the most-relapsed
   discipline in the corpus behind this repo, which is why two of the nine watch them.
-  One stops an act once until the skill that owns it is loaded. The other four inject
+  One stops an act once until the skill that owns it is loaded, and one refuses a
+  session start that names no model. The other four inject
   what a session cannot see for itself: the standing rules at session start, how far
   into its context window it has run, at the end of a turn that changed a rule file
   the lines elsewhere that still say what the change replaced, and, when a run is
@@ -348,6 +349,21 @@ instructions alone cannot:
     redirect, copy, move, `tee` or in-place edit names the path in full, so a form it
     does not parse passes - an act inside `sh -c` or an interpreter's own code, or a
     write by a path relative to the working directory, among them.
+  - **Start without model** — refuses a call that starts another Claude Code session
+    without naming its model: the desktop app's session-start tool with its `model`
+    field empty, or a terminal multiplexer's `cmux send`, `send-panel` or `--command`
+    text that runs `claude` with neither `--model` nor `ANTHROPIC_MODEL`. A session
+    started that way runs on its starter's model, and a coordinator runs on the
+    dearest one, so a build meant for a smaller model runs on the largest and only
+    the bill says so. The refusal asks for the model the requester named, or one
+    tier below the session's own, stated in the line that announces the start, and
+    names no model id, since the hook cannot know the session's tier. It passes the
+    start tool's shapes its schema gives no model (a proposal's start, an offer
+    card, a fork, a cloud session), help, headless and subcommand runs, a start
+    whose words a shell variable holds, and a launcher of the user's own; a
+    subagent's model comes from its agent definition and is left to
+    `delegating-to-subagents`. It refuses rather than warns because a warning
+    arrives after the session has started. Backs `coordinating-sessions`.
   - **Session brief** — at session start, and again after a clear or a compaction,
     injects the standing rules that hold across every task: writing for people, one
     best fix per finding, re-derive what you promote, memory stays minimal, zero
@@ -457,7 +473,7 @@ instructions alone cannot:
     `tracking-open-asks`, which puts such a command whole in a fenced block above the
     table.
 
-![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; fourteen hooks are run by the harness — nine warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a turn putting a command inside a table cell, a pull request or issue body, a review or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
+![The three component types: twenty skills carry the judgment and fire only when invoked; three agent types carry the reviewer, skeptic and mutation contracts so a dispatch prompt shrinks to the task, its scope and the file its report goes to; fifteen hooks are run by the harness — nine warn at the moments a skill is most often skipped (an edit adding a comment, a commit about to run, a commit message a linter will misread, a commit or push about to run with its configured hooks missing, a branch landing on its target, a turn leaving tracked changes uncommitted, a turn handing over a command too wide to copy whole, a turn putting a command inside a table cell, a pull request or issue body, a review or a comment about to be sent), one stops a commit, a pull request, a memory write or a subagent dispatch once until the skill that owns it is loaded, one refuses a start of another session that names no model, and four inject what a session cannot see for itself (the standing rules at session start, how far into its context window it has run, the lines a turn's change to a rule file left stale elsewhere, and what each check costs when a run is polled one call at a time)](assets/diagrams/components.svg)
 
 ## What a run looks like
 

@@ -25,6 +25,7 @@ LAND_HOOK="$ROOT/hooks/landed-branch.py"
 BODY_HOOK="$ROOT/hooks/hard-wrapped-body.py"
 HASH_HOOK="$ROOT/hooks/commit-body-reference.py"
 GATE_PATH_HOOK="$ROOT/hooks/hooks-path-missing.py"
+MODEL_HOOK="$ROOT/hooks/start-without-model.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -497,6 +498,115 @@ for matcher in cfg["hooks"]["PreToolUse"]:
         sys.exit(0)
 sys.exit(1)' "$ROOT/hooks/hooks.json"
 check "hooks-path hook is registered on PreToolUse Bash" 0 $?
+
+# 17e. Start-model hook: a call that starts another Claude Code session with no
+#      model named is refused, through a terminal multiplexer's send or the
+#      desktop app's start tool. A false refusal blocks real work in every
+#      session, so the passing rows come first: a named model in either flag
+#      spelling, text that only mentions the word, help, headless and
+#      subcommand runs, a value the hook cannot read, the start-tool shapes
+#      whose schema takes no model, and malformed input.
+start_bash() { # $1 = command
+  "$PY" -c 'import json,sys;print(json.dumps({"session_id":"m","tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "$1" \
+    | "$PY" "$MODEL_HOOK"
+}
+start_tool() { # $1 = tool_input JSON, $2 = tool name
+  printf '{"session_id":"m","tool_name":"%s","tool_input":%s}' "${2:-mcp__ccd_session__start_session}" "$1" \
+    | "$PY" "$MODEL_HOOK"
+}
+printf '' | "$PY" "$MODEL_HOOK"
+check "start-model hook fails open on empty stdin" 0 $?
+out=$(printf 'not json' | "$PY" "$MODEL_HOOK")
+empty "start-model hook passes input that is not JSON" "$out"
+out=$(printf '{"session_id":"m","tool_name":"Bash","tool_input":"cmux send claude"}' | "$PY" "$MODEL_HOOK")
+empty "start-model hook passes a tool input that is not an object" "$out"
+out=$(printf '{"session_id":"m","tool_name":"Bash","tool_input":{"command":7}}' | "$PY" "$MODEL_HOOK")
+empty "start-model hook passes a command that is not text" "$out"
+out=$(start_bash 'cmux send --workspace $W "claude --model claude-opus-5-5 --effort high -n item-c" && cmux send-key --workspace $W enter')
+check "start-model hook exits 0" 0 $?
+empty "start-model hook passes a start naming its model with --model <m>" "$out"
+out=$(start_bash "cmux send --workspace w 'claude --model=sonnet -n child'")
+empty "start-model hook passes a start naming its model with --model=<m>" "$out"
+out=$(start_bash 'cmux send --workspace w "ANTHROPIC_MODEL=haiku claude -n child"')
+empty "start-model hook passes a start naming its model in the environment" "$out"
+out=$(start_bash 'cmux send --workspace w "ask claude to review the diff"')
+empty "start-model hook passes sent text that only mentions the word" "$out"
+out=$(start_bash 'cmux send --paste --workspace w "Read the brief first. claude is started by the coordinator, not by you."')
+empty "start-model hook passes a sent brief whose text begins with another word" "$out"
+out=$(start_bash 'cmux send --paste --workspace w "$(cat docs/plans/brief.md)"')
+empty "start-model hook passes a send whose text is a substitution" "$out"
+out=$(start_bash 'cmux send --workspace w "claude --help"')
+empty "start-model hook passes claude --help" "$out"
+out=$(start_bash 'cmux send --help')
+empty "start-model hook passes the multiplexer's own help" "$out"
+out=$(start_bash 'cmux send --workspace w "claude -p \"say hi\""')
+empty "start-model hook passes a headless run" "$out"
+out=$(start_bash 'cmux send --workspace w "claude mcp list"')
+empty "start-model hook passes a subcommand" "$out"
+out=$(start_bash 'cmux send --workspace w "claude $LAUNCH_FLAGS -n child"')
+empty "start-model hook passes a start whose flags a variable holds" "$out"
+out=$(start_bash 'cmux send --workspace w "npm test\n" && cmux send-key --workspace w enter')
+empty "start-model hook passes a send of another command" "$out"
+out=$(start_bash 'mailer send "claude -n child"')
+empty "start-model hook passes another program's send" "$out"
+out=$(start_bash "printf '%s\n' 'cmux send --workspace w claude' && git commit -m 'cmux send claude'")
+empty "start-model hook reads a send named inside quotes as message text" "$out"
+out=$(start_bash 'cmux send --workspace w "claude -n child')
+empty "start-model hook passes a command its shell parse cannot split" "$out"
+out=$(start_bash 'mylauncher opus high none -n child')
+empty "start-model hook passes a launcher of the user's own" "$out"
+out=$(start_tool '{"initiation":"user_asked","context":"fresh","model":"claude-sonnet-5-5","title":"t","prompt":"p","background":"b"}')
+empty "start-model hook passes a start tool call naming its model" "$out"
+out=$(start_tool '{"proposal_id":"task_ab12","wake_when_done":true}')
+empty "start-model hook passes a start of a proposal, which carries its id alone" "$out"
+out=$(start_tool '{"proposal_id":"task_ab12","prompt":"p"}')
+empty "start-model hook passes a proposal's start that carries its brief" "$out"
+out=$(start_tool '{"initiation":"offer","title":"t"}')
+empty "start-model hook passes an offer card, which carries a title alone" "$out"
+out=$(start_tool '{"initiation":"user_asked","context":"fork","prompt":"p"}')
+empty "start-model hook passes a fork, which takes no model" "$out"
+out=$(start_tool '{"initiation":"user_asked","target":"cloud","prompt":"p","background":"b"}')
+empty "start-model hook passes a cloud start, which takes no model" "$out"
+out=$(start_tool '{"session":"research-1"}' 'mcp__cmux-cua__start_session')
+empty "start-model hook passes another server's start_session" "$out"
+out=$(start_tool '{"subagent_type":"Explore","prompt":"p"}' 'Agent')
+empty "start-model hook leaves a subagent dispatch to its agent definition" "$out"
+
+out=$(start_bash 'cmux send --workspace w "claude --effort high -n child" && cmux send-key --workspace w enter')
+contains "start-model hook refuses a sent start with no model" "$out" '"permissionDecision": "deny"'
+contains "start-model hook's refusal names the default" "$out" "one tier below your own"
+contains "start-model hook's refusal asks for the model in the start line" "$out" "line that announces the start"
+contains "start-model hook tells the person watching what it stopped" "$out" '"systemMessage": "delivery-skills refused a session start'
+lacks "start-model hook's refusal names no model id" "$out" "claude-"
+out=$(start_bash "cmux send --workspace w 'claude'")
+contains "start-model hook refuses a bare claude" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux send --workspace w "claude\n"')
+contains "start-model hook reads a start ended by an escaped newline" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux send --workspace w "cd /tmp/wt && claude -n child"')
+contains "start-model hook refuses a start behind a cd" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux send --workspace w "~/.local/bin/claude --resume"')
+contains "start-model hook refuses a start by path" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux send --workspace w "claude --model= -n child"')
+contains "start-model hook refuses an empty model" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux send-panel --panel p "claude -n child"')
+contains "start-model hook refuses a start sent to a panel" "$out" '"permissionDecision": "deny"'
+out=$(start_bash 'cmux new-workspace --cwd /tmp/wt --command "claude -n child"')
+contains "start-model hook refuses a start a new pane runs" "$out" '"permissionDecision": "deny"'
+out=$(start_tool '{"initiation":"user_asked","context":"fresh","title":"t","prompt":"p","background":"b"}')
+contains "start-model hook refuses a start tool call with no model" "$out" '"permissionDecision": "deny"'
+contains "start-model hook names the start tool's field" "$out" "\`model\` field"
+out=$(start_tool '{"initiation":"own_initiative","title":"t","prompt":"p","background":"b","model":""}')
+contains "start-model hook refuses a proposal with an empty model" "$out" '"permissionDecision": "deny"'
+out=$(start_tool '{"proposal_id":7,"initiation":"user_asked","context":"fresh","title":"t","prompt":"p","background":"b"}')
+contains "start-model hook refuses a proposal id that is not text" "$out" '"permissionDecision": "deny"'
+for tool in Bash mcp__ccd_session__start_session; do
+  "$PY" -c 'import json, re, sys
+for matcher in json.load(open(sys.argv[1]))["hooks"]["PreToolUse"]:
+    if any("start-without-model.py" in hook["command"] for hook in matcher["hooks"]):
+        sys.exit(0 if re.fullmatch(matcher["matcher"], sys.argv[2]) else 1)
+sys.exit(1)' "$ROOT/hooks/hooks.json" "$tool"
+  check "registration routes $tool to the start-model hook" 0 $?
+done
 
 BRIEF_HOOK="$ROOT/hooks/session-brief.py"
 
