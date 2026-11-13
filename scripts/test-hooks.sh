@@ -293,6 +293,13 @@ body_payload() { # $1 = file holding the command, $2 = the session cwd, $WORK un
   printf 'gh pr create --title "x" --body-file %s/no-such.md\n' "$WORK" > cmd-missing
   printf 'cd sub && gh pr create --title "x" --body-file wrapped.md\n' > cmd-cd
   printf 'git commit -m "gh pr create --body-file wrapped.md"\n' > cmd-message
+  printf 'gh pr review 42 --request-changes --body-file wrapped.md\n' > cmd-review-file
+  printf 'gh pr review 42 -c -b "The export failed\nand was rerun."\n' > cmd-review-vote
+  printf 'gh pr review 42 --approve\n' > cmd-review-bare
+  printf 'gh issue close 7 --comment "The export failed\nand was rerun."\n' > cmd-issue-close
+  printf 'gh pr close 12 -c "The export failed\nand was rerun." --delete-branch\n' > cmd-pr-close
+  printf 'gh pr close 12 --delete-branch\n' > cmd-close-bare
+  printf 'gh pr close 12 --comment "Closing: superseded by the rewrite, which carries the same change in one piece."\n' > cmd-close-long
 }
 out=$(body_payload cmd-file | "$PY" "$BODY_HOOK")
 check "body hook exits 0 (warn-only)" 0 $?
@@ -317,6 +324,20 @@ out=$(body_payload cmd-issue-comment | "$PY" "$BODY_HOOK")
 contains "body hook reads an issue comment" "$out" "hard-wrapped"
 out=$(body_payload cmd-pr-comment | "$PY" "$BODY_HOOK")
 contains "body hook reads a pull request comment's short body flag" "$out" "hard-wrapped"
+out=$(body_payload cmd-review-file | "$PY" "$BODY_HOOK")
+contains "body hook reads a review's body file" "$out" "hard-wrapped"
+out=$(body_payload cmd-review-vote | "$PY" "$BODY_HOOK")
+contains "body hook reads a review body after the boolean -c vote" "$out" "hard-wrapped"
+out=$(body_payload cmd-review-bare | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a review with no body" "$out"
+out=$(body_payload cmd-issue-close | "$PY" "$BODY_HOOK")
+contains "body hook reads an issue's closing comment" "$out" "hard-wrapped"
+out=$(body_payload cmd-pr-close | "$PY" "$BODY_HOOK")
+contains "body hook reads a pull request's closing comment" "$out" "hard-wrapped"
+out=$(body_payload cmd-close-bare | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a close with no comment" "$out"
+out=$(body_payload cmd-close-long | "$PY" "$BODY_HOOK")
+empty "body hook stays quiet on a closing comment that is one long line" "$out"
 out=$(body_payload cmd-clean | "$PY" "$BODY_HOOK")
 empty "body hook stays quiet on lists, tables, code and HTML" "$out"
 out=$(body_payload cmd-code | "$PY" "$BODY_HOOK")

@@ -297,11 +297,12 @@ instructions alone cannot:
     branch, a merge through any of the three forge CLIs or a local merge from the
     default branch, because that moment arrives in a session that was not planning
     for it; backs `landing-merged-work`.
-  - **Hard-wrapped body** — reads a pull request or issue body, or a comment on
-    either, the moment the command sends it, from a body file, a substitution over
-    one, a heredoc or a quoted literal, and warns on a line break mid-sentence,
-    because the forge renders every newline inside a paragraph as a break and the
-    paragraph arrives chopped; backs `writing-pr-descriptions`.
+  - **Hard-wrapped body** — reads a pull request or issue body, a comment on
+    either, a review's body or a closing comment, the moment the command sends
+    it, from a body file, a substitution over one, a heredoc or a quoted literal,
+    and warns on a line break mid-sentence, because the forge renders every
+    newline inside a paragraph as a break and the paragraph arrives chopped; backs
+    `writing-pr-descriptions`.
   - **Commit-body reference** — in a repository whose messages commitlint lints,
     reads a commit's message the moment the command runs, from each `-m`, a heredoc
     inside one, or a `-F` file or heredoc, and warns on a `#` before a word in the
