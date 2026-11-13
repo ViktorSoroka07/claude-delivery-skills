@@ -54,17 +54,19 @@ assertion reading the row's text catches it, and its negative twin matters as
 much: a repo on its default branch must carry no such note, or the assertion
 passes on a script that annotates everything unconditionally.
 
-**`--prune` is tested by what it leaves.** Its mutations loosen a guard toward
-deleting too much, and each is killed by an assertion that a branch it must
-keep still has its tip, so every kept branch in `build_prune_workspace` has a
-tip assertion of its own. Two guards are backed by git, so dropping one changes
-only the row's reason, and its mutation targets the detail assertion: past the
-checked-out guard the main worktree's path reaches `git worktree remove`, which
-refuses a main working tree, and without `--force` it refuses a dirty tree too.
-The branch itself is deleted with `update-ref`, which refuses nothing and
-leaves a checked-out branch's HEAD unborn, so a worktree parse that misses the
-main worktree's branch loses it outright; that mutation dies on the tip. The
-printed restore command is tested by running it and comparing the tip.
+**`--prune` is tested by what it leaves.** Its guard mutations loosen a guard
+toward deleting too much, and each is killed by an assertion that a branch it
+must keep still has its tip, so every kept branch in `build_prune_workspace`
+has a tip assertion of its own. Two guards are backed by git, so dropping one
+changes only the row's reason, and its mutation targets the detail assertion:
+past the checked-out guard the main worktree's path reaches `git worktree
+remove`, which refuses a main working tree, and without `--force` it refuses a
+dirty tree too. The branch itself is deleted with `update-ref`, which refuses
+only a branch that moved since it was judged: it deletes a checked-out branch
+and leaves its HEAD unborn, so a worktree parse that misses the main
+worktree's branch loses it outright; that mutation dies on the tip. The
+printed restore command is tested by running it and comparing the tip, and
+the report of a detached worktree by its row's status.
 
 ## Portability constraints
 
