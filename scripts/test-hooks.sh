@@ -522,6 +522,7 @@ out=$(printf '{"session_id":"m","tool_name":"Bash","tool_input":"cmux send claud
 empty "start-model hook passes a tool input that is not an object" "$out"
 out=$(printf '{"session_id":"m","tool_name":"Bash","tool_input":{"command":7}}' | "$PY" "$MODEL_HOOK")
 empty "start-model hook passes a command that is not text" "$out"
+# shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
 out=$(start_bash 'cmux send --workspace $W "claude --model claude-opus-5-5 --effort high -n item-c" && cmux send-key --workspace $W enter')
 check "start-model hook exits 0" 0 $?
 empty "start-model hook passes a start naming its model with --model <m>" "$out"
@@ -533,6 +534,7 @@ out=$(start_bash 'cmux send --workspace w "ask claude to review the diff"')
 empty "start-model hook passes sent text that only mentions the word" "$out"
 out=$(start_bash 'cmux send --paste --workspace w "Read the brief first. claude is started by the coordinator, not by you."')
 empty "start-model hook passes a sent brief whose text begins with another word" "$out"
+# shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
 out=$(start_bash 'cmux send --paste --workspace w "$(cat docs/plans/brief.md)"')
 empty "start-model hook passes a send whose text is a substitution" "$out"
 out=$(start_bash 'cmux send --workspace w "claude --help"')
@@ -543,6 +545,7 @@ out=$(start_bash 'cmux send --workspace w "claude -p \"say hi\""')
 empty "start-model hook passes a headless run" "$out"
 out=$(start_bash 'cmux send --workspace w "claude mcp list"')
 empty "start-model hook passes a subcommand" "$out"
+# shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
 out=$(start_bash 'cmux send --workspace w "claude $LAUNCH_FLAGS -n child"')
 empty "start-model hook passes a start whose flags a variable holds" "$out"
 out=$(start_bash 'cmux send --workspace w "npm test\n" && cmux send-key --workspace w enter')
