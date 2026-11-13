@@ -15,7 +15,7 @@ ROOT="${TMPDIR:-/tmp}/git-sync-tests.$$"
 PASS=0; FAIL=0
 
 # --- expected status vocabulary (independent of the script) -------------------
-EXPECTED_VOCAB="BLOCKED CONFLICT DECLINED DIVERGED FETCH-FAIL IN-USE LOCAL NO-BRANCH STASHED UPDATED WOULD-UPDATE ok"
+EXPECTED_VOCAB="BLOCKED CONFLICT DECLINED DIVERGED FETCH-FAIL IN-USE KEPT LOCAL NO-BRANCH PRUNED STASHED UPDATED WOULD-PRUNE WOULD-UPDATE ok"
 
 # --- helpers ------------------------------------------------------------------
 
@@ -35,6 +35,25 @@ assert_status() {
   got=$(printf '%s\n' "$line" | awk '{print $1}')
   if [ "$got" = "$want" ]; then ok_ "$label"
   else no_ "$label" "wanted '$want', got '${got:-<none>}' | row: ${line:-<no row for $repo>}"; fi
+}
+
+# --prune adds a row per branch, so these rows are found by repo and branch.
+row_for_branch() { printf '%s\n' "$1" | awk -v r="$2" -v b="$3" -v re="$VOCAB_RE" '$2==r && $3==b && $1 ~ re {print; exit}'; }
+
+assert_branch_status() {
+  local out="$1" repo="$2" branch="$3" want="$4" label="$5"
+  local line got
+  line=$(row_for_branch "$out" "$repo" "$branch")
+  got=$(printf '%s\n' "$line" | awk '{print $1}')
+  if [ "$got" = "$want" ]; then ok_ "$label"
+  else no_ "$label" "wanted '$want', got '${got:-<none>}' | row: ${line:-<no row for $repo $branch>}"; fi
+}
+
+assert_branch_row_contains() {
+  local out="$1" repo="$2" branch="$3" needle="$4" label="$5"
+  local line; line=$(row_for_branch "$out" "$repo" "$branch")
+  if printf '%s\n' "$line" | grep -qF -- "$needle"; then ok_ "$label"
+  else no_ "$label" "row lacks '$needle': ${line:-<no row for $repo $branch>}"; fi
 }
 
 assert_no_row() {
@@ -117,8 +136,10 @@ build_workspace() {
   WS="$ROOT/ws"
   rm -rf "$WS" "$ROOT/wt"; mkdir -p "$WS/.origins" "$WS/.scratch" "$ROOT/wt"
 
-  # ok - already current
+  # ok - already current; just-made is a branch not yet committed to, which
+  # only --prune deletes
   new_repo current
+  gc "$WS/current" branch -q just-made
 
   # UPDATED - on main, clean, behind
   new_repo behind;      advance_origin behind 1
@@ -191,6 +212,56 @@ build_workspace() {
   mkdir -p "$WS/plainfolder"; printf 'hi\n' > "$WS/plainfolder/readme.txt"
 }
 
+# One clone holding a branch for each way --prune judges one: the review copies
+# it deletes and everything it must leave.
+build_prune_workspace() {
+  WS="$ROOT/prune"
+  rm -rf "$WS"; mkdir -p "$WS/.origins" "$WS/.scratch" "$WS/.wt"
+  new_repo reviews
+  local r="$WS/reviews" s="$WS/.scratch/reviews" b
+  for b in pr-same pr-behind pr-ahead pr-merged pr-squashed pr-wtclean pr-wtdirty pr-current; do
+    gc "$r" checkout -q -b "$b" main
+    printf '%s\n' "$b" > "$r/$b.txt"
+    gc "$r" add -A; gc "$r" commit -qm "$b"
+    gc "$r" push -q -u origin "$b" 2>/dev/null
+  done
+
+  gc "$r" checkout -q pr-ahead
+  printf 'local only\n' >> "$r/pr-ahead.txt"; gc "$r" commit -qam "pr-ahead goes on locally"
+
+  gc "$r" checkout -q -b localonly main
+  printf 'local only\n' > "$r/localonly.txt"; gc "$r" add -A; gc "$r" commit -qm localonly
+
+  gc "$r" branch -q fresh main
+
+  # pr-fork tracks a remote the sweep does not fetch, whose branch is gone
+  git init -q --bare "$WS/.origins/fork.git"
+  gc "$r" remote add fork "$WS/.origins/fork.git"
+  gc "$r" checkout -q -b pr-fork main
+  printf 'fork\n' > "$r/pr-fork.txt"; gc "$r" add -A; gc "$r" commit -qm pr-fork
+  gc "$r" push -q -u fork pr-fork 2>/dev/null
+  git --git-dir="$WS/.origins/fork.git" branch -q -D pr-fork
+
+  git clone -q "$WS/.origins/reviews.git" "$s" 2>/dev/null
+  gc "$s" config user.email t@t; gc "$s" config user.name tester
+  gc "$s" checkout -q -B pr-behind origin/pr-behind
+  printf 'more\n' >> "$s/pr-behind.txt"; gc "$s" commit -qam "origin moves pr-behind on"
+  gc "$s" push -q origin pr-behind
+  gc "$s" checkout -q -B main origin/main
+  gc "$s" merge -q --ff-only origin/pr-merged
+  gc "$s" merge -q --squash origin/pr-squashed >/dev/null 2>&1; gc "$s" commit -qm "pr-squashed, squashed"
+  gc "$s" push -q origin main
+  gc "$s" push -q origin --delete pr-merged pr-squashed 2>/dev/null
+
+  gc "$r" checkout -q pr-current
+  gc "$r" worktree add -q "$WS/.wt/clean" pr-wtclean
+  gc "$r" worktree add -q "$WS/.wt/dirty" pr-wtdirty
+  printf 'unsaved\n' >> "$WS/.wt/dirty/pr-wtdirty.txt"
+  gc "$r" worktree add -q --detach "$WS/.wt/detached" main
+}
+
+tip_of() { gc "$WS/reviews" rev-parse -q --verify "refs/heads/$1"; }
+
 # --- tests --------------------------------------------------------------------
 
 t_vocab() {
@@ -200,7 +271,8 @@ t_vocab() {
   want=$(printf '%s' "$EXPECTED_VOCAB" | tr ' ' '\n' | sort | tr '\n' ' ' | sed 's/ *$//')
   assert_eq "$got" "$want" "the script publishes the expected vocabulary"
   local asserted missing=""
-  asserted=$(grep -E '^ *assert_status ' "$0" | awk '{print $4}' | sort -u)
+  asserted=$(grep -E '^ *assert_(branch_)?status ' "$0" |
+    awk '$1=="assert_status" {print $4} $1=="assert_branch_status" {print $5}' | sort -u)
   for s in $got; do
     printf '%s\n' "$asserted" | grep -qx "$s" || missing="$missing $s"
   done
@@ -210,7 +282,8 @@ t_vocab() {
 t_main_sweep() {
   say ""; say "== folder sweep: one status per fixture =="
   build_workspace
-  local out
+  local out just_made
+  just_made=$(gc "$WS/current" rev-parse just-made)
   out=$("$SYNC" "$WS" --jobs 4 --quiet </dev/null 2>&1)
 
   assert_status "$out" current    ok         "current repo reports ok"
@@ -243,10 +316,78 @@ t_main_sweep() {
   assert_eq "$(gc "$WS/parked" rev-parse main)" "$(gc "$WS/parked" rev-parse origin/main)" "parked repo's local main reached origin/main"
   assert_eq "$(gc "$WS/diverged" rev-parse main)" "$(gc "$WS/diverged" rev-parse HEAD)" "diverged repo's main was not moved"
   assert_eq "$(gc "$WS/inuse" rev-parse main)" "$(gc "$WS/inuse" rev-parse main)" "in-use repo was not disturbed"
+  assert_eq "$(gc "$WS/current" rev-parse -q --verify refs/heads/just-made)" "$just_made" "a plain sweep leaves a just-created branch in place"
 
   say ""; say "== exit code =="
   "$SYNC" "$WS" --jobs 4 --quiet </dev/null >/dev/null 2>&1
   assert_eq "$?" "1" "exit 1 when a repo needs attention"
+}
+
+t_prune() {
+  say ""; say "== --prune deletes what origin already holds =="
+  build_prune_workspace
+  local b out line
+  local t_behind t_ahead t_squashed t_localonly t_fork t_wtclean t_wtdirty t_current
+  t_behind=$(tip_of pr-behind); t_ahead=$(tip_of pr-ahead); t_squashed=$(tip_of pr-squashed)
+  t_localonly=$(tip_of localonly); t_fork=$(tip_of pr-fork); t_wtclean=$(tip_of pr-wtclean)
+  t_wtdirty=$(tip_of pr-wtdirty); t_current=$(tip_of pr-current)
+
+  out=$("$SYNC" "$WS" --quiet --prune </dev/null 2>&1)
+
+  assert_branch_status "$out" reviews pr-same    PRUNED "a branch at its upstream's tip is pruned"
+  assert_branch_status "$out" reviews pr-behind  PRUNED "a branch behind its upstream is pruned"
+  assert_branch_status "$out" reviews pr-merged  PRUNED "a merged branch whose upstream is gone is pruned"
+  assert_branch_status "$out" reviews fresh      PRUNED "a branch with no upstream, its tip on the default branch, is pruned"
+  assert_branch_status "$out" reviews pr-wtclean PRUNED "a branch in a clean worktree is pruned"
+  for b in pr-same pr-behind pr-merged fresh pr-wtclean; do
+    assert_eq "$(tip_of "$b")" "" "the $b ref is gone"
+  done
+  assert_eq "$([ -e "$WS/.wt/clean" ] && echo present || echo removed)" removed "the clean worktree on a pruned branch is removed"
+  assert_branch_row_contains "$out" reviews pr-same "on origin/pr-same" "a branch held by its upstream names the upstream"
+  assert_branch_row_contains "$out" reviews pr-merged "on origin/main" "a branch held by the default branch names it"
+
+  say ""; say "== --prune keeps everything else, each tip unchanged =="
+  assert_branch_status "$out" reviews pr-ahead KEPT "a branch ahead of its upstream is kept"
+  assert_eq "$(tip_of pr-ahead)" "$t_ahead" "the branch ahead of its upstream keeps its tip"
+  assert_branch_row_contains "$out" reviews pr-ahead "branch -D pr-ahead" "a kept branch's row carries the command that deletes it"
+  assert_branch_status "$out" reviews pr-squashed KEPT "a squash-merged branch whose upstream is gone is kept"
+  assert_eq "$(tip_of pr-squashed)" "$t_squashed" "the squash-merged branch keeps its tip"
+  assert_branch_row_contains "$out" reviews pr-squashed "is gone" "the squash-merged branch's row says its upstream is gone"
+  assert_branch_status "$out" reviews localonly KEPT "a branch with commits only here is kept"
+  assert_eq "$(tip_of localonly)" "$t_localonly" "the local-only branch keeps its tip"
+  assert_branch_status "$out" reviews pr-fork KEPT "a branch tracking another remote is kept"
+  assert_eq "$(tip_of pr-fork)" "$t_fork" "a branch tracking a remote the sweep did not fetch keeps its tip"
+  assert_branch_status "$out" reviews pr-wtdirty KEPT "a branch in a worktree with changes is kept"
+  assert_eq "$(tip_of pr-wtdirty)" "$t_wtdirty" "the branch in the dirty worktree keeps its tip"
+  assert_branch_row_contains "$out" reviews pr-wtdirty "uncommitted changes" "the dirty worktree's row names its uncommitted changes"
+  assert_eq "$(tail -1 "$WS/.wt/dirty/pr-wtdirty.txt" 2>/dev/null)" "unsaved" "the dirty worktree and its edit are still there"
+  assert_branch_status "$out" reviews pr-current KEPT "the branch checked out in the main worktree is kept"
+  assert_eq "$(tip_of pr-current)" "$t_current" "the branch checked out in the main worktree keeps its tip"
+  assert_eq "$(gc "$WS/reviews" rev-parse --abbrev-ref HEAD)" "pr-current" "the main worktree still stands on its branch"
+  assert_branch_row_contains "$out" reviews pr-current "checked out here" "the checked-out branch's row says why it was kept"
+  assert_branch_status "$out" reviews "(detached)" KEPT "a detached worktree is reported"
+  assert_eq "$([ -e "$WS/.wt/detached" ] && echo present || echo removed)" present "a detached worktree is not removed"
+  assert_eq "$(tip_of main)" "$(gc "$WS/reviews" rev-parse origin/main)" "the local default branch is never pruned"
+
+  say ""; say "== each printed restore brings its branch back =="
+  for b in pr-behind pr-wtclean; do
+    line=$(row_for_branch "$out" reviews "$b")
+    case "$line" in *"restore: "*) eval "${line#*restore: }" >/dev/null 2>&1 ;; esac
+  done
+  assert_eq "$(tip_of pr-behind)" "$t_behind" "the printed restore brings pr-behind back at its tip"
+  assert_eq "$(tip_of pr-wtclean)" "$t_wtclean" "the printed restore brings pr-wtclean back at its tip"
+  assert_eq "$(gc "$WS/.wt/clean" rev-parse --abbrev-ref HEAD 2>/dev/null)" "pr-wtclean" "the printed restore brings the removed worktree back on its branch"
+}
+
+t_prune_dry_run() {
+  say ""; say "== --prune under --dry-run deletes nothing =="
+  build_prune_workspace
+  local t_same out
+  t_same=$(tip_of pr-same)
+  out=$("$SYNC" "$WS" --quiet --prune --dry-run </dev/null 2>&1)
+  assert_branch_status "$out" reviews pr-same WOULD-PRUNE "a dry run with --prune reports what it would prune"
+  assert_eq "$(tip_of pr-same)" "$t_same" "a dry run with --prune deletes nothing"
+  assert_eq "$([ -e "$WS/.wt/clean" ] && echo present || echo removed)" present "a dry run with --prune removes no worktree"
 }
 
 t_dry_run() {
@@ -460,6 +601,8 @@ say "workspace: $ROOT"
 
 t_vocab
 t_main_sweep
+t_prune
+t_prune_dry_run
 t_dry_run
 t_fetch_only
 t_stash_accept

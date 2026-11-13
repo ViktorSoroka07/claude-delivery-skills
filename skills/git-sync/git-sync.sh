@@ -5,11 +5,11 @@
 
 set -uo pipefail
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # test.sh compares this list against the statuses its own assertions cover,
 # so a status added here without a fixture fails the suite.
-STATUS_VOCAB="UPDATED ok STASHED DECLINED BLOCKED DIVERGED CONFLICT IN-USE LOCAL NO-BRANCH FETCH-FAIL WOULD-UPDATE"
+STATUS_VOCAB="UPDATED ok STASHED DECLINED BLOCKED DIVERGED CONFLICT IN-USE LOCAL NO-BRANCH FETCH-FAIL WOULD-UPDATE PRUNED WOULD-PRUNE KEPT"
 
 SEP=$'\037'
 
@@ -23,6 +23,7 @@ JOBS=8
 ASK=0
 NO_WRITE=0
 DRY_RUN=0
+PRUNE=0
 QUIET=0
 
 usage() {
@@ -39,8 +40,12 @@ options:
                       limit of 10 unauthenticated connections to one host)
       --ask           ask before fast-forwarding any repo with local changes,
                       not only the ones git refuses on its own
-      --fetch-only    fetch and prune, leave every local branch alone
+      --fetch-only    fetch, dropping remote-tracking refs origin no longer
+                      has, and leave every local branch alone
       --dry-run       fetch and report what is behind, change no local branch
+      --prune         also delete each local branch whose tip is already on
+                      its origin upstream or on origin's default branch, and
+                      the clean worktrees on those (see below)
   -q, --quiet         no live progress line (the summary still prints)
       --no-color      plain output
   -h, --help          this text
@@ -60,6 +65,21 @@ what happens to each repo:
 Local branches move only by fast-forward, so a repo either advances or reports
 why it did not.
 
+with --prune, after the fetch, each local branch other than the default one:
+  tip on its origin upstream, or on     deleted (PRUNED) with the command that
+  origin's default branch               restores it; a clean worktree on it is
+                                        removed first
+  checked out in the main worktree,     left (KEPT) with the command that would
+  commits on no origin branch, an       act on it
+  upstream gone with the tip not on
+  the default branch (a squash merge
+  looks like this), or a worktree on
+  it with uncommitted changes
+
+A branch just created and not yet committed to is on the default branch, so
+--prune deletes it; that is why pruning is never on by default. With --dry-run
+or --fetch-only, --prune deletes nothing and reports WOULD-PRUNE instead.
+
 exit status: 0 when every repo is current, 1 when any needs your attention.
 EOF
 }
@@ -74,6 +94,7 @@ while [ $# -gt 0 ]; do
     --ask) ASK=1 ;;
     --fetch-only) NO_WRITE=1 ;;
     --dry-run) NO_WRITE=1; DRY_RUN=1 ;;
+    --prune) PRUNE=1 ;;
     -q|--quiet) QUIET=1 ;;
     --no-color) NO_COLOR=1 ;;
     -*) printf 'git-sync: unknown option %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -172,6 +193,97 @@ overlapping_paths() { # dir before after
   rm -f "$d" "$i"
 }
 
+contained() { git -C "$1" merge-base --is-ancestor "$2" "$3" 2>/dev/null; }
+
+worktree_clean() {
+  local out
+  out="$(git -C "$1" status --porcelain -uall 2>/dev/null)" || return 1
+  [ -z "$out" ]
+}
+
+prune_repo() { # dir name db
+  local dir="$1" name="$2" db="$3"
+  local qdir wts line b tip up kind wt held n qb qwt restore err
+  qdir="$(printf '%q' "$dir")"
+  # one record per worktree: kind, branch (empty when detached), path
+  wts="$(git -C "$dir" worktree list --porcelain 2>/dev/null | awk -v s="$SEP" '
+    /^worktree / { if (p != "") print k s b s p
+                   p = substr($0, 10); b = ""; k = (n++ == 0) ? "main" : "linked" }
+    /^branch refs\/heads\// { b = substr($0, 19) }
+    END { if (p != "") print k s b s p }')"
+
+  printf '%s\n' "$wts" | while IFS="$SEP" read -r kind b wt; do
+    if [ "$kind" = linked ] && [ -z "$b" ]; then
+      emit KEPT "$name" "(detached)" "" NONE "detached worktree $wt; to remove: git -C $qdir worktree remove $(printf '%q' "$wt")" "$dir"
+    fi
+  done
+
+  git -C "$dir" for-each-ref --format="%(refname)$SEP%(objectname)$SEP%(upstream)" refs/heads/ |
+  while IFS="$SEP" read -r b tip up; do
+    b="${b#refs/heads/}"
+    [ "$b" = "$db" ] && continue
+    qb="$(printf '%q' "$b")"
+    line="$(printf '%s\n' "$wts" | awk -F"$SEP" -v b="$b" '$2 == b { print; exit }')"
+    kind="${line%%"$SEP"*}"
+    wt=""; [ -n "$line" ] && wt="${line##*"$SEP"}"
+
+    if [ "$kind" = main ]; then
+      emit KEPT "$name" "$b" "" NONE "checked out here; switch away, then rerun: git -C $qdir switch $(printf '%q' "$db")" "$dir"
+      continue
+    fi
+
+    # Only origin was just fetched. Another remote's ref can still name a
+    # branch that remote has deleted, so it proves nothing about the tip.
+    held=""
+    case "$up" in refs/remotes/origin/*) contained "$dir" "$tip" "$up" && held="${up#refs/remotes/}" ;; esac
+    [ -z "$held" ] && contained "$dir" "$tip" "refs/remotes/origin/$db" && held="origin/$db"
+
+    if [ -z "$held" ]; then
+      case "$up" in
+        refs/remotes/origin/*)
+          if git -C "$dir" show-ref --verify --quiet "$up"; then
+            n="$(git -C "$dir" rev-list --count "$up..$tip")"
+            err="$n commit(s) not on ${up#refs/remotes/}"
+          else
+            err="upstream ${up#refs/remotes/} is gone and the tip is not on origin/$db: squash-merged, or never merged"
+          fi ;;
+        *)
+          n="$(git -C "$dir" rev-list --count "refs/remotes/origin/$db..$tip")"
+          err="$n commit(s) on no origin branch" ;;
+      esac
+      emit KEPT "$name" "$b" "" NONE "$err; to delete: git -C $qdir branch -D $qb" "$dir"
+      continue
+    fi
+
+    restore="git -C $qdir branch $qb $tip"
+    if [ -n "$wt" ]; then
+      qwt="$(printf '%q' "$wt")"
+      if ! worktree_clean "$wt"; then
+        emit KEPT "$name" "$b" "" NONE "uncommitted changes in worktree $wt; to delete both: git -C $qdir worktree remove --force $qwt && git -C $qdir branch -D $qb" "$dir"
+        continue
+      fi
+      restore="$restore && git -C $qdir worktree add $qwt $qb"
+    fi
+
+    if [ "$NO_WRITE" -eq 1 ]; then
+      emit WOULD-PRUNE "$name" "$b" "" NONE "on $held${wt:+, worktree $wt}" "$dir"
+      continue
+    fi
+    # No --force: git itself refuses a worktree that changed since the check.
+    if [ -n "$wt" ] && ! err="$(git -C "$dir" worktree remove "$wt" 2>&1)"; then
+      emit KEPT "$name" "$b" "" NONE "could not remove worktree $wt: $err" "$dir"
+      continue
+    fi
+    # The old value makes git refuse a branch that moved since it was judged:
+    # its new commits are on no origin ref.
+    if err="$(git -C "$dir" update-ref -d "refs/heads/$b" "$tip" 2>&1)"; then
+      emit PRUNED "$name" "$b" "" NONE "on $held; restore: $restore" "$dir"
+    else
+      emit KEPT "$name" "$b" "" NONE "could not delete: $err" "$dir"
+    fi
+  done
+}
+
 sync_repo() {
   local dir="$1" name; name="$(basename "$dir")"
   local db cur parked before after delta n_dirty overlap ferr fmsg cand ahead dirtylist shown
@@ -198,6 +310,7 @@ sync_repo() {
   if [ -z "$db" ] || ! git -C "$dir" show-ref --verify --quiet "refs/remotes/origin/$db"; then
     emit NO-BRANCH "$name" "" "" NONE "cannot resolve origin's default branch" "$dir"; return
   fi
+  [ "$PRUNE" -eq 1 ] && prune_repo "$dir" "$name" "$db"
   if ! git -C "$dir" show-ref --verify --quiet "refs/heads/$db"; then
     emit NO-BRANCH "$name" "$db" "" NONE "no local $db branch" "$dir"; return
   fi
@@ -400,7 +513,9 @@ rank() {
     IN-USE|NO-BRANCH) echo 5 ;;
     LOCAL) echo 6 ;;
     FETCH-FAIL) echo 7 ;;
-    *) echo 8 ;;
+    PRUNED|WOULD-PRUNE) echo 8 ;;
+    KEPT) echo 9 ;;
+    *) echo 10 ;;
   esac
 }
 
@@ -425,9 +540,9 @@ awk -F"$SEP" -v grn="$C_GRN" -v yel="$C_YEL" -v red="$C_RED" -v blu="$C_BLU" \
       split(rows[i], f, FS)
       s = f[2]
       c = yel
-      if (s=="UPDATED" || s=="STASHED" || s=="WOULD-UPDATE") c = grn
+      if (s=="UPDATED" || s=="STASHED" || s=="WOULD-UPDATE" || s=="PRUNED" || s=="WOULD-PRUNE") c = grn
       else if (s=="ok") c = dim
-      else if (s=="LOCAL" || s=="IN-USE" || s=="DECLINED") c = blu
+      else if (s=="LOCAL" || s=="IN-USE" || s=="DECLINED" || s=="KEPT") c = blu
       else if (s=="FETCH-FAIL" || s=="CONFLICT") c = red
       printf "  %s%-12s%s %s%*s %s%*s %-5s %s%s%s\n",
              c, s, rst, f[3], wn - f[7] + 1, "", f[4], wb - f[8] + 1, "", f[5], dim, f[6], rst

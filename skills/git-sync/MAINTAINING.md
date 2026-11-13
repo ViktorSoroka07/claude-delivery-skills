@@ -25,7 +25,8 @@ against its own expected list and against the statuses its assertions cover,
 so **a status added without a fixture fails the suite** rather than passing
 untested.
 
-Adding a status means adding its fixture in `build_workspace`.
+Adding a status means adding its fixture in `build_workspace`, or in
+`build_prune_workspace` for one only `--prune` emits.
 
 ## Changing a check means mutating it
 
@@ -52,6 +53,18 @@ note leaves every status identical and every status assertion green. Only an
 assertion reading the row's text catches it, and its negative twin matters as
 much: a repo on its default branch must carry no such note, or the assertion
 passes on a script that annotates everything unconditionally.
+
+**`--prune` is tested by what it leaves.** Its mutations loosen a guard toward
+deleting too much, and each is killed by an assertion that a branch it must
+keep still has its tip, so every kept branch in `build_prune_workspace` has a
+tip assertion of its own. Two guards are backed by git, so dropping one changes
+only the row's reason, and its mutation targets the detail assertion: past the
+checked-out guard the main worktree's path reaches `git worktree remove`, which
+refuses a main working tree, and without `--force` it refuses a dirty tree too.
+The branch itself is deleted with `update-ref`, which refuses nothing and
+leaves a checked-out branch's HEAD unborn, so a worktree parse that misses the
+main worktree's branch loses it outright; that mutation dies on the tip. The
+printed restore command is tested by running it and comparing the tip.
 
 ## Portability constraints
 

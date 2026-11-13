@@ -121,6 +121,81 @@ run_mutation "M7  the fetch error reverts to its last line" \
   'fmsg="$(printf '\''%s\n'\'' "$ferr" | tail -1)"' \
   "the FETCH-FAIL detail names the cause, not the generic hint"
 
+# A branch just created is on the default branch, so pruning is off unless asked
+# for; on by default, it deletes that branch on every plain sync.
+run_mutation "M8  pruning is on without --prune" \
+  'PRUNE=0' \
+  'PRUNE=1' \
+  "a plain sweep leaves a just-created branch in place"
+
+# Containment read the wrong way round accepts a branch whose upstream is
+# behind it, deleting the commits only this clone holds.
+run_mutation "M9  the containment test is read the wrong way round" \
+  'merge-base --is-ancestor "$2" "$3"' \
+  'merge-base --is-ancestor "$3" "$2"' \
+  "the branch ahead of its upstream keeps its tip"
+
+run_mutation "M10 every branch counts as on the default branch" \
+  'contained "$dir" "$tip" "refs/remotes/origin/$db" && held=' \
+  'true && held=' \
+  "the local-only branch keeps its tip"
+
+# Only origin was fetched; another remote's ref can outlive its branch.
+run_mutation "M11 an upstream on any remote counts as proof" \
+  'refs/remotes/origin/*) contained' \
+  'refs/remotes/*) contained' \
+  "a branch tracking a remote the sweep did not fetch keeps its tip"
+
+# Past this guard the main worktree's path reaches `git worktree remove`, which
+# refuses a main working tree, so the branch survives; only the reason shows.
+run_mutation "M12 the checked-out guard is dropped" \
+  'if [ "$kind" = main ]; then' \
+  'if false; then' \
+  "the checked-out branch's row says why it was kept"
+
+# update-ref deletes a checked-out branch and leaves HEAD unborn, so a worktree
+# parse that misses the main worktree's branch loses it outright.
+run_mutation "M13 the main worktree's branch is not read" \
+  '/^branch refs\/heads\// { b = substr($0, 19) }' \
+  '/^branch refs\/heads\// { if (k != "main") b = substr($0, 19) }' \
+  "the branch checked out in the main worktree keeps its tip"
+
+# `git worktree remove` without --force refuses a dirty tree too, so the tree
+# survives either way; only the row's reason shows the guard has gone.
+run_mutation "M14 the dirty-worktree guard is dropped" \
+  'if ! worktree_clean "$wt"; then' \
+  'if false; then' \
+  "the dirty worktree's row names its uncommitted changes"
+
+run_mutation "M15 the default branch is no longer exempt" \
+  '[ "$b" = "$db" ] && continue' \
+  ':' \
+  "the local default branch is never pruned"
+
+run_mutation "M16 a dry run prunes" \
+  'if [ "$NO_WRITE" -eq 1 ]; then
+      emit WOULD-PRUNE' \
+  'if false; then
+      emit WOULD-PRUNE' \
+  "a dry run with --prune deletes nothing"
+
+# The restore command is the undo the deletion relies on; it is checked by
+# running it, so a command that restores the wrong tip is caught.
+run_mutation "M17 the restore command loses the tip" \
+  'restore="git -C $qdir branch $qb $tip"' \
+  'restore="git -C $qdir branch $qb"' \
+  "the printed restore brings pr-behind back at its tip"
+
+run_mutation "M18 the restore command forgets the worktree" \
+  'restore="$restore && git -C $qdir worktree add $qwt $qb"' \
+  ':' \
+  "the printed restore brings the removed worktree back on its branch"
+
+run_mutation "M19 a detached worktree goes unreported" \
+  'if [ "$kind" = linked ] && [ -z "$b" ]; then' \
+  'if false; then' \
+  "a detached worktree is reported"
+
 printf '\n-----------------------------------------\n'
 printf '%d killed, %d survived, %d misfired\n' "$KILLED" "$SURVIVED" "$MISFIRED"
 [ "$SURVIVED" -eq 0 ] && [ "$MISFIRED" -eq 0 ]
