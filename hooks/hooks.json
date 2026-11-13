@@ -50,6 +50,11 @@
             "type": "command",
             "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/hooks-path-missing.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "f=\"${CLAUDE_PLUGIN_ROOT}/hooks/fixup-unfolded.py\"; [ -f \"$f\" ] || exit 0; exec python3 \"$f\"",
+            "timeout": 10
           }
         ]
       },

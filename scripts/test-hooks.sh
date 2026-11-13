@@ -26,6 +26,7 @@ BODY_HOOK="$ROOT/hooks/hard-wrapped-body.py"
 HASH_HOOK="$ROOT/hooks/commit-body-reference.py"
 GATE_PATH_HOOK="$ROOT/hooks/hooks-path-missing.py"
 MODEL_HOOK="$ROOT/hooks/start-without-model.py"
+FIXUP_HOOK="$ROOT/hooks/fixup-unfolded.py"
 
 check() { # $1 = description, $2 = expected exit, $3 = actual exit
   if [ "$2" = "$3" ]; then
@@ -610,6 +611,107 @@ for matcher in json.load(open(sys.argv[1]))["hooks"]["PreToolUse"]:
 sys.exit(1)' "$ROOT/hooks/hooks.json" "$tool"
   check "registration routes $tool to the start-model hook" 0 $?
 done
+
+# 17f. Fix-up hook: a push, `gh pr create` or `gh pr ready` about to publish a
+#      commit whose subject starts fixup!, squash! or amend! warns, naming the
+#      commits and the fold; the same act over a branch whose commits are all
+#      folded or already on a remote-tracking ref stays quiet, as do a tag-only
+#      or delete push, a directory that is not a repository, and an act named
+#      inside a message. Global and system config are shut out so the
+#      machine's own settings cannot reach the rows.
+fixup_act() { # $1 = command, $2 = session cwd
+  commit_payload "$1" | "$PY" -c 'import json,sys;d=json.load(sys.stdin);d["cwd"]=sys.argv[1];print(json.dumps(d))' "$2" \
+    | GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 "$PY" "$FIXUP_HOOK"
+}
+fixup_repo() { # $1 = name, then the subjects to commit on a feature branch, oldest first
+  name=$1; shift
+  git init -q --bare "$WORK/$name-origin.git"
+  mkrepo "$name"
+  git symbolic-ref HEAD refs/heads/main
+  git commit -q --allow-empty -m base
+  git remote add origin "$WORK/$name-origin.git"
+  git push -q origin main
+  git remote set-head origin main
+  git checkout -q -b feat
+  for subject in "$@"; do git commit -q --allow-empty -m "$subject"; done
+}
+printf '' | "$PY" "$FIXUP_HOOK"
+check "fix-up hook fails open on empty stdin" 0 $?
+fixup_repo t17f-fix "Add the cache" "fixup! Add the cache"
+fixup_repo t17f-folded "Add the cache"
+fixup_repo t17f-published "Add the cache" "fixup! Add the cache"
+git push -q origin feat
+fixup_repo t17f-kinds "Add the cache" "squash! Add the cache" "amend! Add the cache" "Explain the fixup of the cache"
+fixup_repo t17f-word "Add the cache" "Explain the fixup of the cache" "Rename fixup! helper"
+mkrepo t17f-local
+git commit -q --allow-empty -m "Add the cache"
+git commit -q --allow-empty -m "fixup! Add the cache"
+mkdir "$WORK/t17f-plain"
+cd "$WORK" || exit 9
+out=$(fixup_act "git push" "$WORK/t17f-fix")
+check "fix-up hook exits 0 (warn-only)" 0 $?
+contains "fix-up hook warns on a push of an unfolded fix-up" "$out" "1 fix-up commit"
+contains "fix-up hook quotes the subject" "$out" "fixup! Add the cache"
+contains "fix-up hook says they land as written" "$out" "land on the target as written"
+contains "fix-up hook says to fold unless asked otherwise" "$out" "unless the requester asked"
+contains "fix-up hook names the fold without an editor" "$out" "GIT_SEQUENCE_EDITOR=true GIT_EDITOR=true git rebase -i --autosquash"
+contains "fix-up hook folds from the parent of the oldest unpublished commit" "$out" "autosquash $(git -C "$WORK/t17f-fix" rev-parse --short main)"
+out=$(fixup_act "git push -u origin feat" "$WORK/t17f-fix")
+contains "fix-up hook reads a first push with an upstream flag" "$out" "fixup! Add the cache"
+out=$(fixup_act "gh pr create --title x --body y" "$WORK/t17f-fix")
+contains "fix-up hook warns on gh pr create" "$out" "fixup! Add the cache"
+out=$(fixup_act "gh pr ready" "$WORK/t17f-fix")
+contains "fix-up hook warns on gh pr ready against the default branch" "$out" "fixup! Add the cache"
+out=$(fixup_act "gh pr ready 12" "$WORK/t17f-published")
+contains "fix-up hook warns on gh pr ready over a branch already pushed" "$out" "fixup! Add the cache"
+out=$(fixup_act "git push" "$WORK/t17f-published")
+empty "fix-up hook stays quiet where the fix-up is already on a remote-tracking ref" "$out"
+out=$(fixup_act "gh pr create --title x --body y" "$WORK/t17f-published")
+empty "fix-up hook stays quiet on gh pr create over a pushed branch" "$out"
+out=$(fixup_act "git push" "$WORK/t17f-folded")
+empty "fix-up hook stays quiet where the commit is folded" "$out"
+out=$(fixup_act "gh pr ready" "$WORK/t17f-folded")
+empty "fix-up hook stays quiet on gh pr ready over a folded branch" "$out"
+out=$(fixup_act "git -C $WORK/t17f-fix push" "$WORK/t17f-plain")
+contains "fix-up hook follows -C" "$out" "fixup! Add the cache"
+out=$(fixup_act "cd $WORK/t17f-fix && git push" "$WORK")
+contains "fix-up hook follows a cd" "$out" "fixup! Add the cache"
+out=$(fixup_act "git -C $WORK/t17f-folded push" "$WORK/t17f-fix")
+empty "fix-up hook reads the -C directory, not the session's" "$out"
+out=$(fixup_act "git push" "$WORK/t17f-kinds")
+contains "fix-up hook counts a squash! and an amend! with the fixup" "$out" "2 fix-up commits"
+contains "fix-up hook quotes a squash! subject" "$out" "squash! Add the cache"
+contains "fix-up hook quotes an amend! subject" "$out" "amend! Add the cache"
+lacks "fix-up hook leaves a subject that only mentions the word alone" "$out" "Explain the fixup"
+out=$(fixup_act "git push" "$WORK/t17f-word")
+empty "fix-up hook stays quiet on a subject that merely contains the word" "$out"
+out=$(fixup_act "git push" "$WORK/t17f-local")
+contains "fix-up hook reads a repository with no remote as all unpublished" "$out" "fixup! Add the cache"
+contains "fix-up hook folds a branch with no base from the root" "$out" "autosquash --root"
+out=$(fixup_act "gh pr ready" "$WORK/t17f-local")
+empty "fix-up hook stays quiet on gh pr ready where no default branch resolves" "$out"
+out=$(fixup_act "git push --tags" "$WORK/t17f-fix")
+empty "fix-up hook stays quiet on a push of tags only" "$out"
+out=$(fixup_act "git push origin --delete feat" "$WORK/t17f-fix")
+empty "fix-up hook stays quiet on a branch delete" "$out"
+out=$(fixup_act "git push origin :feat" "$WORK/t17f-fix")
+empty "fix-up hook stays quiet on a delete refspec" "$out"
+out=$(fixup_act "git push" "$WORK/t17f-plain")
+check "fix-up hook exits 0 outside a repository" 0 $?
+empty "fix-up hook stays quiet outside a repository" "$out"
+out=$(fixup_act "git status && git log -1" "$WORK/t17f-fix")
+empty "fix-up hook stays quiet on an act that publishes nothing" "$out"
+out=$(fixup_act "printf %s 'git push'" "$WORK/t17f-fix")
+empty "fix-up hook reads an act named inside quotes as message text" "$out"
+out=$(fixup_act "git commit -m 'run gh pr ready later'" "$WORK/t17f-fix")
+empty "fix-up hook reads gh pr ready named in a commit message as message text" "$out"
+"$PY" -c 'import json,sys
+cfg = json.load(open(sys.argv[1]))
+for matcher in cfg["hooks"]["PreToolUse"]:
+    if any("fixup-unfolded.py" in hook["command"] for hook in matcher["hooks"]) and "Bash" in matcher["matcher"]:
+        sys.exit(0)
+sys.exit(1)' "$ROOT/hooks/hooks.json"
+check "fix-up hook is registered on PreToolUse Bash" 0 $?
 
 BRIEF_HOOK="$ROOT/hooks/session-brief.py"
 
