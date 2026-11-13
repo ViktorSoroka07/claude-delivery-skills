@@ -28,6 +28,13 @@ Flags: `--dry-run` (report only), `--fetch-only` (move no local branch),
 `--ask` (confirm before touching any repo with local changes), `-j N`, `-q`.
 `-h` prints the full contract.
 
+`--prune` deletes local branches, so pass it only when the user asks to clear
+out stale branches, such as the copies left by checking a request out to
+review it, and never on a plain sync: it removes each branch whose tip is
+already on its origin upstream or on origin's default branch, with the clean
+worktrees on those, so a branch just created goes too. Relay each `PRUNED`
+row's restore command and each `KEPT` row's reason to the user.
+
 **Target resolution.** A directory containing `.git` is treated as that one
 repo. Anything else sweeps its **direct children only**, never recursing, so
 pointing it at a workspace root syncs the checkouts in it and not their
