@@ -264,9 +264,10 @@ check "landing hook ignores non-Bash tools" 0 $?
 echo
 # 17b. Body hook: a pull request or issue body, a comment on either, a review
 #      body or a closing comment, sent with a line break mid-sentence warns,
-#      from every place a command takes the body; a body whose short lines are list items, table rows, fenced
-#      code or HTML stays quiet, as do a merge commit's body, a work item's
-#      HTML field and a command that only names the send inside a message.
+#      from every place a command takes the body; a body whose short lines are
+#      list items, table rows, fenced code or HTML stays quiet, as do a merge
+#      commit's body, a work item's HTML field and a command that only names
+#      the send inside a message.
 cd "$WORK" || exit 9
 body_payload() { # $1 = file holding the command, $2 = the session cwd, $WORK unless given
   "$PY" -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":open(sys.argv[1]).read()},"cwd":sys.argv[2]}))' "$1" "${2:-$WORK}"
