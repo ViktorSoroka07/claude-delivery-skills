@@ -302,7 +302,16 @@ instructions alone cannot:
     either, a review's body or a closing comment, the moment the command sends
     it, from a body file, a substitution over one, a heredoc or a quoted literal,
     and warns on a line break mid-sentence, because the forge renders every
-    newline inside a paragraph as a break and the paragraph arrives chopped; backs
+    newline inside a paragraph as a break and the paragraph arrives chopped. A
+    second check reads the same bodies, and the description and discussion of an
+    `az boards work-item` create or update, for a tag-shaped token such as `<Id>` or
+    the `<Result>` of `Task<Result>` whose element name the forge does not keep,
+    because its sanitizer deletes the token and the send still reports success,
+    leaving an empty gap mid-sentence; it asks for the token without its angle
+    brackets, or as `&lt;Name&gt;`, and for the stored body read back. Through `gh`
+    only prose is read, since code spans and fenced blocks are kept; through `az`
+    the token is read anywhere, since the stored field is HTML, and a wrapped
+    paragraph in a work-item field stays silent, since that field reflows; backs
     `writing-pr-descriptions`.
   - **Commit-body reference** — in a repository whose messages commitlint lints,
     reads a commit's message the moment the command runs, from each `-m`, a heredoc
