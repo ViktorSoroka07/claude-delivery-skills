@@ -1,0 +1,445 @@
+#!/usr/bin/env python3
+"""Fixture suite for post-review.py, run against fake_forge.py.
+
+    python3 test_post_review.py
+
+Prints one PASS or FAIL line per named assertion; mutate.py reads those lines.
+"""
+
+import concurrent.futures
+import glob
+import json
+import os
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SCRIPT = os.path.join(HERE, "post-review.py")
+FORGE = os.path.join(HERE, "fake_forge.py")
+ADO_HOST = "dev.azure.com"
+SENTINEL = "sentinel-token-not-a-secret"
+TOKEN_VAR = "AZURE_DEVOPS_EXT_PAT"
+
+EXPECTED_VOCAB = [
+    "MANIFEST-INVALID", "UNSUPPORTED-FORGE", "EMPTY", "NO-FRONTMATTER", "ALREADY-POSTED",
+    "POSTED-UNKNOWN", "UNFINISHED-RUN", "NO-TOKEN", "AUTH-REFUSED", "STALE-HEAD", "MISSING-COMMIT",
+    "OUT-OF-DIFF", "LINE-OUT-OF-FILE", "OFF-DIFF-LINE", "STALE-SUGGESTION", "SUGGESTION-IN-GROUP",
+    "PARTITION", "PENDING-EXISTS", "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING",
+    "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING",
+]
+
+# Statuses whose fixtures belong to a later task of the build plan. Each task
+# that adds a status's fixture removes it here; the set is empty once the
+# script is complete, and from then on any status without a fixture fails.
+OWED_BY_LATER_TASKS = set(EXPECTED_VOCAB)
+
+HOSTILE_GIT_CONFIG = """\
+[color]
+\tui = always
+[diff]
+\tnoprefix = true
+\tcontext = 8
+\texternal = false
+\trenames = copies
+[core]
+\tquotePath = true
+"""
+
+BUILD_ENV = dict(
+    {k: v for k, v in os.environ.items() if k != TOKEN_VAR},
+    GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1",
+    GIT_AUTHOR_NAME="tester", GIT_AUTHOR_EMAIL="tester@example.invalid",
+    GIT_COMMITTER_NAME="tester", GIT_COMMITTER_EMAIL="tester@example.invalid",
+    GIT_AUTHOR_DATE="@1700000000 +0000", GIT_COMMITTER_DATE="@1700000000 +0000",
+)
+
+APP_BASE = ["line %02d" % n for n in range(1, 21)]
+APP_HEAD = list(APP_BASE)
+APP_HEAD[1] = "LINE 02"
+APP_HEAD[14:17] = ["LINE 15", "LINE 16", "LINE 17"]
+CRLF_BASE = "one\r\ntwo\r\nthree\r\n"
+CRLF_HEAD = 'one\r\nsay("\U0001F600")\r\nshout("\U0001F600")\r\n'
+GUIDE = "".join("guide %d\n" % n for n in range(1, 6))
+
+
+def lines_text(lines):
+    return "".join(line + "\n" for line in lines)
+
+
+CREATED = []
+
+
+# --- the repository every fixture copies -------------------------------------
+
+
+class Template:
+    root = None
+    clone = None
+    base = None
+    head = None
+    moved = None
+
+
+def build_git(cwd, *args):
+    return subprocess.run(["git", *args], cwd=cwd, env=BUILD_ENV, capture_output=True,
+                          check=True).stdout.decode().strip()
+
+
+def write(path, text):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        f.write(text)
+
+
+def build_template():
+    Template.root = tempfile.mkdtemp(prefix="post-review-template-")
+    CREATED.append(Template.root)
+    clone = os.path.join(Template.root, "clone")
+    os.makedirs(clone)
+    build_git(clone, "init", "-q", "-b", "main")
+    write(os.path.join(clone, "src/app.py"), lines_text(APP_BASE))
+    write(os.path.join(clone, "src/crlf.txt"), CRLF_BASE)
+    write(os.path.join(clone, "docs/guide.md"), GUIDE)
+    build_git(clone, "add", "-A")
+    build_git(clone, "commit", "-qm", "base")
+    Template.base = build_git(clone, "rev-parse", "HEAD")
+    build_git(clone, "checkout", "-qb", "feature")
+    write(os.path.join(clone, "src/app.py"), lines_text(APP_HEAD))
+    write(os.path.join(clone, "src/crlf.txt"), CRLF_HEAD)
+    build_git(clone, "commit", "-qam", "head")
+    Template.head = build_git(clone, "rev-parse", "HEAD")
+    write(os.path.join(clone, "src/app.py"), lines_text(APP_HEAD + ["line 21"]))
+    build_git(clone, "commit", "-qam", "moved")
+    Template.moved = build_git(clone, "rev-parse", "HEAD")
+    build_git(clone, "checkout", "-q", Template.head)
+    Template.clone = clone
+
+
+# --- fixtures ----------------------------------------------------------------
+
+
+def default_model(forge, clone):
+    return {
+        "repo": "acme/tickets" if forge == "github" else "acme/field ops/tickets",
+        "number": 42, "head": Template.head, "base": Template.base, "git_dir": clone,
+        "user": {"login": "reviewer", "id": 7, "ado_id": "reviewer-id"},
+        "token": SENTINEL, "reviews": [], "comments": [], "threads": [],
+        "next_id": 100, "faults": {}, "page_size": 100,
+    }
+
+
+class Fixture:
+    def __init__(self, forge="github", threads=None, posted="posted: null", token=SENTINEL):
+        self.forge = forge
+        self.root = tempfile.mkdtemp(prefix="post-review-test-")
+        CREATED.append(self.root)
+        self.clone = os.path.join(self.root, "clone")
+        shutil.copytree(Template.clone, self.clone, symlinks=True)
+        for d in ("bin", "forge", "state", "tmp"):
+            os.makedirs(os.path.join(self.root, d))
+        python = shlex.quote(sys.executable)
+        for tool in ("gh", "curl"):
+            write(os.path.join(self.root, "bin", tool),
+                  "#!/bin/sh\nexec %s %s %s \"$@\"\n" % (python, shlex.quote(FORGE), tool))
+            os.chmod(os.path.join(self.root, "bin", tool), 0o755)
+        write(os.path.join(self.root, "hostile.gitconfig"), HOSTILE_GIT_CONFIG)
+        self.findings = os.path.join(self.root, "reviews", "r1.md")
+        frontmatter = "---\nrepo: x\npr: 42\n%s\n---\n" % posted if posted is not None else ""
+        write(self.findings, frontmatter + "# Review of request 42\n\nFindings.\n")
+        self.model = default_model(forge, self.clone)
+        repo_key = ("github.com/acme/tickets" if forge == "github"
+                    else "%s/acme/field ops/tickets" % ADO_HOST)
+        self.manifest = {
+            "schema": 1, "forge": forge, "repo": repo_key, "request": 42,
+            "reviewed_sha": Template.head, "form": "default", "findings_file": self.findings,
+            "threads": threads if threads is not None else [inline("M-1", 2)],
+        }
+        self.env = dict(
+            {k: v for k, v in os.environ.items() if k != TOKEN_VAR},
+            PATH=os.path.join(self.root, "bin") + os.pathsep + os.environ["PATH"],
+            FAKE_FORGE_DIR=os.path.join(self.root, "forge"),
+            XDG_STATE_HOME=os.path.join(self.root, "state"),
+            TMPDIR=os.path.join(self.root, "tmp"),
+            GIT_CONFIG_GLOBAL=os.path.join(self.root, "hostile.gitconfig"),
+            GIT_CONFIG_NOSYSTEM="1",
+        )
+        if token is not None:
+            self.env[TOKEN_VAR] = token
+
+    def save_model(self):
+        write(os.path.join(self.root, "forge", "model.json"), json.dumps(self.model))
+
+    def stored(self):
+        with open(os.path.join(self.root, "forge", "model.json"), encoding="utf-8") as f:
+            return json.load(f)
+
+    def run(self, *args):
+        self.save_model()
+        path = os.path.join(self.root, "manifest.json")
+        write(path, json.dumps(self.manifest))
+        proc = subprocess.run([sys.executable, SCRIPT, path, *args], cwd=self.clone, env=self.env,
+                              capture_output=True, timeout=300)
+        return Run(proc.returncode, proc.stdout.decode("utf-8", "replace"),
+                   proc.stderr.decode("utf-8", "replace"))
+
+    def tool(self, tool, *args, stdin=""):
+        self.save_model()
+        proc = subprocess.run([os.path.join(self.root, "bin", tool), *args], cwd=self.root,
+                              env=self.env, input=stdin.encode(), capture_output=True, timeout=60)
+        self.model = self.stored()
+        return Run(proc.returncode, proc.stdout.decode("utf-8", "replace"),
+                   proc.stderr.decode("utf-8", "replace"))
+
+    def calls(self):
+        path = os.path.join(self.root, "forge", "calls.jsonl")
+        if not os.path.exists(path):
+            return []
+        with open(path, encoding="utf-8") as f:
+            return [json.loads(line) for line in f]
+
+    def creates(self):
+        return [c for c in self.calls() if is_create(c)]
+
+    def record(self):
+        found = glob.glob(os.path.join(self.root, "state", "delivery-skills", "post-review", "*",
+                                       "state.json"))
+        if not found:
+            return None
+        with open(found[0], encoding="utf-8") as f:
+            return json.load(f)
+
+    def file(self, name, data):
+        path = os.path.join(self.root, name)
+        write(path, data if isinstance(data, str) else json.dumps(data))
+        return path
+
+    def ado_url(self, tail):
+        return "https://%s/acme/field%%20ops/_apis/git/repositories/tickets/pullRequests/42%s" % (
+            ADO_HOST, tail)
+
+
+def is_create(call):
+    argv = call["argv"]
+    method = next((argv[i + 1] for i, a in enumerate(argv[:-1]) if a in ("-X", "--method")), None)
+    target = argv[-1] if call["tool"] == "curl" else next(
+        (a for a in argv[1:] if not a.startswith("-") and a.startswith("repos/")), "")
+    return method == "POST" and (target.endswith("/reviews") or "/threads?" in target
+                                 or target.endswith("/threads"))
+
+
+class Run:
+    def __init__(self, rc, out, err):
+        self.rc = rc
+        self.out = out
+        self.err = err
+
+    def status(self):
+        lines = self.out.strip().split("\n")
+        return lines[-2].split(" ", 1)[0] if len(lines) >= 2 else ""
+
+
+def inline(key, line, path="src/app.py", body=None, **extra):
+    thread = {"key": key, "path": path, "line": line,
+              "body": body if body is not None else "**Medium - %s**\n\nProblem: thing.\n" % key}
+    thread.update(extra)
+    return thread
+
+
+# --- the harness -------------------------------------------------------------
+
+
+class Results:
+    def __init__(self, name):
+        self.name = name
+        self.rows = []
+        self.covered = set()
+
+    def check(self, label, ok, detail=""):
+        self.rows.append((label, bool(ok), detail))
+
+    def eq(self, label, got, want):
+        self.check(label, got == want, "wanted %r, got %r" % (want, got))
+
+    def status(self, label, run, want):
+        self.covered.add(want)
+        self.check(label, run.status() == want,
+                   "wanted %s, got %r | out: %s | err: %s" % (want, run.status(), run.out[-600:],
+                                                              run.err[-300:]))
+
+
+TESTS = []
+
+
+def test(fn):
+    TESTS.append(fn)
+    return fn
+
+
+def run_test(fn):
+    results = Results(fn.__name__)
+    try:
+        fn(results)
+    except Exception as e:  # a crashing test reports as a failure of that test, not of the run
+        results.check("%s ran to the end" % fn.__name__, False, "%s: %s" % (type(e).__name__, e))
+    return results
+
+
+# --- stand-in self-tests -----------------------------------------------------
+
+
+def review_payload(fx, comments, event="COMMENT"):
+    payload = {"commit_id": Template.head, "body": "", "comments": comments}
+    if event:
+        payload["event"] = event
+    return fx.file("payload.json", payload)
+
+
+@test
+def stand_in_refuses_a_github_comment_off_a_changed_line(r):
+    fx = Fixture("github")
+    off = fx.tool("gh", "api", "-i", "-X", "POST", "repos/acme/tickets/pulls/42/reviews", "--input",
+                  review_payload(fx, [{"path": "src/app.py", "line": 10, "side": "RIGHT", "body": "x"}]))
+    r.check("stand-in: a GitHub comment off a changed line gets 422",
+            off.out.startswith("HTTP/2.0 422") and off.rc == 1, off.out[:200])
+    on = fx.tool("gh", "api", "-i", "-X", "POST", "repos/acme/tickets/pulls/42/reviews", "--input",
+                 review_payload(fx, [{"path": "src/app.py", "line": 2, "side": "RIGHT", "body": "x"}]))
+    r.check("stand-in: a GitHub comment on a changed line is accepted",
+            on.out.startswith("HTTP/2.0 200") and on.rc == 0, on.out[:200])
+
+
+@test
+def stand_in_ignores_a_patch_of_thread_context(r):
+    fx = Fixture("ado")
+    context = {"filePath": "/src/app.py", "rightFileStart": {"line": 2, "offset": 1},
+               "rightFileEnd": {"line": 2, "offset": 2}}
+    thread = {"comments": [{"parentCommentId": 0, "content": "x", "commentType": 1}], "status": 1,
+              "threadContext": context}
+    config = 'user = ":%s"\n' % SENTINEL
+    body = os.path.join(fx.root, "reply.json")
+    fx.tool("curl", "-K", "-", "-sS", "-X", "POST", "-o", body, "-w", "%{http_code}",
+            "--data-binary", "@" + fx.file("thread.json", thread),
+            fx.ado_url("/threads?api-version=7.1"), stdin=config)
+    with open(body, encoding="utf-8") as f:
+        thread_id = json.load(f)["id"]
+    moved = dict(context, rightFileStart={"line": 15, "offset": 1}, rightFileEnd={"line": 15, "offset": 2})
+    patched = fx.tool("curl", "-K", "-", "-sS", "-X", "PATCH", "-o", body, "-w", "%{http_code}",
+                      "--data-binary", "@" + fx.file("patch.json", {"threadContext": moved, "status": 1}),
+                      fx.ado_url("/threads/%d?api-version=7.1" % thread_id), stdin=config)
+    r.eq("stand-in: an ADO PATCH of threadContext answers 200", patched.out, "200")
+    listed = fx.tool("curl", "-K", "-", "-sS", "-w", "", fx.ado_url("/threads?api-version=7.1"),
+                     stdin=config)
+    r.eq("stand-in: the patched thread keeps its threadContext",
+         json.loads(listed.out)["value"][0]["threadContext"], context)
+
+
+@test
+def stand_in_answers_a_curl_call_without_credential_with_the_sign_in_page(r):
+    fx = Fixture("ado")
+    url = fx.ado_url("?api-version=7.1")
+    bare = fx.tool("curl", "-sS", "-w", "\\n%{http_code} %{content_type}", url)
+    r.check("stand-in: a curl call without the user line gets 203 and a sign-in page",
+            bare.out.endswith("203 text/html; charset=utf-8") and "Sign in" in bare.out, bare.out[-200:])
+    wrong = fx.tool("curl", "-K", "-", "-sS", "-w", "\\n%{http_code}", url, stdin='user = ":wrong"\n')
+    r.check("stand-in: a curl call with a wrong token gets 203", wrong.out.endswith("203"), wrong.out[-80:])
+    good = fx.tool("curl", "-K", "-", "-sS", "-w", "\\n%{http_code}", url,
+                   stdin='user = ":%s"\n' % SENTINEL)
+    r.check("stand-in: a curl call with the token gets 200", good.out.endswith("200"), good.out[-80:])
+    fx.model["auth_failure"] = 401
+    refused = fx.tool("curl", "-sS", "-w", "%{http_code}", url)
+    r.eq("stand-in: in 401 mode a curl call without the user line gets 401", refused.out, "401")
+    r.check("stand-in: the call log holds no token",
+            SENTINEL not in json.dumps(fx.calls()), "token found in calls.jsonl")
+
+
+@test
+def stand_in_pages_a_github_list(r):
+    fx = Fixture("github")
+    fx.model["page_size"] = 2
+    fx.tool("gh", "api", "-i", "-X", "POST", "repos/acme/tickets/pulls/42/reviews", "--input",
+            review_payload(fx, [{"path": "src/app.py", "line": n, "side": "RIGHT", "body": "c%d" % n}
+                                for n in (2, 15, 16)]))
+    first = fx.tool("gh", "api", "-i", "repos/acme/tickets/pulls/42/comments?per_page=100&page=1")
+    second = fx.tool("gh", "api", "-i", "repos/acme/tickets/pulls/42/comments?per_page=100&page=2")
+    r.check("stand-in: a GitHub list longer than a page links to page two",
+            'rel="next"' in first.out.split("\n\n", 1)[0], first.out[:300])
+    r.eq("stand-in: page two holds the rest of the list",
+         [c["line"] for c in json.loads(second.out.split("\n\n", 1)[1])], [16])
+    r.check("stand-in: the last page links to nothing", 'rel="next"' not in second.out, second.out[:300])
+
+
+@test
+def stand_in_computes_pending_positions_from_its_own_diff(r):
+    fx = Fixture("github")
+    reply = fx.tool("gh", "api", "-X", "POST", "repos/acme/tickets/pulls/42/reviews", "--input",
+                    review_payload(fx, [{"path": "src/app.py", "line": n, "side": "RIGHT", "body": "c"}
+                                        for n in (2, 17)], event=None))
+    review = json.loads(reply.out)
+    r.eq("stand-in: a review without event is pending", review["state"], "PENDING")
+    listed = fx.tool("gh", "api", "repos/acme/tickets/pulls/42/reviews/%d/comments" % review["id"])
+    r.eq("stand-in: positions count from the first hunk header, each later header counting one",
+         [c["position"] for c in json.loads(listed.out)], [3, 16])
+    again = fx.tool("gh", "api", "-i", "-X", "POST", "repos/acme/tickets/pulls/42/reviews", "--input",
+                    review_payload(fx, [], event=None))
+    r.check("stand-in: a second pending review of the same user gets 422",
+            again.out.startswith("HTTP/2.0 422"), again.out[:200])
+
+
+@test
+def stand_in_refuses_arguments_the_real_tools_refuse(r):
+    fx = Fixture("ado")
+    r.check("stand-in: gh refuses an unknown flag",
+            fx.tool("gh", "api", "--paginate-all", "user").rc == 1)
+    r.check("stand-in: curl refuses an unknown option",
+            fx.tool("curl", "--bogus", fx.ado_url("")).rc == 2)
+    r.check("stand-in: gh refuses an --input file that does not exist",
+            fx.tool("gh", "api", "-X", "POST", "--input", "/nonexistent/p.json", "user").rc == 1)
+
+
+# --- the vocabulary ----------------------------------------------------------
+
+
+def vocabulary_check(covered):
+    results = Results("vocabulary")
+    proc = subprocess.run([sys.executable, SCRIPT, "--print-status-vocab"], capture_output=True)
+    printed = proc.stdout.decode().split()
+    results.eq("the status vocabulary matches the expected list", printed, EXPECTED_VOCAB)
+    uncovered = set(EXPECTED_VOCAB) - covered
+    results.check("every status has a fixture, apart from those later tasks owe",
+                  uncovered == OWED_BY_LATER_TASKS,
+                  "without a fixture and not owed: %s; owed but covered: %s" % (
+                      sorted(uncovered - OWED_BY_LATER_TASKS), sorted(OWED_BY_LATER_TASKS - uncovered)))
+    return results
+
+
+def main():
+    build_template()
+    passed = failed = 0
+    covered = set()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        outcomes = list(pool.map(run_test, TESTS))
+    outcomes.append(vocabulary_check(set().union(*(o.covered for o in outcomes))))
+    for outcome in outcomes:
+        print(outcome.name)
+        covered |= outcome.covered
+        for label, ok, detail in outcome.rows:
+            if ok:
+                passed += 1
+                print("  PASS %s" % label)
+            else:
+                failed += 1
+                print("  FAIL %s" % label)
+                if detail:
+                    print("       %s" % detail)
+    if OWED_BY_LATER_TASKS:
+        print("statuses later tasks owe a fixture: %s" % " ".join(sorted(OWED_BY_LATER_TASKS)))
+    print("%d passed, %d failed" % (passed, failed))
+    for root in CREATED:
+        shutil.rmtree(root, ignore_errors=True)
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
