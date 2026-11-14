@@ -1204,6 +1204,31 @@ written with no positional `$` (a `sed` expression, a named variable), or
 lives in a referenced file, which is read rather than loaded;
 `scripts/check-refs.sh` fails on any `$` followed by a digit in a skill body.
 
+**Which suite runs when.** Three suites guard the code the plugin ships:
+`scripts/test-hooks.sh` for the hooks, git-sync's `test.sh`, and review-pr's
+`test_post_review.py` for the posting script. The last two each carry a
+mutation sweep that runs for tens of minutes, and a sweep proves only that the
+checks can fail, which nothing changes until a check, its test or the code
+under it does. So each runs at these points, and is not rerun between them:
+
+- **Per change:** the suites that read what the change touched, plus, where a
+  suite has a sweep, the mutations of the code the change touched. The posting
+  script's `mutate.py` takes them by name; git-sync's `mutate.sh` takes no
+  names, so a change to one of git-sync's checks runs its whole sweep.
+- **At a session's start:** the suite of the code the session will change,
+  never a sweep.
+- **After a rebase:** a suite reruns only where the rebase changed a file it
+  reads.
+- **Before a push:** the gates (`CLAUDE.md`'s Gates section) and every whole
+  sweep, once.
+
+A sweep never runs beside another suite run, for the reason each
+`MAINTAINING.md` gives, and `scripts/test-hooks.sh` runs alone as well: its
+budget rows time a hook against the machine's load, and a row that reads
+`UNMEASURED` is owed a run on a quiet machine, not counted as a pass. The
+posting script's tiers in full, the per-mutation fixture among them, are in
+`skills/review-pr/MAINTAINING.md`.
+
 ## Versioning and releases
 
 The manifest version in `.claude-plugin/plugin.json` is the release trigger:
