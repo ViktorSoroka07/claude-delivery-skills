@@ -52,6 +52,10 @@ SUGGESTION_FIELDS = {"start", "end", "original"}
 MEMBER_FIELDS = {"path", "line"}
 
 CHILD_ENV = {k: v for k, v in os.environ.items() if k != TOKEN_VAR}
+FINISHED = ("LANDED", "CORRECTED")
+LATEST_REVIEWS = ("query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, "
+                  "name: $name) { pullRequest(number: $number) { latestReviews(first: 100) { nodes { "
+                  "databaseId } } } } }")
 
 
 class Stop(Exception):
@@ -338,10 +342,12 @@ class Transport:
         self.files += 1
         return os.path.join(self.workdir, "%s-%03d.json" % (stem, self.files))
 
-    def gh(self, method, path, input_file=None):
+    def gh(self, method, path, input_file=None, fields=()):
         argv = ["gh", "api", "-i", "-X", method, path]
         if input_file:
             argv += ["--input", input_file]
+        for flag, value in fields:
+            argv += [flag, value]
         try:
             proc = subprocess.run(argv, capture_output=True, timeout=self.timeout, env=CHILD_ENV)
         except subprocess.TimeoutExpired:
@@ -408,8 +414,9 @@ def credential_refused(reply):
         reply.status is not None and reply.status // 100 == 2 and "json" not in reply.content_type)
 
 
-def read(fetch: Callable[[], Reply], what, hint):
-    """A GET that creates nothing, so it is retried; returns (data, reply)."""
+def read(fetch: Callable[[], Reply], what, hint, absent_ok=False):
+    """A GET that creates nothing, so it is retried; returns (data, reply), and with
+    absent_ok (None, reply) for a 404."""
     reply = fetch()
     for _ in range(READ_RETRIES):
         if reply.status is not None and reply.status < 500:
@@ -419,6 +426,8 @@ def read(fetch: Callable[[], Reply], what, hint):
     if credential_refused(reply):
         raise Stop("AUTH-REFUSED", "the forge refused the credential on %s (%s); %s" % (
             what, reply.describe(), hint))
+    if absent_ok and reply.status == 404:
+        return None, reply
     if reply.status is None or reply.status // 100 != 2:
         raise Stop("UNVERIFIED", "%s could not be read: %s" % (what, reply.describe()))
     data = parse_reply(reply.body)
@@ -453,22 +462,23 @@ def forge_message(reply):
 
 
 def send(record, key, create: Callable[[], Reply]):
-    """Run one create, recording it before and after; returns the id the forge gave, if readable."""
-    record.event("sending", key)
+    """Run one create, recording it before and after; False when its answer was lost, so the
+    create may or may not have landed."""
+    record.event("sending", key, time.time())
     reply = create()
     outcome = classify_create(reply)
     if outcome == "landed":
         data = parse_reply(reply.body)
-        created = data.get("id") if isinstance(data, dict) else None
-        record.event("landed", key, created)
-        return created
+        record.event("landed", key, data.get("id") if isinstance(data, dict) else None)
+        return True
     if outcome == "rejected":
         record.event("rejected", key, reply.status)
         raise Stop("REJECTED", "the forge refused %s with %s: %s" % (key, reply.describe(),
                                                                     forge_message(reply)))
     record.event("uncertain", key, time.time())
-    raise Stop("UNCERTAIN", "%s on %s: it may have landed, so nothing is retried; read the request "
-               "before deciding" % (reply.describe(), key))
+    print("%s on %s: it may have landed, so it is not retried; reading the request back" % (
+        reply.describe(), key))
+    return False
 
 
 @dataclass
@@ -510,10 +520,25 @@ def pair(wanted, items, known_ids):
         raise Stop("UNCERTAIN", "the request holds new items of yours that pair with no thread "
                    "(ids %s); something landed that this run cannot account for"
                    % ", ".join(str(i.id) for i in free))
+    return pairs
+
+
+def require(pairs, wanted):
     missing = [w.key for w in wanted if w.key not in pairs]
     if missing:
-        raise Stop("MISSING", "the read-back does not show %s" % ", ".join(missing))
+        raise Stop("MISSING", "the read-back does not show %s, even read by id" % ", ".join(missing))
     return pairs
+
+
+def with_landed(items, record, by_id):
+    """The listed items, plus each created id the list lacks, read once by its id."""
+    listed = {i.id for i in items}
+    for created in record.landed_ids().values():
+        if created is not None and created not in listed:
+            item = by_id(created)
+            if item is not None:
+                items.append(item)
+    return items
 
 
 def verdict(body_sent, body_stored, place_sent, place_stored):
@@ -528,15 +553,17 @@ class Outcome:
     def __init__(self):
         self.rows = []
         self.diffs = []
+        self.notes = []
 
-    def judge(self, wanted, item, label):
+    def judge(self, wanted, item, where):
         status = verdict(wanted.body, item.body, wanted.place, item.place)
-        self.rows.append({"key": wanted.key, "id": item.id, "anchor": label, "status": status})
+        row = {"key": wanted.key, "id": item.id, "anchor": where, "status": status}
+        self.rows.append(row)
         if status == "MISMATCH":
             self.diffs.append("".join(difflib.unified_diff(
                 wanted.body.splitlines(True), item.body.splitlines(True),
                 "%s as sent" % wanted.key, "%s as stored" % wanted.key)))
-        print("%s %s %s %s" % (status, wanted.key, item.id, label))
+        print("%s %s %s %s" % (status, wanted.key, item.id, where))
 
     def finish(self):
         statuses = {row["status"] for row in self.rows}
@@ -546,6 +573,7 @@ class Outcome:
                 raise Stop(status, "%s did not read back as sent: %s" % (
                     "the stored text of" if status == "MISMATCH" else "the placement of",
                     ", ".join(keys)), "\n".join(self.diffs))
+        return "LANDED"
 
 
 def label(path, line):
@@ -587,6 +615,7 @@ class GitHub:
         self.t = transport
         self.pulls = "repos/%s/%s/pulls/%d" % (manifest.repo + (manifest.request,))
         self.login = None
+        self.review = None
 
     def head_and_base(self):
         data, _ = read(functools.partial(self.t.gh, "GET", self.pulls), "the request", self.HINT)
@@ -643,39 +672,69 @@ class GitHub:
         print("would POST %s/reviews with %d inline comments%s" % (
             self.pulls, len(self.payload()["comments"]), ", staged" if self.m.pending else ""))
 
-    def post(self, head, record):
-        send(record, "review", functools.partial(self.t.gh, "POST", self.pulls + "/reviews",
-                                                 write_payload(self.t, self.payload())))
+    def units(self, head):
+        """What each create should become: on GitHub the whole review is one create."""
+        return [Wanted("review", self.review_body(), (), None)]
 
-    def read_back(self, head, record, outcome):
-        new = [Item(r.get("id"), r.get("body") or "", (), None) for r in self.my_reviews()
-               if r.get("id") not in record.data["snapshot"]]
-        review = pair([Wanted("review", self.review_body(), (), None)], new,
-                      record.landed_ids())["review"]
-        for t in self.m.threads:
-            if t.path is None:
-                outcome.judge(Wanted(t.key, self.review_body(), (), None), review, label(None, None))
+    def create(self, key, head):
+        return functools.partial(self.t.gh, "POST", self.pulls + "/reviews",
+                                 write_payload(self.t, self.payload()))
+
+    def review_item(self, review):
+        return Item(review.get("id"), review.get("body") or "", (), None)
+
+    def review_by_id(self, review_id):
+        data, _ = read(functools.partial(self.t.gh, "GET", "%s/reviews/%s" % (self.pulls, review_id)),
+                       "review %s" % review_id, self.HINT, absent_ok=True)
+        return self.review_item(data) if isinstance(data, dict) else None
+
+    def new_items(self, record):
+        listed = [self.review_item(r) for r in self.my_reviews() if r.get("id") not in record.data["snapshot"]]
+        return with_landed(listed, record, self.review_by_id)
+
+    def read_back(self, head, record):
+        """[(wanted, item, where)] for every thread, paired with what the forge stores."""
+        units = self.units(head)
+        self.review = require(pair(units, self.new_items(record), record.landed_ids()), units)["review"]
+        rows = [(Wanted(t.key, self.review_body(), (), None), self.review, label(None, None))
+                for t in self.m.threads if t.path is None]
         inline = [t for t in self.m.threads if t.path is not None]
         if self.m.pending:
             positions = {t.path: diff_positions(head, t.path) for t in inline}
-            stored = self.list("%s/reviews/%s/comments" % (self.pulls, review.id),
+            stored = self.list("%s/reviews/%s/comments" % (self.pulls, self.review.id),
                                "the staged review's comments")
             items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("position")),
-                          (c.get("path"), c.get("position"), c.get("commit_id"))) for c in stored]
+                          (c.get("path"), c.get("position"), c.get("commit_id")))
+                     for c in stored]
             wanted = [Wanted(t.key, t.body, (t.path, positions[t.path].get(t.line)),
                              (t.path, positions[t.path].get(t.line), self.m.reviewed_sha))
                       for t in inline]
         else:
             stored = [c for c in self.list(self.pulls + "/comments", "the request's comments")
-                      if c.get("pull_request_review_id") == review.id]
+                      if c.get("pull_request_review_id") == self.review.id]
             items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("line")),
                           (c.get("path"), c.get("line"), c.get("start_line"), c.get("side")))
                      for c in stored]
             wanted = [Wanted(t.key, t.body, (t.path, t.line), (t.path, t.line, t.start_line, "RIGHT"))
                       for t in inline]
-        pairs = pair(wanted, items, {})
-        for w, t in zip(wanted, inline):
-            outcome.judge(w, pairs[w.key], label(t.path, t.line))
+        pairs = require(pair(wanted, items, {}), wanted)
+        return rows + [(w, pairs[w.key], label(t.path, t.line)) for w, t in zip(wanted, inline)]
+
+    def notes(self, record):
+        """A review whose create lost its answer may exist yet be missing from latestReviews."""
+        if not record.ever("uncertain", "review"):
+            return []
+        fields = [("-f", "query=" + LATEST_REVIEWS), ("-f", "owner=" + self.m.repo[0]),
+                  ("-f", "name=" + self.m.repo[1]), ("-F", "number=%d" % self.m.request)]
+        data, _ = read(functools.partial(self.t.gh, "POST", "graphql", None, fields),
+                       "the request's latestReviews", self.HINT)
+        nodes = dig(data, "latestReviews", "data", "repository", "pullRequest", "latestReviews", "nodes")
+        if any(isinstance(n, dict) and n.get("databaseId") == self.review.id for n in nodes):
+            return []
+        return ["review %s landed but is absent from latestReviews, so the request page may not show "
+                "it; the reference's remedy, a second minimal review, is a post for you to decide on"
+                % self.review.id]
+
 
 
 def ado_end_offset(raw_line):
@@ -724,15 +783,18 @@ class Ado:
             self.user_id = dig(data, "the authenticated user", "authenticatedUser", "id")
         return self.user_id
 
+    def first_comment(self, thread):
+        """The thread's opening comment when the user wrote it, else None."""
+        comments = sorted(thread.get("comments") or [], key=lambda c: c.get("id", 0))
+        if comments and (comments[0].get("author") or {}).get("id") == self.user():
+            return comments[0]
+        return None
+
     def my_threads(self):
         data, _ = read(functools.partial(self.t.curl, "GET", self.threads_url), "the request's threads",
                        self.HINT)
-        mine = []
-        for thread in dig(data, "the request's threads", "value"):
-            comments = sorted(thread.get("comments") or [], key=lambda c: c.get("id", 0))
-            if comments and (comments[0].get("author") or {}).get("id") == self.user():
-                mine.append((thread, comments[0]))
-        return mine
+        threads = dig(data, "the request's threads", "value")
+        return [(thread, self.first_comment(thread)) for thread in threads if self.first_comment(thread)]
 
     def snapshot(self):
         return [thread.get("id") for thread, _ in self.my_threads()]
@@ -749,28 +811,43 @@ class Ado:
         for t in self.m.threads:
             print("would POST %s for %s at %s" % (self.threads_url, t.key, label(t.path, t.line)))
 
-    def post(self, head, record):
-        for t in self.m.threads:
-            send(record, t.key, functools.partial(self.t.curl, "POST", self.threads_url,
-                                                  write_payload(self.t, self.payload(t, head))))
+    def units(self, head):
+        return [Wanted(t.key, t.body, (t.path, t.first_line),
+                       (False, "active", context_fields(ado_context(t, head))))
+                for t in self.m.threads]
 
-    def read_back(self, head, record, outcome):
-        items = []
-        for thread, comment in self.my_threads():
-            if thread.get("id") in record.data["snapshot"]:
-                continue
-            context = thread.get("threadContext")
-            anchor = ((context.get("filePath") or "").lstrip("/"),
-                      (context.get("rightFileStart") or {}).get("line")) if context else (None, None)
-            items.append(Item(thread.get("id"), comment.get("content"), anchor,
-                              (bool(thread.get("isDeleted")), thread.get("status"),
-                               context_fields(context))))
-        wanted = [Wanted(t.key, t.body, (t.path, t.first_line),
-                         (False, "active", context_fields(ado_context(t, head))))
-                  for t in self.m.threads]
-        pairs = pair(wanted, items, record.landed_ids())
-        for w, t in zip(wanted, self.m.threads):
-            outcome.judge(w, pairs[w.key], label(t.path, t.line))
+    def create(self, key, head):
+        thread = next(t for t in self.m.threads if t.key == key)
+        return functools.partial(self.t.curl, "POST", self.threads_url,
+                                 write_payload(self.t, self.payload(thread, head)))
+
+    def item(self, thread, comment):
+        context = thread.get("threadContext")
+        anchor = ((context.get("filePath") or "").lstrip("/"),
+                  (context.get("rightFileStart") or {}).get("line")) if context else (None, None)
+        return Item(thread.get("id"), comment.get("content"), anchor,
+                    (bool(thread.get("isDeleted")), thread.get("status"), context_fields(context)))
+
+    def thread_by_id(self, thread_id):
+        url = "%s/threads/%s?%s" % (self.pull, thread_id, ADO_API)
+        thread, _ = read(functools.partial(self.t.curl, "GET", url), "thread %s" % thread_id, self.HINT,
+                         absent_ok=True)
+        comment = self.first_comment(thread) if isinstance(thread, dict) else None
+        return self.item(thread, comment) if comment else None
+
+    def new_items(self, record):
+        listed = [self.item(thread, comment) for thread, comment in self.my_threads()
+                  if thread.get("id") not in record.data["snapshot"]]
+        return with_landed(listed, record, self.thread_by_id)
+
+    def read_back(self, head, record):
+        wanted = self.units(head)
+        pairs = require(pair(wanted, self.new_items(record), record.landed_ids()), wanted)
+        return [(w, pairs[w.key], label(t.path, t.line)) for w, t in zip(wanted, self.m.threads)]
+
+    def notes(self, record):
+        return []
+
 
 
 # --- the run's record ---------------------------------------------------------
@@ -821,9 +898,18 @@ class Record:
     def landed_ids(self):
         return {key: e[2] for key, e in self.last_events().items() if e[0] == "landed"}
 
+    def ever(self, verb, key):
+        return any(e[0] == verb and e[1] == key for e in self.data["events"])
+
     def unfinished(self):
-        return self.data.get("status") != "LANDED" and any(
+        return self.data.get("status") not in FINISHED and any(
             e[0] in ("sending", "landed", "uncertain") for e in self.last_events().values())
+
+    def in_doubt_since(self):
+        """When the latest create still in doubt was made: one whose answer was lost, or one
+        whose run died before its outcome was written. None when no call is in flight."""
+        times = [e[2] for e in self.last_events().values() if e[0] in ("sending", "uncertain")]
+        return max(times) if times else None
 
 
 # --- pre-flight --------------------------------------------------------------
@@ -908,18 +994,37 @@ def check_pending(manifest, forge, login):
                        "submit or delete it first" % (login, review.get("id")))
 
 
-def check_record(manifest):
+def check_record(manifest, resume):
     record = Record.load(record_path(manifest.findings_file))
+    if resume:
+        if record is None or not record.unfinished():
+            raise Stop("NO-STATE", "no unfinished run is recorded for this findings file, so there is "
+                       "nothing to resume; run without --resume")
+        return record
     if record is not None and record.unfinished():
         held = [key for key, e in record.last_events().items() if e[0] != "rejected"]
         raise Stop("UNFINISHED-RUN", "an earlier run on this findings file stopped %s with %s landed "
                    "or in doubt; posting the manifest again would double them, so continue it with "
                    "--resume" % (record.data.get("status"), ", ".join(held)))
+    return None
+
+
+def check_settled(record, settle):
+    since = record.in_doubt_since()
+    if since is None:
+        return
+    left = since + settle - time.time()
+    if left > 0:
+        raise Stop("SETTLING", "a create made %ds ago lost its answer and may still land; resume in "
+                   "%ds, so that a late copy is on the request before the read that decides what "
+                   "to post again" % (time.time() - since, left + 1))
 
 
 def preflight(manifest, args, transport):
     check_postable(manifest, args.repost)
-    check_record(manifest)
+    record = check_record(manifest, args.resume)
+    if record is not None:
+        check_settled(record, args.settle)
     if manifest.forge == "ado" and not transport.token:
         raise Stop("NO-TOKEN", "%s is unset; an Azure DevOps post needs a token there" % TOKEN_VAR)
     forge = GitHub(manifest, transport) if manifest.forge == "github" else Ado(manifest, transport)
@@ -930,7 +1035,7 @@ def preflight(manifest, args, transport):
     warn_tags(manifest)
     if manifest.forge == "github":
         check_pending(manifest, forge, forge.user())
-    return forge, head
+    return forge, head, record
 
 
 # --- the run -----------------------------------------------------------------
@@ -951,25 +1056,61 @@ def parse_args(argv):
     return args
 
 
+def reconcile(forge, head, record, keys):
+    """Pair the request's new items with the creates named, record each pairing with the
+    forge's id, and return the keys nothing on the request pairs with."""
+    wanted = [w for w in forge.units(head) if w.key in keys]
+    pairs = pair(wanted, forge.new_items(record), record.landed_ids())
+    for w in wanted:
+        if w.key in pairs and record.landed_ids().get(w.key) != pairs[w.key].id:
+            record.event("landed", w.key, pairs[w.key].id)
+    return [w.key for w in wanted if w.key not in pairs]
+
+
+def post(forge, head, record, keys, settle):
+    for key in keys:
+        if send(record, key, forge.create(key, head)):
+            continue
+        sent = [w.key for w in forge.units(head) if w.key in record.last_events()]
+        absent = reconcile(forge, head, record, sent)
+        if absent:
+            raise Stop("UNCERTAIN", "the request does not show %s, and a create whose answer was lost "
+                       "may still land, so nothing is retried; run again with --resume once %ds have "
+                       "passed: it reads the request first and posts only what is still absent"
+                       % (", ".join(absent), settle))
+
+
 def run(args, workdir, outcome, started):
     manifest = load_manifest(args.manifest)
     transport = Transport(workdir, args.timeout, os.environ.get(TOKEN_VAR, ""))
-    forge, head = preflight(manifest, args, transport)
+    forge, head, record = preflight(manifest, args, transport)
     if args.dry_run:
         forge.plan(head)
         print("dry run: nothing was posted")
-        return 0
-    record = Record(record_path(manifest.findings_file),
-                    {"started": time.time(), "snapshot": forge.snapshot(), "events": [], "status": None})
+        return "LANDED"
+    keys = [w.key for w in forge.units(head)]
+    if record is None:
+        record = Record(record_path(manifest.findings_file), {
+            "started": time.time(), "snapshot": forge.snapshot(), "events": [], "status": None})
+        record.save()
+        started.append(record)
+        todo = keys
+    else:
+        started.append(record)
+        todo = reconcile(forge, head, record, keys)
+        print("resuming: %d of %d already on the request; posting %s" % (
+            len(keys) - len(todo), len(keys), ", ".join(todo) or "nothing"))
+    post(forge, head, record, todo, args.settle)
+    for wanted, item, where in forge.read_back(head, record):
+        outcome.judge(wanted, item, where)
+    status = outcome.finish()
+    for note in forge.notes(record):
+        print("note: " + note)
+        outcome.notes.append(note)
+    record.data["status"] = status
     record.save()
-    started.append(record)
-    forge.post(head, record)
-    forge.read_back(head, record, outcome)
-    outcome.finish()
-    record.data["status"] = "LANDED"
-    record.save()
-    print("LANDED %d threads posted and read back as sent" % len(manifest.threads))
-    return 0
+    print("%s %d threads posted and read back as sent" % (status, len(manifest.threads)))
+    return status
 
 
 def main(argv):
@@ -977,15 +1118,12 @@ def main(argv):
     if args.print_status_vocab:
         print("\n".join(STATUSES))
         return 0
-    if args.resume:
-        print("--resume is not built yet", file=sys.stderr)
-        return 2
     workdir = tempfile.mkdtemp(prefix="post-review-")
     outcome = Outcome()
     started = []
-    status = "LANDED"
     try:
-        rc = run(args, workdir, outcome, started)
+        status = run(args, workdir, outcome, started)
+        rc = 0
     except Stop as stop:
         status = stop.status
         for record in started:
@@ -998,7 +1136,7 @@ def main(argv):
         print("%s %s" % (stop.status, stop.message))
         rc = 1
     with open(os.path.join(workdir, "result.json"), "w", encoding="utf-8") as f:
-        json.dump({"status": status, "threads": outcome.rows}, f, indent=1)
+        json.dump({"status": status, "threads": outcome.rows, "notes": outcome.notes}, f, indent=1)
     print(workdir)
     return rc
 

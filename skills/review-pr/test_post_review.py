@@ -34,7 +34,7 @@ EXPECTED_VOCAB = [
 # Statuses whose fixtures belong to a later task of the build plan. Each task
 # that adds a status's fixture removes it here; the set is empty once the
 # script is complete, and from then on any status without a fixture fails.
-OWED_BY_LATER_TASKS = {"UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "NO-STATE", "SETTLING"}
+OWED_BY_LATER_TASKS = {"CORRECTED"}
 
 HOSTILE_GIT_CONFIG = """\
 [color]
@@ -148,7 +148,8 @@ class Fixture:
         write(os.path.join(self.root, "hostile.gitconfig"), HOSTILE_GIT_CONFIG)
         self.findings = os.path.join(self.root, "reviews", "r1.md")
         frontmatter = "---\nrepo: x\npr: 42\n%s\n---\n" % posted if posted is not None else ""
-        write(self.findings, frontmatter + "# Review of request 42\n\nFindings.\n")
+        self.findings_text = frontmatter + "# Review of request 42\n\nFindings.\n"
+        write(self.findings, self.findings_text)
         self.model = default_model(forge, self.clone)
         repo_key = ("github.com/acme/tickets" if forge == "github"
                     else "%s/acme/field ops/tickets" % ADO_HOST)
@@ -204,13 +205,36 @@ class Fixture:
     def creates(self):
         return [c for c in self.calls() if is_create(c)]
 
-    def record(self):
+    def record_file(self):
         found = glob.glob(os.path.join(self.root, "state", "delivery-skills", "post-review", "*",
                                        "state.json"))
-        if not found:
+        return found[0] if found else None
+
+    def record(self):
+        if not self.record_file():
             return None
-        with open(found[0], encoding="utf-8") as f:
+        with open(self.record_file(), encoding="utf-8") as f:
             return json.load(f)
+
+    def age(self, seconds):
+        """Move every time the run's record holds `seconds` into the past."""
+        data = self.record()
+        data["started"] -= seconds
+        for event in data["events"]:
+            if event[0] in ("sending", "uncertain"):
+                event[2] -= seconds
+        write(self.record_file(), json.dumps(data))
+
+    def events(self):
+        """The record's events with their times dropped."""
+        return [e[:2] if e[0] in ("sending", "uncertain") else e for e in self.record()["events"]]
+
+    def record_events_for(self, key):
+        return [e for e in self.events() if e[1] == key]
+
+    def findings_now(self):
+        with open(self.findings, encoding="utf-8", newline="") as f:
+            return f.read()
 
     def file(self, name, data):
         path = os.path.join(self.root, name)
@@ -601,7 +625,7 @@ def github_happy_path(r):
     r.eq("the GitHub happy path: one review with two comments",
          (len(stored["reviews"]), len(stored["comments"])), (1, 2))
     r.eq("the GitHub happy path: the record holds sending and landed in order",
-         fx.record()["events"], [["sending", "review"], ["landed", "review", review_id]])
+         fx.events(), [["sending", "review"], ["landed", "review", review_id]])
 
 
 @test
@@ -614,7 +638,7 @@ def ado_happy_path(r):
         ado_payload(SB, ado_context("/src/app.py", 16, 17, 8)),
         ado_payload(RB)])
     ids = [t["id"] for t in fx.stored()["threads"]]
-    r.eq("the ADO happy path: the record holds sending and landed in order", fx.record()["events"],
+    r.eq("the ADO happy path: the record holds sending and landed in order", fx.events(),
          [["sending", "M-1"], ["landed", "M-1", ids[0]], ["sending", "M-2"], ["landed", "M-2", ids[1]],
           ["sending", "R-1"], ["landed", "R-1", ids[2]]])
 
@@ -686,13 +710,17 @@ def ado_rejection_on_the_third_thread(r):
     r.eq("a 400 on the third ADO thread: threads past it are never sent", len(fx.creates()), 3)
     ids = [t["id"] for t in fx.stored()["threads"]]
     r.eq("a 400 on the third ADO thread: the record holds threads 1-2 landed and 3 rejected",
-         fx.record()["events"], [["sending", "M-1"], ["landed", "M-1", ids[0]], ["sending", "M-2"],
+         fx.events(), [["sending", "M-1"], ["landed", "M-1", ids[0]], ["sending", "M-2"],
                                  ["landed", "M-2", ids[1]], ["sending", "M-3"], ["rejected", "M-3", 400]])
     r.check("a 400 on the third ADO thread: the stop names what had landed",
             "landed before the stop: M-1 %s" % ids[0] in run.out, run.out)
     again = fx.run()
     r.status("a plain re-run after the ADO 400: the run stops UNFINISHED-RUN", again, "UNFINISHED-RUN")
     r.eq("a plain re-run after the ADO 400: no further create reached the stand-in", len(fx.creates()), 3)
+    del fx.model["faults"]["reject_create"]
+    landed(r, "a resume at once after the ADO 400, with no call in doubt", fx.run("--resume"))
+    r.eq("a resume at once after the ADO 400: it posts only the threads not yet on the request",
+         (len(fx.creates()), len(fx.stored()["threads"])), (5, 4))
 
 
 @test
@@ -727,7 +755,7 @@ def keys_differing_only_in_case(r):
 @test
 def sanitized_body_stops_mismatch(r):
     fx = Fixture("ado", threads=[inline("M-1", 2, body="Problem: <Id> is dropped.\n")])
-    fx.model["faults"]["sanitize_tags"] = True
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
     run = fx.run()
     r.status("a sanitizer dropping <Id> on ADO: the run stops MISMATCH", run, "MISMATCH")
     r.check("a sanitizer dropping <Id> on ADO: the stop prints the diff",
@@ -742,6 +770,181 @@ def misreported_line_stops_misplaced(r):
     gh = Fixture("github")
     gh.model["faults"]["misreport_line"] = {"nth": 1}
     r.status("a GitHub read-back reporting another line: the run stops MISPLACED", gh.run(), "MISPLACED")
+
+
+# --- task 4: lost answers, resume and the settle window ------------------------
+
+
+SETTLE = 600
+
+
+def three_threads():
+    return [inline("M-1", 2, body=B1), inline("M-2", 15), inline("M-3", 16)]
+
+
+def unwritten(r, label, fx):
+    r.eq("%s: posted: stays unwritten" % label, fx.findings_now(), fx.findings_text)
+
+
+@test
+def lost_answer_whose_create_landed_at_once(r):
+    fx = Fixture("ado", threads=three_threads())
+    fx.model["faults"]["lost_answer"] = {"nth": 2, "answer": 502, "lands": "now"}
+    landed(r, "a 502 whose create landed at once", fx.run())
+    threads = fx.stored()["threads"]
+    r.eq("a 502 whose create landed at once: the stand-in holds one copy of each thread",
+         [t["content"] for t in threads], [B1, three_threads()[1]["body"], three_threads()[2]["body"]])
+    r.eq("a 502 whose create landed at once: the record pairs it with the forge's id",
+         fx.events()[2:5], [["sending", "M-2"], ["uncertain", "M-2"], ["landed", "M-2", threads[1]["id"]]])
+
+
+@test
+def lost_github_answer_and_latest_reviews(r):
+    for absent in (True, False):
+        what = "a GitHub 502 whose review %s latestReviews" % ("is absent from" if absent else "reached")
+        fx = Fixture("github", threads=standard_threads())
+        fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": 502, "lands": "now"}
+        fx.model["faults"]["absent_from_latest"] = absent
+        run = fx.run()
+        landed(r, what, run)
+        r.eq("%s: the stand-in holds one review" % what, len(fx.stored()["reviews"]), 1)
+        r.eq("%s: the run %s" % (what, "reports it absent from latestReviews" if absent else "notes nothing"),
+             "absent from latestReviews" in run.out, absent)
+
+
+@test
+def lost_answer_that_never_lands(r):
+    fx = Fixture("ado", threads=three_threads())
+    fx.model["faults"]["lost_answer"] = {"nth": 2, "answer": 502, "lands": "never"}
+    run = fx.run()
+    what = "a 502 that never lands"
+    r.status("%s: the run stops UNCERTAIN" % what, run, "UNCERTAIN")
+    r.check("%s: the stop names the absent thread and what had landed" % what,
+            "does not show M-2" in run.out and "landed before the stop: M-1" in run.out, run.out)
+    r.eq("%s: no thread past it is sent" % what, len(fx.creates()), 2)
+    unwritten(r, what, fx)
+    again = fx.run()
+    r.status("a plain re-run after an UNCERTAIN stop: the run stops UNFINISHED-RUN", again, "UNFINISHED-RUN")
+    r.eq("a plain re-run after an UNCERTAIN stop: no further create reached the stand-in", len(fx.creates()), 2)
+    calls = len(fx.calls())
+    early = fx.run("--resume")
+    r.status("a resume inside the settle window: the run stops SETTLING", early, "SETTLING")
+    r.eq("a resume inside the settle window: it makes no call", len(fx.calls()), calls)
+    fx.age(SETTLE + 1)
+    landed(r, "a resume after the window, the lost create never landed", fx.run("--resume"))
+    r.eq("a resume after the window, the lost create never landed: it posts the absent threads once",
+         (len(fx.creates()), len(fx.stored()["threads"])), (4, 3))
+
+
+@test
+def late_landing_after_a_hang(r):
+    fx = Fixture("ado", threads=three_threads()[:2])
+    fx.model["faults"]["lost_answer"] = {"nth": 2, "answer": "hang", "lands": "next_run", "seconds": 1}
+    what = "a create that hangs past the timeout and lands later"
+    r.status("%s: the run stops UNCERTAIN" % what, fx.run(), "UNCERTAIN")
+    r.status("%s: a resume inside the window stops SETTLING" % what, fx.run("--resume"), "SETTLING")
+    fx.age(SETTLE + 1)
+    landed(r, "%s: a resume after the window" % what, fx.run("--resume"))
+    r.eq("%s: the resume after the window posts nothing" % what,
+         (len(fx.creates()), len(fx.stored()["threads"])), (2, 2))
+
+
+@test
+def late_landing_of_an_earlier_draft(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body="Problem: the first draft.\n")])
+    fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": 502, "lands": "next_run"}
+    what = "a late landing of an earlier draft"
+    r.status("%s: the run stops UNCERTAIN" % what, fx.run(), "UNCERTAIN")
+    fx.manifest["threads"][0]["body"] = "Problem: the edited text.\n"
+    fx.age(SETTLE + 1)
+    run = fx.run("--resume")
+    r.eq("%s: the resume pairs it by anchor rather than posting again" % what,
+         (len(fx.creates()), len(fx.stored()["threads"])), (1, 1))
+    r.status("%s: the resume stops MISMATCH" % what, run, "MISMATCH")
+
+
+@test
+def lost_answer_landing_with_a_sanitized_body(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body="Problem: <Id> is dropped.\n")])
+    fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": 502, "lands": "now"}
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    fx.run()
+    threads = fx.stored()["threads"]
+    what = "a 502 whose create landed with a sanitized body"
+    r.eq("%s: the stand-in holds one copy" % what, len(threads), 1)
+    r.eq("%s: the record pairs it with the forge's id" % what, fx.events()[-1], ["landed", "M-1", threads[0]["id"]])
+
+
+@test
+def copy_landing_after_the_resume_posted(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body=B1)])
+    fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": 502, "lands": "after_next_create"}
+    fx.run()
+    fx.age(SETTLE + 1)
+    run = fx.run("--resume")
+    what = "the lost original landing after the resume's post"
+    r.status("%s: the run stops UNCERTAIN" % what, run, "UNCERTAIN")
+    r.check("%s: the stop names the copy it cannot account for" % what,
+            "pair with no thread" in run.out, run.out)
+    unwritten(r, what, fx)
+
+
+@test
+def run_killed_between_a_create_and_its_record(r):
+    fx = Fixture("ado", threads=three_threads()[:2])
+    fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": "kill", "lands": "now"}
+    killed = fx.run()
+    what = "a run killed after its create landed"
+    r.check("%s: the run dies" % what, killed.rc != 0 and fx.events() == [["sending", "M-1"]],
+            "rc %s, events %s" % (killed.rc, fx.record() and fx.events()))
+    again = fx.run()
+    r.status("%s: a plain re-run stops UNFINISHED-RUN" % what, again, "UNFINISHED-RUN")
+    r.eq("%s: a plain re-run sends no further create" % what, len(fx.creates()), 1)
+    r.status("%s: a resume inside the window stops SETTLING" % what, fx.run("--resume"), "SETTLING")
+    fx.age(SETTLE + 1)
+    landed(r, "%s: a resume after the window" % what, fx.run("--resume"))
+    threads = fx.stored()["threads"]
+    r.eq("%s: the resume posts only the thread never sent" % what,
+         (len(fx.creates()), len(threads)), (2, 2))
+    r.eq("%s: the record pairs the landed thread with the forge's id" % what,
+         fx.record_events_for("M-1")[-1], ["landed", "M-1", threads[0]["id"]])
+
+
+@test
+def read_back_that_fails(r):
+    for failures, want in ((3, "LANDED"), (4, "UNVERIFIED")):
+        fx = Fixture("github", threads=standard_threads())
+        fx.model["faults"]["fail_reads"] = {"after_creates": 1, "count": failures, "status": 502}
+        run = fx.run()
+        what = "a read-back failing %s times" % ("three" if failures == 3 else "four")
+        r.status("%s: the run stops %s" % (what, want) if want != "LANDED"
+                 else "%s: the retries read it back clean" % what, run, want)
+        if want == "UNVERIFIED":
+            review_id = fx.stored()["reviews"][0]["id"]
+            r.check("%s: the stop lists the created id" % what,
+                    "landed before the stop: review %s" % review_id in run.out, run.out)
+            unwritten(r, what, fx)
+
+
+@test
+def created_thread_that_the_list_never_shows(r):
+    fx = Fixture("ado", threads=three_threads()[:2])
+    fx.model["faults"]["hide"] = {"nth": 2, "by_id": True}
+    landed(r, "a thread missing from the list but readable by id", fx.run())
+    gone = Fixture("ado", threads=three_threads()[:2])
+    gone.model["faults"]["hide"] = {"nth": 2}
+    run = gone.run()
+    what = "a 2xx whose thread never shows, even by id"
+    r.status("%s: the run stops MISSING" % what, run, "MISSING")
+    r.check("%s: the stop names the thread" % what, "does not show M-2" in run.out, run.out)
+    unwritten(r, what, gone)
+
+
+@test
+def resume_without_a_record(r):
+    fx = Fixture("ado")
+    r.status("a resume with no record: the run stops NO-STATE", fx.run("--resume"), "NO-STATE")
+    r.eq("a resume with no record: it makes no call", fx.calls(), [])
 
 
 # --- the vocabulary ----------------------------------------------------------

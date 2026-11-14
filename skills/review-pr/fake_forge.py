@@ -11,8 +11,10 @@ environment.
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
+import time
 import urllib.parse
 
 ADO_HOST = "dev.azure.com"
@@ -22,11 +24,16 @@ HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 
 
 class Answer:
-    def __init__(self, status, body, content_type="application/json; charset=utf-8", headers=None):
+    def __init__(self, status, body, content_type="application/json; charset=utf-8", headers=None,
+                 stall=None):
         self.status = status
         self.body = body
         self.content_type = content_type
         self.headers = headers or {}
+        self.stall = stall
+
+
+BAD_GATEWAY = Answer(502, "<html><body>502 Bad Gateway</body></html>", "text/html")
 
 
 def json_answer(status, data, headers=None):
@@ -138,7 +145,7 @@ def fault(model, name):
 
 
 def create_fault(model):
-    """The scripted rejection for this create, counted across the run, or None."""
+    """The scripted rejection for this create, counted across every run, or None."""
     model["creates"] = model.get("creates", 0) + 1
     reject = fault(model, "reject_create")
     if reject and reject["nth"] == model["creates"]:
@@ -146,8 +153,64 @@ def create_fault(model):
     return None
 
 
-def stored_body(model, body):
-    return TAG.sub("", body) if fault(model, "sanitize_tags") else body
+def lost_answer(model):
+    """The scripted lost answer for the create just counted, or None: `answer` is 502, "hang"
+    (past the caller's timeout) or "kill" (the caller dies), and `lands` is "now", "never",
+    "next_run" (at the next read of the request's head) or "after_next_create"."""
+    lost = fault(model, "lost_answer")
+    if lost and lost["nth"] == model["creates"]:
+        return lost
+    return None
+
+
+def deliver(model, lost, store, payload):
+    """Store the create now or later as `lost` says, and return the answer the caller gets."""
+    if lost["lands"] == "now":
+        created = store(model, payload)
+        if fault(model, "absent_from_latest"):
+            created["unindexed"] = True
+    elif lost["lands"] in ("next_run", "after_next_create"):
+        model.setdefault("deferred", []).append({"store": store.__name__, "payload": payload,
+                                                 "trigger": lost["lands"]})
+    if lost["answer"] == "hang":
+        return Answer(504, "", "text/html", stall=lost.get("seconds", 5))
+    if lost["answer"] == "kill":
+        return Answer(200, "", stall="kill")
+    return BAD_GATEWAY
+
+
+def land_deferred(model, trigger):
+    for item in [d for d in model.get("deferred", []) if d["trigger"] == trigger]:
+        model["deferred"].remove(item)
+        STORES[item["store"]](model, item["payload"])
+
+
+def hide_fault(model, created):
+    hide = fault(model, "hide")
+    if hide and hide["nth"] == model["creates"]:
+        created["hidden"] = "list" if hide.get("by_id") else "all"
+
+
+def stored_body(model, body, patch=False):
+    """The body as the forge keeps it: `mangle` drops tag-shaped tokens, the final newline, or
+    changes the final character, on create and, with `patch`, on every PATCH too."""
+    mangle = fault(model, "mangle")
+    if not mangle or (patch and not mangle.get("patch")):
+        return body
+    if mangle["kind"] == "tags":
+        return TAG.sub("", body)
+    if mangle["kind"] == "final_newline":
+        return body[:-1] if body.endswith("\n") else body
+    return body[:-1] + ("," if body[-1:] != "," else ";")
+
+
+def read_fault(model):
+    """A scripted server error for a read made after `after_creates` creates, `count` times."""
+    fail = fault(model, "fail_reads")
+    if fail and model.get("creates", 0) >= fail["after_creates"] and fail["count"] > 0:
+        fail["count"] -= 1
+        return BAD_GATEWAY
+    return None
 
 
 def misreported(model, index, line):
@@ -191,18 +254,32 @@ def github_create_review(model, payload_text):
     if rejected:
         return json_answer(rejected, {"message": "Unprocessable Entity"})
     diff = diff_model(model)
-    comments = payload.get("comments", [])
-    for comment in comments:
+    for comment in payload.get("comments", []):
         changed = diff.get(comment.get("path"), {}).get("changed", set())
         lines = [comment.get("line"), comment.get("start_line") or comment.get("line")]
         if comment.get("side", "RIGHT") != "RIGHT" or any(n not in changed for n in lines):
             return json_answer(422, {"message": "Unprocessable Entity",
                                      "errors": ["Line could not be resolved"]})
+    lost = lost_answer(model)
+    if lost:
+        return deliver(model, lost, github_store_review, payload)
+    review = github_store_review(model, payload)
+    land_deferred(model, "after_next_create")
+    reply = github_review(model, review)
+    if fault(model, "malformed_reply"):
+        return Answer(200, malformed_echo(reply, review["body"]))
+    return json_answer(200, reply)
+
+
+def github_store_review(model, payload):
+    pending = "event" not in payload
+    login = model["user"]["login"]
+    diff = diff_model(model)
     review = {"id": next_id(model), "login": login, "state": "PENDING" if pending else "COMMENTED",
               "body": stored_body(model, payload.get("body", "")),
               "commit_id": payload.get("commit_id", model["head"])}
     model["reviews"].append(review)
-    for comment in comments:
+    for comment in payload.get("comments", []):
         position = diff[comment["path"]]["position"][comment["line"]]
         model["comments"].append({
             "id": next_id(model), "review_id": review["id"], "path": comment["path"],
@@ -210,10 +287,7 @@ def github_create_review(model, payload_text):
             "side": comment.get("side", "RIGHT"), "start_side": comment.get("start_side"),
             "body": stored_body(model, comment["body"]), "commit_id": review["commit_id"],
             "position": position, "login": login, "pending": pending})
-    reply = github_review(model, review)
-    if fault(model, "malformed_reply"):
-        return Answer(200, malformed_echo(reply, review["body"]))
-    return json_answer(200, reply)
+    return review
 
 
 def github_resolved_comment(model, index, comment):
@@ -225,31 +299,63 @@ def github_resolved_comment(model, index, comment):
             "position": comment["position"], "user": {"login": comment["login"]}}
 
 
-def github_route(model, method, path, payload_text):
+def github_latest_reviews(model, fields):
+    """GraphQL's latestReviews: each user's latest submitted review, missing any the index never took."""
+    wanted = (model["repo"].split("/"), str(model["number"]))
+    if ([fields.get("owner"), fields.get("name")], fields.get("number")) != wanted:
+        return json_answer(200, {"data": {"repository": None}, "errors": [{"type": "NOT_FOUND"}]})
+    latest = {}
+    for review in model["reviews"]:
+        if review["state"] != "PENDING" and not review.get("unindexed"):
+            latest[review["login"]] = review
+    nodes = [{"databaseId": r["id"], "author": {"login": r["login"]}} for r in latest.values()]
+    return json_answer(200, {"data": {"repository": {"pullRequest": {"latestReviews": {"nodes": nodes}}}}})
+
+
+def github_route(model, method, path, payload_text, fields=None):
+    fields = fields or {}
     url = urllib.parse.urlsplit(path.lstrip("/"))
     query = urllib.parse.parse_qs(url.query)
     parts = url.path.split("/")
     if not model.get("gh_authenticated", True):
         return json_answer(401, {"message": "Bad credentials"})
+    if method == "GET":
+        failed = read_fault(model)
+        if failed:
+            return failed
     if parts == ["user"] and method == "GET":
         return json_answer(200, {"login": model["user"]["login"], "id": model["user"]["id"]})
-    prefix = ["repos"] + model["repo"].split("/") + ["pulls", str(model["number"])]
+    if parts == ["graphql"] and method == "POST":
+        return github_latest_reviews(model, fields)
+    pulls = ["repos"] + model["repo"].split("/") + ["pulls"]
+    if parts[:len(pulls) + 1] == pulls + ["comments"] and len(parts) == len(pulls) + 2:
+        comment = next((c for c in model["comments"] if str(c["id"]) == parts[-1]), None)
+        if comment is None or comment["pending"] or method != "PATCH":
+            return json_answer(404, {"message": "Not Found"})
+        comment["body"] = stored_body(model, json.loads(payload_text)["body"], patch=True)
+        return json_answer(200, {"id": comment["id"], "body": comment["body"]})
+    prefix = pulls + [str(model["number"])]
     if parts[:len(prefix)] != prefix:
         return json_answer(404, {"message": "Not Found"})
     rest = parts[len(prefix):]
     page_size = model.get("page_size", 100)
     if rest == [] and method == "GET":
+        land_deferred(model, "next_run")
         return json_answer(200, {"number": model["number"], "head": {"sha": model["head"]},
                                  "base": {"sha": model["base"]}})
     if rest == ["reviews"] and method == "GET":
-        return github_page([github_review(model, r) for r in model["reviews"]], query, page_size)
+        return github_page([github_review(model, r) for r in model["reviews"] if not r.get("hidden")],
+                           query, page_size)
     if rest == ["reviews"] and method == "POST":
         return github_create_review(model, payload_text)
     if len(rest) >= 2 and rest[0] == "reviews":
         review = next((r for r in model["reviews"] if str(r["id"]) == rest[1]), None)
-        if review is None:
+        if review is None or review.get("hidden") == "all":
             return json_answer(404, {"message": "Not Found"})
         if rest[2:] == [] and method == "GET":
+            return json_answer(200, github_review(model, review))
+        if rest[2:] == [] and method == "PUT":
+            review["body"] = stored_body(model, json.loads(payload_text)["body"], patch=True)
             return json_answer(200, github_review(model, review))
         if rest[2:] == ["comments"] and method == "GET":
             mine = [{"id": c["id"], "pull_request_review_id": c["review_id"], "path": c["path"],
@@ -272,7 +378,7 @@ def gh_main(model, argv):
     method = None
     include = False
     input_file = None
-    fields = []
+    fields = {}
     path = None
     args = argv[1:]
     i = 0
@@ -291,7 +397,8 @@ def gh_main(model, argv):
             elif arg == "--input":
                 input_file = value
             elif arg in ("-f", "--raw-field", "-F", "--field"):
-                fields.append(value)
+                name, _, field_value = value.partition("=")
+                fields[name] = field_value
         elif arg.startswith("-"):
             sys.stderr.write("unknown flag: %s\n" % arg)
             return 1
@@ -314,7 +421,8 @@ def gh_main(model, argv):
         except OSError as e:
             sys.stderr.write("open %s: %s\n" % (input_file, e.strerror))
             return 1
-    answer = github_route(model, method, path, payload_text)
+    answer = github_route(model, method, path, payload_text, fields)
+    stall(model, answer, None)
     out = []
     if include:
         out.append("HTTP/2.0 %d %s" % (answer.status, "OK" if answer.status < 400 else "Error"))
@@ -353,21 +461,44 @@ def ado_thread(model, index, thread):
 def ado_create_thread(model, payload_text):
     try:
         payload = json.loads(payload_text)
-        content = payload["comments"][0]["content"]
+        if not isinstance(payload["comments"][0]["content"], str):
+            raise ValueError("content")
     except (TypeError, ValueError, KeyError, IndexError):
         return json_answer(400, {"message": "Value cannot be null.", "typeKey": "ArgumentNullException"})
     rejected = create_fault(model)
     if rejected:
         return json_answer(rejected, {"message": "The request is invalid.",
                                       "typeKey": "InvalidArgumentValueException"})
-    thread = {"id": next_id(model), "author": model["user"]["ado_id"],
-              "status": "active" if payload.get("status") == 1 else payload.get("status"),
-              "threadContext": payload.get("threadContext"), "content": stored_body(model, content)}
-    model["threads"].append(thread)
+    lost = lost_answer(model)
+    if lost:
+        return deliver(model, lost, ado_store_thread, payload)
+    thread = ado_store_thread(model, payload)
+    hide_fault(model, thread)
+    land_deferred(model, "after_next_create")
     reply = ado_thread(model, -1, thread)
     if fault(model, "malformed_reply"):
         return Answer(200, malformed_echo(reply, thread["content"]))
     return json_answer(200, reply)
+
+
+def ado_store_thread(model, payload):
+    thread = {"id": next_id(model), "author": model["user"]["ado_id"],
+              "status": "active" if payload.get("status") == 1 else payload.get("status"),
+              "threadContext": payload.get("threadContext"),
+              "content": stored_body(model, payload["comments"][0]["content"])}
+    model["threads"].append(thread)
+    return thread
+
+
+STORES = {"github_store_review": github_store_review, "ado_store_thread": ado_store_thread}
+
+
+def ado_patch_comment(model, thread_id, comment_id, payload_text):
+    thread = next((t for t in model["threads"] if t["id"] == thread_id), None)
+    if thread is None or comment_id != 1:
+        return json_answer(404, {"message": "Comment not found."})
+    thread["content"] = stored_body(model, json.loads(payload_text)["content"], patch=True)
+    return json_answer(200, ado_thread(model, -1, thread)["comments"][0])
 
 
 def ado_patch_thread(model, thread_id, payload_text):
@@ -391,13 +522,26 @@ def ado_route(model, method, url, payload_text):
     if segments[:len(prefix)] != prefix:
         return json_answer(404, {"message": "The pull request could not be found."})
     rest = segments[len(prefix):]
+    if method == "GET":
+        failed = read_fault(model)
+        if failed:
+            return failed
     if rest == [] and method == "GET":
+        land_deferred(model, "next_run")
         return json_answer(200, {"pullRequestId": model["number"],
                                  "lastMergeSourceCommit": {"commitId": model["head"]},
                                  "lastMergeTargetCommit": {"commitId": model["base"]}})
     if rest == ["threads"] and method == "GET":
-        threads = [ado_thread(model, i, t) for i, t in enumerate(model["threads"])]
+        threads = [ado_thread(model, i, t) for i, t in enumerate(model["threads"]) if not t.get("hidden")]
         return json_answer(200, {"value": threads, "count": len(threads)})
+    if len(rest) == 2 and rest[0] == "threads" and method == "GET":
+        index, thread = next(((i, t) for i, t in enumerate(model["threads"]) if str(t["id"]) == rest[1]),
+                             (None, None))
+        if thread is None or thread.get("hidden") == "all":
+            return json_answer(404, {"message": "Thread not found."})
+        return json_answer(200, ado_thread(model, index, thread))
+    if len(rest) == 4 and rest[0] == "threads" and rest[2] == "comments" and method == "PATCH":
+        return ado_patch_comment(model, int(rest[1]), int(rest[3]), payload_text)
     if rest == ["threads"] and method == "POST":
         return ado_create_thread(model, payload_text)
     if len(rest) == 2 and rest[0] == "threads" and method == "PATCH":
@@ -493,6 +637,13 @@ def curl_main(model, argv, stdin_text):
             answer = Answer(203, SIGN_IN_PAGE, "text/html; charset=utf-8")
     else:
         answer = ado_route(model, method.upper(), url, payload_text)
+    if answer.stall is not None:
+        stall(model, answer, opts.get("max-time"))
+        if answer.stall != "kill":
+            sys.stdout.write(opts.get("write-out", "").replace("%{http_code}", "000")
+                             .replace("%{content_type}", ""))
+            sys.stderr.write("curl: (28) Operation timed out\n")
+            return 28
     output = opts.get("output")
     if output:
         with open(output, "w", encoding="utf-8") as f:
@@ -504,6 +655,21 @@ def curl_main(model, argv, stdin_text):
         sys.stdout.write(write_out.replace("\\n", "\n").replace("%{http_code}", "%03d" % answer.status)
                          .replace("%{content_type}", answer.content_type))
     return 0
+
+
+def stall(model, answer, max_time):
+    """Play a lost answer out: kill the caller, or hang past its timeout (curl's own --max-time
+    when given). The model is saved first, since the caller may kill this process."""
+    if answer.stall is None:
+        return
+    save_model(model)
+    if answer.stall == "kill":
+        os.kill(os.getppid(), signal.SIGKILL)
+        sys.exit(0)
+    seconds = answer.stall
+    if max_time is not None:
+        seconds = min(seconds, float(max_time))
+    time.sleep(seconds)
 
 
 def payload_argument(tool, argv):
