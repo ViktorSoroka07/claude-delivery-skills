@@ -34,7 +34,10 @@ EXPECTED_VOCAB = [
 # Statuses whose fixtures belong to a later task of the build plan. Each task
 # that adds a status's fixture removes it here; the set is empty once the
 # script is complete, and from then on any status without a fixture fails.
-OWED_BY_LATER_TASKS = set(EXPECTED_VOCAB)
+OWED_BY_LATER_TASKS = {
+    "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "MISMATCH", "MISPLACED",
+    "UNFINISHED-RUN", "NO-STATE", "SETTLING",
+}
 
 HOSTILE_GIT_CONFIG = """\
 [color]
@@ -396,6 +399,156 @@ def stand_in_refuses_arguments_the_real_tools_refuse(r):
             fx.tool("curl", "--bogus", fx.ado_url("")).rc == 2)
     r.check("stand-in: gh refuses an --input file that does not exist",
             fx.tool("gh", "api", "-X", "POST", "--input", "/nonexistent/p.json", "user").rc == 1)
+
+
+
+# --- task 2: manifest, pre-flight and the posted-line guard -------------------
+
+
+def refused(r, fx, want, label, *args):
+    run = fx.run(*args)
+    r.status("%s: the run stops %s" % (label, want), run, want)
+    r.eq("%s: no create reached the stand-in" % label, len(fx.creates()), 0)
+    return run
+
+
+SUGGESTION_16_17 = {"start": 16, "end": 17, "original": ["LINE 16", "LINE 17"]}
+
+
+@test
+def unknown_field_is_refused(r):
+    fx = Fixture("ado", threads=[inline("M-1", 17, start_lin=16)])
+    run = refused(r, fx, "MANIFEST-INVALID", "a misspelled start_line")
+    r.check("a misspelled start_line: the refusal names the field", "'start_lin'" in run.out, run.out)
+
+
+@test
+def exact_duplicate_keys_are_refused(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2), inline("M-1", 15)])
+    refused(r, fx, "MANIFEST-INVALID", "a key given twice")
+
+
+@test
+def empty_thread_list_is_refused(r):
+    refused(r, Fixture("github", threads=[]), "EMPTY", "an empty thread list")
+
+
+@test
+def gitlab_manifest_is_refused(r):
+    fx = Fixture("github")
+    fx.manifest.update(forge="gitlab", repo="gitlab.com/acme/tickets")
+    run = refused(r, fx, "UNSUPPORTED-FORGE", "a GitLab manifest")
+    r.check("a GitLab manifest: the refusal says the script does not cover that forge",
+            "github and ado only" in run.out, run.out)
+
+
+@test
+def findings_file_without_frontmatter_is_refused(r):
+    fx = Fixture("ado", posted=None)
+    run = refused(r, fx, "NO-FRONTMATTER", "a findings file without frontmatter")
+    r.check("a findings file without frontmatter: the refusal gives the three lines to add",
+            "---\nposted: null\n---\n" in run.out, run.out)
+
+
+@test
+def findings_file_already_posted_is_refused(r):
+    fx = Fixture("ado", posted="posted: { at: T, form: default, threads: [11, 12] }")
+    refused(r, fx, "ALREADY-POSTED", "a posted: line holding a record")
+
+
+@test
+def findings_file_with_the_placeholder_is_refused(r):
+    fx = Fixture("ado", posted='posted: "before migration - any record of it is in the body"')
+    refused(r, fx, "POSTED-UNKNOWN", "a posted: line holding the placeholder")
+
+
+@test
+def ado_run_without_token_is_refused_before_any_call(r):
+    fx = Fixture("ado", token=None)
+    run = fx.run()
+    r.status("an ADO run without the token variable stops NO-TOKEN", run, "NO-TOKEN")
+    r.eq("an ADO run without the token variable makes no call", fx.calls(), [])
+
+
+@test
+def refused_credential_is_reported(r):
+    for mode in (203, 401):
+        fx = Fixture("ado")
+        fx.model["token"] = "the-token-the-forge-knows"
+        fx.model["auth_failure"] = mode
+        run = refused(r, fx, "AUTH-REFUSED", "a credential refused with %d" % mode)
+        r.check("a credential refused with %d: the token is in no output" % mode,
+                SENTINEL not in run.out + run.err, run.out + run.err)
+        r.check("a credential refused with %d: the token is in no argument list" % mode,
+                SENTINEL not in json.dumps([c["argv"] for c in fx.calls()]))
+
+
+@test
+def moved_forge_head_is_refused(r):
+    fx = Fixture("ado")
+    fx.model["head"] = Template.moved
+    refused(r, fx, "STALE-HEAD", "a forge head moved past the local clone")
+
+
+@test
+def missing_base_commit_is_refused(r):
+    fx = Fixture("ado")
+    fx.model["base"] = "e" * 40
+    run = refused(r, fx, "MISSING-COMMIT", "a base commit missing locally")
+    r.check("a base commit missing locally: the refusal names the fetch", "git fetch" in run.out, run.out)
+
+
+@test
+def out_of_diff_path_is_refused(r):
+    fx = Fixture("ado", threads=[inline("M-1", 3, path="docs/guide.md")])
+    refused(r, fx, "OUT-OF-DIFF", "an ADO thread on a file outside the diff")
+
+
+@test
+def line_past_end_of_file_is_refused(r):
+    fx = Fixture("ado", threads=[inline("M-1", 25)])
+    refused(r, fx, "LINE-OUT-OF-FILE", "an ADO thread past the end of its file")
+
+
+@test
+def github_line_off_changed_lines_is_refused(r):
+    fx = Fixture("github", threads=[inline("M-1", 10)])
+    refused(r, fx, "OFF-DIFF-LINE", "a GitHub thread on an unchanged line")
+
+
+@test
+def stale_suggestion_is_refused(r):
+    stale = dict(SUGGESTION_16_17, original=["  LINE 16", "LINE 17"])
+    fx = Fixture("ado", threads=[inline("M-1", 17, start_line=16, suggestion=stale)])
+    refused(r, fx, "STALE-SUGGESTION", "a suggestion whose lines differ only in leading whitespace")
+
+
+@test
+def suggestion_in_a_group_is_refused(r):
+    members = [{"path": "src/app.py", "line": 17}, {"path": "src/crlf.txt", "line": 2}]
+    fx = Fixture("ado", threads=[inline("C-1", 17, start_line=16, suggestion=SUGGESTION_16_17,
+                                        members=members)])
+    fx.manifest["form"] = "compact"
+    refused(r, fx, "SUGGESTION-IN-GROUP", "a multi-member compact thread with a suggestion")
+
+
+@test
+def partition_straddle_is_refused(r):
+    members = [{"path": "docs/guide.md", "line": 3}, {"path": "src/app.py", "line": 2}]
+    fx = Fixture("ado", threads=[inline("C-1", None, path=None, members=members)])
+    fx.manifest["form"] = "compact"
+    run = refused(r, fx, "PARTITION", "a request-level compact thread with an in-diff member")
+    r.check("a request-level compact thread with an in-diff member: the refusal names it",
+            "src/app.py:2" in run.out and "docs/guide.md:3" not in run.out, run.out)
+
+
+@test
+def existing_pending_review_is_refused(r):
+    fx = Fixture("github")
+    fx.manifest["pending"] = True
+    fx.model["reviews"].append({"id": 5, "login": "reviewer", "state": "PENDING", "body": "",
+                                "commit_id": Template.head})
+    refused(r, fx, "PENDING-EXISTS", "a pending review of the user's already on the request")
 
 
 # --- the vocabulary ----------------------------------------------------------
