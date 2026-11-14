@@ -6,6 +6,7 @@
 Prints one PASS or FAIL line per named assertion; mutate.py reads those lines.
 """
 
+import base64
 import concurrent.futures
 import glob
 import json
@@ -1110,6 +1111,57 @@ def repost_over_earlier_values(r):
     landed(r, "--repost over the placeholder", run)
     r.eq("--repost over the placeholder: the result carries the placeholder",
          old.result(run)["replaced"], placeholder + "\n")
+
+
+# --- task 6: working files, the credential and portability ---------------------
+
+
+def clone_status(fx):
+    return subprocess.run(["git", "status", "--porcelain", "--ignored"], cwd=fx.clone, env=BUILD_ENV,
+                          capture_output=True, check=True).stdout.decode()
+
+
+def listing(root):
+    return sorted(os.path.relpath(os.path.join(d, f), root) for d, _, files in os.walk(root) for f in files)
+
+
+@test
+def run_leaves_the_clone_and_the_review_folder_alone(r):
+    for forge in ("github", "ado"):
+        fx = Fixture(forge, threads=standard_threads())
+        status, reviews = clone_status(fx), listing(os.path.dirname(fx.findings))
+        what = "a%s run from inside a clone" % (" GitHub" if forge == "github" else "n ADO")
+        landed(r, what, fx.run())
+        r.eq("%s: git status is unchanged" % what, clone_status(fx), status)
+        r.eq("%s: the review folder holds no new file" % what, listing(os.path.dirname(fx.findings)), reviews)
+
+
+@test
+def sentinel_token_appears_nowhere(r):
+    fx = Fixture("ado", threads=standard_threads())
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    fx.manifest["threads"][0]["body"] = TAGGED
+    run = fx.run()
+    corrected(r, "an ADO run with a sentinel token", fx, run)
+    forms = (SENTINEL, base64.b64encode((":" + SENTINEL).encode()).decode())
+    files = [os.path.join(fx.root, d, name) for d in ("tmp", "state") for name in listing(os.path.join(fx.root, d))]
+    places = {
+        "in no argument list": json.dumps([c["argv"] for c in fx.calls()]),
+        "not in the stand-in's call log":
+            open(os.path.join(fx.root, "forge", "calls.jsonl"), encoding="utf-8").read(),
+        "not in the stand-in's model, the token it accepts aside":
+            json.dumps({k: v for k, v in fx.stored().items() if k != "token"}),
+        "not in the run's working files or record":
+            "".join(open(f, encoding="utf-8", errors="replace").read() for f in files),
+        "not in the script's output": run.out + run.err,
+    }
+    for place, text in places.items():
+        r.check("the sentinel token: %s" % place, not any(form in text for form in forms), place)
+    r.check("the sentinel token: the result JSON is among the files searched",
+            any(f.endswith("result.json") for f in files), files)
+    flags = [a for c in fx.calls() if c["tool"] == "curl" for a in c["argv"]
+             if a in ("-v", "--verbose") or a.startswith("--trace")]
+    r.eq("no call passes curl a verbose or trace flag", flags, [])
 
 
 # --- the vocabulary ----------------------------------------------------------

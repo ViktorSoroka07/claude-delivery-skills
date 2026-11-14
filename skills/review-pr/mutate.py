@@ -241,6 +241,20 @@ MUTATIONS = [
      "            value += [more.strip() for more in itertools.takewhile(",
      "            value += [more.strip() for more in filter(",
      "a findings file whose posted: is not its last key: the run reads back clean"),
+
+    # Task 6: working files and the credential.
+    ("payload-written-in-the-working-directory",
+     '        return os.path.join(self.workdir, "%s-%03d.json" % (stem, self.files))',
+     '        return "%s-%03d.json" % (stem, self.files)',
+     "an ADO run from inside a clone: git status is unchanged"),
+    ("token-passed-as-an-argument",
+     '        argv = ["curl", "-K", "-", "-sS", "-X", method,',
+     '        argv = ["curl", "-u", ":" + self.token, "-sS", "-X", method,',
+     "the sentinel token: in no argument list"),
+    ("curl-run-verbose",
+     '        argv = ["curl", "-K", "-", "-sS", "-X", method,',
+     '        argv = ["curl", "-K", "-", "-sS", "-v", "-X", method,',
+     "no call passes curl a verbose or trace flag"),
 ]
 
 

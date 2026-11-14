@@ -8,6 +8,7 @@ the argument list and payload file to calls.jsonl, never standard input or the
 environment.
 """
 
+import base64
 import json
 import os
 import re
@@ -630,6 +631,8 @@ def curl_main(model, argv, stdin_text):
         else:
             payload_text = data
     token = users[-1].split(":", 1)[1] if users and ":" in users[-1] else None
+    if opts.get("verbose") and users:
+        sys.stderr.write("> Authorization: Basic %s\n" % base64.b64encode(users[-1].encode()).decode())
     if token != model["token"]:
         if model.get("auth_failure", 203) == 401:
             answer = Answer(401, "", "text/plain")
