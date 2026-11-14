@@ -4,9 +4,10 @@
     python3 mutate.py            # every mutation
     python3 mutate.py NAME ...   # the named ones
 
-Each mutation must find its text exactly once and change the file, the suite
-must then fail on the mutation's target assertion, and the script is restored
-byte-identical before the next one.
+Each mutation must find its text exactly once and change the file, the test
+holding the mutation's target assertion must then fail on it, and the script is
+restored byte-identical before the next one. Only that test runs per mutation;
+which test holds each assertion is read off the baseline run of the whole suite.
 """
 
 import hashlib
@@ -262,9 +263,22 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def run_suite():
-    proc = subprocess.run([sys.executable, SUITE], capture_output=True, timeout=1800)
+def run_suite(*names):
+    proc = subprocess.run([sys.executable, SUITE, *names], capture_output=True, timeout=1800)
     return proc.returncode, proc.stdout.decode("utf-8", "replace")
+
+
+def owners(out):
+    """{assertion label: the test that holds it}, read off the suite's output, where each
+    test's name stands unindented above its PASS and FAIL lines."""
+    owner = {}
+    test = None
+    for line in out.splitlines():
+        if line and not line.startswith(" "):
+            test = line
+        elif line.startswith(("  PASS ", "  FAIL ")):
+            owner[line[len("  PASS "):]] = test
+    return owner
 
 
 def apply(original, find, replace):
@@ -278,8 +292,11 @@ def apply(original, find, replace):
     return mutated, ""
 
 
-def mutate(original, name, find, replace, target):
+def mutate(original, name, find, replace, target, owner):
     print("\n%s\n  target assertion: %s" % (name, target))
+    if target not in owner:
+        print("  NOT APPLIED no test of the suite holds the target assertion")
+        return "misfired"
     mutated, problem = apply(original, find, replace)
     if mutated is None:
         print("  NOT APPLIED %s; the mutation proves nothing" % problem)
@@ -287,18 +304,18 @@ def mutate(original, name, find, replace, target):
     try:
         with open(SCRIPT, "wb") as f:
             f.write(mutated)
-        rc, out = run_suite()
+        rc, out = run_suite(owner[target])
     finally:
         with open(SCRIPT, "wb") as f:
             f.write(original)
     failures = [line.strip()[len("FAIL "):] for line in out.splitlines() if line.strip().startswith("FAIL ")]
     if rc == 0:
-        print("  SURVIVED the suite still passes with the check broken")
+        print("  SURVIVED %s still passes with the check broken" % owner[target])
         return "survived"
     if target in failures:
         print("  KILLED by: %s" % target)
         return "killed"
-    print("  WRONG REASON the suite failed, but not on the target assertion:")
+    print("  WRONG REASON %s failed, but not on the target assertion:" % owner[target])
     for line in failures[:5]:
         print("    %s" % line)
     return "misfired"
@@ -317,11 +334,12 @@ def main(names):
         print("baseline: red - fix the suite before mutating")
         return 2
     print("baseline: green")
+    owner = owners(out)
     tally = {"killed": 0, "survived": 0, "misfired": 0}
     for name, find, replace, target in MUTATIONS:
         if names and name not in names:
             continue
-        tally[mutate(original, name, find, replace, target)] += 1
+        tally[mutate(original, name, find, replace, target, owner)] += 1
         with open(SCRIPT, "rb") as f:
             if digest(f.read()) != digest(original):
                 print("  RESTORE FAILED the script is not byte-identical to the original")

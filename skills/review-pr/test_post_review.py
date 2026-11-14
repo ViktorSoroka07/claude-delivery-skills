@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Fixture suite for post-review.py, run against fake_forge.py.
 
-    python3 test_post_review.py
+    python3 test_post_review.py           # every test, and the vocabulary check
+    python3 test_post_review.py NAME ...  # the named tests only ("vocabulary" names the check)
 
 Prints one PASS or FAIL line per named assertion; mutate.py reads those lines.
 """
@@ -1162,23 +1163,30 @@ def sentinel_token_appears_nowhere(r):
 # --- the vocabulary ----------------------------------------------------------
 
 
-def vocabulary_check(covered):
+def vocabulary_check(covered, every_test_ran):
     results = Results("vocabulary")
     proc = subprocess.run([sys.executable, SCRIPT, "--print-status-vocab"], capture_output=True)
     printed = proc.stdout.decode().split()
     results.eq("the status vocabulary matches the expected list", printed, EXPECTED_VOCAB)
+    if not every_test_ran:
+        return results
     uncovered = set(EXPECTED_VOCAB) - covered
     results.check("every status has a fixture", not uncovered, "without a fixture: %s" % sorted(uncovered))
     return results
 
 
-def main():
+def main(names):
+    unknown = sorted(set(names) - {fn.__name__ for fn in TESTS} - {"vocabulary"})
+    if unknown:
+        print("unknown test: %s" % ", ".join(unknown))
+        return 2
     build_template()
     passed = failed = 0
     covered = set()
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
-        outcomes = list(pool.map(run_test, TESTS))
-    outcomes.append(vocabulary_check(set().union(*(o.covered for o in outcomes))))
+        outcomes = list(pool.map(run_test, [fn for fn in TESTS if not names or fn.__name__ in names]))
+    if not names or "vocabulary" in names:
+        outcomes.append(vocabulary_check(set().union(*(o.covered for o in outcomes)), not names))
     for outcome in outcomes:
         print(outcome.name)
         covered |= outcome.covered
@@ -1198,4 +1206,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))

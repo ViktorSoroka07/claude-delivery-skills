@@ -1,15 +1,30 @@
 # Maintaining post-review.py
 
-    python3 test_post_review.py     # a fixture per status, against the forge stand-in
-    python3 mutate.py               # breaks each check in turn, confirms the suite catches it
-    /usr/bin/python3 test_post_review.py   # the same suite on macOS's stock 3.9
+    python3 test_post_review.py [TEST ...]  # a fixture per status, against the forge stand-in
+    python3 mutate.py [MUTATION ...]        # breaks each check in turn, confirms its test catches it
+    /usr/bin/python3 test_post_review.py    # the same suite on macOS's stock 3.9
 
 Run them from this directory or by path; each finds its siblings itself.
 `mutate.py` requires a green suite first. Never run it beside another suite
 run, and never edit `post-review.py` while it runs: it writes each mutation
 into the script in place, so a concurrent run tests whichever mutation happens
 to be applied. After an interrupted sweep, check `git status --short` before
-trusting the script's bytes. A full sweep takes the better part of an hour.
+trusting the script's bytes.
+
+## What runs when
+
+- **Per mutation:** its own fixture. `mutate.py` runs the whole suite once as
+  its baseline, reads off which test holds each assertion, and then runs only
+  the test holding the mutation's target assertion. A mutation counts as
+  killed only when that named assertion fails.
+- **Per change:** the suite, plus the mutations of the code the change
+  touched, by name.
+- **At a session's start:** the suite, not the sweep.
+- **Before a push:** the suite and the whole sweep.
+
+The cost of the per-mutation fixture: a mutation that breaks something outside
+its own fixture no longer shows in the sweep. The full suite stays the gate
+for that, which is why every tier above runs it.
 
 ## The stand-in interprets; it never echoes
 
@@ -52,8 +67,8 @@ an Azure DevOps token that is a sentinel.
 ## Changing a check means mutating it
 
 `mutate.py` applies one named mutation at a time, requires its text to appear
-exactly once and the edit to change the file, requires the suite to fail **on
-that mutation's own assertion**, then restores the script and checks it is
+exactly once and the edit to change the file, requires the test holding the
+mutation's own assertion to fail **on that assertion**, then restores the script and checks it is
 byte-identical. A mutation that survives, or that fails some other assertion,
 means the check is not doing what its name claims.
 
