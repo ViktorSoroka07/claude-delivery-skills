@@ -375,6 +375,7 @@ t_prune() {
     case "$line" in *"restore: "*) eval "${line#*restore: }" >/dev/null 2>&1 ;; esac
   done
   assert_eq "$(tip_of pr-behind)" "$t_behind" "the printed restore brings pr-behind back at its tip"
+  assert_eq "$(gc "$WS/reviews" rev-parse --abbrev-ref 'pr-behind@{u}' 2>/dev/null)" "origin/pr-behind" "the printed restore brings pr-behind back tracking its upstream"
   assert_eq "$(tip_of pr-wtclean)" "$t_wtclean" "the printed restore brings pr-wtclean back at its tip"
   assert_eq "$(gc "$WS/.wt/clean" rev-parse --abbrev-ref HEAD 2>/dev/null)" "pr-wtclean" "the printed restore brings the removed worktree back on its branch"
 }

@@ -196,6 +196,13 @@ run_mutation "M19 a detached worktree goes unreported" \
   'if false; then' \
   "a detached worktree is reported"
 
+# update-ref leaves the branch's config, which is what brings the upstream back
+# with the restore; `branch -D` deletes the config with the ref.
+run_mutation "M20 the branch is deleted with branch -D" \
+  'update-ref -d "refs/heads/$b" "$tip" 2>&1' \
+  'branch -D "$b" 2>&1' \
+  "the printed restore brings pr-behind back tracking its upstream"
+
 printf '\n-----------------------------------------\n'
 printf '%d killed, %d survived, %d misfired\n' "$KILLED" "$SURVIVED" "$MISFIRED"
 [ "$SURVIVED" -eq 0 ] && [ "$MISFIRED" -eq 0 ]
