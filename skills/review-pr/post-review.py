@@ -290,8 +290,9 @@ def check_postable(manifest, repost):
     value = posted_value(text)
     if value is None:
         raise Stop("NO-FRONTMATTER", "the findings file has no frontmatter posted: line, so there is "
-                   "nothing to guard and nowhere to record the post; add the three lines above at "
-                   "its top and run again", "---\nposted: null\n---")
+                   "nothing to guard and nowhere to record the post; add the lines above at its top "
+                   "and run again", "---\npr: %d\nreviewed_sha: %s\nposted: null\n---" % (
+                       manifest.request, manifest.reviewed_sha))
     check_same_review(manifest, frontmatter(text))
     bare = value.split(" #", 1)[0].strip()
     if bare in NULL_VALUES or repost:

@@ -476,8 +476,12 @@ def gitlab_manifest_is_refused(r):
 def findings_file_without_frontmatter_is_refused(r):
     fx = Fixture("ado", posted=None)
     run = refused(r, fx, "NO-FRONTMATTER", "a findings file without frontmatter")
-    r.check("a findings file without frontmatter: the refusal gives the three lines to add",
-            "---\nposted: null\n---\n" in run.out, run.out)
+    lines = "---\npr: 42\nreviewed_sha: %s\nposted: null\n---\n" % Template.head
+    r.check("a findings file without frontmatter: the refusal gives the lines to add",
+            lines in run.out, run.out)
+    write(fx.findings, lines + fx.findings_text)
+    r.status("a findings file without frontmatter: with the lines given added, the post lands",
+             fx.run(), "LANDED")
 
 
 @test
