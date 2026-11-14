@@ -35,6 +35,13 @@ jobs:
       - name: Hook self-tests
         run: sh scripts/test-hooks.sh
 
+      # A red git-sync suite stops the release: this job runs on all three
+      # systems the plugin claims and `release` needs it. test.sh alone, since
+      # mutate.sh rewrites the script in place and runs for tens of minutes.
+      - name: git-sync fixture suite
+        working-directory: skills/git-sync
+        run: bash test.sh
+
       # .leakwords.local never leaves the author's machine, so CI can check
       # only the committed shape patterns. The local pre-push scan, with the
       # full wordlist, remains the real gate.

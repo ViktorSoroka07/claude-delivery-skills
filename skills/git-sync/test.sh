@@ -567,9 +567,10 @@ t_interrupt() {
   lines_file "$W/interruptme/b.txt" 1 "MY-EDIT-AT-RISK"
 
   # post-merge fires after the fast-forward, holding the window open between
-  # `stash push` and `stash pop` long enough to interrupt deterministically
-  local hook="$W/interruptme/.git/hooks/post-merge"
-  printf '#!/bin/sh\nsleep 6\n' > "$hook"; chmod +x "$hook"
+  # `stash push` and `stash pop`; it marks the moment the window opens so the
+  # signal is sent inside it however slow the machine's fetch and stash were
+  local hook="$W/interruptme/.git/hooks/post-merge" opened="$W/window-open"
+  printf '#!/bin/sh\n: > "%s"\nsleep 6\n' "$opened" > "$hook"; chmod +x "$hook"
 
   # SIGTERM, not SIGINT: a shell sets SIGINT to ignored in background jobs when
   # job control is off, and bash cannot trap a signal ignored on entry, so no
@@ -577,8 +578,8 @@ t_interrupt() {
   # on_interrupt, so TERM tests the same path Ctrl-C takes interactively.
   local log="$ROOT/intr.log"
   printf 'a\n' | "$SYNC" "$W/interruptme" --quiet > "$log" 2>&1 &
-  local pid=$!
-  sleep 2
+  local pid=$! waited=0
+  while [ ! -e "$opened" ] && [ "$waited" -lt 150 ]; do sleep 0.2; waited=$((waited+1)); done
   kill -TERM "$pid" 2>/dev/null
   wait "$pid" 2>/dev/null
 
