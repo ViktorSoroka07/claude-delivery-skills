@@ -360,19 +360,22 @@ empty "body hook reads a send named inside a message as message text" "$out"
 # included, whose fields reflow and so stay silent on wrapping.
 # shellcheck disable=SC2016  # the commands under test carry literal substitutions for the hook to read, never for this shell to expand
 {
-  printf 'The handler returns Task<Result> when the <Id> is unset.\n' > token-prose.md
-  printf 'Pass `<Id>` through unchanged.\n' > token-span.md
+  printf 'The handler returns Task<Result> when the <Id> is unset, and logs the <Id>.\n' > token-prose.md
+  printf 'Pass `<Id>` or ``<Name>`` through unchanged.\n' > token-span.md
   printf 'Example:\n\n```\nTask<Result> run(<Id> x)\n```\n' > token-fence.md
-  printf '<details>\n<summary>More</summary>\n\nA line with <kbd>Ctrl</kbd> and <sub>low</sub> text<br>\n\n<!-- a note -->\n\n</details>\n\n<table><tr><td valign="top">cell</td></tr></table>\n\n<img src="x.png" alt="y" width="100%%">\n\nSee <https://example.com/a> or <ops@example.com>.\n' > kept-html.md
+  printf 'Example:\n\n```\nshort code\n```\n\nThen the <Id> is lost.\n' > token-after-fence.md
+  printf '<details>\n<summary>More</summary>\n\nA line with <KBD>Ctrl</KBD> and <sub>low</sub> text<br>\n\n<!-- a note on the <Id> -->\n\n</details>\n\n<table><tr><td valign="top">cell</td></tr></table>\n\n<img src="x.png" alt="y" width="100%%">\n\nSee <https://example.com/a> or <ops@example.com>.\n' > kept-html.md
   printf 'The export failed on every gateway timeout\nand the <Id> was lost.\n' > both.md
   printf 'gh issue comment 7 --body-file %s/token-prose.md\n' "$WORK" > cmd-token-prose
   printf 'gh issue comment 7 --body-file %s/token-span.md\n' "$WORK" > cmd-token-span
   printf 'gh issue comment 7 --body-file %s/token-fence.md\n' "$WORK" > cmd-token-fence
+  printf 'gh issue comment 7 --body-file %s/token-after-fence.md\n' "$WORK" > cmd-token-after-fence
   printf 'gh pr create --title "x" --body-file %s/kept-html.md\n' "$WORK" > cmd-kept-html
   printf 'gh pr create --title "x" --body-file %s/both.md\n' "$WORK" > cmd-both
   printf 'az repos pr create --title x --description "$(cat token-span.md)"\n' > cmd-az-token-span
   printf 'az boards work-item update --id 5 --discussion "$(cat token-prose.md)"\n' > cmd-item-token-discussion
   printf 'az boards work-item create --type Bug --title x --description "$(cat token-span.md)"\n' > cmd-item-token-span
+  printf 'az boards work-item create --type Bug --title x -d "$(cat token-prose.md)"\n' > cmd-item-token-short
   printf 'az boards work-item update --id 5 --discussion "$(cat wrapped.md)"\n' > cmd-item-wrapped
   printf 'az boards work-item update --id 5 --description "$(cat both.md)"\n' > cmd-item-both
   printf 'az boards work-item update --id 5 --state active --title "Task<Result> fails"\n' > cmd-item-title
@@ -380,6 +383,7 @@ empty "body hook reads a send named inside a message as message text" "$out"
 out=$(body_payload cmd-token-prose | "$PY" "$BODY_HOOK")
 contains "body hook warns on a tag-shaped token in a gh comment's prose" "$out" "<Id>"
 contains "body hook names every distinct token" "$out" "<Result>"
+lacks "body hook names a repeated token once" "$out" "\`<Id>\`, \`<Id>\`"
 contains "body hook says the sender still reports success" "$out" "reports success"
 contains "body hook offers the entity form" "$out" "&lt;Name&gt;"
 contains "body hook asks for the stored body to be read back" "$out" "read the stored body back"
@@ -388,6 +392,8 @@ out=$(body_payload cmd-token-span | "$PY" "$BODY_HOOK")
 empty "body hook leaves a token inside a code span alone for gh" "$out"
 out=$(body_payload cmd-token-fence | "$PY" "$BODY_HOOK")
 empty "body hook leaves a token inside a fenced block alone for gh" "$out"
+out=$(body_payload cmd-token-after-fence | "$PY" "$BODY_HOOK")
+contains "body hook reads the prose after a closed fence for gh" "$out" "<Id>"
 out=$(body_payload cmd-kept-html | "$PY" "$BODY_HOOK")
 empty "body hook stays quiet on kept HTML, comments and autolinks" "$out"
 out=$(body_payload cmd-both | "$PY" "$BODY_HOOK")
@@ -399,6 +405,8 @@ out=$(body_payload cmd-item-token-discussion | "$PY" "$BODY_HOOK")
 contains "body hook reads a work item's discussion for a token" "$out" "<Id>"
 out=$(body_payload cmd-item-token-span | "$PY" "$BODY_HOOK")
 contains "body hook reads a work item's description for a token, code span or not" "$out" "<Id>"
+out=$(body_payload cmd-item-token-short | "$PY" "$BODY_HOOK")
+contains "body hook reads a work item's description under its short flag" "$out" "<Id>"
 out=$(body_payload cmd-item-wrapped | "$PY" "$BODY_HOOK")
 empty "body hook keeps a wrapped work-item discussion silent, its field reflows" "$out"
 out=$(body_payload cmd-item-both | "$PY" "$BODY_HOOK")
