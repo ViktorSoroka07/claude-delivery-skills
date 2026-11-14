@@ -34,7 +34,8 @@ review it, and never on a plain sync: it removes each branch whose tip is
 already on its origin upstream or on origin's default branch, with the
 worktrees on those that hold no change and no ignored file, so a branch just
 created goes too. Relay each `PRUNED`
-row's restore command and each `KEPT` row's reason to the user.
+row's restore command, and each `KEPT` row's reason and its command, to the
+user; never run a `KEPT` command for them.
 
 **Target resolution.** A directory containing `.git` is treated as that one
 repo. Anything else sweeps its **direct children only**, never recursing, so
