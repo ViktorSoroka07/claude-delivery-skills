@@ -42,6 +42,14 @@ jobs:
         working-directory: skills/git-sync
         run: bash test.sh
 
+      # The forge stand-in's gh and curl shims are shebang scripts, which the
+      # posting script's subprocess calls cannot start on Windows. The suite
+      # alone: mutate.py rewrites post-review.py in place.
+      - name: review-pr posting suite
+        if: runner.os != 'Windows'
+        timeout-minutes: 15
+        run: python3 skills/review-pr/test_post_review.py
+
       # .leakwords.local never leaves the author's machine, so CI can check
       # only the committed shape patterns. The local pre-push scan, with the
       # full wordlist, remains the real gate.
