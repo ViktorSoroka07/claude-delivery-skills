@@ -310,7 +310,8 @@ instructions alone cannot:
     leaving an empty gap mid-sentence; it asks for the token without its angle
     brackets, or as `&lt;Name&gt;`, and for the stored body read back. Through `gh`
     code spans and fenced blocks are not read, since they are kept; through `az`
-    the token is read anywhere, since the stored field is HTML, and a wrapped
+    the token is read anywhere, since a work-item field is stored as HTML and a
+    pull request description is read the same way, and a wrapped
     paragraph in a work-item field stays silent, since that field reflows; backs
     `writing-pr-descriptions`.
   - **Commit-body reference** — in a repository whose messages commitlint lints,

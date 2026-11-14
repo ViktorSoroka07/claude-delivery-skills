@@ -400,7 +400,7 @@ out=$(body_payload cmd-both | "$PY" "$BODY_HOOK")
 contains "body hook gives the wrapping warning beside the token's" "$out" "hard-wrapped"
 contains "body hook gives the token warning beside the wrapping's" "$out" "<Id>"
 out=$(body_payload cmd-az-token-span | "$PY" "$BODY_HOOK")
-contains "body hook warns on a token inside a code span for az, which stores HTML" "$out" "<Id>"
+contains "body hook warns on a token inside a code span of an az pull request" "$out" "<Id>"
 out=$(body_payload cmd-item-token-discussion | "$PY" "$BODY_HOOK")
 contains "body hook reads a work item's discussion for a token" "$out" "<Id>"
 out=$(body_payload cmd-item-token-span | "$PY" "$BODY_HOOK")

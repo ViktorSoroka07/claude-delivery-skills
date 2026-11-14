@@ -19,9 +19,10 @@ is not an HTML element the forge keeps (`KEPT`). The forge's sanitizer takes it
 for an unknown tag and deletes it, the send reports success, and readers see an
 empty gap mid-sentence, as `Task<Result>` or a `<Id>` placeholder gives. Through
 gh, text inside a code span or a fenced block is kept, so neither is read;
-through az the token is read anywhere, since the stored field is HTML. An
-autolink and an HTML comment are not tokens. Both rules rest on what a forge
-documents or a body was seen to lose, not on a send made from here.
+through az the token is read anywhere: a work-item field is stored as HTML,
+and a pull request description, which renders Markdown, is read the same
+way. An autolink and an HTML comment are not tokens. Both rules rest on what
+a forge documents or a body was seen to lose, not on a send made from here.
 
 Warn-only: a deliberate line break reads the same as a wrapped one, a token may
 be meant as markup, and the skill owns the judgment. Fails open on any error -
