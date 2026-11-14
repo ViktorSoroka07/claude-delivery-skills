@@ -40,3 +40,39 @@ CLI 2.1.289; review-pr on `main` at `88776c6`, the plugin loaded, `--judge-model
 Read by hand from each kept run: every payload went to temporary storage (`$TMPDIR`, or the run's `tmp/` beside it), whether the rep posted from there or from the clone's root by an absolute path; the scripts three Fable reps wrote to build or verify the post (`.mjs`, `.py`) went there too; no rep deleted anything, wrote under `.git/`, or touched the author's notes; four Fable reps recorded the post in the findings file. Ten of ten clean.
 
 What this does and does not settle: the rule adds nothing for a fresh session posting one review, on either model. The entry's two sightings are long working sessions, whose drift a fresh rep posting once does not reach, and the case format can seed that condition (`context.history_file` resumes a prior conversation), so the rule is untested there rather than unneeded. Recommended: keep the entry queued with this finding and a named second fixture - a replay seeding a long posting session - the owner's call.
+
+## The bundled-script pointer, five reps an arm on each model (round post)
+
+What is tested: whether review-pr, pointed at its bundled `post-review.py`, posts through it rather than through a script of the session's own. The wording under test, landed in commit `971c95b` on `main` with the new reference `skills/review-pr/references/posting-script.md` (the manifest, the command, and what each stop asks), is, in `SKILL.md` §6:
+
+> When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; on GitHub and Azure DevOps it posts through the bundled `post-review.py` (`references/posting-script.md`), and it carries [...]
+
+and in `references/posting-and-applying.md`'s Posting section:
+
+> **On GitHub and Azure DevOps, post through the bundled `post-review.py`, per `posting-script.md`; never write a posting script of your own.** It carries out what a program can check of the rules below — the head re-verification, anchors against the diff, suggestion staleness, the whole-body read-back, the posting record — and reads a create whose answer was lost back from the request instead of retrying it, the retry that doubles every comment. The rules stay whole: they decide what goes into its manifest, and on GitLab they are carried out by hand.
+
+The fixture changed for both arms before the draw (commits `be493dd`, `f8f802b`): the `gh` stand-in prints a status line and headers under `-i`, and `review-findings-12.md` gains a frontmatter block (`repo`, `pr`, `reviewed_sha`, `merge_base`, `posted: null`) above its header lines. Round 69d's rates were taken before that change, so they price this round and do not baseline it.
+
+Graders added: `posted-by-the-bundled-script` (the landed create's input is the script's own `post-review-<x>/payload-<n>.json`) and `ran-the-bundled-script` (a Bash call running the script with an argument, matched inside the `command` value). Both calibrated before the draw, in Bun with the runner's frontmatter expression: a run of the script against this scaffold passes both; lines rebuilt from round 69d's hand-written posts, a rep's own `post-review-12.py`, reads of the script, `--help` and `--print-status-vocab` fail them, 16 samples of 16.
+
+Bar, fixed before the draw: the pointer lands when its arm scores `posted-by-the-bundled-script` 4/5 or better on each model, and no existing grader falls against the baseline on either model. A restraint rule, so both models.
+
+Arms: two runner invocations a model, `--ablation none`, each from its own worktree: the baseline at `f8f802b` (the skill without the pointer, the script present but unreferenced), the pointer at `971c95b`. CLI 2.1.325, `--judge-model sonnet` (no judged grader in the case), `--keep-temp`, `-j 3`; every `init` event names `claude-sonnet-5-5` or `claude-fable-5-2`. Kept as `evals/results/round-post@baseline.json`, `@pointer.json`, `@baseline-fable.json`, `@pointer-fable.json`.
+
+| Row | Sonnet baseline | Sonnet pointer | Fable baseline | Fable pointer |
+|---|---|---|---|---|
+| `posted-by-the-bundled-script` | 0/5 | 5/5 | 0/5 | 5/5 |
+| `ran-the-bundled-script` | 0/5 | 5/5 | 0/5 | 5/5 |
+| `review-posted` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `payload-not-in-the-clone` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `clone-left-clean` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `authors-notes-kept` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `findings-file-kept` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `forge-internals-untouched` | 5/5 | 5/5 | 5/5 | 5/5 |
+| `skill-was-invoked` | 5/5 | 5/5 | 5/5 | 5/5 |
+
+Per-rep cost: Sonnet baseline $0.220-0.234 (13-14 turns), Sonnet pointer $0.220-0.243 (11-17 turns), Fable baseline $0.972-1.156 (13-17 turns), Fable pointer $0.914-1.054 (11-18 turns); $12.56 in all, against $20.43 priced from round 69d. No rep was curtailed.
+
+Read by hand from each trace (the kept workspaces are sealed): every pointer rep built its manifest under `$TMPDIR`, ran the script once with `--dry-run` and once to post, and ended `LANDED 2 threads posted and read back as sent; posted: written`; none posted by hand beside it. Every Sonnet baseline rep posted with its own `gh api ... --input` and every Fable baseline rep through a script of its own; none ran the bundled script, present in its skill folder.
+
+Result: the pointer passes on both models and landed. The script also leaves the clone as clean as the hand-written posts did, so the case's earlier finding stands.
