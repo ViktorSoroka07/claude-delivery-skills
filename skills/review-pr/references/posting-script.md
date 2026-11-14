@@ -75,7 +75,7 @@ After a create the script keeps a record, so **a plain re-run of the same manife
 | Status | Do |
 |---|---|
 | `REJECTED` | The forge refused a thread. On GitHub the review is one submission and nothing landed: fix it and run again. On Azure DevOps the threads before it landed: fix the thread, then `--resume`, which posts only what has not landed. |
-| `UNCERTAIN` | A create's answer was lost and the read-back could not account for it. `--resume`: it refuses (`SETTLING`) until a late copy has had time to land, then posts only what is missing. |
+| `UNCERTAIN` | A create's answer was lost and the read-back could not account for it. `--resume`: it refuses (`SETTLING`) until a late copy has had time to land, then posts only what is missing. Where the message names items of yours that pair with no thread, ask the user about each before resuming: one they wrote themselves stays, and `--resume --ignore-item <id>`, once per item, leaves it out of the pairing; a copy of one of the manifest's threads is theirs to delete, then `--resume`. |
 | `SETTLING` | Run `--resume` again after the time it names. |
 | `UNVERIFIED` | A read failed; any thread created before it is listed as landed. `--resume` reads again, and answers `NO-STATE` when nothing was sent. |
 | `MISSING`, `MISMATCH`, `MISPLACED` | A thread is absent, its text still differs after the one correction (the diff is printed), or it sits elsewhere than sent. Report it to the user with the script's lines; moving or re-posting is theirs to decide. |

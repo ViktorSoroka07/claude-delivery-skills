@@ -584,9 +584,12 @@ def pair(wanted, items, known_ids):
                     pairs[w.key] = item
         free = [i for i in free if not any(i is p for p in pairs.values())]
     if free:
-        raise Stop("UNCERTAIN", "the request holds new items of yours that pair with no thread "
-                   "(ids %s); something landed that this run cannot account for"
-                   % ", ".join(str(i.id) for i in free))
+        ids = ", ".join(str(i.id) for i in free)
+        raise Stop("UNCERTAIN", "the request holds new items of yours that pair with no thread (ids %s); "
+                   "something landed that this run cannot account for. Ask the user about each: one "
+                   "they wrote themselves stays, and --resume --ignore-item <id> leaves it out of the "
+                   "pairing; a copy of one of this manifest's threads is theirs to delete before "
+                   "--resume" % ids)
     return pairs
 
 
@@ -1152,6 +1155,7 @@ def parse_args(argv):
     parser.add_argument("--settle", type=int, default=600)
     parser.add_argument("--timeout", type=int, default=60)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--ignore-item", type=int, action="append", default=[])
     parser.add_argument("--print-status-vocab", action="store_true")
     args = parser.parse_args(argv)
     if not args.print_status_vocab and args.manifest is None:
@@ -1236,6 +1240,7 @@ def run(args, workdir, outcome, started):
         todo = keys
     else:
         started.append(record)
+        record.data["snapshot"] += [i for i in args.ignore_item if i not in record.data["snapshot"]]
         todo = reconcile(forge, head, record, keys)
         check_same_head(record, head, keys, todo)
         print("resuming: %d of %d already on the request; posting %s" % (

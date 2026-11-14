@@ -960,6 +960,26 @@ def copy_landing_after_the_resume_posted(r):
 
 
 @test
+def stray_item_of_the_users_named_on_resume(r):
+    fx = Fixture("ado", threads=three_threads())
+    fx.model["faults"]["lost_answer"] = {"nth": 2, "answer": 502, "lands": "never"}
+    fx.run()
+    fx.model["threads"].append({"id": 500, "author": "reviewer-id", "status": "active",
+                                "threadContext": None, "content": "A note the user wrote by hand.\n"})
+    fx.age(SETTLE + 1)
+    what = "an item the user wrote during the post"
+    run = fx.run("--resume")
+    r.status("%s: the resume stops UNCERTAIN" % what, run, "UNCERTAIN")
+    r.check("%s: the stop names the item and the flag that leaves it out" % what,
+            "ids 500" in run.out and "--resume --ignore-item <id>" in run.out, run.out)
+    landed(r, "%s: a resume naming it with --ignore-item" % what, fx.run("--resume", "--ignore-item", "500"))
+    ids = [t["id"] for t in fx.stored()["threads"]]
+    r.eq("%s: the user's item stays, and the post holds the manifest's threads once" % what,
+         (500 in ids, len(ids), len(fx.creates())), (True, 4, 4))
+    r.check("%s: posted: leaves the user's item out" % what, "500" not in posted_line(fx), posted_line(fx))
+
+
+@test
 def run_killed_between_a_create_and_its_record(r):
     fx = Fixture("ado", threads=three_threads()[:2])
     fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": "kill", "lands": "now"}

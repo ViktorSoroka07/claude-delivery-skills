@@ -199,6 +199,11 @@ MUTATIONS = [
      "              lambda w, i: i.anchor == w.anchor)",
      "              lambda w, i: False)",
      "a 502 whose create landed with a sanitized body: the record pairs it with the forge's id"),
+    ("ignored-item-still-paired",
+     '        record.data["snapshot"] += [i for i in args.ignore_item if i not in record.data["snapshot"]]\n',
+     "",
+     "an item the user wrote during the post: a resume naming it with --ignore-item: the run reads back "
+     "clean"),
     ("resume-across-heads-unchecked",
      '    if record.data["head"] == head.sha:\n',
      "    if True:\n",
