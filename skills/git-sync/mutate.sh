@@ -203,6 +203,13 @@ run_mutation "M20 the branch is deleted with branch -D" \
   'branch -D "$b" 2>&1' \
   "the printed restore brings pr-behind back tracking its upstream"
 
+# `git worktree remove` counts ignored files as clean and deletes them, so past
+# this guard the worktree and its branch both go.
+run_mutation "M21 the ignored-files guard is dropped" \
+  'if [ -n "$ign" ]; then' \
+  'if false; then' \
+  "the branch in the worktree holding ignored files keeps its tip"
+
 printf '\n-----------------------------------------\n'
 printf '%d killed, %d survived, %d misfired\n' "$KILLED" "$SURVIVED" "$MISFIRED"
 [ "$SURVIVED" -eq 0 ] && [ "$MISFIRED" -eq 0 ]

@@ -65,11 +65,14 @@ dirty tree too. The branch itself is deleted with `update-ref`, which refuses
 only a branch that moved since it was judged: it deletes a checked-out branch
 and leaves its HEAD unborn, so a worktree parse that misses the main
 worktree's branch loses it outright; that mutation dies on the tip. The
-printed restore command is tested by running it and comparing the tip and the
-upstream. The upstream comes back only because `update-ref` leaves the
-branch's config section, which `git branch -D` deletes with the branch, so a
-switch to `branch -D` dies on the upstream assertion. The report of a
-detached worktree is tested by its row's status.
+ignored-files guard has no git behind it: `git worktree remove` counts
+ignored files as clean and deletes them with the tree, so dropping that guard
+loses the branch and its mutation dies on the tip. The printed restore
+command is tested by running it and comparing the tip and the upstream. The
+upstream comes back only because `update-ref` leaves the branch's config
+section, which `git branch -D` deletes with the branch, so a switch to
+`branch -D` dies on the upstream assertion. The report of a detached worktree
+is tested by its row's status.
 
 ## Portability constraints
 

@@ -234,6 +234,12 @@ build_prune_workspace() {
 
   gc "$r" branch -q fresh main
 
+  # pr-wtignored's worktree holds only files its .gitignore names
+  gc "$r" checkout -q -b pr-wtignored main
+  printf '.env\n.venv/\nbuild/\nnode_modules/\n' > "$r/.gitignore"
+  gc "$r" add -A; gc "$r" commit -qm pr-wtignored
+  gc "$r" push -q -u origin pr-wtignored 2>/dev/null
+
   # pr-fork tracks a remote the sweep does not fetch, whose branch is gone
   git init -q --bare "$WS/.origins/fork.git"
   gc "$r" remote add fork "$WS/.origins/fork.git"
@@ -257,6 +263,9 @@ build_prune_workspace() {
   gc "$r" worktree add -q "$WS/.wt/clean" pr-wtclean
   gc "$r" worktree add -q "$WS/.wt/dirty" pr-wtdirty
   printf 'unsaved\n' >> "$WS/.wt/dirty/pr-wtdirty.txt"
+  gc "$r" worktree add -q "$WS/.wt/ignored" pr-wtignored
+  mkdir -p "$WS/.wt/ignored/.venv" "$WS/.wt/ignored/build" "$WS/.wt/ignored/node_modules"
+  for b in .env .venv/x build/x node_modules/x; do printf 'not in git\n' > "$WS/.wt/ignored/$b"; done
   gc "$r" worktree add -q --detach "$WS/.wt/detached" main
 }
 
@@ -327,10 +336,10 @@ t_prune() {
   say ""; say "== --prune deletes what origin already holds =="
   build_prune_workspace
   local b out line
-  local t_behind t_ahead t_squashed t_localonly t_fork t_wtclean t_wtdirty t_current
+  local t_behind t_ahead t_squashed t_localonly t_fork t_wtclean t_wtdirty t_wtignored t_current
   t_behind=$(tip_of pr-behind); t_ahead=$(tip_of pr-ahead); t_squashed=$(tip_of pr-squashed)
   t_localonly=$(tip_of localonly); t_fork=$(tip_of pr-fork); t_wtclean=$(tip_of pr-wtclean)
-  t_wtdirty=$(tip_of pr-wtdirty); t_current=$(tip_of pr-current)
+  t_wtdirty=$(tip_of pr-wtdirty); t_wtignored=$(tip_of pr-wtignored); t_current=$(tip_of pr-current)
 
   out=$("$SYNC" "$WS" --quiet --prune </dev/null 2>&1)
 
@@ -361,6 +370,10 @@ t_prune() {
   assert_eq "$(tip_of pr-wtdirty)" "$t_wtdirty" "the branch in the dirty worktree keeps its tip"
   assert_branch_row_contains "$out" reviews pr-wtdirty "uncommitted changes" "the dirty worktree's row names its uncommitted changes"
   assert_eq "$(tail -1 "$WS/.wt/dirty/pr-wtdirty.txt" 2>/dev/null)" "unsaved" "the dirty worktree and its edit are still there"
+  assert_branch_status "$out" reviews pr-wtignored KEPT "a branch in a worktree holding ignored files is kept"
+  assert_eq "$(tip_of pr-wtignored)" "$t_wtignored" "the branch in the worktree holding ignored files keeps its tip"
+  assert_branch_row_contains "$out" reviews pr-wtignored "(.env, .venv/, build/ and 1 more)" "the ignored-files worktree's row names what is ignored there"
+  assert_eq "$(cat "$WS/.wt/ignored/.env" 2>/dev/null)" "not in git" "the worktree's ignored files are still there"
   assert_branch_status "$out" reviews pr-current KEPT "the branch checked out in the main worktree is kept"
   assert_eq "$(tip_of pr-current)" "$t_current" "the branch checked out in the main worktree keeps its tip"
   assert_eq "$(gc "$WS/reviews" rev-parse --abbrev-ref HEAD)" "pr-current" "the main worktree still stands on its branch"

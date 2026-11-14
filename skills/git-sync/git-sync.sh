@@ -5,7 +5,7 @@
 
 set -uo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 
 # test.sh compares this list against the statuses its own assertions cover,
 # so a status added here without a fixture fails the suite.
@@ -45,7 +45,8 @@ options:
       --dry-run       fetch and report what is behind, change no local branch
       --prune         also delete each local branch whose tip is already on
                       its origin upstream or on origin's default branch, and
-                      the clean worktrees on those (see below)
+                      the worktrees on those holding nothing git lacks (see
+                      below)
   -q, --quiet         no live progress line (the summary still prints)
       --no-color      plain output
   -h, --help          this text
@@ -67,14 +68,17 @@ why it did not.
 
 with --prune, after the fetch, each local branch other than the default one:
   tip on its origin upstream, or on     deleted (PRUNED) with the command that
-  origin's default branch               restores it; a clean worktree on it is
+  origin's default branch               restores it; a worktree on it holding
+                                        no change and no ignored file is
                                         removed first
   checked out in the main worktree,     left (KEPT) with the command that would
   commits on no origin branch, an       act on it
   upstream gone with the tip not on
   the default branch (a squash merge
   looks like this), or a worktree on
-  it with uncommitted changes
+  it with uncommitted changes or
+  ignored files (an installed
+  dependency folder, a copied .env)
 
 A branch just created and not yet committed to is on the default branch, so
 --prune deletes it; that is why pruning is never on by default. With --dry-run
@@ -203,7 +207,7 @@ worktree_clean() {
 
 prune_repo() { # dir name db
   local dir="$1" name="$2" db="$3"
-  local qdir wts line b tip up kind wt held n qb qwt restore err
+  local qdir wts line b tip up kind wt held n qb qwt restore err ign
   qdir="$(printf '%q' "$dir")"
   # one record per worktree: kind, branch (empty when detached), path
   wts="$(git -C "$dir" worktree list --porcelain 2>/dev/null | awk -v s="$SEP" '
@@ -260,6 +264,15 @@ prune_repo() { # dir name db
       qwt="$(printf '%q' "$wt")"
       if ! worktree_clean "$wt"; then
         emit KEPT "$name" "$b" "" NONE "uncommitted changes in worktree $wt; to delete both: git -C $qdir worktree remove --force $qwt && git -C $qdir branch -D $qb" "$dir"
+        continue
+      fi
+      # git counts ignored files as clean and removes them with the tree, and
+      # no restore brings back a hand-made .env.
+      ign="$(git -C "$wt" -c core.quotepath=false status --porcelain --ignored -unormal 2>/dev/null |
+        sed -n 's/^!! //p' |
+        awk 'NR <= 3 { s = s (NR > 1 ? ", " : "") $0 } END { if (NR > 3) s = s " and " NR - 3 " more"; print s }')"
+      if [ -n "$ign" ]; then
+        emit KEPT "$name" "$b" "" NONE "ignored files in worktree $wt ($ign); to delete both: git -C $qdir worktree remove $qwt && git -C $qdir branch -D $qb" "$dir"
         continue
       fi
       restore="$restore && git -C $qdir worktree add $qwt $qb"
