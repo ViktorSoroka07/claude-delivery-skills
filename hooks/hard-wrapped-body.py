@@ -24,9 +24,10 @@ and a pull request description, which renders Markdown, is read the same
 way. An autolink and an HTML comment are not tokens. Both rules rest on what
 a forge documents or a body was seen to lose, not on a send made from here.
 
-Warn-only: a deliberate line break reads the same as a wrapped one, a token may
-be meant as markup, and the skill owns the judgment. Fails open on any error -
-a broken backstop must not block the send.
+Warn-only: a deliberate line break reads the same as a wrapped one, and a
+token may be meant as markup. The skill owns the wrapping judgment; the token
+rule lives in this hook alone. Fails open on any error - a broken backstop must
+not block the send.
 """
 import json
 import os

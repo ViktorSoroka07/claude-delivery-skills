@@ -312,8 +312,9 @@ instructions alone cannot:
     code spans and fenced blocks are not read, since they are kept; through `az`
     the token is read anywhere, since a work-item field is stored as HTML and a
     pull request description is read the same way, and a wrapped
-    paragraph in a work-item field stays silent, since that field reflows; backs
-    `writing-pr-descriptions`.
+    paragraph in a work-item field stays silent, since that field reflows. The
+    wrapping check backs `writing-pr-descriptions`; the token rule lives in the
+    hook alone.
   - **Commit-body reference** — in a repository whose messages commitlint lints,
     reads a commit's message the moment the command runs, from each `-m`, a heredoc
     inside one, or a `-F` file or heredoc, and warns on a `#` before a word in the
