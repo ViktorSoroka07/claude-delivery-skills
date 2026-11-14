@@ -57,7 +57,7 @@ Nothing was created by a stop before the post, so fix the cause and run the same
 | Status | Do |
 |---|---|
 | `MANIFEST-INVALID`, `EMPTY` | Fix the manifest as the message says. |
-| `NO-FRONTMATTER` | Add the lines the stop prints at the top of the findings file. |
+| `NO-FRONTMATTER` | Add the lines the stop prints where it says: a file without frontmatter takes the whole block at its top; a file whose frontmatter lacks `posted:` takes only the printed lines, inside that block. |
 | `ALREADY-POSTED` | The review went out already. `--repost` only when the user wants it out a second time; the result's `replaced` holds the earlier record, which you move into the file's body. |
 | `POSTED-UNKNOWN` | Read the findings file's body for a record of a post; with none, `--repost`. |
 | `NO-TOKEN`, `AUTH-REFUSED` | Tell the user the forge needs a credential (`gh auth status`, or `AZURE_DEVOPS_EXT_PAT`); never ask for the token itself. |

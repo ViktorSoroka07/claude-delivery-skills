@@ -492,6 +492,20 @@ def findings_file_without_frontmatter_is_refused(r):
 
 
 @test
+def frontmatter_without_a_posted_line_is_refused(r):
+    head = "---\nrepo: x\npr: 42\nreviewed_sha: %s\n" % Template.head
+    fx = Fixture("ado", findings_text=head + "---\n# Review of request 42\n")
+    what = "a findings file whose frontmatter lacks posted:"
+    run = refused(r, fx, "NO-FRONTMATTER", what)
+    printed = run.out.split("\nNO-FRONTMATTER ", 1)[0]
+    r.eq("%s: the refusal prints only the line the block lacks" % what, printed, "posted: null")
+    write(fx.findings, head + printed + "\n---\n# Review of request 42\n")
+    landed(r, "%s: with the printed line added where the stop says" % what, fx.run())
+    r.eq("%s: the file keeps one frontmatter block" % what,
+         [row for row in fx.findings_now().split("\n") if row == "---"], ["---", "---"])
+
+
+@test
 def findings_file_already_posted_is_refused(r):
     fx = Fixture("ado", posted="posted: { at: T, form: default, threads: [11, 12] }")
     refused(r, fx, "ALREADY-POSTED", "a posted: line holding a record")

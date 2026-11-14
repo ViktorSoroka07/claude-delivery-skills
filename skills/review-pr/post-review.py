@@ -294,10 +294,16 @@ def check_postable(manifest, repost):
         raise invalid("cannot read the findings file: %s" % e) from None
     value = posted_value(text)
     if value is None:
-        raise Stop("NO-FRONTMATTER", "the findings file has no frontmatter posted: line, so there is "
-                   "nothing to guard and nowhere to record the post; add the lines above at its top "
-                   "and run again", "---\npr: %d\nreviewed_sha: %s\nposted: null\n---" % (
-                       manifest.request, manifest.reviewed_sha))
+        fields = frontmatter(text)
+        keys = [("pr", manifest.request), ("reviewed_sha", manifest.reviewed_sha), ("posted", "null")]
+        if fields is None:
+            raise Stop("NO-FRONTMATTER", "the findings file has no frontmatter, so there is nothing to "
+                       "guard and nowhere to record the post; add the lines above at its top and run "
+                       "again", "---\n%s---" % "".join("%s: %s\n" % kv for kv in keys))
+        raise Stop("NO-FRONTMATTER", "the findings file's frontmatter has no posted: line, so there is "
+                   "nowhere to record the post; add the lines above inside that block, before its "
+                   "closing ---, and run again",
+                   "".join("%s: %s\n" % kv for kv in keys if scalar(fields, kv[0]) is None).rstrip("\n"))
     check_same_review(manifest, frontmatter(text))
     bare = value.split(" #", 1)[0].strip()
     if bare in NULL_VALUES or repost:
