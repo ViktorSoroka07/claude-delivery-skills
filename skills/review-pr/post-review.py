@@ -234,21 +234,49 @@ def load_manifest(path):
 # --- the findings file and the run's record -----------------------------------
 
 
-def posted_value(text):
-    """The frontmatter's posted: value with its continuation lines, or None
-    when the file has no frontmatter or no posted: line in it."""
+def frontmatter(text):
+    """The lines between the file's opening and closing ---, or None when it has no frontmatter."""
     lines = text.splitlines()
     if not lines or lines[0].rstrip() != "---":
         return None
     end = next((i for i in range(1, len(lines)) if lines[i].rstrip() == "---"), None)
-    if end is None:
+    return None if end is None else lines[1:end]
+
+
+def scalar(fields, key):
+    """A one-line frontmatter value, unquoted and without its comment, or None when the key is absent."""
+    for line in fields:
+        if line.startswith(key + ":"):
+            return line[len(key) + 1:].split(" #", 1)[0].strip().strip("\"'")
+    return None
+
+
+def posted_value(text):
+    """The frontmatter's posted: value with its continuation lines, or None
+    when the file has no frontmatter or no posted: line in it."""
+    fields = frontmatter(text)
+    if fields is None:
         return None
-    for i in range(1, end):
-        if lines[i].startswith("posted:"):
-            value = [lines[i][len("posted:"):].strip()]
-            value += [line.strip() for line in lines[i + 1:end] if line[:1] in (" ", "\t")]
+    for i, line in enumerate(fields):
+        if line.startswith("posted:"):
+            value = [line[len("posted:"):].strip()]
+            value += [more.strip() for more in fields[i + 1:] if more[:1] in (" ", "\t")]
             return " ".join(value)
     return None
+
+
+def check_same_review(manifest, fields):
+    """The findings file must be the review of this request at this head: the write-back
+    marks it posted, and a file of another request's review would be marked instead."""
+    expected = [("pr", str(manifest.request)),
+                ("reviewed_sha", manifest.reviewed_sha)]
+    for key, want in expected:
+        got = scalar(fields, key)
+        if got != want:
+            raise invalid("the findings file %s, but the manifest posts %s: %s; build the manifest "
+                          "from the findings file of the review it posts" % (
+                              "has no %s line" % key if got is None else "records %s: %s" % (key, got),
+                              key, want))
 
 
 def check_postable(manifest, repost):
@@ -262,6 +290,7 @@ def check_postable(manifest, repost):
         raise Stop("NO-FRONTMATTER", "the findings file has no frontmatter posted: line, so there is "
                    "nothing to guard and nowhere to record the post; add the three lines above at "
                    "its top and run again", "---\nposted: null\n---")
+    check_same_review(manifest, frontmatter(text))
     bare = value.split(" #", 1)[0].strip()
     if bare in NULL_VALUES or repost:
         return

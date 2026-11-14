@@ -132,7 +132,7 @@ def default_model(forge, clone):
 
 
 class Fixture:
-    def __init__(self, forge="github", threads=None, posted="posted: null", token=SENTINEL):
+    def __init__(self, forge="github", threads=None, posted="posted: null", token=SENTINEL, review=None):
         self.forge = forge
         self.root = tempfile.mkdtemp(prefix="post-review-test-")
         CREATED.append(self.root)
@@ -147,7 +147,9 @@ class Fixture:
             os.chmod(os.path.join(self.root, "bin", tool), 0o755)
         write(os.path.join(self.root, "hostile.gitconfig"), HOSTILE_GIT_CONFIG)
         self.findings = os.path.join(self.root, "reviews", "r1.md")
-        frontmatter = "---\nrepo: x\npr: 42\n%s\n---\n" % posted if posted is not None else ""
+        review = dict({"pr": "42", "reviewed_sha": Template.head}, **(review or {}))
+        keys = "".join("%s: %s\n" % kv for kv in review.items() if kv[1] is not None)
+        frontmatter = "---\nrepo: x\n%s%s\n---\n" % (keys, posted) if posted is not None else ""
         self.findings_text = frontmatter + "# Review of request 42\n\nFindings.\n"
         write(self.findings, self.findings_text)
         self.model = default_model(forge, self.clone)
@@ -572,6 +574,20 @@ def existing_pending_review_is_refused(r):
                                 "commit_id": Template.head})
     refused(r, fx, "PENDING-EXISTS", "a pending review of the user's already on the request")
 
+
+
+@test
+def findings_file_of_another_review_is_refused(r):
+    other = refused(r, Fixture("ado", review={"pr": "41"}), "MANIFEST-INVALID",
+                    "a findings file of another request")
+    r.check("a findings file of another request: the refusal names both requests",
+            "records pr: 41" in other.out and "posts pr: 42" in other.out, other.out)
+    refused(r, Fixture("ado", review={"reviewed_sha": Template.base}), "MANIFEST-INVALID",
+            "a findings file of another head")
+    bare = refused(r, Fixture("ado", review={"reviewed_sha": None}), "MANIFEST-INVALID",
+                   "a findings file without reviewed_sha")
+    r.check("a findings file without reviewed_sha: the refusal names the line it lacks",
+            "has no reviewed_sha line" in bare.out, bare.out)
 
 
 # --- task 3: post, classify and read back --------------------------------------
