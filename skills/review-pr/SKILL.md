@@ -188,7 +188,7 @@ In chat, report only the file's absolute path and counts (e.g. "6 confirmed, 2 r
 
 ## 6. Posting and applying (later asks only)
 
-Posting findings to the PR and applying them to the tree are separate user requests — never automatic after a review, and often made in a fresh session, which finds the review as the newest round in the request's folder (§5) unless the user names another file. When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; it carries the re-verification and staleness checks, the pending/staged mode, the thread and suggestion-block packaging rules, the reply-and-resolve discipline, and the apply-mode protocol (every new test must fail against pre-fix code first).
+Posting findings to the PR and applying them to the tree are separate user requests — never automatic after a review, and often made in a fresh session, which finds the review as the newest round in the request's folder (§5) unless the user names another file. When the user asks to post, stage, or apply, read `references/posting-and-applying.md` and follow it; on GitHub and Azure DevOps it posts through the bundled `post-review.py` (`references/posting-script.md`), and it carries the re-verification and staleness checks, the pending/staged mode, the thread and suggestion-block packaging rules, the reply-and-resolve discipline, and the apply-mode protocol (every new test must fail against pre-fix code first).
 
 ## 7. Modes — and telling the user they exist
 

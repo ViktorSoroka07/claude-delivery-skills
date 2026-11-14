@@ -120,7 +120,8 @@ are claims that can be wrong. Two passes: parallel single-axis agents (chosen fr
 diff, never the full set) plus a mutation agent that measures instead of reads — then a
 fresh-eyes verifier prompted to *refute* every draft finding before anything is reported,
 and confirmed findings grouped into one thread per problem. Posts nothing without
-being asked.
+being asked, and on GitHub and Azure DevOps posts through a bundled script that reads
+every thread back as sent and never retries a create whose answer was lost.
 
 ![review-pr's two passes: the diff fans out to parallel axis agents and a mutation agent; their draft findings go to a fresh-eyes verifier prompted to refute, which emits a findings file marked confirmed, refuted, or adjusted — and posting, applying and thread disposition happen only when asked for in a later message](assets/diagrams/review-pr-flow.svg)
 
