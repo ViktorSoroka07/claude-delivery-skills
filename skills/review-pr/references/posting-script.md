@@ -48,7 +48,7 @@ From the clone the review was made in:
 
     python3 <skill dir>/post-review.py "$TMPDIR/<manifest>.json"
 
-`--dry-run` runs every check, reading the request from the forge, and prints the creates it would make. On Azure DevOps the token comes from `AZURE_DEVOPS_EXT_PAT`; never put a token on the command line. The last two lines of the output are the status line (on a dry run, `dry run: nothing was posted`) and the run's temporary directory, whose `result.json` lists every thread's key, id, anchor and status, and each correction's before and after. Exit 0 is `LANDED` or `CORRECTED`.
+`--dry-run` runs every check, reading the request from the forge, and prints the creates it would make. On Azure DevOps the token comes from `AZURE_DEVOPS_EXT_PAT`; never put a token on the command line. The last two lines of the output are the status line and the run's temporary directory, whose `result.json` lists every thread's key, id, anchor and status, and each correction's before and after. Exit 0 is `LANDED` or `CORRECTED`, or `DRY-RUN` on a dry run.
 
 ## What each stop asks of you
 

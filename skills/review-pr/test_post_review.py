@@ -31,7 +31,7 @@ EXPECTED_VOCAB = [
     "POSTED-UNKNOWN", "UNFINISHED-RUN", "NO-TOKEN", "AUTH-REFUSED", "STALE-HEAD", "MISSING-COMMIT",
     "OUT-OF-DIFF", "LINE-OUT-OF-FILE", "OFF-DIFF-LINE", "STALE-SUGGESTION", "SUGGESTION-IN-GROUP",
     "PARTITION", "PENDING-EXISTS", "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING",
-    "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING", "MOVED-MID-RUN",
+    "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING", "MOVED-MID-RUN", "DRY-RUN",
 ]
 
 HOSTILE_GIT_CONFIG = """\
@@ -583,6 +583,14 @@ def missing_base_commit_is_refused(r):
     fx.model["base"] = "e" * 40
     run = refused(r, fx, "MISSING-COMMIT", "a base commit missing locally")
     r.check("a base commit missing locally: the refusal names the fetch", "git fetch" in run.out, run.out)
+
+
+@test
+def dry_run_reports_a_status_of_its_own(r):
+    fx = Fixture("github")
+    run = refused(r, fx, "DRY-RUN", "a dry run", "--dry-run")
+    r.eq("a dry run: it exits 0", run.rc, 0)
+    r.eq("a dry run: result.json says it was a dry run", fx.result(run)["status"], "DRY-RUN")
 
 
 @test

@@ -31,7 +31,7 @@ STATUSES = (
     "OUT-OF-DIFF", "LINE-OUT-OF-FILE", "OFF-DIFF-LINE", "STALE-SUGGESTION", "SUGGESTION-IN-GROUP",
     "PARTITION", "PENDING-EXISTS",
     "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "MISMATCH", "MISPLACED",
-    "NO-STATE", "SETTLING", "MOVED-MID-RUN",
+    "NO-STATE", "SETTLING", "MOVED-MID-RUN", "DRY-RUN",
 )
 
 TOKEN_VAR = "AZURE_DEVOPS_EXT_PAT"
@@ -1234,8 +1234,9 @@ def run(args, workdir, outcome, started):
     forge, head, record = preflight(manifest, args, transport)
     if args.dry_run:
         forge.plan(head)
-        print("dry run: nothing was posted")
-        return "LANDED"
+        print("DRY-RUN every check passed and nothing was posted; the lines above are the creates a "
+              "run would make")
+        return "DRY-RUN"
     keys = [w.key for w in forge.units(head)]
     if record is None:
         record = Record(record_path(manifest.findings_file), {
