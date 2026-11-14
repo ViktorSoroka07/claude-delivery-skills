@@ -31,7 +31,7 @@ EXPECTED_VOCAB = [
     "POSTED-UNKNOWN", "UNFINISHED-RUN", "NO-TOKEN", "AUTH-REFUSED", "STALE-HEAD", "MISSING-COMMIT",
     "OUT-OF-DIFF", "LINE-OUT-OF-FILE", "OFF-DIFF-LINE", "STALE-SUGGESTION", "SUGGESTION-IN-GROUP",
     "PARTITION", "PENDING-EXISTS", "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING",
-    "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING",
+    "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING", "MOVED-MID-RUN",
 ]
 
 HOSTILE_GIT_CONFIG = """\
@@ -459,6 +459,13 @@ def exact_duplicate_keys_are_refused(r):
 
 
 @test
+def malformed_verified_head_is_refused(r):
+    fx = Fixture("github")
+    fx.manifest["verified_head"] = Template.moved[:7]
+    refused(r, fx, "MANIFEST-INVALID", "a verified_head shorter than a full SHA")
+
+
+@test
 def empty_thread_list_is_refused(r):
     refused(r, Fixture("github", threads=[]), "EMPTY", "an empty thread list")
 
@@ -522,6 +529,38 @@ def moved_forge_head_is_refused(r):
     fx = Fixture("ado")
     fx.model["head"] = Template.moved
     refused(r, fx, "STALE-HEAD", "a forge head moved past the local clone")
+
+
+def reviewed_sha_line(fx):
+    return next(row for row in fx.findings_now().split("\n") if row.startswith("reviewed_sha:"))
+
+
+@test
+def moved_head_posts_once_its_advice_is_followed(r):
+    for forge in ("github", "ado"):
+        fx = Fixture(forge, threads=[inline("M-1", 2, body=B1)])
+        fx.model["head"] = Template.moved
+        what = "a %s request whose author pushed after the review" % forge
+        run = refused(r, fx, "STALE-HEAD", what)
+        r.check("%s: the stop says to set verified_head and leave reviewed_sha" % what,
+                "set its verified_head to %s" % Template.moved in run.out
+                and "Leave reviewed_sha as it is" in run.out, run.out)
+        fx.manifest["verified_head"] = Template.moved
+        landed(r, "%s: with verified_head set as the stop says" % what, fx.run())
+        r.eq("%s: the findings file's reviewed_sha is unchanged" % what, reviewed_sha_line(fx),
+             "reviewed_sha: %s" % Template.head)
+        stamp = ("review_id: {0}, url: https://github.com/acme/tickets/pull/42#pullrequestreview-{0}"
+                 .format(fx.stored()["reviews"][0]["id"]) if forge == "github"
+                 else "threads: [%d]" % fx.stored()["threads"][0]["id"])
+        r.eq("%s: posted: records the head the post went out at" % what, posted_line(fx),
+             "posted: { at: T, form: default, %s, head: %s }" % (stamp, Template.moved[:7]))
+        if forge == "github":
+            r.eq("%s: the review is created at the new head" % what, payloads(fx)[0]["commit_id"],
+                 Template.moved)
+    staged = Fixture("github", threads=[inline("M-1", 2, body=B1)])
+    staged.model["head"] = staged.manifest["verified_head"] = Template.moved
+    staged.manifest["pending"] = True
+    landed(r, "a staged review re-verified at a new head", staged.run())
 
 
 @test
@@ -976,6 +1015,46 @@ def resume_without_a_record(r):
     fx = Fixture("ado")
     r.status("a resume with no record: the run stops NO-STATE", fx.run("--resume"), "NO-STATE")
     r.eq("a resume with no record: it makes no call", fx.calls(), [])
+
+
+@test
+def resume_after_the_head_moved_with_nothing_landed(r):
+    fx = Fixture("github", threads=[inline("M-1", 2, body=B1)])
+    fx.model["faults"]["lost_answer"] = {"nth": 1, "answer": 502, "lands": "never"}
+    fx.run()
+    fx.model["head"] = Template.moved
+    fx.age(SETTLE + 1)
+    what = "a resume after the author pushed, the lost review never landed"
+    r.status("%s: the resume stops STALE-HEAD" % what, fx.run("--resume"), "STALE-HEAD")
+    fx.manifest["verified_head"] = Template.moved
+    landed(r, "%s: with verified_head set as the stop says" % what, fx.run("--resume"))
+    r.eq("%s: the review is posted once, at the new head" % what,
+         (len(fx.stored()["reviews"]), payloads(fx)[-1]["commit_id"]), (1, Template.moved))
+    r.eq("%s: the record names the head the resume posted at" % what, fx.record()["head"], Template.moved)
+
+
+@test
+def resume_after_the_head_moved_with_threads_landed(r):
+    fx = Fixture("ado", threads=three_threads())
+    fx.model["faults"]["lost_answer"] = {"nth": 2, "answer": 502, "lands": "never"}
+    fx.run()
+    first = fx.stored()["threads"][0]["id"]
+    fx.model["head"] = fx.manifest["verified_head"] = Template.moved
+    fx.age(SETTLE + 1)
+    what = "a resume after the author pushed, one thread landed"
+    run = fx.run("--resume")
+    r.status("%s: the resume stops MOVED-MID-RUN" % what, run, "MOVED-MID-RUN")
+    r.eq("%s: it posts nothing at the new head" % what, len(fx.creates()), 2)
+    r.check("%s: the stop names what landed where" % what,
+            "M-1 landed at %s before the request moved to %s; M-2, M-3 did not"
+            % (Template.head[:7], Template.moved[:7]) in run.out, run.out)
+    fx.manifest["threads"] = fx.manifest["threads"][1:]
+    landed(r, "%s: the landed thread taken out, run again without --resume" % what, fx.run())
+    ids = [t["id"] for t in fx.stored()["threads"]]
+    r.eq("%s: the request holds each thread once" % what, len(ids), 3)
+    r.eq("%s: posted: records the second run at the new head" % what, posted_line(fx),
+         "posted: { at: T, form: default, threads: [%s], head: %s }"
+         % (", ".join(str(i) for i in ids if i != first), Template.moved[:7]))
 
 
 # --- task 5: correction and write-back -----------------------------------------

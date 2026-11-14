@@ -31,7 +31,7 @@ STATUSES = (
     "OUT-OF-DIFF", "LINE-OUT-OF-FILE", "OFF-DIFF-LINE", "STALE-SUGGESTION", "SUGGESTION-IN-GROUP",
     "PARTITION", "PENDING-EXISTS",
     "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "MISMATCH", "MISPLACED",
-    "NO-STATE", "SETTLING",
+    "NO-STATE", "SETTLING", "MOVED-MID-RUN",
 )
 
 TOKEN_VAR = "AZURE_DEVOPS_EXT_PAT"
@@ -46,7 +46,7 @@ SHA = re.compile(r"^[0-9a-f]{40}([0-9a-f]{24})?$")
 TAG = re.compile(r"<[A-Za-z][A-Za-z0-9]*>")
 HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
-TOP_FIELDS = {"schema", "forge", "repo", "request", "reviewed_sha", "form", "pending",
+TOP_FIELDS = {"schema", "forge", "repo", "request", "reviewed_sha", "verified_head", "form", "pending",
               "findings_file", "threads"}
 THREAD_FIELDS = {"key", "path", "line", "start_line", "body", "suggestion", "members"}
 SUGGESTION_FIELDS = {"start", "end", "original"}
@@ -54,6 +54,7 @@ MEMBER_FIELDS = {"path", "line"}
 
 CHILD_ENV = {k: v for k, v in os.environ.items() if k != TOKEN_VAR}
 FINISHED = ("LANDED", "CORRECTED")
+CLOSED = FINISHED + ("MOVED-MID-RUN",)
 LATEST_REVIEWS = ("query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, "
                   "name: $name) { pullRequest(number: $number) { latestReviews(first: 100) { nodes { "
                   "databaseId } } } } }")
@@ -95,6 +96,7 @@ class Manifest:
     repo: Tuple[str, ...]
     request: int
     reviewed_sha: str
+    verified_head: str
     form: str
     pending: bool
     findings_file: str
@@ -191,7 +193,7 @@ def load_manifest(path):
             raw = json.load(f)
     except (OSError, ValueError) as e:
         raise invalid("cannot read the manifest %s: %s" % (path, e)) from None
-    check_fields(raw, TOP_FIELDS, TOP_FIELDS - {"pending"}, "the manifest")
+    check_fields(raw, TOP_FIELDS, TOP_FIELDS - {"pending", "verified_head"}, "the manifest")
     if raw["schema"] != 1:
         raise invalid("schema %r: this script reads schema 1" % (raw["schema"],))
     forge = raw["forge"]
@@ -205,6 +207,9 @@ def load_manifest(path):
         raise invalid("request must be the request's number")
     if not isinstance(raw["reviewed_sha"], str) or not SHA.match(raw["reviewed_sha"]):
         raise invalid("reviewed_sha must be a full commit SHA")
+    verified_head = raw.get("verified_head", raw["reviewed_sha"])
+    if not isinstance(verified_head, str) or not SHA.match(verified_head):
+        raise invalid("verified_head must be a full commit SHA")
     if raw["form"] not in ("default", "compact"):
         raise invalid("form must be default or compact; a staged review sets pending: true")
     pending = raw.get("pending", False)
@@ -228,8 +233,8 @@ def load_manifest(path):
             raise invalid("the key %r appears twice; keys must be unique" % thread.key)
         keys.add(thread.key)
         threads.append(thread)
-    return Manifest(forge, repo, raw["request"], raw["reviewed_sha"], raw["form"], pending,
-                    findings, tuple(threads))
+    return Manifest(forge, repo, raw["request"], raw["reviewed_sha"], verified_head, raw["form"],
+                    pending, findings, tuple(threads))
 
 
 # --- the findings file and the run's record -----------------------------------
@@ -308,7 +313,7 @@ def check_postable(manifest, repost):
 def posted_record(manifest, forge, head):
     fields = [("at", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
               ("form", "pending" if manifest.pending else manifest.form)] + forge.posted()
-    if manifest.pending:
+    if manifest.pending or head.sha != manifest.reviewed_sha:
         fields.append(("head", head.sha[:7]))
     return "{ %s }" % ", ".join("%s: %s" % field for field in fields)
 
@@ -726,7 +731,7 @@ class GitHub:
                 comment["start_line"] = t.start_line
                 comment["start_side"] = "RIGHT"
             comments.append(comment)
-        payload = {"commit_id": self.m.reviewed_sha, "body": self.review_body(), "comments": comments}
+        payload = {"commit_id": self.m.verified_head, "body": self.review_body(), "comments": comments}
         if not self.m.pending:
             payload["event"] = "COMMENT"
         return payload
@@ -774,7 +779,7 @@ class GitHub:
                           (c.get("path"), c.get("position"), c.get("commit_id")), ("comment", c.get("id")))
                      for c in stored]
             wanted = [Wanted(t.key, t.body, (t.path, positions[t.path].get(t.line)),
-                             (t.path, positions[t.path].get(t.line), self.m.reviewed_sha))
+                             (t.path, positions[t.path].get(t.line), head.sha))
                       for t in inline]
         else:
             stored = [c for c in self.list(self.pulls + "/comments", "the request's comments")
@@ -995,7 +1000,7 @@ class Record:
         return any(e[0] == verb and e[1] == key for e in self.data["events"])
 
     def unfinished(self):
-        return self.data.get("status") not in FINISHED and any(
+        return self.data.get("status") not in CLOSED and any(
             e[0] in ("sending", "landed", "uncertain") for e in self.last_events().values())
 
     def in_doubt_since(self):
@@ -1010,9 +1015,14 @@ class Record:
 
 def check_head(manifest, forge):
     head, base = forge.head_and_base()
-    if head != manifest.reviewed_sha:
-        raise Stop("STALE-HEAD", "the request's head at the forge is %s, the review was made at %s; "
-                   "re-anchor the findings at the new head before posting" % (head, manifest.reviewed_sha))
+    if head != manifest.verified_head:
+        raise Stop("STALE-HEAD", "the request's head at the forge is %s, and the manifest's threads were "
+                   "verified at %s. Fetch it (git fetch origin), re-verify every thread at %s per "
+                   "posting-and-applying.md's \"Re-verify first\" (an anchor whose line moved follows "
+                   "it; a suggestion whose lines changed loses its block, its prose stays), update the "
+                   "manifest's threads, set its verified_head to %s and run again. Leave reviewed_sha "
+                   "as it is: it names the head the review covered"
+                   % (head, manifest.verified_head, head, head))
     for sha in (base, head):
         if not commit_present(sha):
             raise Stop("MISSING-COMMIT", "commit %s is not in this clone; run from the review's clone "
@@ -1160,6 +1170,26 @@ def reconcile(forge, head, record, keys):
     return [w.key for w in wanted if w.key not in pairs]
 
 
+def check_same_head(record, head, keys, todo):
+    """A run posts every thread at one head. A resume after the request moved goes on only
+    when nothing of the run is on the request; otherwise it stops and closes the run."""
+    if record.data["head"] == head.sha:
+        return
+    if len(todo) == len(keys):
+        record.data["head"] = head.sha
+        record.save()
+        return
+    on_request = [key for key in keys if key not in todo]
+    raise Stop("MOVED-MID-RUN", "%s landed at %s before the request moved to %s%s. A run posts at one "
+               "head, so this one is closed here. Tell the user which threads landed at which head. "
+               "To post the rest at %s, take the landed threads out of the manifest and run again "
+               "without --resume; if none is left, the post is complete at %s, and its posted: line, "
+               "with head: %s, is written by hand" % (
+                   ", ".join(on_request), record.data["head"][:7], head.sha[:7],
+                   "; %s did not" % ", ".join(todo) if todo else "", head.sha[:7],
+                   record.data["head"][:7], record.data["head"][:7]))
+
+
 def post(forge, head, record, keys, settle):
     for key in keys:
         if send(record, key, forge.create(key, head)):
@@ -1199,13 +1229,15 @@ def run(args, workdir, outcome, started):
     keys = [w.key for w in forge.units(head)]
     if record is None:
         record = Record(record_path(manifest.findings_file), {
-            "started": time.time(), "snapshot": forge.snapshot(), "events": [], "status": None})
+            "started": time.time(), "head": head.sha, "snapshot": forge.snapshot(), "events": [],
+            "status": None})
         record.save()
         started.append(record)
         todo = keys
     else:
         started.append(record)
         todo = reconcile(forge, head, record, keys)
+        check_same_head(record, head, keys, todo)
         print("resuming: %d of %d already on the request; posting %s" % (
             len(keys) - len(todo), len(keys), ", ".join(todo) or "nothing"))
     post(forge, head, record, todo, args.settle)

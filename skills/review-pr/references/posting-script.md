@@ -4,7 +4,7 @@
 
 What the script does, so the session does not do it again:
 
-- **Before any create, it refuses** a request whose head moved past `reviewed_sha`, an anchor on a file outside the diff, a line past the end of its file, a GitHub anchor off a changed line, a suggestion whose lines changed since the review, a suggestion block in a multi-member compact thread, a compact thread at request level whose members sit in the diff, and a findings file already posted.
+- **Before any create, it refuses** a request whose head moved past the head its threads were verified at, an anchor on a file outside the diff, a line past the end of its file, a GitHub anchor off a changed line, a suggestion whose lines changed since the review, a suggestion block in a multi-member compact thread, a compact thread at request level whose members sit in the diff, and a findings file already posted.
 - **It posts and reads every thread back:** one review on GitHub, one thread at a time on Azure DevOps. Placement is compared, and so is the whole body, byte for byte, against the string it sent. A body the forge stored altered is put back in place once, and the read after that decides.
 - **A create whose answer was lost** (a 5xx, a timeout) is read back from the request, never retried.
 - **It writes the findings file's frontmatter `posted:`** after a clean read-back, and no other byte of that file.
@@ -34,6 +34,7 @@ Write it as JSON under `$TMPDIR`, never in the clone:
 ```
 
 - `forge` is `github` or `ado`. `repo`, `request` and `reviewed_sha` are the findings file's `repo`, `pr` and `reviewed_sha`; the script refuses a findings file whose `pr` or `reviewed_sha` differs.
+- `verified_head`, only after a `STALE-HEAD` stop: the head the threads were re-verified at. Absent, it is `reviewed_sha`.
 - `form` is `default` or `compact`; `"pending": true` stages the review (GitHub only).
 - One thread per posted thread, built by the rules of `posting-and-applying.md` and the platform reference: grouping, compact assembly, held open questions, relocated anchors, the GitHub review body's one exception. `key` is unique: the finding's id, or the compact table's row.
 - `path: null` is a request-level thread; on GitHub these become the review's body, joined in manifest order.
@@ -60,7 +61,8 @@ Nothing was created by a stop before the post, so fix the cause and run the same
 | `ALREADY-POSTED` | The review went out already. `--repost` only when the user wants it out a second time; the result's `replaced` holds the earlier record, which you move into the file's body. |
 | `POSTED-UNKNOWN` | Read the findings file's body for a record of a post; with none, `--repost`. |
 | `NO-TOKEN`, `AUTH-REFUSED` | Tell the user the forge needs a credential (`gh auth status`, or `AZURE_DEVOPS_EXT_PAT`); never ask for the token itself. |
-| `STALE-HEAD`, `MISSING-COMMIT` | The author pushed, or the clone lacks a commit: fetch as the message names, and re-verify at the head per `posting-and-applying.md` before posting. |
+| `STALE-HEAD` | The author pushed after the review. `git fetch origin <branch>`, re-verify every thread at the new head per `posting-and-applying.md`'s "Re-verify first" (an anchor follows its line; a suggestion whose lines changed loses its block, its prose stays), update the manifest's threads, set its `verified_head` to the head the message names, and run again. Never change `reviewed_sha`, in the manifest or the findings file: it names the head the review covered, and the next review round starts from it. |
+| `MISSING-COMMIT` | The clone lacks a commit: fetch as the message names, and run again. |
 | `OUT-OF-DIFF` | Move the thread to request level with its `file:line` in the prose. |
 | `LINE-OUT-OF-FILE`, `OFF-DIFF-LINE` | Re-anchor per the platform reference's anchor rules. |
 | `STALE-SUGGESTION` | Drop the block and its `suggestion`; the prose fix stays. |
@@ -78,7 +80,8 @@ After a create the script keeps a record, so **a plain re-run of the same manife
 | `UNVERIFIED` | A read failed; any thread created before it is listed as landed. `--resume` reads again, and answers `NO-STATE` when nothing was sent. |
 | `MISSING`, `MISMATCH`, `MISPLACED` | A thread is absent, its text still differs after the one correction (the diff is printed), or it sits elsewhere than sent. Report it to the user with the script's lines; moving or re-posting is theirs to decide. |
 | `NO-STATE` | `--resume` found no unfinished run: run without it. |
+| `MOVED-MID-RUN` | The author pushed after some threads landed. The run is closed and nothing was posted at the new head. Tell the user which threads landed at which head. To post the rest, take the landed threads out of the manifest and run without `--resume`, then add the first run's ids, printed as landed before the stop, to the findings file's body. If no thread is left, the post is complete at the old head: write its `posted:` line by hand, with `head:` that head. |
 
 ## After a clean run
 
-`posted:` is written; do not write it again. Bring the findings file's prose into line with what was posted, as `posting-and-applying.md` requires, and record each correction from `result.json`. A `note:` line (a GitHub review missing from the request's latest reviews) goes to the user.
+`posted:` is written, with `head:` where the post went out at a head other than `reviewed_sha`; do not write it again. Bring the findings file's prose into line with what was posted, as `posting-and-applying.md` requires, and record each correction from `result.json`. A `note:` line (a GitHub review missing from the request's latest reviews) goes to the user.
