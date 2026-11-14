@@ -11,6 +11,7 @@ import argparse
 import difflib
 import functools
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -260,7 +261,8 @@ def posted_value(text):
     for i, line in enumerate(fields):
         if line.startswith("posted:"):
             value = [line[len("posted:"):].strip()]
-            value += [more.strip() for more in fields[i + 1:] if more[:1] in (" ", "\t")]
+            value += [more.strip() for more in itertools.takewhile(
+                lambda more: more[:1] in (" ", "\t"), fields[i + 1:])]
             return " ".join(value)
     return None
 
@@ -300,6 +302,34 @@ def check_postable(manifest, repost):
                    "run again with --repost")
     raise Stop("ALREADY-POSTED", "posted: already records a post (%s); run again with --repost "
                "only if this review is to go out a second time" % value)
+
+
+def posted_record(manifest, forge, head):
+    fields = [("at", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
+              ("form", "pending" if manifest.pending else manifest.form)] + forge.posted()
+    if manifest.pending:
+        fields.append(("head", head.sha[:7]))
+    return "{ %s }" % ", ".join("%s: %s" % field for field in fields)
+
+
+def write_posted(path, value):
+    """Replace the frontmatter's posted: value and its continuation lines, leaving every other
+    byte of the file as it was; returns the text replaced."""
+    with open(path, encoding="utf-8", newline="") as f:
+        lines = f.read().splitlines(True)
+    end = next(i for i in range(1, len(lines)) if lines[i].rstrip() == "---")
+    start = next(i for i in range(1, end) if lines[i].startswith("posted:"))
+    stop = start + 1
+    while stop < end and lines[stop][:1] in (" ", "\t"):
+        stop += 1
+    replaced = "".join(lines[start:stop])
+    ending = lines[start][len(lines[start].rstrip("\r\n")):]
+    lines[start:stop] = ["posted: %s%s" % (value, ending)]
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="") as f:
+        f.write("".join(lines))
+    os.replace(tmp, path)
+    return replaced
 
 
 # --- git ---------------------------------------------------------------------
@@ -517,6 +547,8 @@ class Item:
     body: str
     anchor: tuple
     place: object
+    ref: object = None
+    url: str = ""
 
 
 @dataclass
@@ -583,16 +615,20 @@ class Outcome:
         self.rows = []
         self.diffs = []
         self.notes = []
+        self.replaced = None
 
-    def judge(self, wanted, item, where):
+    def judge(self, wanted, item, where, before=None):
+        """Judge one thread as read back; `before` is the body a correction replaced, if any."""
         status = verdict(wanted.body, item.body, wanted.place, item.place)
         row = {"key": wanted.key, "id": item.id, "anchor": where, "status": status}
+        if status == "LANDED" and before is not None:
+            row.update(status="CORRECTED", before=before, after=item.body)
         self.rows.append(row)
         if status == "MISMATCH":
             self.diffs.append("".join(difflib.unified_diff(
                 wanted.body.splitlines(True), item.body.splitlines(True),
                 "%s as sent" % wanted.key, "%s as stored" % wanted.key)))
-        print("%s %s %s %s" % (status, wanted.key, item.id, where))
+        print("%s %s %s %s" % (row["status"], wanted.key, item.id, where))
 
     def finish(self):
         statuses = {row["status"] for row in self.rows}
@@ -602,7 +638,7 @@ class Outcome:
                 raise Stop(status, "%s did not read back as sent: %s" % (
                     "the stored text of" if status == "MISMATCH" else "the placement of",
                     ", ".join(keys)), "\n".join(self.diffs))
-        return "LANDED"
+        return "CORRECTED" if "CORRECTED" in statuses else "LANDED"
 
 
 def label(path, line):
@@ -710,7 +746,8 @@ class GitHub:
                                  write_payload(self.t, self.payload()))
 
     def review_item(self, review):
-        return Item(review.get("id"), review.get("body") or "", (), None)
+        return Item(review.get("id"), review.get("body") or "", (), None, ("review", review.get("id")),
+                    review.get("html_url") or "")
 
     def review_by_id(self, review_id):
         data, _ = read(functools.partial(self.t.gh, "GET", "%s/reviews/%s" % (self.pulls, review_id)),
@@ -733,7 +770,7 @@ class GitHub:
             stored = self.list("%s/reviews/%s/comments" % (self.pulls, self.review.id),
                                "the staged review's comments")
             items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("position")),
-                          (c.get("path"), c.get("position"), c.get("commit_id")))
+                          (c.get("path"), c.get("position"), c.get("commit_id")), ("comment", c.get("id")))
                      for c in stored]
             wanted = [Wanted(t.key, t.body, (t.path, positions[t.path].get(t.line)),
                              (t.path, positions[t.path].get(t.line), self.m.reviewed_sha))
@@ -742,12 +779,27 @@ class GitHub:
             stored = [c for c in self.list(self.pulls + "/comments", "the request's comments")
                       if c.get("pull_request_review_id") == self.review.id]
             items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("line")),
-                          (c.get("path"), c.get("line"), c.get("start_line"), c.get("side")))
+                          (c.get("path"), c.get("line"), c.get("start_line"), c.get("side")),
+                          ("comment", c.get("id")))
                      for c in stored]
             wanted = [Wanted(t.key, t.body, (t.path, t.line), (t.path, t.line, t.start_line, "RIGHT"))
                       for t in inline]
         pairs = require(pair(wanted, items, {}), wanted)
         return rows + [(w, pairs[w.key], label(t.path, t.line)) for w, t in zip(wanted, inline)]
+
+    def correct(self, item, body):
+        """Put the sent body back in place; None where nothing may be edited."""
+        if self.m.pending:
+            return None
+        kind, target = item.ref
+        if kind == "review":
+            method, path = "PUT", "%s/reviews/%s" % (self.pulls, target)
+        else:
+            method, path = "PATCH", "repos/%s/%s/pulls/comments/%s" % (self.m.repo + (target,))
+        return self.t.gh(method, path, write_payload(self.t, {"body": body}))
+
+    def posted(self):
+        return [("review_id", self.review.id), ("url", self.review.url)]
 
     def notes(self, record):
         """A review whose create lost its answer may exist yet be missing from latestReviews."""
@@ -798,6 +850,7 @@ class Ado:
             self.org, project, repo, manifest.request)
         self.threads_url = "%s/threads?%s" % (self.pull, ADO_API)
         self.user_id = None
+        self.ids = []
 
     def head_and_base(self):
         data, _ = read(functools.partial(self.t.curl, "GET", "%s?%s" % (self.pull, ADO_API)),
@@ -855,7 +908,8 @@ class Ado:
         anchor = ((context.get("filePath") or "").lstrip("/"),
                   (context.get("rightFileStart") or {}).get("line")) if context else (None, None)
         return Item(thread.get("id"), comment.get("content"), anchor,
-                    (bool(thread.get("isDeleted")), thread.get("status"), context_fields(context)))
+                    (bool(thread.get("isDeleted")), thread.get("status"), context_fields(context)),
+                    (thread.get("id"), comment.get("id")))
 
     def thread_by_id(self, thread_id):
         url = "%s/threads/%s?%s" % (self.pull, thread_id, ADO_API)
@@ -872,7 +926,16 @@ class Ado:
     def read_back(self, head, record):
         wanted = self.units(head)
         pairs = require(pair(wanted, self.new_items(record), record.landed_ids()), wanted)
+        self.ids = [pairs[w.key].id for w in wanted]
         return [(w, pairs[w.key], label(t.path, t.line)) for w, t in zip(wanted, self.m.threads)]
+
+    def correct(self, item, body):
+        thread_id, comment_id = item.ref
+        url = "%s/threads/%s/comments/%s?%s" % (self.pull, thread_id, comment_id, ADO_API)
+        return self.t.curl("PATCH", url, write_payload(self.t, {"content": body}))
+
+    def posted(self):
+        return [("threads", "[%s]" % ", ".join(str(i) for i in self.ids))]
 
     def notes(self, record):
         return []
@@ -1109,6 +1172,21 @@ def post(forge, head, record, keys, settle):
                        % (", ".join(absent), settle))
 
 
+def verify(forge, head, record, outcome):
+    """Read every thread back, put a stored body that differs from the one sent back in place
+    once, and judge each thread by the read that follows the correction."""
+    rows = forge.read_back(head, record)
+    replaced = {}
+    for wanted, item, _ in rows:
+        if item.ref not in replaced and verdict(wanted.body, item.body, None, None) == "MISMATCH":
+            if forge.correct(item, wanted.body) is not None:
+                replaced[item.ref] = item.body
+    if replaced:
+        rows = forge.read_back(head, record)
+    for wanted, item, where in rows:
+        outcome.judge(wanted, item, where, replaced.get(item.ref))
+
+
 def run(args, workdir, outcome, started):
     manifest = load_manifest(args.manifest)
     transport = Transport(workdir, args.timeout, os.environ.get(TOKEN_VAR, ""))
@@ -1130,15 +1208,18 @@ def run(args, workdir, outcome, started):
         print("resuming: %d of %d already on the request; posting %s" % (
             len(keys) - len(todo), len(keys), ", ".join(todo) or "nothing"))
     post(forge, head, record, todo, args.settle)
-    for wanted, item, where in forge.read_back(head, record):
-        outcome.judge(wanted, item, where)
+    verify(forge, head, record, outcome)
     status = outcome.finish()
     for note in forge.notes(record):
         print("note: " + note)
         outcome.notes.append(note)
+    replaced = write_posted(manifest.findings_file, posted_record(manifest, forge, head))
+    if args.repost:
+        outcome.replaced = replaced
     record.data["status"] = status
     record.save()
-    print("%s %d threads posted and read back as sent" % (status, len(manifest.threads)))
+    print("%s %d threads posted and read back as sent%s; posted: written" % (
+        status, len(manifest.threads), ", some after a correction" if status == "CORRECTED" else ""))
     return status
 
 
@@ -1165,7 +1246,10 @@ def main(argv):
         print("%s %s" % (stop.status, stop.message))
         rc = 1
     with open(os.path.join(workdir, "result.json"), "w", encoding="utf-8") as f:
-        json.dump({"status": status, "threads": outcome.rows, "notes": outcome.notes}, f, indent=1)
+        result = {"status": status, "threads": outcome.rows, "notes": outcome.notes}
+        if outcome.replaced is not None:
+            result["replaced"] = outcome.replaced
+        json.dump(result, f, indent=1)
     print(workdir)
     return rc
 

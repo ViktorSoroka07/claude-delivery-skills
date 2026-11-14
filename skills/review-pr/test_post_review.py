@@ -10,6 +10,7 @@ import concurrent.futures
 import glob
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -34,7 +35,7 @@ EXPECTED_VOCAB = [
 # Statuses whose fixtures belong to a later task of the build plan. Each task
 # that adds a status's fixture removes it here; the set is empty once the
 # script is complete, and from then on any status without a fixture fails.
-OWED_BY_LATER_TASKS = {"CORRECTED"}
+OWED_BY_LATER_TASKS = set()
 
 HOSTILE_GIT_CONFIG = """\
 [color]
@@ -132,7 +133,8 @@ def default_model(forge, clone):
 
 
 class Fixture:
-    def __init__(self, forge="github", threads=None, posted="posted: null", token=SENTINEL, review=None):
+    def __init__(self, forge="github", threads=None, posted="posted: null", token=SENTINEL, review=None,
+                 findings_text=None):
         self.forge = forge
         self.root = tempfile.mkdtemp(prefix="post-review-test-")
         CREATED.append(self.root)
@@ -150,7 +152,7 @@ class Fixture:
         review = dict({"pr": "42", "reviewed_sha": Template.head}, **(review or {}))
         keys = "".join("%s: %s\n" % kv for kv in review.items() if kv[1] is not None)
         frontmatter = "---\nrepo: x\n%s%s\n---\n" % (keys, posted) if posted is not None else ""
-        self.findings_text = frontmatter + "# Review of request 42\n\nFindings.\n"
+        self.findings_text = findings_text or frontmatter + "# Review of request 42\n\nFindings.\n"
         write(self.findings, self.findings_text)
         self.model = default_model(forge, self.clone)
         repo_key = ("github.com/acme/tickets" if forge == "github"
@@ -233,6 +235,13 @@ class Fixture:
 
     def record_events_for(self, key):
         return [e for e in self.events() if e[1] == key]
+
+    def result(self, run):
+        with open(os.path.join(run.out.strip().split("\n")[-1], "result.json"), encoding="utf-8") as f:
+            return json.load(f)
+
+    def edits(self):
+        return [c for c in self.calls() if any(m in c["argv"] for m in ("PATCH", "PUT"))]
 
     def findings_now(self):
         with open(self.findings, encoding="utf-8", newline="") as f:
@@ -771,11 +780,14 @@ def keys_differing_only_in_case(r):
 @test
 def sanitized_body_stops_mismatch(r):
     fx = Fixture("ado", threads=[inline("M-1", 2, body="Problem: <Id> is dropped.\n")])
-    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    fx.model["faults"]["mangle"] = {"kind": "tags", "patch": True}
     run = fx.run()
-    r.status("a sanitizer dropping <Id> on ADO: the run stops MISMATCH", run, "MISMATCH")
-    r.check("a sanitizer dropping <Id> on ADO: the stop prints the diff",
+    what = "a sanitizer dropping <Id> again after the PATCH"
+    r.status("%s: the run stops MISMATCH" % what, run, "MISMATCH")
+    r.check("%s: the stop prints the diff" % what,
             "-Problem: <Id> is dropped." in run.out and "+Problem:  is dropped." in run.out, run.out)
+    r.eq("%s: it is corrected once" % what, len(fx.edits()), 1)
+    r.eq("%s: posted: stays unwritten" % what, fx.findings_now(), fx.findings_text)
 
 
 @test
@@ -786,6 +798,8 @@ def misreported_line_stops_misplaced(r):
     gh = Fixture("github")
     gh.model["faults"]["misreport_line"] = {"nth": 1}
     r.status("a GitHub read-back reporting another line: the run stops MISPLACED", gh.run(), "MISPLACED")
+    r.eq("a read-back reporting another line: nothing is moved", ado.edits() + gh.edits(), [])
+    r.eq("a read-back reporting another line: posted: stays unwritten", ado.findings_now(), ado.findings_text)
 
 
 # --- task 4: lost answers, resume and the settle window ------------------------
@@ -876,7 +890,7 @@ def late_landing_of_an_earlier_draft(r):
     run = fx.run("--resume")
     r.eq("%s: the resume pairs it by anchor rather than posting again" % what,
          (len(fx.creates()), len(fx.stored()["threads"])), (1, 1))
-    r.status("%s: the resume stops MISMATCH" % what, run, "MISMATCH")
+    r.status("%s: the resume corrects the draft in place" % what, run, "CORRECTED")
 
 
 @test
@@ -961,6 +975,141 @@ def resume_without_a_record(r):
     fx = Fixture("ado")
     r.status("a resume with no record: the run stops NO-STATE", fx.run("--resume"), "NO-STATE")
     r.eq("a resume with no record: it makes no call", fx.calls(), [])
+
+
+# --- task 5: correction and write-back -----------------------------------------
+
+
+TAGGED = "Problem: <Id> is dropped.\n"
+STAMP = re.compile(r"at: \d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ, ")
+
+
+def posted_line(fx):
+    """The findings file's posted: line with its time replaced by T, or None if the time is malformed."""
+    line = next(row for row in fx.findings_now().split("\n") if row.startswith("posted:"))
+    return STAMP.sub("at: T, ", line) if STAMP.search(line) else line
+
+
+def corrected(r, what, fx, run):
+    r.status("%s: the run corrects it in place" % what, run, "CORRECTED")
+    r.eq("%s: the run exits 0" % what, run.rc, 0)
+
+
+@test
+def sanitized_body_corrected_on_ado(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body=TAGGED)])
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    run = fx.run()
+    what = "a sanitizer dropping <Id> on ADO once"
+    corrected(r, what, fx, run)
+    r.eq("%s: the stored body is the one sent" % what, fx.stored()["threads"][0]["content"], TAGGED)
+    r.eq("%s: the result records the correction" % what,
+         [(row["status"], row["before"], row["after"]) for row in fx.result(run)["threads"]],
+         [("CORRECTED", "Problem:  is dropped.\n", TAGGED)])
+
+
+@test
+def sanitized_bodies_corrected_on_github(r):
+    fx = Fixture("github", threads=[inline("M-1", 2, body=TAGGED),
+                                    {"key": "R-1", "path": None, "body": "Request: <Id> too.\n"}])
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    run = fx.run()
+    what = "a sanitizer dropping <Id> from a GitHub comment and the review body"
+    corrected(r, what, fx, run)
+    stored = fx.stored()
+    r.eq("%s: both bodies are stored as sent" % what,
+         (stored["comments"][0]["body"], stored["reviews"][0]["body"]), (TAGGED, "Request: <Id> too.\n"))
+    r.eq("%s: one PATCH and one PUT" % what, sorted(c["argv"][3] for c in fx.edits()), ["PATCH", "PUT"])
+
+
+@test
+def sanitized_pending_review_is_not_edited(r):
+    fx = Fixture("github", threads=[inline("M-1", 2, body=TAGGED)])
+    fx.manifest["pending"] = True
+    fx.model["faults"]["mangle"] = {"kind": "tags"}
+    run = fx.run()
+    what = "a staged review with a sanitized body"
+    r.status("%s: the run stops MISMATCH" % what, run, "MISMATCH")
+    r.eq("%s: no PATCH reached the stand-in" % what, fx.edits(), [])
+
+
+@test
+def bodies_differing_at_their_end(r):
+    for kind, body, what in (("final_char", "Problem: off by one.", "a body differing only in its final character"),
+                             ("final_newline", B1, "a body that lost its trailing newline")):
+        fx = Fixture("ado", threads=[inline("M-1", 2, body=body)])
+        fx.model["faults"]["mangle"] = {"kind": kind}
+        corrected(r, what, fx, fx.run())
+        r.eq("%s: the stored body is the one sent" % what, fx.stored()["threads"][0]["content"], body)
+
+
+@test
+def written_posted_values(r):
+    gh = Fixture("github", threads=standard_threads())
+    landed(r, "a GitHub post's write-back", gh.run())
+    review = gh.stored()["reviews"][0]["id"]
+    r.eq("a GitHub post's write-back: posted: holds the review's id and link", posted_line(gh),
+         "posted: { at: T, form: default, review_id: %d, url: "
+         "https://github.com/acme/tickets/pull/42#pullrequestreview-%d }" % (review, review))
+    staged = Fixture("github", threads=[inline("M-1", 2, body=B1)])
+    staged.manifest["pending"] = True
+    landed(r, "a staged GitHub review's write-back", staged.run())
+    review = staged.stored()["reviews"][0]["id"]
+    r.eq("a staged GitHub review's write-back: posted: holds the review and the staged head",
+         posted_line(staged), "posted: { at: T, form: pending, review_id: %d, url: "
+         "https://github.com/acme/tickets/pull/42#pullrequestreview-%d, head: %s }"
+         % (review, review, Template.head[:7]))
+    ado = Fixture("ado", threads=standard_threads())
+    ado.manifest["form"] = "compact"
+    landed(r, "a compact ADO post's write-back", ado.run())
+    r.eq("a compact ADO post's write-back: posted: holds every thread's id", posted_line(ado),
+         "posted: { at: T, form: compact, threads: [%s] }"
+         % ", ".join(str(t["id"]) for t in ado.stored()["threads"]))
+
+
+FRONTMATTER_AROUND = """---
+repo: %s/acme/field ops/tickets      # the folder key
+pr: 42                             # null for a branch review
+reviewed_sha: %s
+posted: null
+extra:
+  - kept as it was
+---
+# Review of request 42\r
+\r
+Body lines keep their CRLF.\r
+"""
+
+
+@test
+def write_back_changes_only_the_posted_value(r):
+    text = FRONTMATTER_AROUND % (ADO_HOST, Template.head)
+    fx = Fixture("ado", findings_text=text)
+    what = "the write-back"
+    landed(r, "a findings file whose posted: is not its last key", fx.run())
+    thread = fx.stored()["threads"][0]["id"]
+    r.eq("%s: every byte outside posted: is unchanged" % what, STAMP.sub("at: T, ", fx.findings_now()),
+         text.replace("posted: null\n",
+                      "posted: { at: T, form: default, threads: [%d] }\n" % thread))
+
+
+@test
+def repost_over_earlier_values(r):
+    record = "posted: { at: T, form: default,\n    threads: [11, 12] }"
+    fx = Fixture("ado", posted=record)
+    run = fx.run("--repost")
+    what = "--repost over a value running over several lines"
+    landed(r, what, run)
+    thread = fx.stored()["threads"][0]["id"]
+    r.eq("%s: the file reads as the literal" % what, STAMP.sub("at: T, ", fx.findings_now()),
+         fx.findings_text.replace(record, "posted: { at: T, form: default, threads: [%d] }" % thread))
+    r.eq("%s: the result carries the value replaced" % what, fx.result(run)["replaced"], record + "\n")
+    placeholder = 'posted: "before migration - any record of it is in the body"'
+    old = Fixture("ado", posted=placeholder)
+    run = old.run("--repost")
+    landed(r, "--repost over the placeholder", run)
+    r.eq("--repost over the placeholder: the result carries the placeholder",
+         old.result(run)["replaced"], placeholder + "\n")
 
 
 # --- the vocabulary ----------------------------------------------------------
