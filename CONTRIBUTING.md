@@ -1222,6 +1222,10 @@ under it does. So each runs at these points, and is not rerun between them:
 - **Before a push:** the gates (`CLAUDE.md`'s Gates section) and every whole
   sweep, once.
 
+git-sync's `matrix.sh`, its suite rerun under several global git
+configurations, is owed before a push beside the sweeps, and per change where
+the change touches how the script reads git configuration.
+
 A sweep never runs beside another suite run, for the reason each
 `MAINTAINING.md` gives, and `scripts/test-hooks.sh` runs alone as well: its
 budget rows time a hook against the machine's load, and a row that reads
