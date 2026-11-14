@@ -4,6 +4,7 @@
 Run from the clone the review was made in:
 
     post-review.py <manifest.json> [--resume] [--repost] [--settle N] [--timeout N] [--dry-run]
+                   [--ignore-item ID ...]
     post-review.py --print-status-vocab
 """
 
