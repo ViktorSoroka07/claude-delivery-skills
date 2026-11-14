@@ -1,7 +1,7 @@
 ---
 name: git-sync
 description: Use when asked to fetch, sync, refresh or update the git repos in a folder rather than one at a time — "sync all my repos", "fetch everything under this directory", "which of these clones are behind", "bring my checkouts up to date" — and when surveying what has moved across many clones before starting work. Runs a bundled script; the judgement is in reading its output, not in doing the git work by hand.
-argument-hint: "[folder | repo] [--dry-run] [--fetch-only] [--ask]"
+argument-hint: "[folder | repo] [--dry-run] [--fetch-only] [--ask] [--prune]"
 license: MIT
 ---
 
@@ -31,8 +31,9 @@ Flags: `--dry-run` (report only), `--fetch-only` (move no local branch),
 `--prune` deletes local branches, so pass it only when the user asks to clear
 out stale branches, such as the copies left by checking a request out to
 review it, and never on a plain sync: it removes each branch whose tip is
-already on its origin upstream or on origin's default branch, with the clean
-worktrees on those, so a branch just created goes too. Relay each `PRUNED`
+already on its origin upstream or on origin's default branch, with the
+worktrees on those that hold no change and no ignored file, so a branch just
+created goes too. Relay each `PRUNED`
 row's restore command and each `KEPT` row's reason to the user.
 
 **Target resolution.** A directory containing `.git` is treated as that one
@@ -84,6 +85,9 @@ do" on every repo that uses the other.
 | `NO-BRANCH` | No local branch matching the remote's default | nothing automatic |
 | `FETCH-FAIL` | Remote unreachable or auth failed | check network or credentials |
 | `WOULD-UPDATE` | `--dry-run` only | rerun without `--dry-run` |
+| `PRUNED` | `--prune` only: the branch's tip is on origin, so it was deleted, with any worktree on it | relay the row's restore command |
+| `WOULD-PRUNE` | `--prune` with `--dry-run` or `--fetch-only`: the branch would be deleted | rerun without them to delete |
+| `KEPT` | `--prune` only: a branch, or a detached worktree, left for the reason the row gives | relay the reason and the row's command; never run it for them |
 
 Exit `1` when any repo is `FETCH-FAIL`, `DIVERGED`, `CONFLICT` or `BLOCKED`.
 
