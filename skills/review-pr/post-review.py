@@ -8,7 +8,9 @@ Run from the clone the review was made in:
 """
 
 import argparse
+import difflib
 import functools
+import hashlib
 import json
 import os
 import re
@@ -433,6 +435,150 @@ def dig(data, what, *keys):
     return data
 
 
+# --- posting and reading back ------------------------------------------------
+
+
+def classify_create(reply):
+    if reply.status is None or reply.status >= 500 or reply.status == 203:
+        return "uncertain"
+    if 200 <= reply.status < 300:
+        return "landed" if "json" in reply.content_type else "uncertain"
+    return "rejected"
+
+
+def forge_message(reply):
+    data = parse_reply(reply.body)
+    message = data.get("message") if isinstance(data, dict) else None
+    return (message or reply.body.strip() or reply.describe())[:300]
+
+
+def send(record, key, create: Callable[[], Reply]):
+    """Run one create, recording it before and after; returns the id the forge gave, if readable."""
+    record.event("sending", key)
+    reply = create()
+    outcome = classify_create(reply)
+    if outcome == "landed":
+        data = parse_reply(reply.body)
+        created = data.get("id") if isinstance(data, dict) else None
+        record.event("landed", key, created)
+        return created
+    if outcome == "rejected":
+        record.event("rejected", key, reply.status)
+        raise Stop("REJECTED", "the forge refused %s with %s: %s" % (key, reply.describe(),
+                                                                    forge_message(reply)))
+    record.event("uncertain", key, time.time())
+    raise Stop("UNCERTAIN", "%s on %s: it may have landed, so nothing is retried; read the request "
+               "before deciding" % (reply.describe(), key))
+
+
+@dataclass
+class Item:
+    """One item of the user's the read-back found: an ADO thread, a GitHub review or comment."""
+    id: object
+    body: str
+    anchor: tuple
+    place: object
+
+
+@dataclass
+class Wanted:
+    """What one manifest thread should have become."""
+    key: str
+    body: str
+    anchor: tuple
+    place: object
+
+
+def pair(wanted, items, known_ids):
+    """Pair each wanted thread with one item: by the id its create returned, then
+    by exact body, then by anchor; a match counts only when it is one-to-one."""
+    pairs = {}
+    free = list(items)
+    stages = (lambda w, i: known_ids.get(w.key) is not None and i.id == known_ids[w.key],
+              lambda w, i: i.body == w.body,
+              lambda w, i: i.anchor == w.anchor)
+    for same in stages:
+        open_threads = [w for w in wanted if w.key not in pairs]
+        hits = {w.key: [i for i in free if same(w, i)] for w in open_threads}
+        for w in open_threads:
+            if len(hits[w.key]) == 1:
+                item = hits[w.key][0]
+                if sum(any(x is item for x in h) for h in hits.values()) == 1:
+                    pairs[w.key] = item
+        free = [i for i in free if not any(i is p for p in pairs.values())]
+    if free:
+        raise Stop("UNCERTAIN", "the request holds new items of yours that pair with no thread "
+                   "(ids %s); something landed that this run cannot account for"
+                   % ", ".join(str(i.id) for i in free))
+    missing = [w.key for w in wanted if w.key not in pairs]
+    if missing:
+        raise Stop("MISSING", "the read-back does not show %s" % ", ".join(missing))
+    return pairs
+
+
+def verdict(body_sent, body_stored, place_sent, place_stored):
+    if body_stored != body_sent:
+        return "MISMATCH"
+    if place_stored != place_sent:
+        return "MISPLACED"
+    return "LANDED"
+
+
+class Outcome:
+    def __init__(self):
+        self.rows = []
+        self.diffs = []
+
+    def judge(self, wanted, item, label):
+        status = verdict(wanted.body, item.body, wanted.place, item.place)
+        self.rows.append({"key": wanted.key, "id": item.id, "anchor": label, "status": status})
+        if status == "MISMATCH":
+            self.diffs.append("".join(difflib.unified_diff(
+                wanted.body.splitlines(True), item.body.splitlines(True),
+                "%s as sent" % wanted.key, "%s as stored" % wanted.key)))
+        print("%s %s %s %s" % (status, wanted.key, item.id, label))
+
+    def finish(self):
+        statuses = {row["status"] for row in self.rows}
+        for status in ("MISMATCH", "MISPLACED"):
+            if status in statuses:
+                keys = [row["key"] for row in self.rows if row["status"] == status]
+                raise Stop(status, "%s did not read back as sent: %s" % (
+                    "the stored text of" if status == "MISMATCH" else "the placement of",
+                    ", ".join(keys)), "\n".join(self.diffs))
+
+
+def label(path, line):
+    return "%s:%s" % (path, line) if path else "request-level"
+
+
+def diff_positions(head, path):
+    """{right-side line: position} in the file's unified diff, git's default
+    three lines of context, counted from the line under the first hunk header."""
+    diff = git("diff", "-U3", "--no-color", "--no-ext-diff", head.merge_base, head.sha, "--", path)
+    positions = {}
+    position = None
+    line = 0
+    for row in diff.decode("utf-8", "replace").split("\n"):
+        hunk = HUNK.match(row)
+        if hunk:
+            line = int(hunk.group(1))
+            position = 0 if position is None else position + 1
+        elif position is not None and row[:1] in ("+", " ", "-"):
+            position += 1
+            if row[:1] != "-":
+                positions[line] = position
+                line += 1
+    return positions
+
+
+def write_payload(transport, payload):
+    path = transport.workfile("payload")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False)
+    return path
+
+
 class GitHub:
     HINT = "check gh auth status"
 
@@ -440,14 +586,18 @@ class GitHub:
         self.m = manifest
         self.t = transport
         self.pulls = "repos/%s/%s/pulls/%d" % (manifest.repo + (manifest.request,))
+        self.login = None
 
     def head_and_base(self):
         data, _ = read(functools.partial(self.t.gh, "GET", self.pulls), "the request", self.HINT)
         return dig(data, "the request", "head", "sha"), dig(data, "the request", "base", "sha")
 
     def user(self):
-        data, _ = read(functools.partial(self.t.gh, "GET", "user"), "the authenticated user", self.HINT)
-        return dig(data, "the authenticated user", "login")
+        if self.login is None:
+            data, _ = read(functools.partial(self.t.gh, "GET", "user"), "the authenticated user",
+                           self.HINT)
+            self.login = dig(data, "the authenticated user", "login")
+        return self.login
 
     def list(self, path, what):
         items = []
@@ -465,6 +615,88 @@ class GitHub:
     def reviews(self):
         return self.list(self.pulls + "/reviews", "the request's reviews")
 
+    def my_reviews(self):
+        return [r for r in self.reviews() if (r.get("user") or {}).get("login") == self.user()]
+
+    def snapshot(self):
+        return [r.get("id") for r in self.my_reviews()]
+
+    def payload(self):
+        comments = []
+        for t in self.m.threads:
+            if t.path is None:
+                continue
+            comment = {"path": t.path, "line": t.line, "side": "RIGHT", "body": t.body}
+            if t.start_line:
+                comment["start_line"] = t.start_line
+                comment["start_side"] = "RIGHT"
+            comments.append(comment)
+        payload = {"commit_id": self.m.reviewed_sha, "body": self.review_body(), "comments": comments}
+        if not self.m.pending:
+            payload["event"] = "COMMENT"
+        return payload
+
+    def review_body(self):
+        return "\n\n".join(t.body for t in self.m.threads if t.path is None)
+
+    def plan(self, head):
+        print("would POST %s/reviews with %d inline comments%s" % (
+            self.pulls, len(self.payload()["comments"]), ", staged" if self.m.pending else ""))
+
+    def post(self, head, record):
+        send(record, "review", functools.partial(self.t.gh, "POST", self.pulls + "/reviews",
+                                                 write_payload(self.t, self.payload())))
+
+    def read_back(self, head, record, outcome):
+        new = [Item(r.get("id"), r.get("body") or "", (), None) for r in self.my_reviews()
+               if r.get("id") not in record.data["snapshot"]]
+        review = pair([Wanted("review", self.review_body(), (), None)], new,
+                      record.landed_ids())["review"]
+        for t in self.m.threads:
+            if t.path is None:
+                outcome.judge(Wanted(t.key, self.review_body(), (), None), review, label(None, None))
+        inline = [t for t in self.m.threads if t.path is not None]
+        if self.m.pending:
+            positions = {t.path: diff_positions(head, t.path) for t in inline}
+            stored = self.list("%s/reviews/%s/comments" % (self.pulls, review.id),
+                               "the staged review's comments")
+            items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("position")),
+                          (c.get("path"), c.get("position"), c.get("commit_id"))) for c in stored]
+            wanted = [Wanted(t.key, t.body, (t.path, positions[t.path].get(t.line)),
+                             (t.path, positions[t.path].get(t.line), self.m.reviewed_sha))
+                      for t in inline]
+        else:
+            stored = [c for c in self.list(self.pulls + "/comments", "the request's comments")
+                      if c.get("pull_request_review_id") == review.id]
+            items = [Item(c.get("id"), c.get("body"), (c.get("path"), c.get("line")),
+                          (c.get("path"), c.get("line"), c.get("start_line"), c.get("side")))
+                     for c in stored]
+            wanted = [Wanted(t.key, t.body, (t.path, t.line), (t.path, t.line, t.start_line, "RIGHT"))
+                      for t in inline]
+        pairs = pair(wanted, items, {})
+        for w, t in zip(wanted, inline):
+            outcome.judge(w, pairs[w.key], label(t.path, t.line))
+
+
+def ado_end_offset(raw_line):
+    """Apply replaces exactly the span, counted in UTF-16 units, with a CRLF terminator outside it."""
+    text = raw_line.decode("utf-8").rstrip("\r")
+    return len(text.encode("utf-16-le")) // 2 + 1
+
+
+def ado_context(t, head):
+    if t.path is None:
+        return None
+    end = ado_end_offset(head_lines(head, t.path)[t.line - 1]) if t.suggestion else 2
+    return {"filePath": "/" + t.path, "rightFileStart": {"line": t.first_line, "offset": 1},
+            "rightFileEnd": {"line": t.line, "offset": end}}
+
+
+def context_fields(context):
+    if not context:
+        return None
+    return {k: context.get(k) for k in ("filePath", "rightFileStart", "rightFileEnd")}
+
 
 class Ado:
     HINT = "set %s to a working token" % TOKEN_VAR
@@ -476,12 +708,122 @@ class Ado:
         self.org = "https://%s/%s" % (ADO_HOST, org)
         self.pull = "%s/%s/_apis/git/repositories/%s/pullRequests/%d" % (
             self.org, project, repo, manifest.request)
+        self.threads_url = "%s/threads?%s" % (self.pull, ADO_API)
+        self.user_id = None
 
     def head_and_base(self):
         data, _ = read(functools.partial(self.t.curl, "GET", "%s?%s" % (self.pull, ADO_API)),
                        "the request", self.HINT)
         return (dig(data, "the request", "lastMergeSourceCommit", "commitId"),
                 dig(data, "the request", "lastMergeTargetCommit", "commitId"))
+
+    def user(self):
+        if self.user_id is None:
+            data, _ = read(functools.partial(self.t.curl, "GET", self.org + "/_apis/connectionData"),
+                           "the authenticated user", self.HINT)
+            self.user_id = dig(data, "the authenticated user", "authenticatedUser", "id")
+        return self.user_id
+
+    def my_threads(self):
+        data, _ = read(functools.partial(self.t.curl, "GET", self.threads_url), "the request's threads",
+                       self.HINT)
+        mine = []
+        for thread in dig(data, "the request's threads", "value"):
+            comments = sorted(thread.get("comments") or [], key=lambda c: c.get("id", 0))
+            if comments and (comments[0].get("author") or {}).get("id") == self.user():
+                mine.append((thread, comments[0]))
+        return mine
+
+    def snapshot(self):
+        return [thread.get("id") for thread, _ in self.my_threads()]
+
+    def payload(self, t, head):
+        payload = {"comments": [{"parentCommentId": 0, "content": t.body, "commentType": 1}],
+                   "status": 1}
+        context = ado_context(t, head)
+        if context:
+            payload["threadContext"] = context
+        return payload
+
+    def plan(self, head):
+        for t in self.m.threads:
+            print("would POST %s for %s at %s" % (self.threads_url, t.key, label(t.path, t.line)))
+
+    def post(self, head, record):
+        for t in self.m.threads:
+            send(record, t.key, functools.partial(self.t.curl, "POST", self.threads_url,
+                                                  write_payload(self.t, self.payload(t, head))))
+
+    def read_back(self, head, record, outcome):
+        items = []
+        for thread, comment in self.my_threads():
+            if thread.get("id") in record.data["snapshot"]:
+                continue
+            context = thread.get("threadContext")
+            anchor = ((context.get("filePath") or "").lstrip("/"),
+                      (context.get("rightFileStart") or {}).get("line")) if context else (None, None)
+            items.append(Item(thread.get("id"), comment.get("content"), anchor,
+                              (bool(thread.get("isDeleted")), thread.get("status"),
+                               context_fields(context))))
+        wanted = [Wanted(t.key, t.body, (t.path, t.first_line),
+                         (False, "active", context_fields(ado_context(t, head))))
+                  for t in self.m.threads]
+        pairs = pair(wanted, items, record.landed_ids())
+        for w, t in zip(wanted, self.m.threads):
+            outcome.judge(w, pairs[w.key], label(t.path, t.line))
+
+
+# --- the run's record ---------------------------------------------------------
+
+
+def record_path(findings_file):
+    root = os.environ.get("XDG_STATE_HOME") or os.path.join(os.path.expanduser("~"), ".local", "state")
+    digest = hashlib.sha256(os.path.realpath(findings_file).encode("utf-8")).hexdigest()[:16]
+    return os.path.join(root, "delivery-skills", "post-review", digest, "state.json")
+
+
+class Record:
+    """The run's state outside the clone: what was sent and what landed, so a
+    stop leaves an exact account and a plain re-run cannot double a post."""
+
+    def __init__(self, path, data):
+        self.path = path
+        self.data = data
+
+    @classmethod
+    def load(cls, path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                return cls(path, json.load(f))
+        except FileNotFoundError:
+            return None
+        except (OSError, ValueError) as e:
+            raise Stop("UNFINISHED-RUN", "the run record %s cannot be read (%s); read it before "
+                       "posting again" % (path, e)) from None
+
+    def save(self):
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        tmp = self.path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(self.data, f, indent=1)
+        os.replace(tmp, self.path)
+
+    def event(self, *fields):
+        self.data["events"].append(list(fields))
+        self.save()
+
+    def last_events(self):
+        last = {}
+        for event in self.data["events"]:
+            last[event[1]] = event
+        return last
+
+    def landed_ids(self):
+        return {key: e[2] for key, e in self.last_events().items() if e[0] == "landed"}
+
+    def unfinished(self):
+        return self.data.get("status") != "LANDED" and any(
+            e[0] in ("sending", "landed", "uncertain") for e in self.last_events().values())
 
 
 # --- pre-flight --------------------------------------------------------------
@@ -566,8 +908,18 @@ def check_pending(manifest, forge, login):
                        "submit or delete it first" % (login, review.get("id")))
 
 
+def check_record(manifest):
+    record = Record.load(record_path(manifest.findings_file))
+    if record is not None and record.unfinished():
+        held = [key for key, e in record.last_events().items() if e[0] != "rejected"]
+        raise Stop("UNFINISHED-RUN", "an earlier run on this findings file stopped %s with %s landed "
+                   "or in doubt; posting the manifest again would double them, so continue it with "
+                   "--resume" % (record.data.get("status"), ", ".join(held)))
+
+
 def preflight(manifest, args, transport):
     check_postable(manifest, args.repost)
+    check_record(manifest)
     if manifest.forge == "ado" and not transport.token:
         raise Stop("NO-TOKEN", "%s is unset; an Azure DevOps post needs a token there" % TOKEN_VAR)
     forge = GitHub(manifest, transport) if manifest.forge == "github" else Ado(manifest, transport)
@@ -599,12 +951,25 @@ def parse_args(argv):
     return args
 
 
-def run(args, workdir):
+def run(args, workdir, outcome, started):
     manifest = load_manifest(args.manifest)
     transport = Transport(workdir, args.timeout, os.environ.get(TOKEN_VAR, ""))
-    preflight(manifest, args, transport)
-    print("posting is not built yet", file=sys.stderr)
-    return 2
+    forge, head = preflight(manifest, args, transport)
+    if args.dry_run:
+        forge.plan(head)
+        print("dry run: nothing was posted")
+        return 0
+    record = Record(record_path(manifest.findings_file),
+                    {"started": time.time(), "snapshot": forge.snapshot(), "events": [], "status": None})
+    record.save()
+    started.append(record)
+    forge.post(head, record)
+    forge.read_back(head, record, outcome)
+    outcome.finish()
+    record.data["status"] = "LANDED"
+    record.save()
+    print("LANDED %d threads posted and read back as sent" % len(manifest.threads))
+    return 0
 
 
 def main(argv):
@@ -612,14 +977,28 @@ def main(argv):
     if args.print_status_vocab:
         print("\n".join(STATUSES))
         return 0
+    if args.resume:
+        print("--resume is not built yet", file=sys.stderr)
+        return 2
     workdir = tempfile.mkdtemp(prefix="post-review-")
+    outcome = Outcome()
+    started = []
+    status = "LANDED"
     try:
-        rc = run(args, workdir)
+        rc = run(args, workdir, outcome, started)
     except Stop as stop:
+        status = stop.status
+        for record in started:
+            record.data["status"] = stop.status
+            record.save()
+            for key, created in record.landed_ids().items():
+                print("landed before the stop: %s %s" % (key, created))
         if stop.detail:
             print(stop.detail)
         print("%s %s" % (stop.status, stop.message))
         rc = 1
+    with open(os.path.join(workdir, "result.json"), "w", encoding="utf-8") as f:
+        json.dump({"status": status, "threads": outcome.rows}, f, indent=1)
     print(workdir)
     return rc
 

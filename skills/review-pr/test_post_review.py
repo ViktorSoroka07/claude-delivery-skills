@@ -34,10 +34,7 @@ EXPECTED_VOCAB = [
 # Statuses whose fixtures belong to a later task of the build plan. Each task
 # that adds a status's fixture removes it here; the set is empty once the
 # script is complete, and from then on any status without a fixture fails.
-OWED_BY_LATER_TASKS = {
-    "LANDED", "REJECTED", "UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "MISMATCH", "MISPLACED",
-    "UNFINISHED-RUN", "NO-STATE", "SETTLING",
-}
+OWED_BY_LATER_TASKS = {"UNCERTAIN", "UNVERIFIED", "MISSING", "CORRECTED", "NO-STATE", "SETTLING"}
 
 HOSTILE_GIT_CONFIG = """\
 [color]
@@ -185,6 +182,7 @@ class Fixture:
         write(path, json.dumps(self.manifest))
         proc = subprocess.run([sys.executable, SCRIPT, path, *args], cwd=self.clone, env=self.env,
                               capture_output=True, timeout=300)
+        self.model = self.stored()
         return Run(proc.returncode, proc.stdout.decode("utf-8", "replace"),
                    proc.stderr.decode("utf-8", "replace"))
 
@@ -549,6 +547,201 @@ def existing_pending_review_is_refused(r):
     fx.model["reviews"].append({"id": 5, "login": "reviewer", "state": "PENDING", "body": "",
                                 "commit_id": Template.head})
     refused(r, fx, "PENDING-EXISTS", "a pending review of the user's already on the request")
+
+
+
+# --- task 3: post, classify and read back --------------------------------------
+
+
+B1 = "**Medium - first**\n\nProblem: the thing.\n"
+SB = "**Minor - rename**\n\nSuggestion:\n```suggestion\nfixed 16\nfixed 17\n```\n"
+RB = "**Minor - docs/guide.md:3 is stale**\n\nProblem: it says otherwise.\n"
+MALFORMED = "**Medium - path**\n\nProblem: C:\\qux\\new\tpath, see `x`.\n"
+
+
+def standard_threads():
+    return [inline("M-1", 2, body=B1),
+            inline("M-2", 17, start_line=16, suggestion=SUGGESTION_16_17, body=SB),
+            {"key": "R-1", "path": None, "body": RB}]
+
+
+def payloads(fx):
+    return [json.loads(c["payload"]) for c in fx.creates()]
+
+
+def ado_payload(body, context=None):
+    payload = {"comments": [{"parentCommentId": 0, "content": body, "commentType": 1}], "status": 1}
+    if context:
+        payload["threadContext"] = context
+    return payload
+
+
+def ado_context(path, start, end, end_offset):
+    return {"filePath": path, "rightFileStart": {"line": start, "offset": 1},
+            "rightFileEnd": {"line": end, "offset": end_offset}}
+
+
+def landed(r, label, run):
+    r.status("%s: the run reads back clean" % label, run, "LANDED")
+    r.eq("%s: the run exits 0" % label, run.rc, 0)
+
+
+@test
+def github_happy_path(r):
+    fx = Fixture("github", threads=standard_threads())
+    run = fx.run()
+    landed(r, "the GitHub happy path", run)
+    r.eq("the GitHub happy path: the stored payload matches the literal", payloads(fx), [{
+        "commit_id": Template.head, "event": "COMMENT", "body": RB, "comments": [
+            {"path": "src/app.py", "line": 2, "side": "RIGHT", "body": B1},
+            {"path": "src/app.py", "line": 17, "start_line": 16, "side": "RIGHT",
+             "start_side": "RIGHT", "body": SB}]}])
+    stored = fx.stored()
+    review_id = stored["reviews"][0]["id"] if stored["reviews"] else None
+    r.eq("the GitHub happy path: one review with two comments",
+         (len(stored["reviews"]), len(stored["comments"])), (1, 2))
+    r.eq("the GitHub happy path: the record holds sending and landed in order",
+         fx.record()["events"], [["sending", "review"], ["landed", "review", review_id]])
+
+
+@test
+def ado_happy_path(r):
+    fx = Fixture("ado", threads=standard_threads())
+    run = fx.run()
+    landed(r, "the ADO happy path", run)
+    r.eq("the ADO happy path: the stored payloads match the literals", payloads(fx), [
+        ado_payload(B1, ado_context("/src/app.py", 2, 2, 2)),
+        ado_payload(SB, ado_context("/src/app.py", 16, 17, 8)),
+        ado_payload(RB)])
+    ids = [t["id"] for t in fx.stored()["threads"]]
+    r.eq("the ADO happy path: the record holds sending and landed in order", fx.record()["events"],
+         [["sending", "M-1"], ["landed", "M-1", ids[0]], ["sending", "M-2"], ["landed", "M-2", ids[1]],
+          ["sending", "R-1"], ["landed", "R-1", ids[2]]])
+
+
+@test
+def github_pending_review(r):
+    fx = Fixture("github", threads=[inline("M-1", 2, body=B1), inline("M-2", 17, start_line=16, body=SB)])
+    fx.manifest["pending"] = True
+    run = fx.run()
+    landed(r, "a staged GitHub review", run)
+    r.check("a staged GitHub review: the payload carries no event",
+            payloads(fx) and "event" not in payloads(fx)[0], payloads(fx))
+    stored = fx.stored()
+    r.eq("a staged GitHub review: the stand-in holds it pending at the literal positions",
+         ([rv["state"] for rv in stored["reviews"]], [c["position"] for c in stored["comments"]]),
+         (["PENDING"], [3, 16]))
+
+
+@test
+def github_comments_past_one_page(r):
+    fx = Fixture("github", threads=[inline("M-%d" % n, n) for n in (2, 15, 16)])
+    fx.model["page_size"] = 2
+    landed(r, "a GitHub review whose comments run past one page", fx.run())
+
+
+@test
+def malformed_create_replies(r):
+    gh = Fixture("github", threads=[inline("M-1", 2), {"key": "R-1", "path": None, "body": MALFORMED}])
+    gh.model["faults"]["malformed_reply"] = True
+    landed(r, "a malformed GitHub create reply", gh.run())
+    stored = gh.stored()
+    r.eq("a malformed GitHub create reply: the review is recorded once", len(stored["reviews"]), 1)
+    r.eq("a malformed GitHub create reply: the record holds the id the forge gave",
+         gh.record()["events"][-1], ["landed", "review", stored["reviews"][0]["id"]])
+    ado = Fixture("ado", threads=[inline("M-1", 2, body=MALFORMED), inline("M-2", 15, body=MALFORMED + "2")])
+    ado.model["faults"]["malformed_reply"] = True
+    landed(r, "a malformed ADO create reply", ado.run())
+    threads = ado.stored()["threads"]
+    r.eq("a malformed ADO create reply: each thread is recorded once", len(threads), 2)
+    r.eq("a malformed ADO create reply: the record holds the ids the forge gave",
+         [e[2] for e in ado.record()["events"] if e[0] == "landed"], [t["id"] for t in threads])
+
+
+@test
+def stand_in_malformed_reply_defeats_a_strict_parse(r):
+    fx = Fixture("ado")
+    fx.model["faults"]["malformed_reply"] = True
+    body = os.path.join(fx.root, "reply.json")
+    fx.tool("curl", "-K", "-", "-sS", "-X", "POST", "-o", body, "-w", "%{http_code}", "--data-binary",
+            "@" + fx.file("thread.json", ado_payload(MALFORMED)), fx.ado_url("/threads?api-version=7.1"),
+            stdin='user = ":%s"\n' % SENTINEL)
+    with open(body, encoding="utf-8") as f:
+        text = f.read()
+    try:
+        json.loads(text)
+        strict_fails = False
+    except ValueError:
+        strict_fails = True
+    r.check("stand-in: a malformed create reply fails a strict JSON parse", strict_fails, text[:200])
+
+
+@test
+def ado_rejection_on_the_third_thread(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2), inline("M-2", 15), inline("M-3", 16),
+                                 {"key": "R-1", "path": None, "body": RB}])
+    fx.model["faults"]["reject_create"] = {"nth": 3, "status": 400}
+    run = fx.run()
+    r.status("a 400 on the third ADO thread: the run stops REJECTED", run, "REJECTED")
+    r.eq("a 400 on the third ADO thread: threads past it are never sent", len(fx.creates()), 3)
+    ids = [t["id"] for t in fx.stored()["threads"]]
+    r.eq("a 400 on the third ADO thread: the record holds threads 1-2 landed and 3 rejected",
+         fx.record()["events"], [["sending", "M-1"], ["landed", "M-1", ids[0]], ["sending", "M-2"],
+                                 ["landed", "M-2", ids[1]], ["sending", "M-3"], ["rejected", "M-3", 400]])
+    r.check("a 400 on the third ADO thread: the stop names what had landed",
+            "landed before the stop: M-1 %s" % ids[0] in run.out, run.out)
+    again = fx.run()
+    r.status("a plain re-run after the ADO 400: the run stops UNFINISHED-RUN", again, "UNFINISHED-RUN")
+    r.eq("a plain re-run after the ADO 400: no further create reached the stand-in", len(fx.creates()), 3)
+
+
+@test
+def github_rejection_leaves_nothing_behind(r):
+    fx = Fixture("github", threads=standard_threads())
+    fx.model["faults"]["reject_create"] = {"nth": 1, "status": 422}
+    run = fx.run()
+    r.status("a GitHub 422: the run stops REJECTED", run, "REJECTED")
+    r.eq("a GitHub 422: the stand-in holds no review", fx.stored()["reviews"], [])
+    landed(r, "a plain re-run after a GitHub 422", fx.run())
+
+
+@test
+def ado_suggestion_over_an_astral_character_and_crlf(r):
+    original = ['say("\U0001F600")', 'shout("\U0001F600")']
+    fx = Fixture("ado", threads=[inline("M-1", 3, path="src/crlf.txt", start_line=2, body=SB,
+                                        suggestion={"start": 2, "end": 3, "original": original})])
+    landed(r, "an ADO suggestion over an astral character and CRLF", fx.run())
+    r.eq("an ADO suggestion over an astral character and CRLF: the stored payload spans the literal "
+         "UTF-16 offset", payloads(fx), [ado_payload(SB, ado_context("/src/crlf.txt", 2, 3, 12))])
+
+
+@test
+def keys_differing_only_in_case(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body="upper\n"), inline("m-1", 15, body="lower\n")])
+    run = fx.run()
+    r.check("case-distinct keys: both threads land and read back as sent",
+            run.status() == "LANDED" and [t["content"] for t in fx.stored()["threads"]] == ["upper\n", "lower\n"],
+            run.out[-400:])
+
+
+@test
+def sanitized_body_stops_mismatch(r):
+    fx = Fixture("ado", threads=[inline("M-1", 2, body="Problem: <Id> is dropped.\n")])
+    fx.model["faults"]["sanitize_tags"] = True
+    run = fx.run()
+    r.status("a sanitizer dropping <Id> on ADO: the run stops MISMATCH", run, "MISMATCH")
+    r.check("a sanitizer dropping <Id> on ADO: the stop prints the diff",
+            "-Problem: <Id> is dropped." in run.out and "+Problem:  is dropped." in run.out, run.out)
+
+
+@test
+def misreported_line_stops_misplaced(r):
+    ado = Fixture("ado")
+    ado.model["faults"]["misreport_line"] = {"nth": 1}
+    r.status("an ADO read-back reporting another line: the run stops MISPLACED", ado.run(), "MISPLACED")
+    gh = Fixture("github")
+    gh.model["faults"]["misreport_line"] = {"nth": 1}
+    r.status("a GitHub read-back reporting another line: the run stops MISPLACED", gh.run(), "MISPLACED")
 
 
 # --- the vocabulary ----------------------------------------------------------
