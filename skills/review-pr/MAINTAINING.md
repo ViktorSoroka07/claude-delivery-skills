@@ -24,7 +24,8 @@ trusting the script's bytes.
 
 The cost of the per-mutation fixture: a mutation that breaks something outside
 its own fixture no longer shows in the sweep. The full suite stays the gate
-for that, which is why every tier above runs it.
+for that, which is why the sweep runs it first as its baseline and every
+other tier runs it whole.
 
 ## The stand-in interprets; it never echoes
 
