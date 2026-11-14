@@ -228,8 +228,9 @@ def main():
             "or as &lt;Name&gt;, then read the stored body back to see what the forge kept."
             % shown
         )
+    speaker = "writing-pr-descriptions backstop: " if joins else "body-token: "
     sys.stdout.write(json.dumps({
-        "systemMessage": "writing-pr-descriptions backstop: " + " ".join(system) + " Not blocked.",
+        "systemMessage": speaker + " ".join(system) + " Not blocked.",
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "additionalContext": "\n\n".join(context),

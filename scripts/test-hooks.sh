@@ -308,6 +308,7 @@ out=$(body_payload cmd-file | "$PY" "$BODY_HOOK")
 check "body hook exits 0 (warn-only)" 0 $?
 contains "body hook warns on a wrapped body file" "$out" "hard-wrapped"
 contains "body hook names the first wrapped line" "$out" "first at line 2"
+contains "body hook keeps the pull-request skill's prefix on a wrapping warning" "$out" '"systemMessage": "writing-pr-descriptions backstop: the body carries 2 hard-wrapped'
 contains "body hook counts a wrapped list item's second line" "$out" "carries 2 hard-wrapped"
 out=$(body_payload cmd-relative | "$PY" "$BODY_HOOK")
 contains "body hook resolves a relative body file against the session cwd" "$out" "hard-wrapped"
@@ -388,6 +389,8 @@ contains "body hook says the sender still reports success" "$out" "reports succe
 contains "body hook offers the entity form" "$out" "&lt;Name&gt;"
 contains "body hook asks for the stored body to be read back" "$out" "read the stored body back"
 lacks "body hook does not call a token-only body hard-wrapped" "$out" "hard-wrapped"
+lacks "body hook names no pull-request skill on a token-only warning" "$out" "writing-pr-descriptions"
+contains "body hook opens a token-only warning with what speaks" "$out" '"systemMessage": "body-token: the body carries'
 out=$(body_payload cmd-token-span | "$PY" "$BODY_HOOK")
 empty "body hook leaves a token inside a code span alone for gh" "$out"
 out=$(body_payload cmd-token-fence | "$PY" "$BODY_HOOK")
@@ -399,10 +402,12 @@ empty "body hook stays quiet on kept HTML, comments and autolinks" "$out"
 out=$(body_payload cmd-both | "$PY" "$BODY_HOOK")
 contains "body hook gives the wrapping warning beside the token's" "$out" "hard-wrapped"
 contains "body hook gives the token warning beside the wrapping's" "$out" "<Id>"
+contains "body hook keeps the pull-request skill's prefix when a token rides with the wrapping" "$out" '"systemMessage": "writing-pr-descriptions backstop: the body carries'
 out=$(body_payload cmd-az-token-span | "$PY" "$BODY_HOOK")
 contains "body hook warns on a token inside a code span of an az pull request" "$out" "<Id>"
 out=$(body_payload cmd-item-token-discussion | "$PY" "$BODY_HOOK")
 contains "body hook reads a work item's discussion for a token" "$out" "<Id>"
+lacks "body hook names no pull-request skill on a work item's token warning" "$out" "writing-pr-descriptions"
 out=$(body_payload cmd-item-token-span | "$PY" "$BODY_HOOK")
 contains "body hook reads a work item's description for a token, code span or not" "$out" "<Id>"
 out=$(body_payload cmd-item-token-short | "$PY" "$BODY_HOOK")
