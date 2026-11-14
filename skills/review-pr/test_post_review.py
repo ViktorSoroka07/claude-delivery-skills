@@ -33,11 +33,6 @@ EXPECTED_VOCAB = [
     "CORRECTED", "MISMATCH", "MISPLACED", "NO-STATE", "SETTLING",
 ]
 
-# Statuses whose fixtures belong to a later task of the build plan. Each task
-# that adds a status's fixture removes it here; the set is empty once the
-# script is complete, and from then on any status without a fixture fails.
-OWED_BY_LATER_TASKS = set()
-
 HOSTILE_GIT_CONFIG = """\
 [color]
 \tui = always
@@ -1173,10 +1168,7 @@ def vocabulary_check(covered):
     printed = proc.stdout.decode().split()
     results.eq("the status vocabulary matches the expected list", printed, EXPECTED_VOCAB)
     uncovered = set(EXPECTED_VOCAB) - covered
-    results.check("every status has a fixture, apart from those later tasks owe",
-                  uncovered == OWED_BY_LATER_TASKS,
-                  "without a fixture and not owed: %s; owed but covered: %s" % (
-                      sorted(uncovered - OWED_BY_LATER_TASKS), sorted(OWED_BY_LATER_TASKS - uncovered)))
+    results.check("every status has a fixture", not uncovered, "without a fixture: %s" % sorted(uncovered))
     return results
 
 
@@ -1199,8 +1191,6 @@ def main():
                 print("  FAIL %s" % label)
                 if detail:
                     print("       %s" % detail)
-    if OWED_BY_LATER_TASKS:
-        print("statuses later tasks owe a fixture: %s" % " ".join(sorted(OWED_BY_LATER_TASKS)))
     print("%d passed, %d failed" % (passed, failed))
     for root in CREATED:
         shutil.rmtree(root, ignore_errors=True)
