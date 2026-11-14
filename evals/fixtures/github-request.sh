@@ -20,7 +20,8 @@
 # `git remote get-url origin` still reads git@github.com:acme/ticket-gateway.git.
 # `gh` is a stand-in on the run's PATH, written into the run's home beside
 # stage-git.sh's git wrapper. It answers the calls a review and a post make,
-# takes the endpoint wherever `gh api` finds it, logs each call with its
+# takes the endpoint wherever `gh api` finds it, prints the status line and
+# headers before the body under `gh api -i`, logs each call with its
 # outcome, its working directory and its input file's resolved path to
 # .git/forge/gh-log, and keeps a review that lands in .git/forge/reviews/.
 # Run stage-git.sh before this script.
@@ -153,7 +154,17 @@ cat >> "$home/.evalbin/gh" <<'EOF'
 JQ=/usr/bin/jq
 line="$(date +%T) gh $*"
 input_abs=-
-done_() { echo "$line | cwd=$PWD status=$1 input=$input_abs" >> "$F/gh-log"; exit "$2"; }
+buf=''
+done_() {
+  echo "$line | cwd=$PWD status=$1 input=$input_abs" >> "$F/gh-log"
+  if [ -n "$buf" ]; then
+    exec 1>&3
+    case "$1" in 200) why=OK ;; 201) why=Created ;; 400) why='Bad Request' ;; 404) why='Not Found' ;; *) why='Unprocessable Entity' ;; esac
+    printf 'HTTP/2.0 %s %s\r\nContent-Type: application/json; charset=utf-8\r\n\r\n' "$1" "$why"
+    cat "$buf"; rm -f "$buf"
+  fi
+  exit "$2"
+}
 fail() { printf '%s\n' "$2" >&2; done_ "$1" 1; }
 out() { if [ -n "$jq_expr" ]; then "$JQ" -r "$jq_expr"; else cat; fi; }
 read_input() {
@@ -161,7 +172,7 @@ read_input() {
   if [ "$input" = - ]; then cat > "$body"; else cat "$input" > "$body" 2>/dev/null || { rm -f "$body"; fail 400 "gh: open $input: no such file or directory"; }; fi
   "$JQ" -e . "$body" >/dev/null 2>&1 || { rm -f "$body"; fail 400 "gh: Problems parsing JSON (HTTP 400)"; }
 }
-jq_expr=''; json_fields=''; input=''; method=''; fields=0; name_only=0; pos=''
+jq_expr=''; json_fields=''; input=''; method=''; fields=0; name_only=0; include=0; pos=''
 sub1=${1-}; [ $# -gt 0 ] && shift
 sub2=''
 case "$sub1" in pr|repo|auth) sub2=${1-}; [ $# -gt 0 ] && shift ;; esac
@@ -176,6 +187,7 @@ while [ $# -gt 0 ]; do
     -f|-F|--field|--raw-field) fields=1; [ $# -gt 0 ] && shift ;;
     -H|--header|--hostname|--head|--base|--state|-R|--repo|--limit|-L|--template|-t|--cache|--author|--search|-S) [ $# -gt 0 ] && shift ;;
     --name-only) name_only=1 ;;
+    -i|--include) include=1 ;;
     -*) ;;
     *) pos="$pos
 $a" ;;
@@ -207,6 +219,7 @@ case "$sub1 $sub2" in
     echo "Switched to branch 'feat/close-ticket'"; done_ 200 0 ;;
   "repo view") echo '{"name":"ticket-gateway","nameWithOwner":"acme/ticket-gateway","owner":{"login":"acme"},"defaultBranchRef":{"name":"main"},"url":"https://github.com/acme/ticket-gateway"}' | if [ -n "$json_fields" ]; then "$JQ" -c "{$json_fields}"; else cat; fi | out; done_ 200 0 ;;
   "api "*)
+    if [ "$include" = 1 ]; then buf=$(mktemp "${TMPDIR:-/tmp}/gh-reply.XXXXXX"); exec 3>&1 1>"$buf"; fi
     p=$(printf '%s' "$first" | sed 's#^/##; s#{owner}#acme#g; s#{repo}#ticket-gateway#g; s#{branch}#feat/close-ticket#g; s#?.*##')
     if [ -z "$method" ]; then if [ -n "$input" ] || [ "$fields" = 1 ]; then method=POST; else method=GET; fi; fi
     R=repos/acme/ticket-gateway
