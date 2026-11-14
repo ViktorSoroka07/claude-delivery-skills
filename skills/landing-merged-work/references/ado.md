@@ -19,4 +19,4 @@ Switch a field to Markdown with one PATCH that sets the format and a value toget
 
 After that PATCH, plain CommonMark in later updates renders correctly without repeating the format op. Confirm which format actually landed by reading `multilineFieldsFormat` back — a mismatch between what was sent and what the field claims to be otherwise stays silent.
 
-**In both formats, a raw `<` in the field is read as an unclosed HTML tag and silently truncates everything after it** — no error on write; the field just reads back shorter than what was sent. Escape it (`&lt;`) or keep it inside a code span. (learned from a real work-item update)
+**In both formats, a raw `<` in the field is read as an unclosed HTML tag and silently truncates everything after it** — no error on write; the field just reads back shorter than what was sent. Escape it (`&lt;`). (learned from a real work-item update)
