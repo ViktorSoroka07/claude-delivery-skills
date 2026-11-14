@@ -18,7 +18,7 @@ tag-shaped token: `<Name>` or `</Name>`, with or without attributes, whose name
 is not an HTML element the forge keeps (`KEPT`). The forge's sanitizer takes it
 for an unknown tag and deletes it, the send reports success, and readers see an
 empty gap mid-sentence, as `Task<Result>` or a `<Id>` placeholder gives. Through
-gh, text inside a code span or a fenced block is kept, so only prose is read;
+gh, text inside a code span or a fenced block is kept, so neither is read;
 through az the token is read anywhere, since the stored field is HTML. An
 autolink and an HTML comment are not tokens. Both rules rest on what a forge
 documents or a body was seen to lose, not on a send made from here.
@@ -141,7 +141,7 @@ def body_of(command, cwd):
 def dropped_tokens(text, forge):
     """The distinct tag-shaped tokens of the body whose element name the forge
     does not keep, as written without attributes, in order of appearance;
-    through gh only prose is read, since code spans and fenced blocks are kept."""
+    through gh code spans and fenced blocks are not read, since they are kept."""
     text = HTML_COMMENT.sub("", text)
     if forge == "gh":
         lines = []
